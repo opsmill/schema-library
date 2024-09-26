@@ -83,6 +83,11 @@ generics:
         kind: Number
         optional: true
         order_weight: 1500
+      - name: serial
+        label: serial
+        kind: Text
+        optional: true
+        order_weight: 1500
     relationships:
       - name: device_type
         peer: DcimDeviceType
@@ -345,9 +350,9 @@ nodes:
     icon: clarity:network-switch-solid
     namespace: Dcim
     inherit_from:
-      - CoreArtifactTarget
-      - DcimGenericDevice
-      - DcimPhysicalDevice
+      - "CoreArtifactTarget"
+      - "DcimGenericDevice"
+      - "DcimPhysicalDevice"
     attributes:
       - name: role
         kind: Dropdown
