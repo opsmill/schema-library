@@ -14,6 +14,9 @@ nodes:
       - address__value
     inherit_from:
       - BuiltinIPAddress
+    uniqueness_constraints:
+      - ["ip_namespace", "address__value"]
+    human_friendly_id: ["address__value", "ip_namespace__name__value"]
     attributes:
       - name: fqdn
         label: FQDN
@@ -103,6 +106,9 @@ nodes:
       - prefix__value
     inherit_from:
       - BuiltinIPPrefix
+    uniqueness_constraints:
+      - ["ip_namespace", "prefix__value"]
+    human_friendly_id: ["prefix__value", "ip_namespace__name__value"]
     attributes:
       - name: status
         kind: Dropdown

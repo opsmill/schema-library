@@ -62,7 +62,10 @@ nodes:
 
   - name: Rack
     namespace: Location
-    inherit_from: ["LocationGeneric", "LocationHosting", "CoreArtifactTarget"]
+    inherit_from:
+      - "LocationGeneric"
+      - "LocationHosting"
+      - "CoreArtifactTarget"
     include_in_menu: true
     label: Rack
     display_labels:
