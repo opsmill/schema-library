@@ -1,9 +1,10 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+---
 version: "1.0"
 nodes:
   # --------------------  BGP (ASN, BGP Groups, BGP Sessions)  --------------------
   - name: AutonomousSystem
-    namespace: Infra #TODO: RENAME
+    namespace: Infra # TODO: RENAME
     description: "An Autonomous System (AS) is a set of Internet routable IP prefixes belonging to a network"
     label: "Autonomous System"
     icon: "mdi:bank-circle-outline"

@@ -4,7 +4,7 @@ version: "1.0"
 nodes:
   # -------------------- VRF & RouteTarget --------------------
   - name: VRF
-    namespace: Ipam #TODO: Is IPAM the right namespace here?
+    namespace: Ipam # TODO: Is IPAM the right namespace here?
     description: "A VRF is isolated layer three domain"
     label: "VRF"
     icon: "mdi:router"
@@ -58,7 +58,7 @@ nodes:
     display_labels:
       - name__value
     attributes:
-      #TODO: regex to comply with RFC 4360 (nautobot doesn't enforce that)
+      # TODO: regex to comply with RFC 4360 (nautobot doesn't enforce that)
       - name: name
         kind: Text
         unique: true

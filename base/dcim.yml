@@ -426,7 +426,7 @@ nodes:
         kind: Text
         enum: ["Access", "Trunk", "Tunnel"]
         order_weight: 1250
-  - name: Cable #TODO: Put more body to this one
+  - name: Cable # TODO: Put more body to this one
     namespace: Dcim
     description: "Cable connecting two endpoints"
     include_in_menu: true

@@ -3,7 +3,7 @@
 version: "1.0"
 generics:
   - name: Generic
-    namespace: Organization #TODO: find something better here => Vendor, contractor ...
+    namespace: Organization # TODO: find something better here => Vendor, contractor ...
     label: Organization
     description: An organization represent a legal entity, a company.
     default_filter: name__value
