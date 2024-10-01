@@ -7,8 +7,12 @@ nodes:
     description: "A VLAN is isolated layer two domain"
     label: "VLAN"
     icon: "mdi:lan-pending"
+    include_in_menu: true
+    menu_placement: IpamL2Domain
     # FIXME: Provide this node with a proper placement
     # menu_placement: "Ipam"
+    uniqueness_constraints:
+      - ["l2domain", "vlan_id__value"]
     default_filter: name__value
     order_by:
       - name__value
@@ -43,6 +47,7 @@ nodes:
             color: "#bfbfbf"
       - name: role
         kind: Dropdown
+        optional: true
         choices:
           - name: server
             label: Server
@@ -65,6 +70,31 @@ nodes:
         peer: IpamPrefix
         optional: true
         cardinality: many
+      - name: l2domain
+        peer: IpamL2Domain
+        optional: false
+        cardinality: one
+        kind: Attribute
+        order_weight: 1200
+
+  - name: L2Domain
+    namespace: Ipam
+    description: "Represents layer 2 domain."
+    label: "Layer 2 Domain"
+    icon: "mdi:domain-switch"
+    include_in_menu: true
+    default_filter: name__value
+    display_labels: [name__value]
+    attributes:
+      - name: name
+        kind: Text
+        order_weight: 1000
+    relationships:
+      - name: vlans
+        peer: IpamVLAN
+        optional: true
+        cardinality: many
+        kind: Component
 
 extensions:
   nodes:
