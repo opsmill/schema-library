@@ -11,5 +11,6 @@ This schema extension contains models for VRRP.
 
 ## Dependencies
 
+- Base
 - DCIM
 - IPAM

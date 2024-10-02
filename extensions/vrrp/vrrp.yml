@@ -8,7 +8,7 @@ nodes:
     namespace: Network
     label: VRRP Group
     icon: "fluent:virtual-network-20-filled"
-    menu_placement: InterfaceBase
+    menu_placement: DcimInterface
     description: "VRRP Group configuration"
     display_labels:
       - name__value

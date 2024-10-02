@@ -7,7 +7,7 @@ nodes:
     namespace: Dwdm
     description: "A DWDM channel with its wavelength and frequency."
     label: "DWDM Channel"
-    menu_placement: InterfaceBase
+    menu_placement: DcimInterface
     icon: "game-icons:laser-warning"
     default_filter: channel__value
     order_by:
