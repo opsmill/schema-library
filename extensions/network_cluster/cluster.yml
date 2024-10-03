@@ -5,6 +5,7 @@ nodes:
   # -------------------- Virtual Chassis --------------------
   - name: VirtualChassis
     namespace: Cluster
+    icon: ph:stack-bold
     description: "A virtual chassis represents a set of devices sharing a common control plane (e.g., a stack of switches)."
     label: "Virtual Chassis"
     attributes:
@@ -27,6 +28,7 @@ nodes:
   # -------------------- Virtual Chassis Member --------------------
   - name: VirtualChassisMember
     namespace: Cluster
+    icon: ph:stack-plus-bold
     description: "A member device in a virtual chassis with its position, priority, and role."
     label: "Virtual Chassis Member"
     attributes:
