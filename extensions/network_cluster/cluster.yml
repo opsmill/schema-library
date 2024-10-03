@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+---
+version: '1.0'
+nodes:
+  # -------------------- Virtual Chassis --------------------
+  - name: VirtualChassis
+    namespace: Cluster
+    description: "A virtual chassis represents a set of devices sharing a common control plane (e.g., a stack of switches)."
+    label: "Virtual Chassis"
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        description: "The name of the virtual chassis."
+      - name: domain
+        kind: Text
+        description: "The domain assigned for VC member devices."
+    relationships:
+      - name: members
+        label: Members
+        peer: ClusterVirtualChassisMember
+        identifier: chassis__members
+        cardinality: many
+        kind: Component
+        description: "Devices that are members of this virtual chassis."
+
+  # -------------------- Virtual Chassis Member --------------------
+  - name: VirtualChassisMember
+    namespace: Cluster
+    description: "A member device in a virtual chassis with its position, priority, and role."
+    label: "Virtual Chassis Member"
+    attributes:
+      - name: position
+        kind: Number
+        description: "The position of the device in the virtual chassis."
+      - name: priority
+        kind: Number
+        description: "The priority of the device in the virtual chassis (optional)."
+        optional: true
+      - name: is_master
+        kind: Boolean
+        description: "Indicates whether the device is the master of the virtual chassis."
+        default_value: false
+      - name: role
+        kind: Dropdown
+        description: "The role of the device within the virtual chassis."
+        choices:
+          - name: primary
+            label: Primary
+            description: "A primary device in the chassis."
+          - name: secondary
+            label: Secondary
+            description: "A secondary device in the chassis."
+          - name: member
+            label: Member
+            description: "A regular member of the chassis."
+    relationships:
+      - name: device
+        label: Device
+        peer: DcimDevice
+        identifier: virtual_chassis_member__device
+        cardinality: one
+        kind: Attribute
+        description: "The device that is a member of the virtual chassis."
+      - name: virtual_chassis
+        label: Virtual Chassis
+        peer: ClusterVirtualChassis
+        cardinality: one
+        kind: Parent
+        description: "The virtual chassis this device belongs to."
+
+extensions:
+  nodes:
+    # DCIM Extensions
+    - kind: DcimDevice
+      relationships:
+        - name: virtual_chassis_membership
+          label: Virtual Chassis Membership
+          peer: ClusterVirtualChassisMember
+          identifier: virtual_chassis_member__device
+          cardinality: one
+          kind: Component
+          description: "Membership in a virtual chassis."
