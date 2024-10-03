@@ -29,7 +29,7 @@ nodes:
       - name: members
         label: Members
         peer: ClusterVirtualChassisMember
-        identifier: chassis__members
+        identifier: virtual_chassis__members
         cardinality: many
         kind: Component
         description: "Devices that are members of this virtual chassis."
@@ -67,25 +67,26 @@ nodes:
         choices:
           - name: primary
             label: Primary
-            description: "A primary device in the chassis."
+            description: "A primary device in the chassis. (i.e routing-engine for Juniper)"
           - name: secondary
             label: Secondary
-            description: "A secondary device in the chassis."
+            description: "A secondary device in the chassis"
           - name: member
             label: Member
-            description: "A regular member of the chassis."
+            description: "A regular member of the chassis. (i.e line-card for Juniper)"
     relationships:
       - name: device
         label: Device
         peer: DcimDevice
         identifier: virtual_chassis_member__device
         cardinality: one
-        kind: Attribute
         optional: false
+        kind: Attribute
         description: "The device that is a member of the virtual chassis."
       - name: virtual_chassis
         label: Virtual Chassis
         peer: ClusterVirtualChassis
+        identifier: virtual_chassis__members
         cardinality: one
         optional: false
         kind: Parent
