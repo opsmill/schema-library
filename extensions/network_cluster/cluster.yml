@@ -8,6 +8,14 @@ nodes:
     icon: ph:stack-bold
     description: "A virtual chassis represents a set of devices sharing a common control plane (e.g., a stack of switches)."
     label: "Virtual Chassis"
+    display_labels:
+      - name__value
+    order_by:
+      - name__value
+    uniqueness_constraints:
+      - ["name__value"]
+    human_friendly_id:
+      - name__value
     attributes:
       - name: name
         kind: Text
@@ -16,6 +24,7 @@ nodes:
       - name: domain
         kind: Text
         description: "The domain assigned for VC member devices."
+        optional: true
     relationships:
       - name: members
         label: Members
@@ -29,8 +38,17 @@ nodes:
   - name: VirtualChassisMember
     namespace: Cluster
     icon: ph:stack-plus-bold
+    menu_placement: ClusterVirtualChassis
     description: "A member device in a virtual chassis with its position, priority, and role."
     label: "Virtual Chassis Member"
+    order_by:
+      - virtual_chassis__name__value
+      - position__value
+    uniqueness_constraints:
+      - ["virtual_chassis", "position__value"]
+    human_friendly_id:
+      - virtual_chassis__name__value
+      - position__value
     attributes:
       - name: position
         kind: Number
@@ -63,6 +81,7 @@ nodes:
         identifier: virtual_chassis_member__device
         cardinality: one
         kind: Attribute
+        optional: false
         description: "The device that is a member of the virtual chassis."
       - name: virtual_chassis
         label: Virtual Chassis
