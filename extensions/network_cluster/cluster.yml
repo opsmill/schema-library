@@ -68,6 +68,7 @@ nodes:
         label: Virtual Chassis
         peer: ClusterVirtualChassis
         cardinality: one
+        optional: false
         kind: Parent
         description: "The virtual chassis this device belongs to."
 
