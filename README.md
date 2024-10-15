@@ -1,14 +1,33 @@
 # Schema Library
 
-## Quick start
+Welcome to the Schema Library for Infrahub. This repository contains a collection of schemas that are designed to streamline and standardize infrastructure-related data structures.
 
-1. Create a branch
+> [!NOTE]
+> Status: Experimental 🚧 This project is currently in an experimental phase and is subject to significant changes. The schemas may evolve, and backward compatibility is not guaranteed. Use with caution in production environments, and expect potential breaking changes as we iterate and improve.
+
+## Getting Started
+
+There are various way to consume schema library, you could copy paste some YAML files into your own workspace.
+
+You could also clone the repo and use Infrahub CTL to load the schema.
+
+Follow [this guide](https://docs.infrahub.app/infrahubctl) to install Infrahub CTL.
+
+0. Clone the repository
+
+    ```console
+    git clone git@github.com:opsmill/schema-library.git
+    ```
+
+1. Create a branch on your Infrahub instance
 
     ```console
     infrahubctl branch create testing-schema-library
     ```
 
-2. Load base schema
+2. Load the base schema
+
+    _Please note that base schema is a prerequisite to any extension._
 
     ```console
     infrahubctl schema load --branch testing-schema-library base/
@@ -22,51 +41,6 @@
     infrahubctl schema load --branch testing-schema-library extensions/bgp
     ```
 
-## Main changes
+## Contributing
 
-- Split "Infra" namespace with proper DCIM / IPAM
-- Move VRF to extension part
-
-## Open topics
-
-- [ ] Should we split DCIM to Circuit and Device for instance? (as per nautobot)
-- [ ] How can I add VLANs to IPAM section?
-- [ ] For location the fact we have three (parent/child) forces us to create 2 different extensions
-- [ ] We can't add a "parent" statement in "extensions" section
-- [ ] Putting enum (status, roles ...) in generics prevents users from editing ...
-- [x] Should we split virtualization? e.g. clustering and hypervisors? Otherwise people doing only clusters (e.g. k8 ...) will have hypervisors and people doing only hypervisors will see clusters/nodes ...
-
-## Progress
-
-Base
-
-- [x] Circuit
-- [x] Dcim
-- [x] Ipam
-- [x] Location
-- [x] Organization
-
-Extensions
-
-- [x] bgp
-- [x] lag
-- [x] location_extended
-- [x] location_minimal
-- [x] qinq
-- [x] tenancy
-- [x] vrf
-- [ ] mlag
-- [x] virtualization
-- [x] clustering
-
-Experimental
-
-- [ ] peering
-- [ ] topology
-- [ ] security
-
-Next
-
-- [ ] dns
-- [ ] dhcp
-- [ ] ntp
+We welcome contributions and feedback. Please open an issue or submit a pull request to suggest improvements or report bugs.
