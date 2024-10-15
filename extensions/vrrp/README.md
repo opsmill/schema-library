@@ -1,4 +1,4 @@
-# VRRP schema extension
+# 🧩 VRRP
 
 This schema extension contains models for VRRP.
 

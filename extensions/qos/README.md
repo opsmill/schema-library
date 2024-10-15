@@ -1,4 +1,4 @@
-# QoS schema extension
+# 🧩 Quality of Service (QoS)
 
 This schema extension contains models for Quality of Service (QoS)
 
