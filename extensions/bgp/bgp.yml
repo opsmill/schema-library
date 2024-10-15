@@ -4,11 +4,11 @@ version: "1.0"
 nodes:
   # --------------------  BGP (ASN, BGP Groups, BGP Sessions)  --------------------
   - name: AutonomousSystem
-    namespace: Infra # TODO: RENAME
+    namespace: Routing
     description: "An Autonomous System (AS) is a set of Internet routable IP prefixes belonging to a network"
     label: "Autonomous System"
     icon: "mdi:bank-circle-outline"
-    menu_placement: InfraBGPSession
+    menu_placement: RoutingBGPSession
     default_filter: name__value
     order_by: ["asn__value"]
     display_labels:
@@ -40,12 +40,13 @@ nodes:
         optional: true
         cardinality: many
         kind: Attribute
+
   - name: BGPPeerGroup
-    namespace: Infra
+    namespace: Routing
     description: "A BGP Peer Group is used to regroup parameters that are shared across multiple peers"
     label: "BGP Peer Group"
     icon: "mdi:view-grid-plus-outline"
-    menu_placement: InfraBGPSession
+    menu_placement: RoutingBGPSession
     include_in_menu: true
     default_filter: name__value
     order_by:
@@ -73,18 +74,19 @@ nodes:
     relationships:
       - name: local_as
         identifier: bgppeergroup__local_as
-        peer: InfraAutonomousSystem
+        peer: RoutingAutonomousSystem
         optional: true
         cardinality: one
         kind: Attribute
       - name: remote_as
         identifier: bgppeergroup__remote_as
-        peer: InfraAutonomousSystem
+        peer: RoutingAutonomousSystem
         optional: true
         cardinality: one
         kind: Attribute
+
   - name: BGPSession
-    namespace: Infra
+    namespace: Routing
     description: "A BGP Session represent a point to point connection between two routers"
     label: "BGP Session"
     icon: "mdi:router"
@@ -146,13 +148,13 @@ nodes:
     relationships:
       - name: local_as
         identifier: bgpsession__local_as
-        peer: InfraAutonomousSystem
+        peer: RoutingAutonomousSystem
         optional: true
         cardinality: one
         kind: Attribute
       - name: remote_as
         identifier: bgpsession__remote_as
-        peer: InfraAutonomousSystem
+        peer: RoutingAutonomousSystem
         optional: true
         cardinality: one
         kind: Attribute
@@ -173,12 +175,12 @@ nodes:
         optional: true
         cardinality: one
       - name: peer_group
-        peer: InfraBGPPeerGroup
+        peer: RoutingBGPPeerGroup
         optional: true
         cardinality: one
         kind: Attribute
       - name: peer_session
-        peer: InfraBGPSession
+        peer: RoutingBGPSession
         optional: true
         cardinality: one
         kind: Attribute
@@ -188,7 +190,7 @@ extensions:
     - kind: DcimGenericDevice
       relationships:
         - name: asn
-          peer: InfraAutonomousSystem
+          peer: RoutingAutonomousSystem
           optional: true
           cardinality: one
           kind: Attribute
@@ -199,5 +201,5 @@ extensions:
           label: "Autonomous System"
           cardinality: many
           optional: true
-          peer: InfraAutonomousSystem
+          peer: RoutingAutonomousSystem
           order_weight: 2000
