@@ -5,7 +5,7 @@ nodes:
   # --------------------  Circuits  --------------------
   - name: Circuit
     namespace: Circuit
-    description: "A Circuit represent a single physical link between two locations"
+    description: "A Circuit represent a single physical link operated by a provider."
     label: "Circuit"
     icon: "mdi:cable-data"
     default_filter: circuit_id__value
@@ -24,6 +24,17 @@ nodes:
       - name: vendor_id
         kind: Text
         optional: true
+      - name: type
+        kind: Dropdown
+        choices:
+          - name: internet
+            label: Internet Access
+            description: "Connect to Internet service provider."
+            color: "#6a5acd"
+          - name: peering
+            label: Peering
+            description: "Connect with other networks via IX."
+            color: "#85db9b"
       - name: status
         kind: Dropdown
         choices:
@@ -43,30 +54,9 @@ nodes:
             label: Drained
             description: "Temporarily taken out of service."
             color: "#bfbfbf"
-      - name: role
-        kind: Dropdown
-        choices:
-          - name: backbone
-            label: Backbone
-            description: "Provide main data routes."
-            color: "#6a5acd"
-          - name: upstream
-            label: upstream
-            description: "Connect to Internet service provider."
-            color: "#9090de"
-          - name: peering
-            label: Peering
-            description: "Connect with other networks via IX."
-            color: "#85db9b"
     relationships:
       - name: provider
         peer: OrganizationProvider
-        optional: false
-        cardinality: one
-        kind: Attribute
-      - name: circuit_type
-        label: Circuit Type
-        peer: CircuitType
         optional: false
         cardinality: one
         kind: Attribute
@@ -74,90 +64,38 @@ nodes:
         peer: CircuitEndpoint
         optional: true
         cardinality: many
-        kind: Component
-  - name: Type
-    namespace: Circuit
-    description: "A type of Circuit"
-    label: "Circuit Type"
-    icon: "mdi:poll"
-    menu_placement: "CircuitCircuit"
-    display_labels:
-      - name__value
-    order_by:
-      - name__value
-    attributes:
-      - name: name
-        kind: Text
-        unique: true
-        order_weight: 1000
-      - name: description
-        kind: Text
-        optional: true
-        order_weight: 1100
-    relationships:
-      - name: circuits
-        label: Circuits
-        peer: CircuitCircuit
-        optional: true
-        cardinality: many
+        kind: Attribute
+        # TODO: So far it's a many to many, would be better to have a proper a z relationships
+
   - name: Endpoint
     namespace: Circuit
     description: "A Circuit endpoint is attached to each end of a circuit"
     label: "Circuit Endpoint"
     icon: "mdi:ethernet-cable"
     menu_placement: "CircuitCircuit"
-    include_in_menu: false
+    include_in_menu: true
     attributes:
       - name: description
+        kind: Text
+        optional: true
+      - name: cross_connect
+        kind: Text
+        optional: true
+      - name: patch_panel
         kind: Text
         optional: true
     inherit_from:
       - "DcimEndpoint"
     relationships:
       - name: location
-        label: Location
-        peer: LocationGeneric
-        optional: false
+        peer: LocationHosting
+        optional: true
         cardinality: one
         kind: Attribute
       - name: circuit
         peer: CircuitCircuit
-        optional: false
+        optional: true
         cardinality: one
-        kind: Parent
-  - name: ProviderNetwork
-    namespace: Circuit
-    description: "Represent the boundary of a provider network, the details of which are unknown or unimportant"
-    label: "Provider Network"
-    icon: "mdi:cloud"
-    menu_placement: "CircuitCircuit"
-    default_filter: name__value
-    order_by:
-      - name__value
-    display_labels:
-      - name__value
-    attributes:
-      - name: name
-        kind: Text
-        unique: true
-      - name: description
-        kind: Text
-        optional: true
-      - name: vendor_id
-        kind: Text
-        optional: true
-    inherit_from:
-      - "DcimEndpoint"
-    relationships:
-      - name: provider
-        peer: OrganizationProvider
-        optional: false
-        cardinality: one
-        kind: Attribute
-      - name: tags
-        peer: BuiltinTag
-        optional: true
-        cardinality: many
         kind: Attribute
 
 extensions:
