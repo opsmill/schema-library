@@ -30,6 +30,7 @@ nodes:
         peer: DcimInterfaceL3
         optional: true
         cardinality: one
+
   - name: Prefix
     namespace: Ipam
     description: "IPv4 or IPv6 network (with mask)"
