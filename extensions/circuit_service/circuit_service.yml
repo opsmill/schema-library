@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+---
+version: "1.0"
+nodes:
+  - name: Service
+    namespace: Circuit
+    description: "Represent the boundary of a provider network, the details of which are unknown or unimportant"
+    label: "Circuit Service"
+    icon: "mdi:cloud"
+    menu_placement: "CircuitCircuit"
+    default_filter: name__value
+    order_by:
+      - name__value
+    display_labels:
+      - name__value
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+      - name: service_id
+        kind: Text
+        optional: true
+      - name: description
+        kind: Text
+        optional: true
+    relationships:
+      - name: provider
+        peer: OrganizationProvider
+        optional: false
+        cardinality: one
+        kind: Attribute
+      - name: circuit_endpoints
+        peer: CircuitEndpoint
+        optional: true
+        cardinality: many
+        kind: Component
+
+extensions:
+  nodes:
+    - kind: OrganizationProvider
+      relationships:
+        - name: circuit_services
+          peer: CircuitService
+          cardinality: many
+          optional: true
+    - kind: CircuitEndpoint
+      relationships:
+        - name: circuit_service
+          peer: CircuitService
+          cardinality: one
+          optional: true
