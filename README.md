@@ -16,7 +16,7 @@ Follow [this guide](https://docs.infrahub.app/infrahubctl) to install Infrahub C
 0. Clone the repository
 
     ```console
-    git clone git@github.com:opsmill/schema-library.git
+    git clone https://github.com/opsmill/schema-library.git
     ```
 
 1. Create a branch on your Infrahub instance
