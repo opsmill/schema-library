@@ -8,9 +8,8 @@ nodes:
     label: "IP Address"
     icon: "mdi:ip"
     include_in_menu: false
-    default_filter: address__value
     order_by:
-      - "address__value"
+      - address__value
     display_labels:
       - address__value
     inherit_from:
@@ -37,7 +36,6 @@ nodes:
     icon: "mdi:ip-network"
     include_in_menu: false
     label: "Prefix"
-    default_filter: prefix__value
     order_by:
       - prefix__value
     display_labels:

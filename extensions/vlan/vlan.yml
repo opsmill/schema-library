@@ -13,7 +13,8 @@ nodes:
     # menu_placement: "Ipam"
     uniqueness_constraints:
       - ["l2domain", "vlan_id__value"]
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     order_by:
       - name__value
     display_labels:
@@ -83,7 +84,8 @@ nodes:
     label: "Layer 2 Domain"
     icon: "mdi:domain-switch"
     include_in_menu: true
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels: [name__value]
     attributes:
       - name: name

@@ -9,7 +9,6 @@ nodes:
     label: "DWDM Channel"
     menu_placement: DcimInterface
     icon: "game-icons:laser-warning"
-    default_filter: channel__value
     order_by:
       - channel__value
     display_labels:
@@ -25,9 +24,9 @@ nodes:
         unique: true
       - name: wavelength
         label: Wavelength (nm)
-        kind: Text  # Text until float possible in Number Kind
+        kind: Text # Text until float possible in Number Kind
         description: "Wavelength of the channel in nm."
       - name: frequency
         label: Frequency (THz)
-        kind: Text  # Text until float possible in Number Kind
+        kind: Text # Text until float possible in Number Kind
         description: "Frequency of the channel in THz."

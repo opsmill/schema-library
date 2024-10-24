@@ -1,13 +1,14 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
-version: '1.0'
+version: "1.0"
 generics:
   - name: Community
     namespace: Snmp
     description: "Generic model for SNMP community configurations."
     label: "SNMP Community"
     icon: "iconoir:community"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels: [name__value]
     order_by: [name__value]
     include_in_menu: true
@@ -34,7 +35,8 @@ nodes:
     icon: "iconoir:community"
     menu_placement: "SnmpCommunity"
     include_in_menu: false
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels: [name__value]
     order_by: [name__value]
     inherit_from:
@@ -55,7 +57,8 @@ nodes:
     icon: "iconoir:community"
     menu_placement: "SnmpCommunity"
     include_in_menu: false
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels: [name__value]
     order_by: [name__value]
     inherit_from:
@@ -107,7 +110,8 @@ nodes:
     icon: "ph:user-list-light"
     menu_placement: "SnmpCommunity"
     include_in_menu: true
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels: [name__value]
     order_by: [name__value]
     attributes:

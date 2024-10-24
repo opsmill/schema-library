@@ -11,7 +11,8 @@ nodes:
       - name__value
     order_by:
       - name__value
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     uniqueness_constraints:
       - ["name__value"]
     menu_placement: QosClassOfService
@@ -40,7 +41,8 @@ nodes:
       - name__value
     order_by:
       - name__value
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     uniqueness_constraints:
       - ["name__value"]
     attributes:
@@ -65,7 +67,8 @@ nodes:
       - name__value
     order_by:
       - name__value
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     uniqueness_constraints:
       - ["name__value"]
     menu_placement: QosClassOfService
@@ -94,7 +97,8 @@ nodes:
       - name__value
     order_by:
       - name__value
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     uniqueness_constraints:
       - ["name__value"]
     menu_placement: QosClassOfService
@@ -131,7 +135,8 @@ nodes:
       - name__value
     order_by:
       - name__value
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     uniqueness_constraints:
       - ["name__value"]
     menu_placement: QosClassOfService
@@ -182,7 +187,8 @@ nodes:
       - name__value
     order_by:
       - name__value
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     uniqueness_constraints:
       - ["name__value"]
     menu_placement: QosClassOfService

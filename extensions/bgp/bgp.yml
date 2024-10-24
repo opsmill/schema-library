@@ -9,7 +9,8 @@ nodes:
     label: "Autonomous System"
     icon: "mdi:bank-circle-outline"
     menu_placement: RoutingBGPSession
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     order_by: ["asn__value"]
     display_labels:
       - name__value
@@ -48,7 +49,8 @@ nodes:
     icon: "mdi:view-grid-plus-outline"
     menu_placement: RoutingBGPSession
     include_in_menu: true
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     order_by:
       - name__value
     display_labels:

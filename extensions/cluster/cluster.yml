@@ -9,7 +9,8 @@ nodes:
     icon: mdi:dots-hexagon
     inherit_from:
       - VirtualizationHostVirtualMachine
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     order_by:
       - name__value
     display_labels:

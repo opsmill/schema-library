@@ -8,7 +8,8 @@ nodes:
     label: "Circuit Service"
     icon: "mdi:cloud"
     menu_placement: "CircuitCircuit"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     order_by:
       - name__value
     display_labels:

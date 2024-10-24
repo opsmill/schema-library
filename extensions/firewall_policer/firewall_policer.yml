@@ -9,7 +9,6 @@ nodes:
     icon: "mdi:car-speed-limiter"
     menu_placement: SecurityFirewallFilter
     description: A generic policer configuration.
-    default_filter: name__value
     display_labels:
       - name__value
     order_by:
@@ -39,19 +38,19 @@ nodes:
           - name: bandwidth-policer
             label: "Bandwidth Policer"
             description: "Policer that limits bandwidth on interfaces."
-            color: "#C3E0E5"  # pastel teal
+            color: "#C3E0E5" # pastel teal
           - name: interface-policer
             label: "Interface Policer"
             description: "Policer applied to interfaces for rate-limiting traffic."
-            color: "#D1E7E1"  # light teal
+            color: "#D1E7E1" # light teal
           - name: shared-policer
             label: "Shared Policer"
             description: "Policer with shared bandwidth across multiple links."
-            color: "#A5C9C7"  # muted teal
+            color: "#A5C9C7" # muted teal
           - name: hierarchical-policer
             label: "Hierarchical Policer"
             description: "Policer applied in a hierarchical manner (e.g., parent-child relationships)."
-            color: "#B1E0D9"  # pastel mint
+            color: "#B1E0D9" # pastel mint
       - name: bandwidth_limit
         kind: Dropdown
         description: "Bandwidth limit for the policer."
@@ -62,51 +61,51 @@ nodes:
           - name: 500k
             label: "500 Kbps"
             description: "Bandwidth limit of 500 Kbps."
-            color: "#A9CCE3"  # pastel blue
+            color: "#A9CCE3" # pastel blue
           - name: 2125k
             label: "2,125 Kbps"
             description: "Bandwidth limit of 2,125 Kbps."
-            color: "#AED6F1"  # light blue
+            color: "#AED6F1" # light blue
           - name: 5250k
             label: "5,250 Kbps"
             description: "Bandwidth limit of 5,250 Kbps."
-            color: "#B4DDED"  # lighter blue
+            color: "#B4DDED" # lighter blue
           - name: 10m
             label: "10 Mbps"
             description: "Bandwidth limit of 10 Mbps."
-            color: "#C2E2F3"  # very light blue
+            color: "#C2E2F3" # very light blue
           - name: 20m
             label: "20 Mbps"
             description: "Bandwidth limit of 20 Mbps."
-            color: "#D0E7F8"  # very pale blue
+            color: "#D0E7F8" # very pale blue
           - name: 30m
             label: "30 Mbps"
             description: "Bandwidth limit of 30 Mbps."
-            color: "#E0ECF9"  # soft blue
+            color: "#E0ECF9" # soft blue
           - name: 50m
             label: "50 Mbps"
             description: "Bandwidth limit of 50 Mbps."
-            color: "#AFC7F2"  # pastel cornflower blue
+            color: "#AFC7F2" # pastel cornflower blue
           - name: 75m
             label: "75 Mbps"
             description: "Bandwidth limit of 75 Mbps."
-            color: "#E8F3FD"  # sky blue
+            color: "#E8F3FD" # sky blue
           - name: 100m
             label: "100 Mbps"
             description: "Bandwidth limit of 100 Mbps."
-            color: "#F0F9FF"  # very light azure
+            color: "#F0F9FF" # very light azure
           - name: 200m
             label: "200 Mbps"
             description: "Bandwidth limit of 200 Mbps."
-            color: "#D1E6F9"  # soft sky blue
+            color: "#D1E6F9" # soft sky blue
           - name: 300m
             label: "300 Mbps"
             description: "Bandwidth limit of 300 Mbps."
-            color: "#EAF2FC"  # very pale blue
+            color: "#EAF2FC" # very pale blue
           - name: 1000m
             label: "1 Gbps"
             description: "Bandwidth limit of 1 Gbps."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
       - name: pps_limit
         kind: Dropdown
         description: "Packets per second (PPS) limit for the policer."
@@ -117,15 +116,15 @@ nodes:
           - name: 500pps
             label: "500 PPS"
             description: "PPS limit of 500."
-            color: "#E0BBE4"  # pastel lilac
+            color: "#E0BBE4" # pastel lilac
           - name: 1000pps
             label: "1,000 PPS"
             description: "PPS limit of 1,000."
-            color: "#D4A5E4"  # light lavender
+            color: "#D4A5E4" # light lavender
           - name: 5000pps
             label: "5,000 PPS"
             description: "PPS limit of 5,000."
-            color: "#C89BE4"  # pale purple
+            color: "#C89BE4" # pale purple
       - name: burst_size_limit
         kind: Dropdown
         description: "Burst size limit for the policer."
@@ -136,63 +135,63 @@ nodes:
           - name: 50k
             label: "50 KB"
             description: "Burst size limit of 50 KB."
-            color: "#CDEACC"  # pastel green
+            color: "#CDEACC" # pastel green
           - name: 100k
             label: "100 KB"
             description: "Burst size limit of 100 KB."
-            color: "#B3E2A8"  # light green
+            color: "#B3E2A8" # light green
           - name: 128k
             label: "128 KB"
             description: "Burst size limit of 128 KB."
-            color: "#A3D89E"  # softer green
+            color: "#A3D89E" # softer green
           - name: 256k
             label: "256 KB"
             description: "Burst size limit of 256 KB."
-            color: "#92CF91"  # pastel lime
+            color: "#92CF91" # pastel lime
           - name: 512k
             label: "512 KB"
             description: "Burst size limit of 512 KB."
-            color: "#88C786"  # light mint
+            color: "#88C786" # light mint
           - name: 1m
             label: "1 MB"
             description: "Burst size limit of 1 MB."
-            color: "#7FCF79"  # lime green
+            color: "#7FCF79" # lime green
           - name: 1500k
             label: "1.5 MB"
             description: "Burst size limit of 1.5 MB."
-            color: "#77C46B"  # soft lime
+            color: "#77C46B" # soft lime
           - name: 2m
             label: "2 MB"
             description: "Burst size limit of 2 MB."
-            color: "#63A17E"  # muted mint green
+            color: "#63A17E" # muted mint green
           - name: 3m
             label: "3 MB"
             description: "Burst size limit of 3 MB."
-            color: "#8FD19E"  # Mint green
+            color: "#8FD19E" # Mint green
           - name: 4m
             label: "4 MB"
             description: "Burst size limit of 4 MB."
-            color: "#70B961"  # muted green
+            color: "#70B961" # muted green
           - name: 8m
             label: "8 MB"
             description: "Burst size limit of 8 MB."
-            color: "#6BAD57"  # pale green
+            color: "#6BAD57" # pale green
           - name: 12m
             label: "12 MB"
             description: "Burst size limit of 12 MB."
-            color: "#63A14C"  # pastel olive
+            color: "#63A14C" # pastel olive
           - name: 37m
             label: "37 MB"
             description: "Burst size limit of 37 MB."
-            color: "#56A56C"  # deep pastel green
+            color: "#56A56C" # deep pastel green
           - name: 40m
             label: "40 MB"
             description: "Burst size limit of 40 MB."
-            color: "#5F9742"  # light olive
+            color: "#5F9742" # light olive
           - name: 1000000k
             label: "1 GB"
             description: "Burst size limit of 1 GB."
-            color: "#599D4A"  # dark pastel green
+            color: "#599D4A" # dark pastel green
       - name: packet_burst
         kind: Dropdown
         description: "Packet burst size for the policer."
@@ -203,15 +202,15 @@ nodes:
           - name: 1k
             label: "1,000 packets"
             description: "Packet burst size of 1,000 packets."
-            color: "#FFE4E1"  # pastel misty rose
+            color: "#FFE4E1" # pastel misty rose
           - name: 5k
             label: "5,000 packets"
             description: "Packet burst size of 5,000 packets."
-            color: "#FFFACD"  # pastel lemon chiffon
+            color: "#FFFACD" # pastel lemon chiffon
           - name: 10k
             label: "10,000 packets"
             description: "Packet burst size of 10,000 packets."
-            color: "#FFF0F5"  # lavender blush
+            color: "#FFF0F5" # lavender blush
       - name: action
         kind: Dropdown
         description: Action to take when limits are exceeded.
@@ -221,12 +220,12 @@ nodes:
           - name: discard
             label: Discard
             description: Discard the packet.
-            color: "#F4CCCC"  # pastel red
+            color: "#F4CCCC" # pastel red
           - name: drop
             label: Drop
             description: Drop the packet.
-            color: "#FAD7A0"  # pastel orange
+            color: "#FAD7A0" # pastel orange
           - name: accept
             label: Accept
             description: Accept the packet.
-            color: "#CDEACC"  # slightly darker pastel green
+            color: "#CDEACC" # slightly darker pastel green

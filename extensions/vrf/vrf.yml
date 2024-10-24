@@ -8,7 +8,8 @@ nodes:
     description: "A VRF is isolated layer three domain"
     label: "VRF"
     icon: "mdi:router"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     order_by:
       - name__value
     display_labels:
@@ -52,7 +53,8 @@ nodes:
     label: "Route Target"
     icon: "mdi:target"
     menu_placement: "IpamVRF"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     order_by:
       - name__value
     display_labels:

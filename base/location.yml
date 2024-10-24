@@ -9,7 +9,6 @@ generics:
     icon: "mingcute:location-line"
     include_in_menu: true
     hierarchical: true
-    default_filter: shortname__value
     human_friendly_id:
       - shortname__value
     order_by:
@@ -39,7 +38,10 @@ generics:
     namespace: Location
     description: "Location directly hosting device."
     include_in_menu: false
-    default_filter: shortname__value
+    order_by:
+      - name__value
+    display_labels:
+      - name__value
     human_friendly_id:
       - shortname__value
     # This is only owning relationships toward various assets that could be found on those locations

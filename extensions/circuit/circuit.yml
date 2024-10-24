@@ -8,7 +8,8 @@ nodes:
     description: "A Circuit represent a single physical link operated by a provider."
     label: "Circuit"
     icon: "mdi:cable-data"
-    default_filter: circuit_id__value
+    human_friendly_id:
+      - circuit_id__value
     include_in_menu: true
     order_by:
       - circuit_id__value

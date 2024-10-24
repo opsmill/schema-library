@@ -113,7 +113,8 @@ nodes:
     inherit_from: ["LocationGeneric"]
     include_in_menu: true
     label: Rack
-    default_filter: shortname__value
+    human_friendly_id:
+      - shortname__value
     display_labels:
       - name__value
     menu_placement: "LocationGeneric"

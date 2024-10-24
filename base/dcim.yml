@@ -7,7 +7,8 @@ generics:
     description: "Generic Device object."
     label: "Device"
     icon: "mdi:server"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     order_by:
       - name__value
     display_labels:
@@ -141,7 +142,8 @@ nodes:
     label: "Device Type"
     icon: "mdi:poll"
     menu_placement: "DcimGenericDevice"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels:
       - name__value
     order_by:
@@ -203,7 +205,8 @@ nodes:
     label: "Platform"
     icon: "mdi:application-cog-outline"
     menu_placement: "DcimGenericDevice"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels:
       - name__value
     order_by:
