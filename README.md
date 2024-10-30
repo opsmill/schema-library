@@ -1,4 +1,4 @@
-# Schema Library
+# Infrahub Schema Library
 
 Welcome to the Schema Library for Infrahub! This repository offers a collection of schemas designed to streamline and standardize infrastructure-related data structures.
 
@@ -20,7 +20,7 @@ There are several ways to [load a schema in Infrahub](https://docs.infrahub.app/
 This project is divided into three main parts:
 
 - Base: This is the foundational layer required for any extension. It must be loaded before adding extensions.
-- Extension: Designed to be simple and generic, this section offers various schema components for managing infrastructure. Note that extensions may have dependencies on each other.
+- Extensions: Designed to be simple and generic, this section offers various schema components for managing infrastructure. Note that extensions may have dependencies on each other.
 - Experimental: This section contains schema components that are not yet fully supported.
 
 ## Contributing

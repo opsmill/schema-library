@@ -1,0 +1,114 @@
+---
+# yamllint disable rule:truthy rule:truthy rule:line-length
+name: "CI"
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
+
+jobs:
+  files-changed:
+    name: Detect which file has changed
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      yaml: ${{ steps.changes.outputs.yaml_all }}
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v4"
+      - name: Check for file changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          token: ${{ github.token }}
+          filters: .github/file-filters.yml
+
+  yaml-lint:
+    if: needs.files-changed.outputs.yaml == 'true'
+    needs: ["files-changed"]
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v4"
+      - name: "Setup environment"
+        run: "pip install yamllint==1.35.1"
+      - name: "Linting: yamllint"
+        run: "yamllint -s ."
+
+  E2E-testing-invoke-start:
+    needs:
+      - files-changed
+      - yaml-lint
+    if: |
+      always() && !cancelled() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    runs-on:
+      group: huge-runners
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Invoke
+        run: |
+          pip install toml invoke
+
+      - name: Set job name
+        run: echo JOB_NAME="$GITHUB_JOB" >> $GITHUB_ENV
+
+      - name: "Set environment variables"
+        run: echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
+      - name: "Clear docker environment"
+        run: docker compose -p $INFRAHUB_BUILD_NAME down -v --remove-orphans --rmi local
+
+      - name: "Store start time"
+        run: echo TEST_START_TIME=$(date +%s)000 >> $GITHUB_ENV
+
+      - name: Run 'invoke start'
+        run: |
+          unset INFRAHUB_IMAGE_VER
+          invoke start load_schema
+
+      - name: Display server logs
+        if: always()
+        run: docker logs "${INFRAHUB_BUILD_NAME}-server-1"
+
+      - name: Display task worker 1 logs
+        if: always()
+        run: docker logs "${INFRAHUB_BUILD_NAME}-infrahub-git-1"
+
+      - name: Display task worker 2 logs
+        if: always()
+        run: docker logs "${INFRAHUB_BUILD_NAME}-infrahub-git-2"
+
+      - name: Display task manager logs
+        if: always()
+        run: docker logs "${INFRAHUB_BUILD_NAME}-task-manager-1"
+
+      - name: Display database logs
+        if: always()
+        run: docker logs "${INFRAHUB_BUILD_NAME}-database-1"
+
+      - name: Display message-queue logs
+        if: always()
+        run: docker logs "${INFRAHUB_BUILD_NAME}-message-queue-1"
+
+      - name: "Clear docker environment and force vmagent to stop"
+        if: always()
+        run: docker compose -p $INFRAHUB_BUILD_NAME down -v --remove-orphans --rmi local
