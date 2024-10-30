@@ -69,7 +69,7 @@ jobs:
 
       - name: Install Invoke
         run: |
-          pip install toml invoke
+          pip install toml invoke infrahubctl["all"]
 
       - name: Set job name
         run: echo JOB_NAME="$GITHUB_JOB" >> $GITHUB_ENV
