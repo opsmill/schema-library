@@ -13,7 +13,11 @@ def start(context: Context) -> None:
     context.run(f"{COMPOSE_COMMAND} up -d")
 
 @task
-def load_schema(context: Context, schema: Path=Path("./base/*.yml")) -> None:
+def load_schema_base(context: Context, schema: Path=Path("./base/*.yml")) -> None:
+    context.run(f"infrahubctl schema load {schema}")
+
+@task
+def load_schema_all(context: Context, schema: Path=Path("./base/*.yml")) -> None:
     context.run(f"infrahubctl schema load {schema}")
 
 @task
