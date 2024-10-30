@@ -147,9 +147,9 @@ nodes:
             label: Spare
             description: "Stored somewhere as a spare."
             color: "#ffff7f"
-          - name: decomissioned
-            label: Decomissioned
-            description: "Decomissioned might be broken or not used anymore."
+          - name: decommissioned
+            label: Decommissioned
+            description: "Decommissioned might be broken or not used anymore."
             color: "#ffd27f"
       - name: serial
         kind: Text

@@ -1,6 +1,6 @@
 # 🧩 Cluster
 
-This schema extension contains all you need to modelize your clusters!
+This schema extension contains all you need to model your clusters
 
 ## Nodes
 

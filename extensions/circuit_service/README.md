@@ -4,7 +4,7 @@ This schema extension contains model coming on top of circuit to capture a singl
 
 For example you have a MPLS network supported by a provider connecting multiple locations:
 
-- One single Circuit Service would be needed to store MPLS related informations (e.g. service id, provider ...)
+- One single Circuit Service would be needed to store MPLS related information (e.g. service id, provider ...)
 - On each site we would create a circuit connecting on one side our device and the Circuit Service on the other side
 
 ## Nodes

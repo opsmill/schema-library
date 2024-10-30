@@ -69,7 +69,7 @@ nodes:
       - name: priority
         kind: Number
         label: VRRP Priority
-        description: "VRRP Prioritory (Should be between 0 to 255)"
+        description: "VRRP Priority (Should be between 0 to 255)"
         # Using a Regex until https://github.com/opsmill/infrahub/issues/2967
         regex: "^(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])$"
         default_value: 100
