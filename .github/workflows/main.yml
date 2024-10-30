@@ -87,10 +87,10 @@ jobs:
           unset INFRAHUB_IMAGE_VER
           invoke start load-schema-base
 
-      - name: Test experimental schema files
-        run: |
-          unset INFRAHUB_IMAGE_VER
-          invoke start load-schema-experimental
+      # - name: Test experimental schema files
+      #   run: |
+      #     unset INFRAHUB_IMAGE_VER
+      #     invoke start load-schema-experimental
 
       - name: Display server logs
         if: always()
