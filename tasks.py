@@ -17,7 +17,7 @@ def load_schema_base(context: Context, schema: Path=Path("./base/*.yml")) -> Non
     context.run(f"infrahubctl schema load {schema}")
 
 @task
-def load_schema_all(context: Context, schema: Path=Path("./base/*.yml")) -> None:
+def load_schema_experimental(context: Context, schema: Path=Path("./experimental/**.yml")) -> None:
     context.run(f"infrahubctl schema load {schema}")
 
 @task

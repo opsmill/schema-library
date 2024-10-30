@@ -13,6 +13,8 @@ concurrency:
 
 env:
   GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
+  INFRAHUB_ADDRESS: "http://localhost:8000"
+  INFRAHUB_API_TOKEN: "06438eb2-8019-4776-878c-0941b1f1d1ec"
 
 jobs:
   files-changed:
@@ -80,10 +82,15 @@ jobs:
       - name: "Store start time"
         run: echo TEST_START_TIME=$(date +%s)000 >> $GITHUB_ENV
 
-      - name: Run 'invoke start'
+      - name: Test base schema files
         run: |
           unset INFRAHUB_IMAGE_VER
           invoke start load-schema-base
+
+      - name: Test experimental schema files
+        run: |
+          unset INFRAHUB_IMAGE_VER
+          invoke start load-schema-experimental
 
       - name: Display server logs
         if: always()
