@@ -83,7 +83,7 @@ jobs:
       - name: Run 'invoke start'
         run: |
           unset INFRAHUB_IMAGE_VER
-          invoke start load_schema_base
+          invoke start load-schema-base
 
       - name: Display server logs
         if: always()
