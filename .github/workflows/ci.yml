@@ -75,6 +75,11 @@ jobs:
       # - name: "Set environment variable INFRAHUB_BUILD_NAME"
       #   run: echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
 
+      - name: Initialize Infrahub
+        run: |
+          unset INFRAHUB_IMAGE_VER
+          invoke start
+
       - name: Set infrahub address
         run: |
           INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }}
@@ -89,9 +94,7 @@ jobs:
         run: echo TEST_START_TIME=$(date +%s)000 >> $GITHUB_ENV
 
       - name: Test base schema files
-        run: |
-          unset INFRAHUB_IMAGE_VER
-          invoke start load-schema-base
+        run: invoke load-schema-base
 
       # - name: Test experimental schema files
       #   run: |
