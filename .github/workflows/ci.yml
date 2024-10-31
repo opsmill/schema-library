@@ -54,6 +54,8 @@ jobs:
       !contains(needs.*.result, 'cancelled')
     runs-on:
       group: huge-runners
+    env:
+      INFRAHUB_API_TOKEN: 06438eb2-8019-4776-878c-0941b1f1d1ec
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
