@@ -80,8 +80,8 @@ jobs:
           PORT=$(docker compose -p $INFRAHUB_BUILD_NAME port server 8000 | cut -d: -f2)
           echo "INFRAHUB_ADDRESS=http://localhost:${PORT}" >> $GITHUB_ENV
 
-      - name: "Clear docker environment"
-        run: docker compose -p $INFRAHUB_BUILD_NAME down -v --remove-orphans --rmi local
+      # - name: "Clear docker environment"
+      #   run: docker compose -p $INFRAHUB_BUILD_NAME down -v --remove-orphans --rmi local
 
       - name: "Store start time"
         run: echo TEST_START_TIME=$(date +%s)000 >> $GITHUB_ENV
