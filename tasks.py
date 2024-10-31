@@ -7,11 +7,11 @@ from invoke import task, Context  # type: ignore
 # If no version is indicated, we will take the latest
 VERSION = os.getenv("INFRAHUB_VERSION", None)
 DOCKER_PROJECT = os.getenv("INFRAHUB_BUILD_NAME", "schema-library-ci")
-COMPOSE_COMMAND = f"curl https://infrahub.opsmill.io/{VERSION if VERSION else ''} | docker compose -p {DOCKER_PROJECT} -f -"
+COMPOSE_COMMAND = f"curl https://infrahub.opsmill.io/{VERSION if VERSION else ''} | sed 's/8000:8000/0:8000/' | docker compose -p {DOCKER_PROJECT} -f -"
 
 @task
 def start(context: Context) -> None:
-    context.run(f"{COMPOSE_COMMAND} up -d")
+    context.run(f"{COMPOSE_COMMAND} up -d --wait")
 
 @task
 def load_schema_base(context: Context, schema: Path=Path("./base/*.yml")) -> None:
