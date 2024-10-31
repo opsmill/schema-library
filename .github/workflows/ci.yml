@@ -13,8 +13,6 @@ concurrency:
 
 env:
   GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
-  INFRAHUB_ADDRESS: "http://server:8000"
-  INFRAHUB_API_TOKEN: "06438eb2-8019-4776-878c-0941b1f1d1ec"
 
 jobs:
   files-changed:
@@ -75,7 +73,11 @@ jobs:
         run: echo JOB_NAME="$GITHUB_JOB" >> $GITHUB_ENV
 
       - name: "Set environment variables"
-        run: echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
+        run: |
+          echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
+          echo INFRAHUB_ADDRESS="http://server:8000" >> $GITHUB_ENV
+          echo INFRAHUB_API_TOKEN="06438eb2-8019-4776-878c-0941b1f1d1ec" >> $GITHUB_ENV
+
       - name: "Clear docker environment"
         run: docker compose -p $INFRAHUB_BUILD_NAME down -v --remove-orphans --rmi local
 
