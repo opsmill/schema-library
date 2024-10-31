@@ -72,10 +72,13 @@ jobs:
       - name: Set job name
         run: echo JOB_NAME="$GITHUB_JOB" >> $GITHUB_ENV
 
-      - name: "Set environment variables"
+      - name: "Set environment variable INFRAHUB_BUILD_NAME"
+        run: echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
+
+      - name: Set infrahub address
         run: |
-          echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
-          echo INFRAHUB_API_TOKEN="06438eb2-8019-4776-878c-0941b1f1d1ec" >> $GITHUB_ENV
+          PORT=$(docker compose -p $INFRAHUB_BUILD_NAME port server 8000 | cut -d: -f2)
+          echo "INFRAHUB_ADDRESS=http://localhost:${PORT}" >> $GITHUB_ENV
 
       - name: "Clear docker environment"
         run: docker compose -p $INFRAHUB_BUILD_NAME down -v --remove-orphans --rmi local
