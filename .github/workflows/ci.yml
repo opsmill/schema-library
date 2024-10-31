@@ -72,23 +72,16 @@ jobs:
       - name: Set job name
         run: echo JOB_NAME="$GITHUB_JOB" >> $GITHUB_ENV
 
-      # - name: "Set environment variable INFRAHUB_BUILD_NAME"
-      #   run: echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
+      - name: "Set environment variable INFRAHUB_BUILD_NAME"
+        run: echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
 
       - name: Initialize Infrahub
-        run: |
-          unset INFRAHUB_IMAGE_VER
-          invoke start
+        run: invoke start
 
       - name: Set infrahub address
         run: |
-          INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }}
-          echo $INFRAHUB_BUILD_NAME >> $GITHUB_ENV
-          PORT=$(docker compose -p $INFRAHUB_BUILD_NAME port server 8000 | cut -d: -f2)
+          PORT=$(docker compose -p $INFRAHUB_BUILD_NAME port infrahub-server 8000 | cut -d: -f2)
           echo "INFRAHUB_ADDRESS=http://localhost:${PORT}" >> $GITHUB_ENV
-
-      # - name: "Clear docker environment"
-      #   run: docker compose -p $INFRAHUB_BUILD_NAME down -v --remove-orphans --rmi local
 
       - name: "Store start time"
         run: echo TEST_START_TIME=$(date +%s)000 >> $GITHUB_ENV
@@ -96,10 +89,8 @@ jobs:
       - name: Test base schema files
         run: invoke load-schema-base
 
-      # - name: Test experimental schema files
-      #   run: |
-      #     unset INFRAHUB_IMAGE_VER
-      #     invoke start load-schema-experimental
+      - name: Test experimental schema files
+        run: invoke load-schema-experimental
 
       - name: "Clear docker environment and force vmagent to stop"
         if: always()
