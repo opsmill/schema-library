@@ -75,7 +75,6 @@ jobs:
       - name: "Set environment variables"
         run: |
           echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
-          echo INFRAHUB_ADDRESS="http://server:8000" >> $GITHUB_ENV
           echo INFRAHUB_API_TOKEN="06438eb2-8019-4776-878c-0941b1f1d1ec" >> $GITHUB_ENV
 
       - name: "Clear docker environment"
