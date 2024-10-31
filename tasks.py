@@ -6,7 +6,8 @@ from invoke import task, Context  # type: ignore
 
 # If no version is indicated, we will take the latest
 VERSION = os.getenv("INFRAHUB_VERSION", None)
-COMPOSE_COMMAND = f"curl https://infrahub.opsmill.io/{VERSION if VERSION else ''} | docker compose -f -"
+DOCKER_PROJECT = os.getenv("INFRAHUB_BUILD_NAME", "schema-library-ci")
+COMPOSE_COMMAND = f"curl https://infrahub.opsmill.io/{VERSION if VERSION else ''} | docker compose -p {DOCKER_PROJECT} -f -"
 
 @task
 def start(context: Context) -> None:
