@@ -1,5 +1,5 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
 
 generics:
@@ -27,7 +27,7 @@ nodes:
     human_friendly_id:
       - name__value
     uniqueness_constraints:
-      - ["name__value", "device"]
+      - [name__value, device]
     attributes:
       - name: name
         kind: Text
@@ -36,45 +36,45 @@ nodes:
         order_weight: 900
       - name: disk_type
         kind: Dropdown
-        description: "Specifies the type of disk"
+        description: Specifies the type of disk
         order_weight: 950
         optional: true
         choices:
           - name: ssd
-            label: "SSD"
-            description: "Solid State Drive"
+            label: SSD
+            description: Solid State Drive
             color: "#a6c1ff"
           - name: nvme
-            label: "NVMe"
-            description: "Non-Volatile Memory Express"
+            label: NVMe
+            description: Non-Volatile Memory Express
             color: "#ffbf80"
           - name: hdd
-            label: "HDD"
-            description: "Hard Disk Drive"
+            label: HDD
+            description: Hard Disk Drive
             color: "#80c7a6"
           - name: hybrid
-            label: "Hybrid"
-            description: "Hybrid Drive"
+            label: Hybrid
+            description: Hybrid Drive
             color: "#ffcc80"
       - name: status
         kind: Dropdown
-        description: "Lifecycle status of the hardware component."
+        description: Lifecycle status of the hardware component.
         choices:
           - name: in_inventory
             label: In Inventory
-            description: "The disk is newly acquired and held in inventory."
+            description: The disk is newly acquired and held in inventory.
             color: "#6c757d"
           - name: active
             label: Active
-            description: "The disk is currently in use within the infrastructure."
+            description: The disk is currently in use within the infrastructure.
             color: "#28a745"
           - name: decommissioned
             label: Decommissioned
-            description: "The disk is retired from active use but still stored for potential reuse or auditing."
+            description: The disk is retired from active use but still stored for potential reuse or auditing.
             color: "#17a2b8"
           - name: disposed
             label: Disposed
-            description: "The disk has been securely erased and disposed of."
+            description: The disk has been securely erased and disposed of.
             color: "#dc3545"
       - name: size
         label: Size (GB)
@@ -84,7 +84,7 @@ nodes:
         description: Disk capacity (in GB).
       - name: serial_number
         kind: Text
-        description: "Serial number of the disk"
+        description: Serial number of the disk
         unique: true
         order_weight: 1100
         optional: true

@@ -1,5 +1,5 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
 
 generics:
@@ -7,7 +7,6 @@ generics:
     namespace: Compute
     description: A generic unit that can compute (e.g. server, vm ...).
     include_in_menu: false
-
   - name: HostVirtualMachine
     namespace: Virtualization
     description: A generic unut that can host VM
@@ -39,27 +38,26 @@ nodes:
         choices:
           - name: active
             label: Active
-            description: "Fully operational and currently in service."
+            description: Fully operational and currently in service.
             color: "#7fbf7f"
           - name: provisioning
             label: Provisioning
-            description: "In the process of being set up and configured."
+            description: In the process of being set up and configured.
             color: "#ffff7f"
           - name: maintenance
             label: Maintenance
-            description: "Undergoing routine maintenance or repairs."
+            description: Undergoing routine maintenance or repairs.
             color: "#ffd27f"
           - name: drained
             label: Drained
-            description: "Temporarily taken out of service."
+            description: Temporarily taken out of service.
             color: "#bfbfbf"
-
   - name: VirtualMachine
     namespace: Virtualization
     description: A virtual machine hosted on a server or a cluster.
     include_in_menu: true
-    label: "Virtual Machine"
-    icon: "carbon:virtual-machine"
+    label: Virtual Machine
+    icon: carbon:virtual-machine
     inherit_from:
       - ComputeGenericUnit
       - DcimGenericDevice

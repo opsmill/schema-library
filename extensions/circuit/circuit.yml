@@ -1,14 +1,14 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
 
 nodes:
-  #TODO: Maybe create a generic, we would have colored circuits, cross co, for instance
+  # TODO: Maybe create a generic, we would have colored circuits, cross co, for instance
   - name: Circuit
     namespace: Circuit
-    description: "A Circuit represent service operated by a provider."
-    label: "Circuit"
-    icon: "mdi:cable-data"
+    description: A Circuit represent service operated by a provider.
+    label: Circuit
+    icon: mdi:cable-data
     human_friendly_id:
       - circuit_id__value
     inherit_from:
@@ -27,42 +27,42 @@ nodes:
         optional: true
       - name: type
         kind: Dropdown
-        description: "Specifies the type of circuit."
+        description: Specifies the type of circuit.
         choices:
           - name: upstream
-            label: "Upstream"
-            description: "Connection to an upstream provider or Internet service provider (ISP)"
+            label: Upstream
+            description: Connection to an upstream provider or Internet service provider (ISP)
             color: "#1e90ff"
           - name: peering
-            label: "Peering"
-            description: "Connection to another network for exchange of traffic"
+            label: Peering
+            description: Connection to another network for exchange of traffic
             color: "#20b2aa"
           - name: dark_fiber
-            label: "Dark Fiber"
-            description: "Leased, unlit fiber for customer management and operation"
+            label: Dark Fiber
+            description: Leased, unlit fiber for customer management and operation
             color: "#333333"
           - name: mpls
-            label: "MPLS"
-            description: "Multi-Protocol Label Switching circuit for QoS-based routing"
+            label: MPLS
+            description: Multi-Protocol Label Switching circuit for QoS-based routing
             color: "#7f00ff"
       - name: status
         kind: Dropdown
         choices:
           - name: active
             label: Active
-            description: "Fully operational and currently in service."
+            description: Fully operational and currently in service.
             color: "#7fbf7f"
           - name: provisioning
             label: Provisioning
-            description: "In the process of being set up and configured."
+            description: In the process of being set up and configured.
             color: "#ffff7f"
           - name: maintenance
             label: Maintenance
-            description: "Undergoing routine maintenance or repairs."
+            description: Undergoing routine maintenance or repairs.
             color: "#ffd27f"
           - name: drained
             label: Drained
-            description: "Temporarily taken out of service."
+            description: Temporarily taken out of service.
             color: "#bfbfbf"
     relationships:
       - name: provider

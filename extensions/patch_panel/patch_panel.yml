@@ -1,5 +1,5 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
 
 generics:
@@ -22,93 +22,111 @@ generics:
         choices:
           - name: FC
             label: FC
-            description: "Standardized fiber optic connector used primarily in datacom and telecom applications, known for its threaded coupling design."
+            description:
+              Standardized fiber optic connector used primarily in datacom and telecom applications, known for
+              its threaded coupling design.
           - name: LC
             label: LC
-            description: "Compact fiber optic connector with a push-pull mechanism, widely used for high-density connections."
+            description: Compact fiber optic connector with a push-pull mechanism, widely used for high-density connections.
           - name: LC_PC
             label: LC/PC
-            description: "Polished LC connector providing physical contact (PC) to minimize signal loss and back reflections."
+            description: Polished LC connector providing physical contact (PC) to minimize signal loss and back reflections.
           - name: LC_UPC
             label: LC/UPC
-            description: "Ultra-Physical Contact (UPC) variant of the LC connector with enhanced polish for lower return loss."
+            description: Ultra-Physical Contact (UPC) variant of the LC connector with enhanced polish for lower return loss.
           - name: LC_APC
             label: LC/APC
-            description: "Angled Physical Contact (APC) version of the LC connector with a slanted fiber end-face to reduce back reflection."
+            description:
+              Angled Physical Contact (APC) version of the LC connector with a slanted fiber end-face to reduce
+              back reflection.
           - name: LSH
             label: LSH
-            description: "European fiber optic connector offering high durability, often used in industrial and high-performance settings."
+            description:
+              European fiber optic connector offering high durability, often used in industrial and high-performance
+              settings.
           - name: LSH_PC
             label: LSH/PC
-            description: "Physical Contact version of LSH with standard polish, ensuring good connection quality and low signal loss."
+            description:
+              Physical Contact version of LSH with standard polish, ensuring good connection quality and low signal
+              loss.
           - name: LSH_UPC
             label: LSH/UPC
-            description: "Ultra-Physical Contact variant of LSH, minimizing return loss with a superior polish."
+            description: Ultra-Physical Contact variant of LSH, minimizing return loss with a superior polish.
           - name: LSH_APC
             label: LSH/APC
-            description: "Angled Physical Contact version of LSH, designed to reduce back reflections in high-frequency applications."
+            description: Angled Physical Contact version of LSH, designed to reduce back reflections in high-frequency applications.
           - name: LX_5
             label: LX.5
-            description: "Miniaturized fiber optic connector similar to LC but with an additional shutter mechanism for dust protection."
+            description:
+              Miniaturized fiber optic connector similar to LC but with an additional shutter mechanism for dust
+              protection.
           - name: LX_5_PC
             label: LX.5/PC
-            description: "Physical Contact version of LX.5, designed for reliable, low-loss connections in high-density settings."
+            description: Physical Contact version of LX.5, designed for reliable, low-loss connections in high-density settings.
           - name: LX_5_UPC
             label: LX.5/UPC
-            description: "Ultra-Physical Contact variant of LX.5, offering improved return loss performance for high-quality signals."
+            description:
+              Ultra-Physical Contact variant of LX.5, offering improved return loss performance for high-quality
+              signals.
           - name: LX_5_APC
             label: LX.5/APC
-            description: "Angled Physical Contact version of LX.5, minimizing back reflection for sensitive, high-frequency networks."
+            description:
+              Angled Physical Contact version of LX.5, minimizing back reflection for sensitive, high-frequency
+              networks.
           - name: MPO
             label: MPO
-            description: "Multi-fiber Push-On connector typically used in data centers for high-speed applications like 40G/100G Ethernet."
+            description:
+              Multi-fiber Push-On connector typically used in data centers for high-speed applications like 40G/100G
+              Ethernet.
           - name: MTRJ
             label: MTRJ
-            description: "Male-to-female fiber optic connector with two fibers, popular for duplex multimode applications."
+            description: Male-to-female fiber optic connector with two fibers, popular for duplex multimode applications.
           - name: SC
             label: SC
-            description: "Square fiber optic connector with push-pull lock, commonly used for both single-mode and multimode fibers."
+            description:
+              Square fiber optic connector with push-pull lock, commonly used for both single-mode and multimode
+              fibers.
           - name: SC_PC
             label: SC/PC
-            description: "Physical Contact SC connector with a polished end-face, ensuring low insertion and return loss."
+            description: Physical Contact SC connector with a polished end-face, ensuring low insertion and return loss.
           - name: SC_UPC
             label: SC/UPC
-            description: "Ultra-Physical Contact variant of SC, providing low return loss due to its high-precision polish."
+            description: Ultra-Physical Contact variant of SC, providing low return loss due to its high-precision polish.
           - name: SC_APC
             label: SC/APC
-            description: "Angled Physical Contact version of SC, optimized to reduce back reflections in high-power applications."
+            description: Angled Physical Contact version of SC, optimized to reduce back reflections in high-power applications.
           - name: ST
             label: ST
-            description: "Bayonet-style fiber optic connector primarily used in industrial and military applications."
+            description: Bayonet-style fiber optic connector primarily used in industrial and military applications.
           - name: CS
             label: CS
-            description: "Compact connector with a high-density duplex configuration, typically used in high-speed applications."
+            description: Compact connector with a high-density duplex configuration, typically used in high-speed applications.
           - name: SN
             label: SN
-            description: "Small-form connector with dual fibers, optimized for high-density networks and data center use."
+            description: Small-form connector with dual fibers, optimized for high-density networks and data center use.
           - name: SMA_905
             label: SMA 905
-            description: "Stainless steel fiber optic connector, commonly used in medical, industrial, and military environments."
+            description: Stainless steel fiber optic connector, commonly used in medical, industrial, and military environments.
           - name: SMA_906
             label: SMA 906
-            description: "Variant of SMA 905 with similar durability, frequently used in high-vibration settings."
+            description: Variant of SMA 905 with similar durability, frequently used in high-vibration settings.
           - name: URM_P2
             label: URM-P2
-            description: "Specialized fiber optic connector for industrial and harsh environments, typically used in automation."
+            description: Specialized fiber optic connector for industrial and harsh environments, typically used in automation.
           - name: URM_P4
             label: URM-P4
-            description: "Similar to URM-P2 but designed for higher performance, often in rugged outdoor or factory settings."
+            description: Similar to URM-P2 but designed for higher performance, often in rugged outdoor or factory settings.
           - name: URM_P8
             label: URM-P8
-            description: "Enhanced version of URM connectors with higher protection, ideal for high-stress industrial use."
+            description: Enhanced version of URM connectors with higher protection, ideal for high-stress industrial use.
           - name: Splice
             label: Splice
-            description: "Permanent fiber connection method where two fiber ends are fused, often used in network backbones."
+            description: Permanent fiber connection method where two fiber ends are fused, often used in network backbones.
 
 nodes:
   - name: PatchPanel
     label: Patch Panel
-    description: "A Patch Panel used for managing network cable connections in a data center or telecom setup."
+    description: A Patch Panel used for managing network cable connections in a data center or telecom setup.
     icon: ic:round-device-hub
     namespace: Dcim
     include_in_menu: true
@@ -129,7 +147,7 @@ nodes:
         label: Module Capacity
         kind: Number
         optional: true
-        description: "The maximum number of modules that can be housed within this patch panel."
+        description: The maximum number of modules that can be housed within this patch panel.
       - name: description
         kind: Text
         optional: true
@@ -155,7 +173,6 @@ nodes:
         optional: true
         cardinality: many
         kind: Component
-
   - name: FrontPatchPanelInterface
     label: Patch Panel Front Interfaces
     menu_placement: DcimGenericPatchPanelInterface
@@ -164,19 +181,19 @@ nodes:
       - patch_panel__name__value
       - name__value
     display_labels:
-      # - patch_panel #FIXME: DcimInterface.display_labels: this property only supports attributes, not relationships
+      #  - patch_panel  # FIXME: DcimInterface.display_labels: this property only supports attributes, not relationships
       - name__value
     order_by:
       - corresponding_front_rear__name__value
       - name__value
     uniqueness_constraints:
-      - ["patch_panel", "name__value"]
+      - [patch_panel, name__value]
     inherit_from:
       - DcimEndpoint
       - DcimGenericPatchPanelInterface
     relationships:
       - name: corresponding_front_rear
-        label: "Corresponding rear interface"
+        label: Corresponding rear interface
         peer: DcimRearPatchPanelInterface
         order_weight: 1200
         optional: true
@@ -189,7 +206,6 @@ nodes:
         optional: false
         cardinality: one
         kind: Parent
-
   - name: RearPatchPanelInterface
     label: Patch Panel Rear Interfaces
     menu_placement: DcimGenericPatchPanelInterface
@@ -198,19 +214,19 @@ nodes:
       - patch_panel__name__value
       - name__value
     display_labels:
-      # - patch_panel #FIXME: DcimInterface.display_labels: this property only supports attributes, not relationships
+      #  - patch_panel  # FIXME: DcimInterface.display_labels: this property only supports attributes, not relationships
       - name__value
     order_by:
       - patch_panel__name__value
       - name__value
     uniqueness_constraints:
-      - ["patch_panel", "name__value"]
+      - [patch_panel, name__value]
     inherit_from:
       - DcimEndpoint
       - DcimGenericPatchPanelInterface
     relationships:
       - name: corresponding_front_rear
-        label: "Corresponding front interfaces"
+        label: Corresponding front interfaces
         peer: DcimFrontPatchPanelInterface
         order_weight: 1200
         optional: true
@@ -223,7 +239,6 @@ nodes:
         optional: false
         cardinality: one
         kind: Parent
-
   - name: PatchPanelModule
     namespace: Dcim
     label: Patch Panel Module
@@ -233,31 +248,31 @@ nodes:
       - patch_panel__name__value
       - name__value
     display_labels:
-      # - patch_panel #FIXME: DcimInterface.display_labels: this property only supports attributes, not relationships
+      #  - patch_panel  # FIXME: DcimInterface.display_labels: this property only supports attributes, not relationships
       - name__value
     order_by:
       - patch_panel__name__value
       - position__value
     uniqueness_constraints:
-      - ["patch_panel", "position__value"]
+      - [patch_panel, position__value]
     attributes:
       - name: name
         kind: Text
         order_weight: 1000
       - name: position
         kind: Number
-        description: "Position for the module inside the Patch Panel."
+        description: Position for the module inside the Patch Panel.
         order_weight: 1100
       - name: module_type
         label: Module Type
         kind: Dropdown
-        description: "Type of module inserted into the patch panel."
+        description: Type of module inserted into the patch panel.
         order_weight: 1200
         optional: true
         choices:
           - name: 3_mpo_24_fo_lc
-            label: "24 FO LC 3 MPO"
-            description: "High-density MPO cassette with 24 fibers to front and 3 MPO to rear."
+            label: 24 FO LC 3 MPO
+            description: High-density MPO cassette with 24 fibers to front and 3 MPO to rear.
             color: "#7f7fff"
       - name: serial
         kind: Text

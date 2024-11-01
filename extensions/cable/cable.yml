@@ -1,14 +1,14 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
 
 nodes:
   - name: Cable
     namespace: Dcim
-    description: "Physical cable connecting two endpoints"
+    description: Physical cable connecting two endpoints
     include_in_menu: true
-    menu_placement: "DcimDevice"
-    label: "Cable"
+    menu_placement: DcimDevice
+    label: Cable
     icon: mdi:cable-data
     inherit_from:
       - DcimConnector
@@ -20,11 +20,11 @@ nodes:
         choices:
           - name: connected
             label: Connected
-            description: "Fully operational and currently in connected"
+            description: Fully operational and currently in connected
             color: "#7fbf7f"
           - name: planned
             label: Planned
-            description: "In the process of being set up"
+            description: In the process of being set up
             color: "#ffff7f"
       - name: type
         kind: Dropdown

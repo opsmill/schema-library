@@ -1,13 +1,14 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
+
 nodes:
   # -------------------- VRF & RouteTarget --------------------
   - name: VRF
     namespace: Ipam # TODO: Is IPAM the right namespace here?
-    description: "A VRF is isolated layer three domain"
-    label: "VRF"
-    icon: "mdi:router"
+    description: A VRF is isolated layer three domain
+    label: VRF
+    icon: mdi:router
     human_friendly_id:
       - name__value
     order_by:
@@ -34,25 +35,25 @@ nodes:
         cardinality: one
         kind: Attribute
       - name: import_rt
-        identifier: "vrf__import"
-        label: "Import Targets"
+        identifier: vrf__import
+        label: Import Targets
         peer: IpamRouteTarget
         optional: true
         cardinality: one
         kind: Attribute
       - name: export_rt
-        identifier: "vrf__export"
-        label: "Export Targets"
+        identifier: vrf__export
+        label: Export Targets
         peer: IpamRouteTarget
         optional: true
         cardinality: one
         kind: Attribute
   - name: RouteTarget
     namespace: Ipam
-    description: "Route Target (RFC 4360)"
-    label: "Route Target"
-    icon: "mdi:target"
-    menu_placement: "IpamVRF"
+    description: Route Target (RFC 4360)
+    label: Route Target
+    icon: mdi:target
+    menu_placement: IpamVRF
     human_friendly_id:
       - name__value
     order_by:
@@ -72,6 +73,7 @@ nodes:
         peer: IpamVRF
         optional: true
         cardinality: many
+
 extensions:
   nodes:
     - kind: IpamPrefix

@@ -1,5 +1,5 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
 
 nodes:
@@ -37,17 +37,17 @@ nodes:
         choices:
           - name: active
             label: Active
-            description: "Fully operational and currently in service."
+            description: Fully operational and currently in service.
             color: "#7fbf7f"
           - name: provisioning
             label: Provisioning
-            description: "In the process of being set up and configured."
+            description: In the process of being set up and configured.
             color: "#ffff7f"
           - name: maintenance
             label: Maintenance
-            description: "Undergoing routine maintenance or repairs."
+            description: Undergoing routine maintenance or repairs.
             color: "#ffd27f"
           - name: drained
             label: Drained
-            description: "Temporarily taken out of service."
+            description: Temporarily taken out of service.
             color: "#bfbfbf"

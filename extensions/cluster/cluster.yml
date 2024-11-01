@@ -1,5 +1,5 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
 
 generics:
@@ -37,7 +37,6 @@ generics:
         cardinality: many
         kind: Attribute
         order_weight: 2000
-
   - name: GenericComputeUnitNodes
     namespace: Cluster
     description: A generic to apply on clusters that can be built out of generic compute units.
