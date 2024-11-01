@@ -15,6 +15,9 @@ There are several ways to [load a schema in Infrahub](https://docs.infrahub.app/
 - Quick View: To take a quick look at a schema, you can use Infrahub CTL. Follow [this guide](https://docs.infrahub.app/infrahubctl) to install Infrahub CTL.
 - Controlled Integration: For a more organized and unified approach to loading schemas, you can connect a Git repository. Follow [this guide](https://docs.infrahub.app/guides/repository) to connect a Git repository.
 
+> [!NOTE]
+> Schema extensions don’t specify menu placement, so they will default to the root level of the menu. Follow [this guide](https://docs.infrahub.app/guides/menu) to learn more about menu customization.
+
 ## Project Structure
 
 This project is divided into three main parts:
