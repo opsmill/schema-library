@@ -29,7 +29,8 @@ nodes:
       - ComputeGenericUnit
       - DcimGenericDevice
       - DcimPhysicalDevice
-      - VirtualizationHostVirtualMachine # If you don't want to have VM running directly on your physical server you can comment out this line
+      # If you don't want to have VM running directly on your physical server you can comment out the following line
+      - VirtualizationHostVirtualMachine
     attributes:
       - name: status
         kind: Dropdown

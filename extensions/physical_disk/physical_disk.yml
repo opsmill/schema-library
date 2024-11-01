@@ -5,7 +5,9 @@ version: "1.0"
 generics:
   - name: DeviceWithPhysicalDisks
     namespace: Dcim
-    description: Generic that hold relationship toward physical disks. To apply on device that can have physical disks.
+    description:
+      Generic that hold relationship toward physical disks. To apply on device that can have physical
+      disks.
     include_in_menu: false
     relationships:
       - name: physical_disks
