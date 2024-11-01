@@ -1,12 +1,13 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
+
 generics:
   - name: Generic
     namespace: Location
-    description: "Generic Location, could be a country, city ..."
-    label: "Location"
-    icon: "mingcute:location-line"
+    description: Generic Location, could be a country, city ...
+    label: Location
+    icon: mingcute:location-line
     include_in_menu: true
     hierarchical: true
     human_friendly_id:
@@ -36,7 +37,7 @@ generics:
 
   - name: Hosting
     namespace: Location
-    description: "Location directly hosting device and services."
+    description: Location directly hosting device and services.
     include_in_menu: false
     # This is only owning relationships toward various assets that could be found on those locations
     relationships:

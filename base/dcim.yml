@@ -1,12 +1,13 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
+
 generics:
   - name: GenericDevice
     namespace: Dcim
-    description: "Generic Device object."
-    label: "Device"
-    icon: "mdi:server"
+    description: Generic Device object.
+    label: Device
+    icon: mdi:server
     human_friendly_id:
       - name__value
     order_by:
@@ -54,7 +55,7 @@ generics:
 
   - name: PhysicalDevice
     namespace: Dcim
-    description: "Generic holding attributes and relationships relevant for physical device."
+    description: Generic holding attributes and relationships relevant for physical device.
     include_in_menu: false
     attributes:
       - name: position
@@ -69,7 +70,7 @@ generics:
         order_weight: 1500
       - name: rack_face
         label: Rack Face
-        description: "On which face of the rack the device is mounted."
+        description: On which face of the rack the device is mounted.
         kind: Dropdown
         optional: false
         default_value: front
@@ -77,10 +78,10 @@ generics:
         choices:
           - name: front
             label: Front
-            description: "Device mounted on the front face of the rack."
+            description: Device mounted on the front face of the rack.
           - name: rear
             label: Rear
-            description: "Device mounted on the rear face of the rack."
+            description: Device mounted on the rear face of the rack.
     relationships:
       - name: device_type
         peer: DcimDeviceType
@@ -98,10 +99,10 @@ generics:
 
   - name: Interface
     namespace: Dcim
-    description: "Generic Network Interface."
-    label: "Interface"
-    icon: "mdi:ethernet"
-    menu_placement: "DcimGenericDevice"
+    description: Generic Network Interface.
+    label: Interface
+    icon: mdi:ethernet
+    menu_placement: DcimGenericDevice
     include_in_menu: true
     display_labels:
       - name__value
@@ -109,7 +110,7 @@ generics:
       - device__name__value
       - name__value
     uniqueness_constraints:
-      - ["device", "name__value"]
+      - [device, name__value]
     attributes:
       - name: name
         kind: Text
@@ -144,7 +145,7 @@ generics:
 
   - name: Endpoint
     namespace: Dcim
-    description: "Generic Endpoint to receive a connector."
+    description: Generic Endpoint to receive a connector.
     include_in_menu: false
     relationships:
       - name: connector
@@ -156,7 +157,7 @@ generics:
 
   - name: Connector
     namespace: Dcim
-    description: "Generic Connector to link two endpoints together."
+    description: Generic Connector to link two endpoints together.
     include_in_menu: false
     relationships:
       - name: connected_endpoints
@@ -170,10 +171,10 @@ nodes:
   # --------------------  Device (Types, Platforms, Device, Interfaces )  --------------------
   - name: DeviceType
     namespace: Dcim
-    description: "A model of device"
-    label: "Device Type"
-    icon: "mdi:poll"
-    menu_placement: "DcimGenericDevice"
+    description: A model of device
+    label: Device Type
+    icon: mdi:poll
+    menu_placement: DcimGenericDevice
     human_friendly_id:
       - name__value
     display_labels:
@@ -182,7 +183,7 @@ nodes:
       - manufacturer__name__value
       - name__value
     uniqueness_constraints:
-      - ["manufacturer", "name__value"]
+      - [manufacturer, name__value]
     attributes:
       - name: name
         kind: Text
@@ -198,18 +199,18 @@ nodes:
         kind: Text
         order_weight: 1200
       - name: height
-        label: "Height (U)"
+        label: Height (U)
         optional: false
         default_value: 1
         kind: Number
         order_weight: 1400
       - name: full_depth
-        label: "Full Depth"
+        label: Full Depth
         default_value: true
         kind: Boolean
         order_weight: 1500
       - name: weight
-        label: "Weight (kg)"
+        label: Weight (kg)
         optional: true
         kind: Number
         order_weight: 1600
@@ -234,10 +235,10 @@ nodes:
 
   - name: Platform
     namespace: Dcim
-    description: "A Platform represent the type of software running on a device."
-    label: "Platform"
-    icon: "mdi:application-cog-outline"
-    menu_placement: "DcimGenericDevice"
+    description: A Platform represent the type of software running on a device.
+    label: Platform
+    icon: mdi:application-cog-outline
+    menu_placement: DcimGenericDevice
     human_friendly_id:
       - name__value
     display_labels:
@@ -246,7 +247,7 @@ nodes:
       - manufacturer__name__value
       - name__value
     uniqueness_constraints:
-      - ["name__value"]
+      - [name__value]
     attributes:
       - name: name
         kind: Text
@@ -289,9 +290,9 @@ nodes:
         order_weight: 1300
 
   - name: Device
-    label: "Network Device"
+    label: Network Device
     description: A configurable network device for managing and directing data traffic, including routers, switches...
-    menu_placement: "DcimGenericDevice"
+    menu_placement: DcimGenericDevice
     icon: clarity:network-switch-solid
     namespace: Dcim
     inherit_from:
@@ -306,19 +307,19 @@ nodes:
         choices:
           - name: active
             label: Active
-            description: "Fully operational and currently in service."
+            description: Fully operational and currently in service.
             color: "#7fbf7f"
           - name: provisioning
             label: Provisioning
-            description: "In the process of being set up and configured."
+            description: In the process of being set up and configured.
             color: "#ffff7f"
           - name: maintenance
             label: Maintenance
-            description: "Undergoing routine maintenance or repairs."
+            description: Undergoing routine maintenance or repairs.
             color: "#ffd27f"
           - name: drained
             label: Drained
-            description: "Temporarily taken out of service."
+            description: Temporarily taken out of service.
             color: "#bfbfbf"
       - name: role
         kind: Dropdown
@@ -331,31 +332,31 @@ nodes:
             color: "#7f7fff"
           - name: edge
             label: Edge Router
-            description: "Network boundary with external networks."
+            description: Network boundary with external networks.
             color: "#bf7fbf"
           - name: cpe
             label: Customer Premise Equipment
-            description: "Devices located at the customer's premises."
+            description: Devices located at the customer's premises.
             color: "#bf7f7f"
           - name: spine
             label: Spine Router
-            description: "Aggregation router part of a Fabric."
+            description: Aggregation router part of a Fabric.
             color: "#aeeeee"
           - name: leaf
             label: Leaf Switch
-            description: "Top of Rack part of a Fabric."
+            description: Top of Rack part of a Fabric.
             color: "#e6e6fa"
           - name: tor
             label: Tor Switch
-            description: "Tor switch part of a Fabric."
+            description: Tor switch part of a Fabric.
             color: "#e8e7fd"
 
   - name: InterfaceL3
     namespace: Dcim
-    description: "Network Layer 3 Interface"
-    label: "Interface L3"
-    icon: "mdi:ethernet"
-    menu_placement: "DcimGenericDevice"
+    description: Network Layer 3 Interface
+    label: Interface L3
+    icon: mdi:ethernet
+    menu_placement: DcimGenericDevice
     include_in_menu: false
     display_labels:
       - name__value
@@ -371,43 +372,43 @@ nodes:
         choices:
           - name: backbone
             label: Backbone
-            description: "Provide main data routes."
+            description: Provide main data routes.
             color: "#6a5acd"
           - name: upstream
             label: upstream
-            description: "Connect to Internet service provider."
+            description: Connect to Internet service provider.
             color: "#9090de"
           - name: peering
             label: Peering
-            description: "Connect with other networks via IX."
+            description: Connect with other networks via IX.
             color: "#ffa07a"
           - name: peer
             label: Peer
-            description: "Equal-status connections for direct interchange."
+            description: Equal-status connections for direct interchange.
             color: "#faa446"
           - name: server
             label: Server
-            description: "Dedicated to interfaces connected to servers."
+            description: Dedicated to interfaces connected to servers.
             color: "#98b2d1"
           - name: loopback
             label: Loopback
-            description: "Internal interface."
+            description: Internal interface.
             color: "#93e9be"
           - name: management
             label: Management
-            description: "Dedicated network for control and monitoring."
+            description: Dedicated network for control and monitoring.
             color: "#ccc28a"
           - name: uplink
             label: Uplink
-            description: "Connect to higher device."
+            description: Connect to higher device.
             color: "#ff6b6b"
           - name: leaf
             label: Leaf
-            description: "Connect to leaf device."
+            description: Connect to leaf device.
             color: "#e6e6fa"
           - name: spare
             label: Spare
-            description: "Reserve resources for future use."
+            description: Reserve resources for future use.
             color: "#d3d3d3"
         order_weight: 1700
       - name: status
@@ -417,19 +418,19 @@ nodes:
         choices:
           - name: active
             label: Active
-            description: "Fully operational and currently in service."
+            description: Fully operational and currently in service.
             color: "#7fbf7f"
           - name: provisioning
             label: Provisioning
-            description: "In the process of being set up and configured."
+            description: In the process of being set up and configured.
             color: "#ffff7f"
           - name: maintenance
             label: Maintenance
-            description: "Undergoing routine maintenance or repairs."
+            description: Undergoing routine maintenance or repairs.
             color: "#ffd27f"
           - name: drained
             label: Drained
-            description: "Temporarily taken out of service."
+            description: Temporarily taken out of service.
             color: "#bfbfbf"
     relationships:
       - name: ip_addresses
@@ -440,10 +441,10 @@ nodes:
 
   - name: InterfaceL2
     namespace: Dcim
-    description: "Network Layer 2 Interface"
-    label: "Interface L2"
-    icon: "mdi:ethernet"
-    menu_placement: "DcimGenericDevice"
+    description: Network Layer 2 Interface
+    label: Interface L2
+    icon: mdi:ethernet
+    menu_placement: DcimGenericDevice
     include_in_menu: false
     display_labels:
       - name__value
@@ -459,43 +460,43 @@ nodes:
         choices:
           - name: backbone
             label: Backbone
-            description: "Provide main data routes."
+            description: Provide main data routes.
             color: "#6a5acd"
           - name: upstream
             label: upstream
-            description: "Connect to Internet service provider."
+            description: Connect to Internet service provider.
             color: "#9090de"
           - name: peering
             label: Peering
-            description: "Connect with other networks via IX."
+            description: Connect with other networks via IX.
             color: "#ffa07a"
           - name: peer
             label: Peer
-            description: "Equal-status connections for direct interchange."
+            description: Equal-status connections for direct interchange.
             color: "#faa446"
           - name: server
             label: Server
-            description: "Dedicated to interfaces connected to servers."
+            description: Dedicated to interfaces connected to servers.
             color: "#98b2d1"
           - name: loopback
             label: Loopback
-            description: "Internal interface."
+            description: Internal interface.
             color: "#93e9be"
           - name: management
             label: Management
-            description: "Dedicated network for control and monitoring."
+            description: Dedicated network for control and monitoring.
             color: "#ccc28a"
           - name: uplink
             label: Uplink
-            description: "Connect to higher device."
+            description: Connect to higher device.
             color: "#ff6b6b"
           - name: leaf
             label: Leaf
-            description: "Connect to leaf device."
+            description: Connect to leaf device.
             color: "#e6e6fa"
           - name: spare
             label: Spare
-            description: "Reserve resources for future use."
+            description: Reserve resources for future use.
             color: "#d3d3d3"
         order_weight: 1700
       - name: status
@@ -505,22 +506,25 @@ nodes:
         choices:
           - name: active
             label: Active
-            description: "Fully operational and currently in service."
+            description: Fully operational and currently in service.
             color: "#7fbf7f"
           - name: provisioning
             label: Provisioning
-            description: "In the process of being set up and configured."
+            description: In the process of being set up and configured.
             color: "#ffff7f"
           - name: maintenance
             label: Maintenance
-            description: "Undergoing routine maintenance or repairs."
+            description: Undergoing routine maintenance or repairs.
             color: "#ffd27f"
           - name: drained
             label: Drained
-            description: "Temporarily taken out of service."
+            description: Temporarily taken out of service.
             color: "#bfbfbf"
       - name: l2_mode
         label: Layer2 Mode
         kind: Text
-        enum: ["Access", "Trunk", "Tunnel"]
+        enum:
+          - Access
+          - Trunk
+          - Tunnel
         order_weight: 1250

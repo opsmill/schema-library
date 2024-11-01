@@ -1,12 +1,14 @@
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
+
 nodes:
   # --------------------  IPAM (Prefix, IP Address)  --------------------
   - name: IPAddress
     namespace: Ipam
-    description: "IP Address"
-    label: "IP Address"
-    icon: "mdi:ip"
+    description: IP Address
+    label: IP Address
+    icon: mdi:ip
     include_in_menu: false
     order_by:
       - address__value
@@ -15,15 +17,17 @@ nodes:
     inherit_from:
       - BuiltinIPAddress
     uniqueness_constraints:
-      - ["ip_namespace", "address__value"]
-    human_friendly_id: ["address__value", "ip_namespace__name__value"]
+      - [ip_namespace, address__value]
+    human_friendly_id:
+      - address__value
+      - ip_namespace__name__value
     attributes:
       - name: fqdn
         label: FQDN
         kind: Text
         optional: true
         # https://stackoverflow.com/questions/11809631/fully-qualified-domain-name-validation
-        regex: "(?=^.{1,253}$)(^(((?!-)[a-zA-Z0-9-]{1,63}(?<!-))|((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\\.)+[a-zA-Z]{2,63})$)"
+        regex: (?=^.{1,253}$)(^(((?!-)[a-zA-Z0-9-]{1,63}(?<!-))|((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63})$)
     relationships:
       - name: interface
         peer: DcimInterfaceL3
@@ -32,10 +36,10 @@ nodes:
 
   - name: Prefix
     namespace: Ipam
-    description: "IPv4 or IPv6 network (with mask)"
-    icon: "mdi:ip-network"
+    description: IPv4 or IPv6 network (with mask)
+    icon: mdi:ip-network
     include_in_menu: false
-    label: "Prefix"
+    label: Prefix
     order_by:
       - prefix__value
     display_labels:
@@ -43,8 +47,10 @@ nodes:
     inherit_from:
       - BuiltinIPPrefix
     uniqueness_constraints:
-      - ["ip_namespace", "prefix__value"]
-    human_friendly_id: ["prefix__value", "ip_namespace__name__value"]
+      - [ip_namespace, prefix__value]
+    human_friendly_id:
+      - prefix__value
+      - ip_namespace__name__value
     attributes:
       - name: status
         kind: Dropdown
@@ -61,31 +67,31 @@ nodes:
         choices:
           - name: loopback
             label: Loopback
-            description: "Represents internal communications."
+            description: Represents internal communications.
             color: "#B0A8B9"
           - name: management
             label: Management
-            description: "Handles administrative operations."
+            description: Handles administrative operations.
             color: "#AEC6CF"
           - name: public
             label: Public
-            description: "Public facing network."
+            description: Public facing network.
             color: "#FDFD96"
           - name: server
             label: Server
-            description: "Dedicated to server functions."
+            description: Dedicated to server functions.
             color: "#77DD77"
           - name: supernet
             label: Supernet
-            description: "Covers multiple networks"
+            description: Covers multiple networks
             color: "#FFB347"
           - name: technical
             label: Technical
-            description: "Focused on technical aspects."
+            description: Focused on technical aspects.
             color: "#9678B6"
           - name: loopback-vtep
             label: Loopback VTEP
-            description: "Facilitates virtualized network communications within loopback configurations."
+            description: Facilitates virtualized network communications within loopback configurations.
             color: "#CDB4DB"
     relationships:
       - name: organization
@@ -102,7 +108,7 @@ nodes:
         order_weight: 1300
       - name: gateway
         label: L3 Gateway
-        identifier: "prefix__gateway"
+        identifier: prefix__gateway
         peer: IpamIPAddress
         optional: true
         cardinality: one
