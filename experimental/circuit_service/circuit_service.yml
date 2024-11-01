@@ -7,7 +7,7 @@ nodes:
     description: "Represent the boundary of a provider network, the details of which are unknown or unimportant"
     label: "Circuit Service"
     icon: "mdi:cloud"
-    menu_placement: "dCICircuit"
+    menu_placement: "DcimCircuit"
     human_friendly_id:
       - name__value
     order_by:
