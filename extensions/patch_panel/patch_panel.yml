@@ -112,7 +112,6 @@ nodes:
     description: A Patch Panel used for managing network cable connections in a data center or telecom setup.
     icon: ic:round-device-hub
     namespace: Dcim
-    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
@@ -153,6 +152,7 @@ nodes:
         optional: true
         cardinality: many
         kind: Component
+
   - name: FrontPatchPanelInterface
     label: Patch Panel Front Interfaces
     menu_placement: DcimGenericPatchPanelInterface
@@ -186,6 +186,7 @@ nodes:
         optional: false
         cardinality: one
         kind: Parent
+
   - name: RearPatchPanelInterface
     label: Patch Panel Rear Interfaces
     menu_placement: DcimGenericPatchPanelInterface
@@ -219,6 +220,7 @@ nodes:
         optional: false
         cardinality: one
         kind: Parent
+
   - name: PatchPanelModule
     namespace: Dcim
     label: Patch Panel Module

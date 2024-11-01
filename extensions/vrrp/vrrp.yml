@@ -3,12 +3,10 @@
 version: "1.0"
 
 nodes:
-  # --------------------  VRRP (VRRP Group & VRRP Interfaces)  --------------------
   - name: VRRPGroup
     namespace: Network
     label: VRRP Group
     icon: fluent:virtual-network-20-filled
-    menu_placement: DcimInterface
     description: VRRP Group configuration
     display_labels:
       - name__value
@@ -54,6 +52,7 @@ nodes:
         cardinality: many
         label: VRRP Interfaces
         order_weight: 1300
+
   - name: VRRPInterface
     namespace: Network
     label: VRRP Interface
@@ -93,7 +92,6 @@ nodes:
 
 extensions:
   nodes:
-    # DCIM Extensions
     - kind: DcimInterfaceL3
       relationships:
         - name: vrrp
@@ -103,8 +101,6 @@ extensions:
           cardinality: one
           label: VRRP
           order_weight: 1500
-
-    # IPAM Extensions
     - kind: IpamIPAddress
       relationships:
         - name: vrrp

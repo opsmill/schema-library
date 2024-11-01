@@ -4,7 +4,7 @@ A rather generic cluster built with compute units (e.g. servers) and able to hos
 
 ## Nodes
 
-- HostingCluster
+- ClusterHosting
 
 ## Dependencies
 

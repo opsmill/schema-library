@@ -6,8 +6,6 @@ nodes:
   - name: Cable
     namespace: Dcim
     description: Physical cable connecting two endpoints
-    include_in_menu: true
-    menu_placement: DcimDevice
     label: Cable
     icon: mdi:cable-data
     inherit_from:

@@ -3,11 +3,10 @@
 version: "1.0"
 
 nodes:
-  - name: Channel
-    namespace: Dwdm
+  - name: DWDMChannel
+    namespace: Dcim
     description: A DWDM channel with its wavelength and frequency.
     label: DWDM Channel
-    menu_placement: DcimInterface
     icon: game-icons:laser-warning
     order_by:
       - channel__value

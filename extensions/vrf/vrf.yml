@@ -3,9 +3,8 @@
 version: "1.0"
 
 nodes:
-  # -------------------- VRF & RouteTarget --------------------
   - name: VRF
-    namespace: Ipam # TODO: Is IPAM the right namespace here?
+    namespace: Ipam
     description: A VRF is isolated layer three domain
     label: VRF
     icon: mdi:router
@@ -48,6 +47,7 @@ nodes:
         optional: true
         cardinality: one
         kind: Attribute
+
   - name: RouteTarget
     namespace: Ipam
     description: Route Target (RFC 4360)

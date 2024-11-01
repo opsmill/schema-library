@@ -20,7 +20,7 @@ nodes:
   - name: PhysicalDisk
     namespace: Dcim
     description: Physical Disk
-    label: Disk
+    label: Physical Disk
     icon: carbon:vmdk-disk
     order_by:
       - name__value

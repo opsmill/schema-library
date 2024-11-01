@@ -32,6 +32,7 @@ nodes:
         description: List of code points for low loss priority.
         optional: true
         order_weight: 1300
+
   - name: ClassOfService
     namespace: Qos
     label: Class of Service
@@ -57,6 +58,7 @@ nodes:
         cardinality: many
         optional: true
         order_weight: 1200
+
   - name: TrafficControlProfile
     namespace: Qos
     label: Traffic Control Profile
@@ -86,6 +88,7 @@ nodes:
             label: Inactive
         default_value: inactive
         order_weight: 1200
+
   - name: Classifier
     namespace: Qos
     label: Classifier
@@ -123,6 +126,7 @@ nodes:
         cardinality: many
         optional: true
         order_weight: 1300
+
   - name: Scheduler
     namespace: Qos
     label: Scheduler
@@ -174,6 +178,7 @@ nodes:
             label: High Excess Priority
         optional: true
         order_weight: 1500
+
   - name: SchedulerMap
     namespace: Qos
     label: Scheduler Map

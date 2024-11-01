@@ -3,11 +3,12 @@
 version: "1.0"
 
 nodes:
-  - name: HostingCluster
-    namespace: Virtualization
+  - name: Hosting
+    namespace: Cluster
     label: Hosting Cluster
     description: A cluster hosting virtual machines.
     icon: mdi:dots-hexagon
+    menu_placement: ClusterGeneric
     inherit_from:
       - ClusterGeneric
       - VirtualizationHostVirtualMachine # Means we can get VM running on this one

@@ -5,11 +5,10 @@ version: "1.0"
 nodes:
   - name: Country
     namespace: Location
+    label: Country
     inherit_from:
       - LocationGeneric
-    include_in_menu: true
     menu_placement: LocationGeneric
-    label: Country
     display_labels:
       - name__value
     parent: ""
@@ -20,26 +19,26 @@ nodes:
         kind: Text
         optional: true
         order_weight: 1300
+
   - name: Metro
     namespace: Location
+    label: Metro
     inherit_from:
       - LocationGeneric
-    include_in_menu: true
     menu_placement: LocationGeneric
-    label: Metro
     display_labels:
       - name__value
     parent: LocationCountry
     children: LocationSite
     icon: healthicons:city
+
   - name: Site
     namespace: Location
+    label: Site
     inherit_from:
       - LocationGeneric
       - LocationHosting
-    include_in_menu: true
     menu_placement: LocationGeneric
-    label: Site
     display_labels:
       - name__value
     parent: LocationMetro
@@ -61,14 +60,14 @@ nodes:
         peer: OrganizationGeneric
         optional: true
         cardinality: one
+
   - name: Rack
     namespace: Location
+    label: Rack
     inherit_from:
       - LocationGeneric
       - LocationHosting
-      - CoreArtifactTarget
     include_in_menu: true
-    label: Rack
     display_labels:
       - name__value
     menu_placement: LocationGeneric
@@ -96,7 +95,7 @@ extensions:
   nodes:
     - kind: OrganizationProvider
       relationships:
-        - name: location
+        - name: sites
           peer: LocationSite
           cardinality: many
           optional: true

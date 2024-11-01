@@ -3,12 +3,10 @@
 version: "1.0"
 
 nodes:
-  # --------------------  Policer  --------------------
   - name: Policer
     namespace: Security
     label: Network Policer
     icon: mdi:car-speed-limiter
-    # menu_placement: SecurityPolicer
     description: A generic policer configuration.
     display_labels:
       - name__value

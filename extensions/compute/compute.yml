@@ -7,6 +7,7 @@ generics:
     namespace: Compute
     description: A generic unit that can compute (e.g. server, vm ...).
     include_in_menu: false
+
   - name: HostVirtualMachine
     namespace: Virtualization
     description: A generic unut that can host VM
@@ -23,7 +24,6 @@ nodes:
     namespace: Compute
     description: A physical server with fixed resources and specific hardware characteristics.
     label: Physical Server
-    include_in_menu: true
     icon: mdi:server
     inherit_from:
       - ComputeGenericUnit
@@ -56,7 +56,6 @@ nodes:
   - name: VirtualMachine
     namespace: Virtualization
     description: A virtual machine hosted on a server or a cluster.
-    include_in_menu: true
     label: Virtual Machine
     icon: carbon:virtual-machine
     inherit_from:

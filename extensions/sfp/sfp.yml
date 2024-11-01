@@ -9,7 +9,6 @@ nodes:
     label: SFP
     icon: mdi:gpu
     include_in_menu: true
-    menu_placement: DcimGenericDevice
     human_friendly_id:
       - form_factor__value
       - type__value

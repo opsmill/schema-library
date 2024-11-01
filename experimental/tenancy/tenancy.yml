@@ -22,6 +22,6 @@ nodes:
         cardinality: many
         optional: true
       - name: circuit
-        peer: CircuitCircuit
+        peer: DcimCircuit
         cardinality: many
         optional: true

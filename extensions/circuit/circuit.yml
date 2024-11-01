@@ -5,7 +5,7 @@ version: "1.0"
 nodes:
   # TODO: Maybe create a generic, we would have colored circuits, cross co, for instance
   - name: Circuit
-    namespace: Circuit
+    namespace: Dcim
     description: A Circuit represent service operated by a provider.
     label: Circuit
     icon: mdi:cable-data
@@ -13,7 +13,6 @@ nodes:
       - circuit_id__value
     inherit_from:
       - DcimConnector
-    include_in_menu: true
     order_by:
       - circuit_id__value
     display_labels:
@@ -83,12 +82,12 @@ extensions:
     - kind: OrganizationProvider
       relationships:
         - name: circuits
-          peer: CircuitCircuit
+          peer: DcimCircuit
           cardinality: many
           optional: true
     - kind: LocationHosting
       relationships:
         - name: circuits
-          peer: CircuitCircuit
+          peer: DcimCircuit
           cardinality: many
           optional: true

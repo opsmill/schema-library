@@ -174,7 +174,6 @@ nodes:
     description: A model of device
     label: Device Type
     icon: mdi:poll
-    menu_placement: DcimGenericDevice
     human_friendly_id:
       - name__value
     display_labels:
@@ -238,7 +237,6 @@ nodes:
     description: A Platform represent the type of software running on a device.
     label: Platform
     icon: mdi:application-cog-outline
-    menu_placement: DcimGenericDevice
     human_friendly_id:
       - name__value
     display_labels:
@@ -292,7 +290,6 @@ nodes:
   - name: Device
     label: Network Device
     description: A configurable network device for managing and directing data traffic, including routers, switches...
-    menu_placement: DcimGenericDevice
     icon: clarity:network-switch-solid
     namespace: Dcim
     inherit_from:
@@ -356,8 +353,7 @@ nodes:
     description: Network Layer 3 Interface
     label: Interface L3
     icon: mdi:ethernet
-    menu_placement: DcimGenericDevice
-    include_in_menu: false
+    menu_placement: DcimInterface
     display_labels:
       - name__value
     order_by:
@@ -444,8 +440,7 @@ nodes:
     description: Network Layer 2 Interface
     label: Interface L2
     icon: mdi:ethernet
-    menu_placement: DcimGenericDevice
-    include_in_menu: false
+    menu_placement: DcimInterface
     display_labels:
       - name__value
     order_by:
