@@ -5,10 +5,15 @@ With some vendors, the tunable optics are not configured via the channel number 
 
 ## Nodes
 
-- DcimDWDMChannel
-- DcimSFPDwdm
+- DwdmChannel
+- SFPDwdm
+- RearDwdmInterface
+- FrontDwdmInterface
+- DwdmDevice
 
 ## Generics
+
+- GenericDwdmInterface
 
 ## Dependencies
 

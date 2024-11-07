@@ -207,6 +207,7 @@ nodes:
     description: A DWDM channel with its wavelength and frequency.
     label: DWDM Channel
     icon: game-icons:laser-warning
+    menu_placement: DcimDwdmDevice
     order_by:
       - channel__value
     display_labels:
