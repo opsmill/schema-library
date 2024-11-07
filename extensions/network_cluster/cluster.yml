@@ -6,7 +6,7 @@ nodes:
   - name: VirtualChassis
     namespace: Cluster
     icon: ph:stack-bold
-    description: "A virtual chassis represents a set of devices sharing a common control plane (e.g., a stack of switches)."
+    description: "A virtual chassis represents a set of devices sharing a common control plane."
     label: "Virtual Chassis"
     display_labels:
       - name__value

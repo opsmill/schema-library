@@ -1,4 +1,4 @@
-# Network Cluster (Virtual-Chassis, VPC, ...) schema extension
+# 🧩 Network Cluster (Virtual-Chassis, VPC, ...) schema extension
 
 This schema extension modelize virtual-chassis and their members.
 
