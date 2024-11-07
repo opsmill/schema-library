@@ -2,8 +2,207 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
 
+generics:
+  - name: GenericDwdmInterface
+    label: DWDM Interfaces
+    menu_placement: DcimDwdmDevice
+    namespace: Dcim
+    icon: mdi:ethernet
+    attributes:
+      - name: name
+        kind: Text
+        order_weight: 1000
+      - name: description
+        kind: Text
+        optional: true
+        order_weight: 2000
+      - name: connector_type
+        kind: Dropdown
+        order_weight: 1100
+        choices:
+          - name: FC
+            label: FC
+            description: "Standardized fiber optic connector used primarily in datacom and telecom applications."
+          - name: LC
+            label: LC
+            description: "Compact fiber optic connector with a push-pull mechanism."
+          - name: LC_PC
+            label: LC/PC
+            description: "Polished LC connector providing physical contact (PC)."
+          - name: LC_UPC
+            label: LC/UPC
+            description: "Ultra-Physical Contact (UPC) variant of the LC connector with enhanced polish."
+          - name: LC_APC
+            label: LC/APC
+            description: "Angled Physical Contact (APC) version of the LC connector with a slanted fiber end-face."
+          - name: LSH
+            label: LSH
+            description: "European fiber optic connector offering high durability."
+          - name: LSH_PC
+            label: LSH/PC
+            description: "Physical Contact version of LSH with standard polish."
+          - name: LSH_UPC
+            label: LSH/UPC
+            description: "Ultra-Physical Contact variant of LSH, minimizing return loss with a superior polish."
+          - name: LSH_APC
+            label: LSH/APC
+            description: "Angled Physical Contact version of LSH, designed to reduce back reflections."
+          - name: LX_5
+            label: LX.5
+            description: "Miniaturized fiber optic connector similar to LC but with an additional shutter mechanism."
+          - name: LX_5_PC
+            label: LX.5/PC
+            description: "Physical Contact version of LX.5."
+          - name: LX_5_UPC
+            label: LX.5/UPC
+            description: "Ultra-Physical Contact variant of LX.5."
+          - name: LX_5_APC
+            label: LX.5/APC
+            description: "Angled Physical Contact version of LX.5."
+          - name: MPO
+            label: MPO
+            description: "Multi-fiber Push-On connector typically used in data centers for high-speed applications."
+          - name: MTRJ
+            label: MTRJ
+            description: "Male-to-female fiber optic connector with two fibers."
+          - name: SC
+            label: SC
+            description: "Square fiber optic connector with push-pull lock."
+          - name: SC_PC
+            label: SC/PC
+            description: "Physical Contact SC connector with a polished end-face."
+          - name: SC_UPC
+            label: SC/UPC
+            description: "Ultra-Physical Contact variant of SC."
+          - name: SC_APC
+            label: SC/APC
+            description: "Angled Physical Contact version of SC."
+          - name: ST
+            label: ST
+            description: "Bayonet-style fiber optic connector primarily used in industrial and military applications."
+          - name: CS
+            label: CS
+            description: "Compact connector with a high-density duplex configuration."
+          - name: SN
+            label: SN
+            description: "Small-form connector with dual fibers."
+          - name: SMA_905
+            label: SMA 905
+            description: "Stainless steel fiber optic connector."
+          - name: SMA_906
+            label: SMA 906
+            description: "Variant of SMA 905 with similar durability, frequently used in high-vibration settings."
+          - name: URM_P2
+            label: URM-P2
+            description: "Specialized fiber optic connector for industrial and harsh environments."
+          # FIXME: Commenting out otherwise I'm facing a Text attribute length should be less than 4096 characters.
+          # - name: URM_P4
+          #   label: URM-P4
+          #   description: "Similar to URM-P2 but designed for higher performance."
+          # - name: URM_P8
+          #   label: URM-P8
+          #   description: "Enhanced version of URM connectors with higher protection."
+          # - name: Splice
+          #   label: Splice
+          #   description: "Permanent fiber connection method where two fiber ends are fused."
+
 nodes:
-  - name: DWDMChannel
+  - name: DwdmDevice
+    label: DWDM Device
+    description: A DWDM device for managing optical network traffic.
+    icon: mdi:transit-connection-variant
+    namespace: Dcim
+    human_friendly_id:
+      - name__value
+    order_by:
+      - name__value
+    display_labels:
+      - name__value
+    inherit_from:
+      - DcimPhysicalDevice
+    attributes:
+      - name: name
+        kind: Text
+        unique: true # TODO: maybe combine location / name
+        order_weight: 1000
+      - name: description
+        kind: Text
+        optional: true
+        order_weight: 2000
+    relationships:
+      - name: front_interfaces
+        peer: DcimFrontDwdmInterface
+        identifier: front_interfaces
+        optional: true
+        cardinality: many
+        kind: Component
+      - name: rear_interface
+        peer: DcimRearDwdmInterface
+        identifier: rear_interfaces
+        optional: true
+        cardinality: one
+        kind: Component
+
+  - name: FrontDwdmInterface
+    label: DWDM Front Interfaces
+    menu_placement: DcimGenericDwdmInterface
+    namespace: Dcim
+    human_friendly_id:
+      - dwdm_device__name__value
+      - name__value
+    display_labels:
+      #  - dwdm  # FIXME: DcimInterface.display_labels: this property only supports attributes, not relationships
+      - name__value
+    order_by:
+      - name__value
+    uniqueness_constraints:
+      - [dwdm_device, name__value]
+    inherit_from:
+      - DcimEndpoint
+      - DcimGenericDwdmInterface
+    relationships:
+      - name: dwdm_device
+        peer: DcimDwdmDevice
+        order_weight: 900
+        identifier: front_interfaces
+        optional: false
+        cardinality: one
+        kind: Parent
+      - name: channels
+        peer: DcimDwdmChannel
+        order_weight: 1200
+        optional: true
+        cardinality: many
+        kind: Attribute
+
+  - name: RearDwdmInterface
+    label: DWDM Rear Interfaces
+    menu_placement: DcimGenericDwdmInterface
+    namespace: Dcim
+    human_friendly_id:
+      - dwdm_device__name__value
+      - name__value
+    display_labels:
+      #  - dwdm  # FIXME: DcimInterface.display_labels: this property only supports attributes, not relationships
+      - name__value
+    order_by:
+      - dwdm_device__name__value
+      - name__value
+    uniqueness_constraints:
+      - [dwdm_device, name__value]
+    inherit_from:
+      - DcimEndpoint
+      - DcimGenericDwdmInterface
+    relationships:
+      - name: dwdm_device
+        peer: DcimDwdmDevice
+        order_weight: 900
+        identifier: rear_interface
+        optional: false
+        cardinality: one
+        kind: Parent
+
+  - name: DwdmChannel
     namespace: Dcim
     description: A DWDM channel with its wavelength and frequency.
     label: DWDM Channel
@@ -59,7 +258,7 @@ nodes:
     relationships:
       - name: dwdm_channel
         label: DWDM Channel
-        peer: DcimDWDMChannel
+        peer: DcimDwdmChannel
         kind: Attribute
         cardinality: one
         optional: false
