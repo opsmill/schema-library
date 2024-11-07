@@ -5,12 +5,12 @@ With some vendors, the tunable optics are not configured via the channel number 
 
 ## Nodes
 
-- DwdmChannel
+- DcimDWDMChannel
+- DcimSFPDwdm
 
 ## Generics
 
 ## Dependencies
 
 - Base
-
-TODO: when we have a proper `optic` schema, we could link those DwdmChannel to it.
+- SFP

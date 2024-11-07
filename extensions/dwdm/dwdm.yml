@@ -14,6 +14,8 @@ nodes:
       - channel__value
     uniqueness_constraints:
       - [channel__value]
+      - [wavelength__value]
+      - [frequency__value]
     human_friendly_id:
       - channel__value
     attributes:
@@ -29,8 +31,6 @@ nodes:
         label: Frequency (THz)
         kind: Text # Text until float possible in Number Kind
         description: Frequency of the channel in THz.
-<<<<<<< HEAD
-=======
 
   - name: SFPDwdm
     namespace: Dcim
@@ -64,4 +64,3 @@ nodes:
         cardinality: one
         optional: false
         order_weight: 1150
->>>>>>> fb63214 (transform SFP as generic + add Bidi + add DWDM)
