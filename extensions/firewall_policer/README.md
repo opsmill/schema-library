@@ -1,4 +1,4 @@
-# Firewall schema extension
+# 🧩 Firewall policer
 
 This schema extension contains models for VMs. You might consider Cluster or/and Hypervisor extension to go with!
 

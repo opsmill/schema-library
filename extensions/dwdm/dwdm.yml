@@ -1,33 +1,31 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
 
 nodes:
-  - name: Channel
-    namespace: Dwdm
-    description: "A DWDM channel with its wavelength and frequency."
-    label: "DWDM Channel"
-    menu_placement: InterfaceBase
-    icon: "game-icons:laser-warning"
-    default_filter: channel__value
+  - name: DWDMChannel
+    namespace: Dcim
+    description: A DWDM channel with its wavelength and frequency.
+    label: DWDM Channel
+    icon: game-icons:laser-warning
     order_by:
       - channel__value
     display_labels:
       - channel__value
     uniqueness_constraints:
-      - ["channel__value"]
+      - [channel__value]
     human_friendly_id:
       - channel__value
     attributes:
       - name: channel
         kind: Number
-        description: "DWDM channel number."
+        description: DWDM channel number.
         unique: true
       - name: wavelength
         label: Wavelength (nm)
-        kind: Text  # Text until float possible in Number Kind
-        description: "Wavelength of the channel in nm."
+        kind: Text # Text until float possible in Number Kind
+        description: Wavelength of the channel in nm.
       - name: frequency
         label: Frequency (THz)
-        kind: Text  # Text until float possible in Number Kind
-        description: "Frequency of the channel in THz."
+        kind: Text # Text until float possible in Number Kind
+        description: Frequency of the channel in THz.

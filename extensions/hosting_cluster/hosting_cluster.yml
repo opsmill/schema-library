@@ -1,0 +1,54 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+version: "1.0"
+
+nodes:
+  - name: Hosting
+    namespace: Cluster
+    label: Hosting Cluster
+    description: A cluster hosting virtual machines.
+    icon: mdi:dots-hexagon
+    menu_placement: ClusterGeneric
+    inherit_from:
+      - ClusterGeneric
+      - VirtualizationHostVirtualMachine # Means we can get VM running on this one
+      - ClusterGenericComputeUnitNodes # Means it's built out of regular compute unit (e.g. server)
+    attributes:
+      - name: type
+        kind: Dropdown
+        order_weight: 1200
+        description: Type of the cluster.
+        choices:
+          - name: aws
+            label: Amazon Web Service
+            color: "#b90028"
+          - name: kvm
+            label: KVM
+            color: "#0082e2"
+          - name: gcp
+            label: Google Cloud Platform
+            color: "#e29200"
+          - name: vmware
+            label: VMware
+            color: "#3d8600"
+      - name: status
+        kind: Dropdown
+        optional: false
+        order_weight: 1300
+        choices:
+          - name: active
+            label: Active
+            description: Fully operational and currently in service.
+            color: "#7fbf7f"
+          - name: provisioning
+            label: Provisioning
+            description: In the process of being set up and configured.
+            color: "#ffff7f"
+          - name: maintenance
+            label: Maintenance
+            description: Undergoing routine maintenance or repairs.
+            color: "#ffd27f"
+          - name: drained
+            label: Drained
+            description: Temporarily taken out of service.
+            color: "#bfbfbf"

@@ -1,13 +1,13 @@
 # 🧩 Virtualization Cluster
 
-This schema extension contains all you need to modelize your clusters!
+This schema extension contains the foundations to capture clusters. With this one in place you can unlock various clusters flavors (hosting cluster able to host VMs, firewall clusters built with specific appliances ...)
 
-## Nodes
+## Generics
 
-- Cluster
-- Cluster Nodes
+- ClusterGeneric
+- GenericComputeUnitNodes
 
 ## Dependencies
 
 - Base
-- Virtualization
+- Compute

@@ -98,7 +98,8 @@ nodes:
   - name: Zone
     namespace: Security
     menu_placement: SecurityPolicy
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels:
       - name__value
     include_in_menu: true
@@ -123,7 +124,8 @@ nodes:
     icon: "mdi:ip-outline"
     description: "Infrahub IPv4/6 address"
     label: "IPAM IP Address"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     inherit_from:
       - SecurityGenericAddress
     attributes:
@@ -143,7 +145,8 @@ nodes:
     icon: "mdi:ip-network-outline"
     description: "Infrahub IPv4/6 prefix"
     label: "IPAM IP Prefix"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     inherit_from:
       - SecurityGenericAddress
     attributes:
@@ -161,7 +164,8 @@ nodes:
     menu_placement: SecurityPolicy
     include_in_menu: true
     description: "IPv4/6 address"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     label: "IP Address"
     icon: "mdi:ip-outline"
     inherit_from:
@@ -184,7 +188,8 @@ nodes:
     icon: "mdi:ip-network-outline"
     description: "IPv4/6 prefix"
     label: "Prefix"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     inherit_from:
       - "SecurityGenericAddress"
     order_by:
@@ -207,7 +212,8 @@ nodes:
     icon: "mdi:ip-outline"
     description: "IPv4/6 Range"
     label: "IP Range"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels:
       - name__value
     inherit_from:
@@ -230,7 +236,8 @@ nodes:
     icon: "eos-icons:dns"
     menu_placement: SecurityPolicy
     label: "FQDN"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels:
       - name__value
     inherit_from:
@@ -252,7 +259,8 @@ nodes:
     icon: "material-symbols:menu-book-outline-rounded"
     description: "Group of addresses"
     label: Address Group
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     parent: SecurityAddressGroup
     display_labels:
       - name__value
@@ -266,7 +274,8 @@ nodes:
     include_in_menu: true
     description: "IP protocol"
     label: IP Protocols
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels:
       - name__value
     order_by:
@@ -285,7 +294,8 @@ nodes:
     icon: "eos-icons:application-outlined"
     description: "Service"
     label: Service
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels:
       - name__value
     order_by:
@@ -309,7 +319,8 @@ nodes:
     icon: "eos-icons:application-outlined"
     description: "Service range"
     label: Service range
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels:
       - name__value
     order_by:
@@ -337,7 +348,8 @@ nodes:
     icon: "material-symbols:menu-book-outline-rounded"
     label: Service group
     description: "Group of services"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels:
       - name__value
     order_by:
@@ -347,7 +359,8 @@ nodes:
   - name: Policy
     namespace: Security
     label: "Security Policy"
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     display_labels:
       - name__value
     order_by:
@@ -487,7 +500,8 @@ nodes:
       - SecurityPolicyAssignment
     icon: "mdi:firewall"
     include_in_menu: true
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     menu_placement: "InfraGenericDevice"
     attributes:
       - name: role

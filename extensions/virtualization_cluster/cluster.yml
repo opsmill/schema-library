@@ -1,15 +1,15 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
 
-nodes:
-  - name: Cluster
-    namespace: Virtualization
-    description: A cluster hosting virtual machines.
+generics:
+  - name: Generic
+    namespace: Cluster
+    description: A cluster of machines hosting services or other machines.
+    label: Clusters
     icon: mdi:dots-hexagon
-    inherit_from:
-      - VirtualizationHostVirtualMachine
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     order_by:
       - name__value
     display_labels:
@@ -20,54 +20,10 @@ nodes:
         description: Name of the cluster.
         unique: true
         order_weight: 1000
-      - name: type
-        kind: Dropdown
-        order_weight: 1200
-        description: Type of the cluster.
-        choices:
-          - name: aws
-            label: Amazon Web Service
-            color: "#b90028"
-          - name: kvm
-            label: KVM
-            color: "#0082e2"
-          - name: gcp
-            label: Google Cloud Platform
-            color: "#e29200"
-          - name: vmware
-            label: VMware
-            color: "#3d8600"
-      - name: status
-        kind: Dropdown
-        optional: false
-        default_value: provisioning
-        order_weight: 1300
-        choices:
-          - name: active
-            label: Active
-            description: "Fully operational and currently in service."
-            color: "#7fbf7f"
-          - name: provisioning
-            label: Provisioning
-            description: "In the process of being set up and configured."
-            color: "#ffff7f"
-          - name: maintenance
-            label: Maintenance
-            description: "Undergoing routine maintenance or repairs."
-            color: "#ffd27f"
-          - name: drained
-            label: Drained
-            description: "Temporarily taken out of service."
-            color: "#bfbfbf"
       - name: description
         kind: Text
         optional: true
     relationships:
-      - name: nodes
-        label: Nodes
-        cardinality: many
-        peer: VirtualizationClusterNode
-        kind: Component
       - name: location
         label: Location
         peer: LocationGeneric
@@ -82,17 +38,35 @@ nodes:
         kind: Attribute
         order_weight: 2000
 
-  - name: ClusterNode
-    namespace: Virtualization
-    description: A node building a cluster.
-    icon: mdi:dot
-    menu_placement: VirtualizationCluster
-    inherit_from:
-      - DcimGenericDevice
-      - DcimPhysicalDevice
-    attributes: []
+  - name: GenericComputeUnitNodes
+    namespace: Cluster
+    description: A generic to apply on clusters that can be built out of generic compute units.
+    include_in_menu: false
     relationships:
-      - name: cluster
-        peer: VirtualizationCluster
-        optional: true
-        kind: Attribute
+      - name: nodes
+        label: Nodes
+        identifier: worker_in_cluster
+        cardinality: many
+        peer: ComputeGenericUnit
+        kind: Component
+
+extensions:
+  nodes:
+    - kind: ComputeGenericUnit
+      relationships:
+        - name: worker_in_cluster
+          identifier: worker_in_cluster
+          label: Worker in cluster
+          peer: ClusterGenericComputeUnitNodes
+          cardinality: one
+          description: This device is a worker node of the specified cluster.
+          optional: true
+    - kind: LocationGeneric
+      relationships:
+        - name: clusters
+          label: Clusters
+          peer: ClusterGeneric
+          cardinality: many
+          kind: Component
+          description: All clusters available on that location.
+          optional: true

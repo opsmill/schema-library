@@ -1,6 +1,7 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
+
 nodes:
   - name: Tenant
     namespace: Tenancy
@@ -21,6 +22,6 @@ nodes:
         cardinality: many
         optional: true
       - name: circuit
-        peer: CircuitCircuit
+        peer: DcimCircuit
         cardinality: many
         optional: true

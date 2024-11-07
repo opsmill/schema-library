@@ -1,6 +1,6 @@
 # 🧩 BGP
 
-This schema extension contains all you need to modelize your BGP platform!
+This schema extension contains all you need to model your BGP platform
 
 ## Nodes
 

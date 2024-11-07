@@ -97,14 +97,14 @@ nodes:
         optional: true
         order_weight: 1500
     relationships:
-        - name: interface
-          kind: Parent
-          peer: DcimInterface
-          description: "Interface to which the Input/Output VLAN mapping is applied"
-          cardinality: one
-          optional: False
-          label: Interface
-          order_weight: 1000
+      - name: interface
+        kind: Parent
+        peer: DcimInterface
+        description: "Interface to which the Input/Output VLAN mapping is applied"
+        cardinality: one
+        optional: false
+        label: Interface
+        order_weight: 1000
 
 extensions:
   nodes:
@@ -116,5 +116,5 @@ extensions:
           peer: NetworkMapInOut
           description: "Interface Input/Output VLAN mapping"
           cardinality: many
-          label: Input/Ouput MAP
+          label: Input/Output MAP
           order_weight: 1600

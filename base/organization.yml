@@ -1,13 +1,16 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
+
 generics:
   - name: Generic
-    namespace: Organization #TODO: find something better here => Vendor, contractor ...
+    namespace: Organization
     label: Organization
     description: An organization represent a legal entity, a company.
-    default_filter: name__value
-    order_by: [name__value]
+    human_friendly_id:
+      - name__value
+    order_by:
+      - name__value
     display_labels:
       - name__value
     icon: mdi:domain
@@ -47,6 +50,7 @@ nodes:
         peer: DcimPlatform
         cardinality: many
         optional: true
+
   - name: Provider
     namespace: Organization
     description: Circuit or Location Provider

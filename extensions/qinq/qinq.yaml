@@ -1,9 +1,8 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
 
 # TODO: Override L2 interface to add trunnel option for l2 mode
-
 extensions:
   nodes:
     - kind: IpamVLAN

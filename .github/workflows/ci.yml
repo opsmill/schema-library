@@ -1,0 +1,100 @@
+---
+# yamllint disable rule:truthy rule:truthy rule:line-length
+name: "CI"
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
+
+jobs:
+  files-changed:
+    name: Detect which file has changed
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      yaml: ${{ steps.changes.outputs.yaml_all }}
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v4"
+      - name: Check for file changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          token: ${{ github.token }}
+          filters: .github/file-filters.yml
+
+  yaml-lint:
+    if: needs.files-changed.outputs.yaml == 'true'
+    needs: ["files-changed"]
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v4"
+      - name: "Setup environment"
+        run: "pip install yamllint==1.35.1"
+      - name: "Linting: yamllint"
+        run: "yamllint -s ."
+
+  E2E-testing-invoke-start:
+    needs:
+      - files-changed
+      - yaml-lint
+    if: |
+      always() && !cancelled() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    runs-on:
+      group: huge-runners
+    env:
+      INFRAHUB_API_TOKEN: 06438eb2-8019-4776-878c-0941b1f1d1ec
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Invoke
+        run: |
+          pip install toml invoke infrahub-sdk["all"]
+
+      - name: Set job name
+        run: echo JOB_NAME="$GITHUB_JOB" >> $GITHUB_ENV
+
+      - name: "Set environment variable INFRAHUB_BUILD_NAME"
+        run: echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
+
+      - name: Initialize Infrahub
+        run: invoke start
+
+      - name: Set infrahub address
+        run: |
+          PORT=$(docker compose -p $INFRAHUB_BUILD_NAME port infrahub-server 8000 | cut -d: -f2)
+          echo "INFRAHUB_ADDRESS=http://localhost:${PORT}" >> $GITHUB_ENV
+
+      - name: "Store start time"
+        run: echo TEST_START_TIME=$(date +%s)000 >> $GITHUB_ENV
+
+      - name: Test base schema files
+        run: invoke load-schema-base
+
+      # NOTE: Doesn't work now
+      # - name: Test experimental schema files
+      #   run: invoke load-schema-experimental
+
+      - name: "Clear docker environment and force vmagent to stop"
+        if: always()
+        run: docker compose -p $INFRAHUB_BUILD_NAME down -v --remove-orphans --rmi local

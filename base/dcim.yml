@@ -1,13 +1,15 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
+
 generics:
   - name: GenericDevice
     namespace: Dcim
-    description: "Generic Device object."
-    label: "Device"
-    icon: "mdi:server"
-    default_filter: name__value
+    description: Generic Device object.
+    label: Device
+    icon: mdi:server
+    human_friendly_id:
+      - name__value
     order_by:
       - name__value
     display_labels:
@@ -21,32 +23,10 @@ generics:
         kind: Text
         optional: true
         order_weight: 2000
-      - name: status
-        kind: Dropdown
-        optional: false
-        default_value: provisioning
-        order_weight: 1100
-        choices:
-          - name: active
-            label: Active
-            description: "Fully operational and currently in service."
-            color: "#7fbf7f"
-          - name: provisioning
-            label: Provisioning
-            description: "In the process of being set up and configured."
-            color: "#ffff7f"
-          - name: maintenance
-            label: Maintenance
-            description: "Undergoing routine maintenance or repairs."
-            color: "#ffd27f"
-          - name: drained
-            label: Drained
-            description: "Temporarily taken out of service."
-            color: "#bfbfbf"
       - name: os_version
         kind: Text
         optional: true
-        order_weight: 1800
+        order_weight: 2200
     relationships:
       - name: interfaces
         peer: DcimInterface
@@ -72,9 +52,10 @@ generics:
         cardinality: one
         kind: Attribute
         order_weight: 1250
+
   - name: PhysicalDevice
     namespace: Dcim
-    description: "Generic holding attributes and relationships relevant for physical device."
+    description: Generic holding attributes and relationships relevant for physical device.
     include_in_menu: false
     attributes:
       - name: position
@@ -83,6 +64,24 @@ generics:
         kind: Number
         optional: true
         order_weight: 1500
+      - name: serial
+        kind: Text
+        optional: true
+        order_weight: 1500
+      - name: rack_face
+        label: Rack Face
+        description: On which face of the rack the device is mounted.
+        kind: Dropdown
+        optional: false
+        default_value: front
+        order_weight: 1515
+        choices:
+          - name: front
+            label: Front
+            description: Device mounted on the front face of the rack.
+          - name: rear
+            label: Rear
+            description: Device mounted on the rear face of the rack.
     relationships:
       - name: device_type
         peer: DcimDeviceType
@@ -97,12 +96,13 @@ generics:
         cardinality: one
         kind: Attribute
         order_weight: 1500
+
   - name: Interface
     namespace: Dcim
-    description: "Generic Network Interface."
-    label: "Interface"
-    icon: "mdi:ethernet"
-    menu_placement: "DcimGenericDevice"
+    description: Generic Network Interface.
+    label: Interface
+    icon: mdi:ethernet
+    menu_placement: DcimGenericDevice
     include_in_menu: true
     display_labels:
       - name__value
@@ -110,7 +110,7 @@ generics:
       - device__name__value
       - name__value
     uniqueness_constraints:
-      - ["device", "name__value"]
+      - [device, name__value]
     attributes:
       - name: name
         kind: Text
@@ -131,72 +131,6 @@ generics:
         kind: Boolean
         default_value: true
         order_weight: 1200
-      - name: status
-        kind: Dropdown
-        optional: true
-        choices:
-          - name: active
-            label: Active
-            description: "Fully operational and currently in service."
-            color: "#7fbf7f"
-          - name: provisioning
-            label: Provisioning
-            description: "In the process of being set up and configured."
-            color: "#ffff7f"
-          - name: maintenance
-            label: Maintenance
-            description: "Undergoing routine maintenance or repairs."
-            color: "#ffd27f"
-          - name: drained
-            label: Drained
-            description: "Temporarily taken out of service."
-            color: "#bfbfbf"
-        order_weight: 1300
-      - name: role
-        kind: Dropdown
-        optional: true
-        choices:
-          - name: backbone
-            label: Backbone
-            description: "Provide main data routes."
-            color: "#6a5acd"
-          - name: upstream
-            label: upstream
-            description: "Connect to Internet service provider."
-            color: "#9090de"
-          - name: peering
-            label: Peering
-            description: "Connect with other networks via IX."
-            color: "#ffa07a"
-          - name: peer
-            label: Peer
-            description: "Equal-status connections for direct interchange."
-            color: "#faa446"
-          - name: server
-            label: Server
-            description: "Dedicated to interfaces connected to servers."
-            color: "#98b2d1"
-          - name: loopback
-            label: Loopback
-            description: "Internal interface."
-            color: "#93e9be"
-          - name: management
-            label: Management
-            description: "Dedicated network for control and monitoring."
-            color: "#ccc28a"
-          - name: uplink
-            label: Uplink
-            description: "Connect to higher device."
-            color: "#ff6b6b"
-          - name: leaf
-            label: Leaf
-            description: "Connect to leaf device."
-            color: "#e6e6fa"
-          - name: spare
-            label: Spare
-            description: "Reserve resources for future use."
-            color: "#d3d3d3"
-        order_weight: 1700
     relationships:
       - name: device
         peer: DcimGenericDevice
@@ -208,35 +142,47 @@ generics:
         optional: true
         cardinality: many
         kind: Attribute
+
   - name: Endpoint
     namespace: Dcim
-    description: "Generic Endpoint to connect two objects together."
+    description: Generic Endpoint to receive a connector.
     include_in_menu: false
-    label: "Endpoint"
     relationships:
-      - name: connected_cable
-        peer: DcimCable
+      - name: connector
+        peer: DcimConnector
         optional: true
         cardinality: one
+        order_weight: 1500
         kind: Attribute
-        identifier: connected__cable
+
+  - name: Connector
+    namespace: Dcim
+    description: Generic Connector to link two endpoints together.
+    include_in_menu: false
+    relationships:
+      - name: connected_endpoints
+        peer: DcimEndpoint
+        optional: true
+        cardinality: many
+        order_weight: 1500
+        kind: Generic
 
 nodes:
   # --------------------  Device (Types, Platforms, Device, Interfaces )  --------------------
   - name: DeviceType
     namespace: Dcim
-    description: "A model of device"
-    label: "Device Type"
-    icon: "mdi:poll"
-    menu_placement: "DcimGenericDevice"
-    default_filter: name__value
+    description: A model of device
+    label: Device Type
+    icon: mdi:poll
+    human_friendly_id:
+      - name__value
     display_labels:
       - name__value
     order_by:
       - manufacturer__name__value
       - name__value
     uniqueness_constraints:
-      - ["manufacturer", "name__value"]
+      - [manufacturer, name__value]
     attributes:
       - name: name
         kind: Text
@@ -252,18 +198,18 @@ nodes:
         kind: Text
         order_weight: 1200
       - name: height
-        label: "Height (U)"
+        label: Height (U)
         optional: false
         default_value: 1
         kind: Number
         order_weight: 1400
       - name: full_depth
-        label: "Full Depth"
+        label: Full Depth
         default_value: true
         kind: Boolean
         order_weight: 1500
       - name: weight
-        label: "Weight (kg)"
+        label: Weight (kg)
         optional: true
         kind: Number
         order_weight: 1600
@@ -285,20 +231,21 @@ nodes:
         cardinality: many
         kind: Attribute
         order_weight: 2000
+
   - name: Platform
     namespace: Dcim
-    description: "A Platform represent the type of software running on a device."
-    label: "Platform"
-    icon: "mdi:application-cog-outline"
-    menu_placement: "DcimGenericDevice"
-    default_filter: name__value
+    description: A Platform represent the type of software running on a device.
+    label: Platform
+    icon: mdi:application-cog-outline
+    human_friendly_id:
+      - name__value
     display_labels:
       - name__value
     order_by:
       - manufacturer__name__value
       - name__value
     uniqueness_constraints:
-      - ["name__value"]
+      - [name__value]
     attributes:
       - name: name
         kind: Text
@@ -339,9 +286,10 @@ nodes:
         cardinality: one
         kind: Attribute
         order_weight: 1300
+
   - name: Device
-    label: "Network Device"
-    menu_placement: "DcimGenericDevice"
+    label: Network Device
+    description: A configurable network device for managing and directing data traffic, including routers, switches...
     icon: clarity:network-switch-solid
     namespace: Dcim
     inherit_from:
@@ -349,6 +297,27 @@ nodes:
       - DcimGenericDevice
       - DcimPhysicalDevice
     attributes:
+      - name: status
+        kind: Dropdown
+        optional: false
+        order_weight: 1100
+        choices:
+          - name: active
+            label: Active
+            description: Fully operational and currently in service.
+            color: "#7fbf7f"
+          - name: provisioning
+            label: Provisioning
+            description: In the process of being set up and configured.
+            color: "#ffff7f"
+          - name: maintenance
+            label: Maintenance
+            description: Undergoing routine maintenance or repairs.
+            color: "#ffd27f"
+          - name: drained
+            label: Drained
+            description: Temporarily taken out of service.
+            color: "#bfbfbf"
       - name: role
         kind: Dropdown
         optional: true
@@ -360,115 +329,197 @@ nodes:
             color: "#7f7fff"
           - name: edge
             label: Edge Router
-            description: "Network boundary with external networks."
+            description: Network boundary with external networks.
             color: "#bf7fbf"
           - name: cpe
             label: Customer Premise Equipment
-            description: "Devices located at the customer's premises."
+            description: Devices located at the customer's premises.
             color: "#bf7f7f"
           - name: spine
             label: Spine Router
-            description: "Aggregation router part of a Fabric."
+            description: Aggregation router part of a Fabric.
             color: "#aeeeee"
           - name: leaf
             label: Leaf Switch
-            description: "Top of Rack part of a Fabric."
+            description: Top of Rack part of a Fabric.
             color: "#e6e6fa"
           - name: tor
             label: Tor Switch
-            description: "Tor switch part of a Fabric."
+            description: Tor switch part of a Fabric.
             color: "#e8e7fd"
 
   - name: InterfaceL3
     namespace: Dcim
-    description: "Network Layer 3 Interface"
-    label: "Interface L3"
-    icon: "mdi:ethernet"
-    menu_placement: "DcimGenericDevice"
-    include_in_menu: false
+    description: Network Layer 3 Interface
+    label: Interface L3
+    icon: mdi:ethernet
+    menu_placement: DcimInterface
     display_labels:
       - name__value
     order_by:
       - name__value
     inherit_from:
-      - "DcimInterface"
-      - "DcimEndpoint"
-      - "CoreArtifactTarget"
+      - DcimInterface
+      - DcimEndpoint
+    attributes:
+      - name: role
+        kind: Dropdown
+        optional: true
+        choices:
+          - name: backbone
+            label: Backbone
+            description: Provide main data routes.
+            color: "#6a5acd"
+          - name: upstream
+            label: upstream
+            description: Connect to Internet service provider.
+            color: "#9090de"
+          - name: peering
+            label: Peering
+            description: Connect with other networks via IX.
+            color: "#ffa07a"
+          - name: peer
+            label: Peer
+            description: Equal-status connections for direct interchange.
+            color: "#faa446"
+          - name: server
+            label: Server
+            description: Dedicated to interfaces connected to servers.
+            color: "#98b2d1"
+          - name: loopback
+            label: Loopback
+            description: Internal interface.
+            color: "#93e9be"
+          - name: management
+            label: Management
+            description: Dedicated network for control and monitoring.
+            color: "#ccc28a"
+          - name: uplink
+            label: Uplink
+            description: Connect to higher device.
+            color: "#ff6b6b"
+          - name: leaf
+            label: Leaf
+            description: Connect to leaf device.
+            color: "#e6e6fa"
+          - name: spare
+            label: Spare
+            description: Reserve resources for future use.
+            color: "#d3d3d3"
+        order_weight: 1700
+      - name: status
+        kind: Dropdown
+        optional: true
+        order_weight: 1300
+        choices:
+          - name: active
+            label: Active
+            description: Fully operational and currently in service.
+            color: "#7fbf7f"
+          - name: provisioning
+            label: Provisioning
+            description: In the process of being set up and configured.
+            color: "#ffff7f"
+          - name: maintenance
+            label: Maintenance
+            description: Undergoing routine maintenance or repairs.
+            color: "#ffd27f"
+          - name: drained
+            label: Drained
+            description: Temporarily taken out of service.
+            color: "#bfbfbf"
     relationships:
       - name: ip_addresses
         peer: IpamIPAddress
         optional: true
         cardinality: many
         kind: Component
+
   - name: InterfaceL2
     namespace: Dcim
-    description: "Network Layer 2 Interface"
-    label: "Interface L2"
-    icon: "mdi:ethernet"
-    menu_placement: "DcimGenericDevice"
-    include_in_menu: false
+    description: Network Layer 2 Interface
+    label: Interface L2
+    icon: mdi:ethernet
+    menu_placement: DcimInterface
     display_labels:
       - name__value
     order_by:
       - name__value
     inherit_from:
-      - "DcimInterface"
-      - "DcimEndpoint"
-      - "CoreArtifactTarget"
+      - DcimInterface
+      - DcimEndpoint
     attributes:
-      - name: l2_mode
-        label: Layer2 Mode
-        kind: Text
-        enum: ["Access", "Trunk", "Tunnel"]
-        order_weight: 1250
-    relationships:
-      - name: untagged_vlan
-        label: Untagged VLAN
-        peer: IpamVLAN
-        optional: true
-        cardinality: one
-        kind: Component
-        identifier: interface_l2__untagged_vlan
-      - name: tagged_vlan
-        label: Tagged VLANs
-        peer: IpamVLAN
-        optional: true
-        cardinality: many
-        kind: Component
-        identifier: interface_l2__tagged_vlan
-  - name: Cable #TODO: Put more body to this one
-    namespace: Dcim
-    description: "Cable connecting two endpoints"
-    include_in_menu: true
-    menu_placement: "DcimDevice"
-    label: "Cable"
-    icon: "mdi:server"
-    attributes:
-      - name: status
+      - name: role
         kind: Dropdown
         optional: true
         choices:
-          - name: connected
-            label: Connected
-            description: "Fully operational and currently in connected"
+          - name: backbone
+            label: Backbone
+            description: Provide main data routes.
+            color: "#6a5acd"
+          - name: upstream
+            label: upstream
+            description: Connect to Internet service provider.
+            color: "#9090de"
+          - name: peering
+            label: Peering
+            description: Connect with other networks via IX.
+            color: "#ffa07a"
+          - name: peer
+            label: Peer
+            description: Equal-status connections for direct interchange.
+            color: "#faa446"
+          - name: server
+            label: Server
+            description: Dedicated to interfaces connected to servers.
+            color: "#98b2d1"
+          - name: loopback
+            label: Loopback
+            description: Internal interface.
+            color: "#93e9be"
+          - name: management
+            label: Management
+            description: Dedicated network for control and monitoring.
+            color: "#ccc28a"
+          - name: uplink
+            label: Uplink
+            description: Connect to higher device.
+            color: "#ff6b6b"
+          - name: leaf
+            label: Leaf
+            description: Connect to leaf device.
+            color: "#e6e6fa"
+          - name: spare
+            label: Spare
+            description: Reserve resources for future use.
+            color: "#d3d3d3"
+        order_weight: 1700
+      - name: status
+        kind: Dropdown
+        optional: true
+        order_weight: 1300
+        choices:
+          - name: active
+            label: Active
+            description: Fully operational and currently in service.
             color: "#7fbf7f"
-          - name: planned
-            label: Planned
-            description: "In the process of being set up"
+          - name: provisioning
+            label: Provisioning
+            description: In the process of being set up and configured.
             color: "#ffff7f"
-      - name: color
-        optional: true
-        kind: Color
-    relationships:
-      - name: endpoint_a
-        peer: DcimEndpoint
-        optional: true
-        cardinality: one
-        kind: Attribute
-        identifier: connected__endpoint__a
-      - name: endpoint_z
-        peer: DcimEndpoint
-        optional: true
-        cardinality: one
-        kind: Attribute
-        identifier: connected__endpoint__z
+          - name: maintenance
+            label: Maintenance
+            description: Undergoing routine maintenance or repairs.
+            color: "#ffd27f"
+          - name: drained
+            label: Drained
+            description: Temporarily taken out of service.
+            color: "#bfbfbf"
+      - name: l2_mode
+        label: Layer2 Mode
+        kind: Text
+        enum:
+          - Access
+          - Trunk
+          - Tunnel
+        order_weight: 1250

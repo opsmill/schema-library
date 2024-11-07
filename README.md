@@ -1,72 +1,31 @@
-# Schema Library
+# Infrahub Schema Library
 
-## Quick start
+Welcome to the Schema Library for Infrahub! This repository offers a collection of schemas designed to streamline and standardize infrastructure-related data structures.
 
-1. Create a branch
+> [!WARNING]
+> This project is currently a collection of examples intended to serve as inspiration. Please note that it is in an experimental phase and may undergo significant changes.
 
-    ```console
-    infrahubctl branch create testing-schema-library
-    ```
+## Getting Started
 
-2. Load base schema
+> [!NOTE]
+> One of Infrahub’s key strengths is its flexibility. We encourage you to copy any schemas you find useful into your own repository and tailor them to your specific needs, ensuring that your schema aligns perfectly with your requirements.
 
-    ```console
-    infrahubctl schema load --branch testing-schema-library base/
-    ```
+There are several ways to [load a schema in Infrahub](https://docs.infrahub.app/guides/import-schema):
 
-3. Then pick and load extensions that fit your use case
+- Quick View: To take a quick look at a schema, you can use Infrahub CTL. Follow [this guide](https://docs.infrahub.app/infrahubctl) to install Infrahub CTL.
+- Controlled Integration: For a more organized and unified approach to loading schemas, you can connect a Git repository. Follow [this guide](https://docs.infrahub.app/guides/repository) to connect a Git repository.
 
-    ```console
-    infrahubctl schema load --branch testing-schema-library extensions/location_minimal
-    infrahubctl schema load --branch testing-schema-library extensions/vrf
-    infrahubctl schema load --branch testing-schema-library extensions/bgp
-    ```
+> [!NOTE]
+> Schema extensions don’t specify menu placement, so they will default to the root level of the menu. Follow [this guide](https://docs.infrahub.app/guides/menu) to learn more about menu customization.
 
-## Main changes
+## Project Structure
 
-- Split "Infra" namespace with proper DCIM / IPAM
-- Move VRF to extension part
+This project is divided into three main parts:
 
-## Open topics
+- Base: This is the foundational layer required for any extension. It must be loaded before adding extensions.
+- Extensions: Designed to be simple and generic, this section offers various schema components for managing infrastructure. Note that extensions may have dependencies on each other.
+- Experimental: This section contains schema components that are not yet fully supported.
 
-- [ ] Should we split DCIM to Circuit and Device for instance? (as per nautobot)
-- [ ] How can I add VLANs to IPAM section?
-- [ ] For location the fact we have three (parent/child) forces us to create 2 different extensions
-- [ ] We can't add a "parent" statement in "extensions" section
-- [ ] Putting enum (status, roles ...) in generics prevents users from editing ...
-- [x] Should we split virtualization? e.g. clustering and hypervisors? Otherwise people doing only clusters (e.g. k8 ...) will have hypervisors and people doing only hypervisors will see clusters/nodes ...
+## Contributing
 
-## Progress
-
-Base
-
-- [x] Circuit
-- [x] Dcim
-- [x] Ipam
-- [x] Location
-- [x] Organization
-
-Extensions
-
-- [x] bgp
-- [x] lag
-- [x] location_extended
-- [x] location_minimal
-- [x] qinq
-- [x] tenancy
-- [x] vrf
-- [ ] mlag
-- [x] virtualization
-- [x] clustering
-
-Experimental
-
-- [ ] peering
-- [ ] topology
-- [ ] security
-
-Next
-
-- [ ] dns
-- [ ] dhcp
-- [ ] ntp
+We welcome contributions and feedback! Feel free to open an issue or submit a pull request to suggest improvements or report bugs.

@@ -1,58 +1,60 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
 
 nodes:
   - name: ForwardingClass
     namespace: Qos
     label: Forwarding Class
-    description: "Represents a forwarding class in QoS with distinct loss priorities."
+    description: Represents a forwarding class in QoS with distinct loss priorities.
     display_labels:
       - name__value
     order_by:
       - name__value
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     uniqueness_constraints:
-      - ["name__value"]
+      - [name__value]
     menu_placement: QosClassOfService
     attributes:
       - name: name
         kind: Text
-        description: "Name of the forwarding class."
+        description: Name of the forwarding class.
         unique: true
         order_weight: 1000
       - name: high_loss_priority_code
         kind: List
-        description: "List of code points for high loss priority."
+        description: List of code points for high loss priority.
         optional: true
         order_weight: 1200
       - name: low_loss_priority_code
         kind: List
-        description: "List of code points for low loss priority."
+        description: List of code points for low loss priority.
         optional: true
         order_weight: 1300
 
   - name: ClassOfService
     namespace: Qos
     label: Class of Service
-    description: "Defines a Class of Service configuration."
+    description: Defines a Class of Service configuration.
     display_labels:
       - name__value
     order_by:
       - name__value
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     uniqueness_constraints:
-      - ["name__value"]
+      - [name__value]
     attributes:
       - name: name
         kind: Text
-        description: "Name of the Class of Service."
+        description: Name of the Class of Service.
         unique: true
         order_weight: 1000
     relationships:
       - name: traffic_control_profiles
         peer: QosTrafficControlProfile
-        description: "List of traffic control profiles."
+        description: List of traffic control profiles.
         cardinality: many
         optional: true
         order_weight: 1200
@@ -60,24 +62,25 @@ nodes:
   - name: TrafficControlProfile
     namespace: Qos
     label: Traffic Control Profile
-    description: "Defines a traffic control profile with an active/inactive state."
+    description: Defines a traffic control profile with an active/inactive state.
     display_labels:
       - name__value
     order_by:
       - name__value
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     uniqueness_constraints:
-      - ["name__value"]
+      - [name__value]
     menu_placement: QosClassOfService
     attributes:
       - name: name
         kind: Text
-        description: "Name of the traffic control profile."
+        description: Name of the traffic control profile.
         unique: true
         order_weight: 1000
       - name: status
         kind: Dropdown
-        description: "Status of the traffic control profile (active/inactive)."
+        description: Status of the traffic control profile (active/inactive).
         choices:
           - name: active
             label: Active
@@ -89,24 +92,25 @@ nodes:
   - name: Classifier
     namespace: Qos
     label: Classifier
-    description: "Represents a classifier mapping DSCP or EXP values to forwarding classes."
+    description: Represents a classifier mapping DSCP or EXP values to forwarding classes.
     display_labels:
       - name__value
     order_by:
       - name__value
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     uniqueness_constraints:
-      - ["name__value"]
+      - [name__value]
     menu_placement: QosClassOfService
     attributes:
       - name: name
         kind: Text
-        description: "Name of the classifier."
+        description: Name of the classifier.
         unique: true
         order_weight: 1000
       - name: type
         kind: Dropdown
-        description: "Type of classifier (DSCP, EXP, etc.)."
+        description: Type of classifier (DSCP, EXP, etc.).
         choices:
           - name: dscp
             label: DSCP Classifier
@@ -118,7 +122,7 @@ nodes:
     relationships:
       - name: forwarding_classes
         peer: QosForwardingClass
-        description: "List of forwarding classes defined in the classifier."
+        description: List of forwarding classes defined in the classifier.
         cardinality: many
         optional: true
         order_weight: 1300
@@ -126,34 +130,35 @@ nodes:
   - name: Scheduler
     namespace: Qos
     label: Scheduler
-    description: "Represents a scheduler configuration."
+    description: Represents a scheduler configuration.
     display_labels:
       - name__value
     order_by:
       - name__value
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     uniqueness_constraints:
-      - ["name__value"]
+      - [name__value]
     menu_placement: QosClassOfService
     attributes:
       - name: name
         kind: Text
-        description: "Name of the scheduler."
+        description: Name of the scheduler.
         unique: true
         order_weight: 1000
       - name: transmit_rate
-        label: "Transmit Rate (%)"
+        label: Transmit Rate (%)
         kind: Number
-        description: "Transmit rate in percentage."
+        description: Transmit rate in percentage.
         order_weight: 1200
       - name: buffer_size
-        label: "Buffer Size (%)"
+        label: Buffer Size (%)
         kind: Number
-        description: "Buffer size in percentage."
+        description: Buffer size in percentage.
         order_weight: 1300
       - name: priority
         kind: Dropdown
-        description: "Priority of the scheduler."
+        description: Priority of the scheduler.
         choices:
           - name: low
             label: Low Priority
@@ -165,7 +170,7 @@ nodes:
         order_weight: 1400
       - name: excess_priority
         kind: Dropdown
-        description: "Excess priority when applicable."
+        description: Excess priority when applicable.
         choices:
           - name: low
             label: Low Excess Priority
@@ -177,31 +182,32 @@ nodes:
   - name: SchedulerMap
     namespace: Qos
     label: Scheduler Map
-    description: "Defines mappings of schedulers to forwarding classes."
+    description: Defines mappings of schedulers to forwarding classes.
     display_labels:
       - name__value
     order_by:
       - name__value
-    default_filter: name__value
+    human_friendly_id:
+      - name__value
     uniqueness_constraints:
-      - ["name__value"]
+      - [name__value]
     menu_placement: QosClassOfService
     attributes:
       - name: name
         kind: Text
-        description: "Name of the scheduler map."
+        description: Name of the scheduler map.
         unique: true
         order_weight: 1000
     relationships:
       - name: schedulers
         peer: QosScheduler
-        description: "List of schedulers defined in the map."
+        description: List of schedulers defined in the map.
         cardinality: many
         optional: true
         order_weight: 1200
       - name: forwarding_classes
         peer: QosForwardingClass
-        description: "List of forwarding classes associated with schedulers."
+        description: List of forwarding classes associated with schedulers.
         cardinality: many
         optional: true
         order_weight: 1300
