@@ -29,3 +29,39 @@ nodes:
         label: Frequency (THz)
         kind: Text # Text until float possible in Number Kind
         description: Frequency of the channel in THz.
+<<<<<<< HEAD
+=======
+
+  - name: SFPDwdm
+    namespace: Dcim
+    inherit_from:
+      - "DcimSFPGeneric"
+    description: "DWDM SFP with configuration for Dense Wavelength Division Multiplexing."
+    label: "SFP DWDM"
+    icon: "mdi:laser-pointer"
+    menu_placement: DcimSFPGeneric
+    attributes:
+      - name: wdm_type
+        kind: Dropdown
+        description: "Type of WDM (e.g CDWM. DWDM)"
+        order_weight: 1110
+        optional: false
+        choices:
+          - name: cwdm
+            label: CWDM (Coarse Wavelength Division Multiplexing)
+            description: Supports multiple wavelengths for long-distance communication.
+            color: "#0099cc"
+          - name: dwdm
+            label: DWDM (Dense Wavelength Division Multiplexing)
+            description: Supports dense wavelengths for long-distance communication.
+            color: "#9933cc"
+        default_value: dwdm
+    relationships:
+      - name: dwdm_channel
+        label: DWDM Channel
+        peer: DcimDWDMChannel
+        kind: Attribute
+        cardinality: one
+        optional: false
+        order_weight: 1150
+>>>>>>> fb63214 (transform SFP as generic + add Bidi + add DWDM)
