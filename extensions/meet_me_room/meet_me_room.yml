@@ -1,0 +1,22 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+version: "1.0"
+
+nodes:
+  - name: MMR
+    label: Meet Me Room
+    description: A Meet Me Room (MMR) within a data center for interconnecting network providers and customers.
+    icon: mdi:room
+    namespace: Dcim
+    inherit_from:
+      - LocationGeneric
+      - LocationHosting
+    parent: LocationSite
+    display_labels:
+      - name__value
+    relationships:
+      - name: provider
+        peer: OrganizationProvider
+        optional: false
+        cardinality: one
+        kind: Attribute
