@@ -42,15 +42,18 @@ def load_schema_base(context: Context) -> None:
 def load_schema_extensions(context: Context) -> None:
     extensions_path = Path("./extensions")
 
-    # First loop: here we allow to fail so it will load as much as it can
+    # First/second loop: here we allow to fail so it will load as much as it can
     print("Loading all extensions once ...")
     _parse_and_load_extensions(context, extensions_path, True)
 
-    # First loop: all the dependencies are loaded it MUST work
     print("Loading all extensions second time ...")
-    _parse_and_load_extensions(context, extensions_path, False)
+    _parse_and_load_extensions(context, extensions_path, True)
 
-    # FIXME: If we have 3 degrees of dependencies it won't work
+    # Third loop: all the dependencies are loaded it MUST work
+    print("Loading all extensions third time ...")
+    _parse_and_load_extensions(context, extensions_path, True)
+
+    # FIXME: If we have 4 degrees of dependencies it won't work
     print("All good!")
 
 
