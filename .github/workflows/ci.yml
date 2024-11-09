@@ -32,6 +32,7 @@ jobs:
           filters: .github/file-filters.yml
 
   yaml-lint:
+    name: Run yaml lint
     if: needs.files-changed.outputs.yaml == 'true'
     needs: ["files-changed"]
     runs-on: "ubuntu-latest"
@@ -45,7 +46,8 @@ jobs:
         run: "yamllint -s ."
 
   # FIXME: This should be triggered only when some YAML schema changes...
-  E2E-testing-invoke-start:
+  schema-test:
+    name: Test all schema files
     needs:
       - files-changed
       - yaml-lint
