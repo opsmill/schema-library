@@ -13,6 +13,15 @@ Welcome to the Schema Library for Infrahub! This repository offers a collection 
 There are several ways to [load a schema in Infrahub](https://docs.infrahub.app/guides/import-schema):
 
 - Quick View: To take a quick look at a schema, you can use Infrahub CTL. Follow [this guide](https://docs.infrahub.app/infrahubctl) to install Infrahub CTL.
+
+```console
+  # Load the base
+  infrahubctl schema load base
+
+  # Load an extension
+  infrahubctl schema load extensions/location_minimal
+```
+
 - Controlled Integration: For a more organized and unified approach to loading schemas, you can connect a Git repository. Follow [this guide](https://docs.infrahub.app/guides/repository) to connect a Git repository.
 
 > [!NOTE]
