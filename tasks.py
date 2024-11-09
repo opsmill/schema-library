@@ -42,6 +42,9 @@ def load_schema_base(context: Context) -> None:
 def load_schema_extensions(context: Context) -> None:
     extensions_path = Path("./extensions")
 
+    # FIXME: Find a more efficient way to deal with dependencies that doesn't
+    # require developer to explicitly maintain it
+
     # First/second loop: here we allow to fail so it will load as much as it can
     print("Loading all extensions once ...")
     _parse_and_load_extensions(context, extensions_path, True)

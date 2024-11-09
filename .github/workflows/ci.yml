@@ -44,6 +44,7 @@ jobs:
       - name: "Linting: yamllint"
         run: "yamllint -s ."
 
+  # FIXME: This should be triggered only when some YAML schema changes...
   E2E-testing-invoke-start:
     needs:
       - files-changed
