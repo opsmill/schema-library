@@ -91,9 +91,8 @@ jobs:
       - name: Test base schema files
         run: invoke load-schema-base
 
-      # NOTE: Doesn't work now
-      # - name: Test experimental schema files
-      #   run: invoke load-schema-experimental
+      - name: Test extensions schema files
+        run: invoke load-schema-extensions
 
       - name: "Clear docker environment and force vmagent to stop"
         if: always()
