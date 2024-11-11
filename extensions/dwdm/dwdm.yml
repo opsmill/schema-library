@@ -109,7 +109,8 @@ generics:
 nodes:
   - name: OpticalMultiplexer
     label: Optical Multiplexer
-    description: An OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies.
+    description: An OADM (Optical Add Drop Multiplexer) supporting various
+      WDM (Wavelength Division Multiplexing) technologies.
     icon: mdi:transit-connection-variant
     namespace: Dcim
     # human_friendly_id:
@@ -165,7 +166,7 @@ nodes:
       - optical_multiplexer__name__value
       - name__value
     display_labels:
-      #  - optical_multiplexer  # FIXME: DcimInterface.display_labels: this property only supports attributes, not relationships
+      #  - optical_multiplexer  # FIXME: DcimInterface.display_labels: this property only supports attributes
       - name__value
     order_by:
       - optical_multiplexer__name__value
