@@ -3,11 +3,11 @@
 version: "1.0"
 
 generics:
-  - name: SFPGeneric
+  - name: GenericSFP
     namespace: Dcim
-    description: "Generic base for all Small Form-factor Pluggable (SFP) transceivers."
-    label: "SFP Generic"
-    icon: "game-icons:laser-warning"
+    description: Generic base for all Small Form-factor Pluggable (SFP) transceivers.
+    label: SFP
+    icon: mdi:gpu
     include_in_menu: true
     display_labels:
       - form_factor__value
@@ -147,23 +147,23 @@ generics:
         order_weight: 1350
 
 nodes:
-  - name: SFP
+  - name: StandardSFP
     namespace: Dcim
     inherit_from:
-      - "DcimSFPGeneric"
-    description: "Standard SFP module for various types (e.g., LR, SR, T)."
-    label: "SFP"
-    icon: "mdi:gpu"
-    menu_placement: DcimSFPGeneric
+      - DcimGenericSFP
+    description: Standard SFP module for various types (e.g., LR, SR, T).
+    label: Standard SFP
+    icon: mdi:gpu
+    menu_placement: DcimGenericSFP
 
-  - name: SFPBidi
+  - name: BidiSFP
     namespace: Dcim
     inherit_from:
-      - "DcimSFPGeneric"
+      - DcimGenericSFP
     description: "Bidirectional SFP supporting two wavelengths for single-fiber operation."
-    label: "SFP Bidi"
-    icon: "lineicons:arrow-both-direction-vertical-1"
-    menu_placement: DcimSFPGeneric
+    label: Bidirectional SFP
+    icon: lineicons:arrow-both-direction-vertical-1
+    menu_placement: DcimGenericSFP
     attributes:
       - name: wavelength_tx
         label: "Transmit Wavelength (nm)"
@@ -183,19 +183,19 @@ extensions:
     - kind: DcimInterface
       relationships:
         - name: plugged_sfp
-          peer: DcimSFPGeneric
+          peer: DcimGenericSFP
           cardinality: one
           optional: true
     - kind: LocationHosting
       relationships:
         - name: spare_sfps
-          peer: DcimSFPGeneric
+          peer: DcimGenericSFP
           cardinality: many
           optional: true
     - kind: OrganizationManufacturer
       relationships:
         - name: sfps
           label: SFPs
-          peer: DcimSFPGeneric
+          peer: DcimGenericSFP
           cardinality: many
           optional: true

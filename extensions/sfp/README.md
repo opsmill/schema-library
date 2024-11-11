@@ -12,11 +12,12 @@ Improvements:
 
 ## Nodes
 
-- DcimSFP
-- DcimSFPBidi
+- DcimStandardSFP
+- DcimBidiSFP
 
 ## Generics
-- DcimSFPGeneric
+
+- DcimGenericSFP
 
 ## Dependencies
 
