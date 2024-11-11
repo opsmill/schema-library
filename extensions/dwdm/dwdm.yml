@@ -107,13 +107,13 @@ generics:
           #   description: "Permanent fiber connection method where two fiber ends are fused."
 
 nodes:
-  - name: OadmMultiplexer
+  - name: OpticalMultiplexer
     label: Optical Multiplexer
     description: An OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies.
     icon: mdi:transit-connection-variant
     namespace: Dcim
-    human_friendly_id:
-      - name__value
+    # human_friendly_id:
+    #   - name__value
     order_by:
       - name__value
     display_labels:
@@ -151,7 +151,7 @@ nodes:
         cardinality: many
         kind: Component
       - name: rear_interface
-        peer: DcimRearOadmInterface
+        peer: DcimOadmRearInterface
         identifier: rear_interfaces
         optional: true
         cardinality: one
@@ -223,14 +223,17 @@ nodes:
     label: WDM Channel
     icon: game-icons:laser-warning
     order_by:
+      - wdm_type__value
       - channel__value
     display_labels:
+      - wdm_type__value
       - channel__value
     uniqueness_constraints:
-      - [wdm_type__value]
-      - [channel__value]
-      - [wavelength__value]
-      - [frequency__value]
+      # Combination must be unique
+      - [wdm_type__value, channel__value, wavelength__value, frequency__value]
+      # For a given type channel number must be unique
+      - [wdm_type__value, channel__value]
+      # TODO: Maybe add some further validations
     human_friendly_id:
       - wdm_type__value
       - channel__value
@@ -258,15 +261,15 @@ nodes:
         kind: Text # Text until float possible in Number Kind
         description: Wavelength of the channel in nm.
       - name: frequency
-        label: Frequency (THz)
+        label: Frequency (GHz)
         kind: Text # Text until float possible in Number Kind
-        description: Frequency of the channel in THz.
+        description: Frequency of the channel in GHz.
 
   - name: WdmSFP
     namespace: Dcim
     inherit_from:
       - DcimGenericSFP
-    description: WDM SFP with configuration for Wavelength Division Multiplexing.
+    description: SFP with configuration for Wavelength Division Multiplexing.
     label: WDM SFP
     icon: mdi:laser-pointer
     menu_placement: DcimGenericSFP
