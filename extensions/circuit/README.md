@@ -11,3 +11,4 @@ The circuit could be a fiber connecting two sites, you would then have two endpo
 ## Dependencies
 
 - Base
+- LocationMinimal
