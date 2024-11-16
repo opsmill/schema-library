@@ -10,7 +10,7 @@ generics:
 
   - name: HostVirtualMachine
     namespace: Virtualization
-    description: A generic unut that can host VM
+    description: A generic unit that can host VM
     include_in_menu: false
     relationships:
       - name: virtual_machines
