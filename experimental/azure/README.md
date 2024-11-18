@@ -1,4 +1,4 @@
-# 🧩 Tenancy
+# 🧩 Azure
 
 This schema extension introduces cloud support for Microsoft Azure.
 

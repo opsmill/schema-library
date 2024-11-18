@@ -1,4 +1,4 @@
-# 🧩 Tenancy
+# 🧩 Infiniband
 
 This schema extension adds support for InfiniBand switches.
 
