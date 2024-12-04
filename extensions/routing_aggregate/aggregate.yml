@@ -1,0 +1,34 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+version: "1.0"
+
+nodes:
+  - name: AggregateRoute
+    namespace: Routing
+    description: "Aggregate Protocol with action and BGP communities"
+    label: "Aggregate Routes"
+    include_in_menu: false
+    icon: "grommet-icons:aggregate"
+    inherit_from:
+      - "RoutingProtocol"
+    attributes:
+      - name: discard
+        label: Discard
+        kind: Boolean
+        optional: true
+        default_value: false
+        order_weight: 1275
+      - name: import_policies
+        kind: Text
+        optional: true
+        order_weight: 1300
+      - name: export_policies
+        kind: Text
+        optional: true
+        order_weight: 1350
+    relationships:
+      - name: destination
+        kind: Attribute
+        peer: IpamPrefix
+        description: "Destination network for the static route."
+        order_weight: 1200

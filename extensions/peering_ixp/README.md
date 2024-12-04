@@ -1,12 +1,16 @@
-# IX schema extension
+# 🧩 Exchange Points (IXP)
 
 This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)!
 
 ## Nodes
 
-- ExchangePoint
-- ...
+- PeeringIXP
+- PeeringIXPConnection
 
 ## Dependencies
 
-- Extensions.BGP
+- Base
+- BGP
+- Routing
+- RoutingBGP
+- RoutingBGPCommunity

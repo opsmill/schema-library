@@ -4,10 +4,11 @@ This schema extension contains all you need to model your BGP platform
 
 ## Nodes
 
-- AutonomousSystem
-- BGPPeerGroup
-- BGPSession
+- RoutingAutonomousSystem
+- RoutingBGPPeerGroup
+- RoutingBGPSession
 
 ## Dependencies
 
 - Base
+- Routing

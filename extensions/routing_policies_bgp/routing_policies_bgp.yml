@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+---
+version: "1.0"
+
+nodes:
+  - name: PolicyBGP
+    namespace: Routing
+    description: A routing policiers for BGP
+    label: BGP Routing Policies
+    icon: carbon:deployment-policy
+    include_in_menu: false
+    inherit_from:
+      - "RoutingPolicy"
+    # TODO: extend if need
+
+extensions:
+  nodes:
+    - kind: RoutingBGPPeerGroup
+      attributes:
+        - name: import_policies
+          kind: Text
+          state: absent
+        - name: export_policies
+          kind: Text
+          state: absent
+      relationships:
+        - name: import_routing_policies
+          label: Import Routing Policies
+          peer: RoutingPolicyBGP
+          identifier: bgp__import_policies
+          description: "The routing-policies used by this instance for import."
+          kind: Generic
+          cardinality: many
+        - name: export_routing_policies
+          label: Export Routing Policies
+          peer: RoutingPolicyBGP
+          identifier: bgp__export_policies
+          description: "The routing-policies used by this instance for export."
+          kind: Generic
+          cardinality: many
+
+    - kind: RoutingBGPSession
+      attributes:
+        - name: import_policies
+          kind: Text
+          state: absent
+        - name: export_policies
+          kind: Text
+          state: absent
+      relationships:
+        - name: import_routing_policies
+          label: Import Routing Policies
+          peer: RoutingPolicy
+          identifier: bgp__import_policies
+          description: "The routing-policies used by this instance for import."
+          kind: Generic
+          cardinality: many
+        - name: export_routing_policies
+          label: Export Routing Policies
+          peer: RoutingPolicy
+          identifier: bgp__export_policies
+          description: "The routing-policies used by this instance for export."
+          kind: Generic
+          cardinality: many
