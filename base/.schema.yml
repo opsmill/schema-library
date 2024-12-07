@@ -2,4 +2,6 @@
 apiVersion: infrahub.app/v1
 kind: Schema
 spec:
-  description: This is the foundation for every single schema extension you might want to use afterward. This one is mandatory and will unlock access to the extensions section.
+  description: |
+    This is the foundation for every single schema extension you might want to
+    use afterward. This one is mandatory and will unlock access to the extensions section.

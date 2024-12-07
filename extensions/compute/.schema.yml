@@ -2,6 +2,9 @@
 apiVersion: infrahub.app/v1
 kind: Schema
 spec:
-  description: With this schema extension in place you will be able to capture all your physical servers. It also gives you the baseline to build virtualization. You might consider HostingCluster extension to go with!
+  description: |
+    With this schema extension in place you will be able to capture all your physical
+    servers. It also gives you the baseline to build virtualization. You might consider
+    HostingCluster extension to go with!
   dependencies:
     - base
