@@ -1,6 +1,8 @@
-# 🧩 Location minimal
+# location_minimal
 
 This schema extension is minimal but will provide you with basic items to store location related data.
+
+## Generics
 
 ## Nodes
 
@@ -11,4 +13,4 @@ This schema extension is minimal but will provide you with basic items to store 
 
 ## Dependencies
 
-- Base
+- base

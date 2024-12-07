@@ -1,6 +1,8 @@
-# 🧩 BGP
+# bgp
 
 This schema extension contains all you need to model your BGP platform
+
+## Generics
 
 ## Nodes
 
@@ -10,4 +12,4 @@ This schema extension contains all you need to model your BGP platform
 
 ## Dependencies
 
-- Base
+- base

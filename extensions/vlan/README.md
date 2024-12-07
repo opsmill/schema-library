@@ -1,12 +1,14 @@
-# 🧩 VLAN
+# vlan
 
 This schema extension contains models to support VLANs in you network.
 
+## Generics
+
 ## Nodes
 
-- Vlan
+- VLAN
 - L2Domain
 
 ## Dependencies
 
-- Base
+- base

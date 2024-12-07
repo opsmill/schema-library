@@ -1,4 +1,4 @@
-# 🧩 SFP
+# sfp
 
 This schema extension gives you all the models you need to document Small Form-factor Pluggable (SFP).
 
@@ -10,15 +10,16 @@ Improvements:
 - You could plug any SFP into any equipment interface (e.g. a virtual interface ...)
 - You could link a SFP to an interface AND a location ...
 
-## Nodes
-
-- DcimStandardSFP
-- DcimBidiSFP
 
 ## Generics
 
-- DcimGenericSFP
+- GenericSFP
+
+## Nodes
+
+- StandardSFP
+- BidiSFP
 
 ## Dependencies
 
-- Base
+- base

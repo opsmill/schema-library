@@ -199,13 +199,13 @@ all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2
 
 [[package]]
 name = "infrahub-sdk"
-version = "0.14.1"
+version = "1.1.0"
 description = "Python Client to interact with Infrahub"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "infrahub_sdk-0.14.1-py3-none-any.whl", hash = "sha256:f981e74ba932d3e6711daa0eaf0a08410e5956f02a0a1548b2d4c3b0e22aa892"},
-    {file = "infrahub_sdk-0.14.1.tar.gz", hash = "sha256:becb43c130ab5178c831b193a0951892ad461844dd432b9d6602ebcc4522bcc6"},
+    {file = "infrahub_sdk-1.1.0-py3-none-any.whl", hash = "sha256:b996a6d5d862e66f13a8dc68adad74a59a1f1175a33809db5e84fc58276ebf35"},
+    {file = "infrahub_sdk-1.1.0.tar.gz", hash = "sha256:b0f995053a6a92f72ec92abef2564080ff9c72e026db1bc0d686cb84ffd1e5e0"},
 ]
 
 [package.dependencies]
@@ -1144,4 +1144,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10, < 3.13"
-content-hash = "5f79ba69ac8da55cdb0fbc1a18d9380f5105aae635c0d96ade70e4a3e04d9291"
+content-hash = "f955d4a9a6adcaa89c96fabeab0f3582a38c76888b6936a9706c8be046002f2d"

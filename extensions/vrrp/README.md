@@ -1,16 +1,14 @@
-# 🧩 VRRP
+# vrrp
 
 This schema extension contains models for VRRP.
 
+## Generics
+
 ## Nodes
 
-- NetworkVRRPGroup
-- NetworkVRRPInterface
-
-## Generics
+- VRRPGroup
+- VRRPInterface
 
 ## Dependencies
 
-- Base
-- DCIM
-- IPAM
+- base

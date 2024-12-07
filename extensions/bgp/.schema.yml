@@ -1,0 +1,8 @@
+---
+apiVersion: infrahub.app/v1
+kind: Schema
+spec:
+  description: This schema extension contains all you need to model your BGP platform
+
+  dependencies:
+    - base

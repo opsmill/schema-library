@@ -1,13 +1,15 @@
-# 🧩 Hosting cluster
+# hosting_cluster
 
 A rather generic cluster built with compute units (e.g. servers) and able to host VMs.
 
+## Generics
+
 ## Nodes
 
-- ClusterHosting
+- Hosting
 
 ## Dependencies
 
-- Base
-- Cluster
-- Compute
+- base
+- extensions.cluster
+- extensions.compute

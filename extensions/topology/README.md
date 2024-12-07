@@ -1,11 +1,13 @@
-# 🧩 Topology
+# topology
 
 This schema extension brings generic foundations for topology support.
 
 ## Generics
 
-- Topology
+- Generic
+
+## Nodes
 
 ## Dependencies
 
-- Base
+- base

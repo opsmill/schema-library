@@ -1,6 +1,8 @@
-# 🧩 Tenancy
+# tenancy
 
 This schema extension introduces tenancy for some of the schema nodes (circuits...)
+
+## Generics
 
 ## Nodes
 
@@ -8,6 +10,6 @@ This schema extension introduces tenancy for some of the schema nodes (circuits.
 
 ## Dependencies
 
-- Base
-- Circuit
-- LocationExtended
+- base
+- extensions.circuit
+- extensions.location_extended

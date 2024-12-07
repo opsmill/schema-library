@@ -37,4 +37,24 @@ This project is divided into three main parts:
 
 ## Contributing
 
-We welcome contributions and feedback! Feel free to open an issue or submit a pull request to suggest improvements or report bugs.
+We welcome contributions and feedback! Feel free to open an issue or submit a pull request to suggest additions, improvements or to report bugs.
+
+To add a new example, follow these steps:
+
+- Create a directory in `experimental` with the name of the schema example
+- Create a `<example_name>.yml` file using the [Infrahub schema format](https://docs.infrahub.app/reference/schema)
+- Create a `.schema.yml` file using the the following example format, modified with a description and needed schema dependencies:
+
+```yaml
+---
+apiVersion: infrahub.app/v1
+kind: Schema
+spec:
+  description: A text description of the purpose of the schema extension
+  dependencies:
+    - base
+    - extensions.cluster
+```
+
+- Run `invoke build` to automatically generate a `README.md` file for the schema extension
+- Submit the pull request!
