@@ -1,13 +1,13 @@
-# VLAN Translation schema extension
+# vlan-translation
 
-This schema extension is based on Juniper VLAN MAP, and not yet test out for other vendors.
-
-## Nodes
-
-- NetworkMapInOut
+This schema extension is based on Juniper VLAN MAP, and not yet tested out for other vendors.
 
 ## Generics
 
+## Nodes
+
+- MapInOut
+
 ## Dependencies
 
-- DCIM
+- base

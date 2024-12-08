@@ -1,0 +1,9 @@
+---
+apiVersion: infrahub.app/v1
+kind: Schema
+spec:
+  description: A rather generic cluster built with compute units (e.g. servers) and able to host VMs.
+  dependencies:
+    - base
+    - extensions.cluster
+    - extensions.compute

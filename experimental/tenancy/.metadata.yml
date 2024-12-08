@@ -1,0 +1,9 @@
+---
+apiVersion: infrahub.app/v1
+kind: Schema
+spec:
+  description: This schema extension introduces tenancy for some of the schema nodes (circuits...)
+  dependencies:
+    - base
+    - extensions.circuit
+    - extensions.location_extended

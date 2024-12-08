@@ -1,6 +1,10 @@
-# 🧩 Location extended
+# location_extended
 
-This schema extension is the most detailed when it comes to location, you'll find all the layers you can think of.
+This schema extension is the most detailed when it comes to location, you'll find
+all the layers you can think of.
+
+
+## Generics
 
 ## Nodes
 
@@ -15,4 +19,4 @@ This schema extension is the most detailed when it comes to location, you'll fin
 
 ## Dependencies
 
-- Base
+- base

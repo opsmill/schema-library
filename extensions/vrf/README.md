@@ -1,6 +1,8 @@
-# 🧩 VRF
+# vrf
 
-This schema extension contains models to support VRF in your network.
+This schema extension contains models to support VRFs in your network.
+
+## Generics
 
 ## Nodes
 
@@ -9,4 +11,4 @@ This schema extension contains models to support VRF in your network.
 
 ## Dependencies
 
-- Base
+- base

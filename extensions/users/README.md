@@ -1,14 +1,14 @@
-# 🧩 Accounts management
+# users
 
 This schema extension contains models for Accounts management.
 
+## Generics
+
 ## Nodes
 
-- UserAccount
-- UserGroup
-
-## Generics
+- Group
+- Account
 
 ## Dependencies
 
-- Base
+- base

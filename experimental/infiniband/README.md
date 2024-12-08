@@ -1,13 +1,15 @@
-# 🧩 Infiniband
+# infiniband
 
 This schema extension adds support for InfiniBand switches.
 
+## Generics
+
 ## Nodes
 
-- InfiniBand Switch
-- InfiniBand Switch Interface
-- InfiniBandSwitchMgmtInterface
-- InfiniBandSwitchIntfSpeedOptions
+- Switch
+- SwitchInterface
+- SwitchMgmtInterface
+- SwitchIntfSpeedOptions
 - RSU
 - Fabric
 - Hall
@@ -16,5 +18,5 @@ This schema extension adds support for InfiniBand switches.
 
 ## Dependencies
 
-- Base
-- Compute
+- base
+- extensions.compute

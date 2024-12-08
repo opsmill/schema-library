@@ -1,16 +1,18 @@
-# 🧩 Quality of Service (QoS)
+# qos
 
 This schema extension contains models for Quality of Service (QoS)
 
-## Nodes
-
-- QosForwardingClass
-- QosClassOfService
-- QosTrafficControlProfile
-- QosClassifier
-- QosScheduler
-- QosSchedulerMap
-
 ## Generics
 
+## Nodes
+
+- ForwardingClass
+- ClassOfService
+- TrafficControlProfile
+- Classifier
+- Scheduler
+- SchedulerMap
+
 ## Dependencies
+
+- base
