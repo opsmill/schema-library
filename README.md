@@ -43,7 +43,7 @@ To add a new example, follow these steps:
 
 - Create a directory in `experimental` with the name of the schema example
 - Create a `<example_name>.yml` file using the [Infrahub schema format](https://docs.infrahub.app/reference/schema)
-- Create a `.schema.yml` file using the the following example format, modified with a description and needed schema dependencies:
+- Create a `.metadata.yml` file using the the following example format, modified with a description and needed schema dependencies:
 
 ```yaml
 ---

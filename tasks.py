@@ -13,7 +13,7 @@ def generate_readme_for_extension(extension_dir: Path) -> None:
     """Generate README.md for a schema extension directory."""
 
     # Find schema description file
-    schema_description_file = next(extension_dir.glob("*.schema.yml"), None)
+    schema_description_file = next(extension_dir.glob("*.metadata.yml"), None)
     if not schema_description_file:
         return
 
