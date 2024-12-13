@@ -340,13 +340,12 @@ nodes:
     display_labels:
       - identifier__value
     uniqueness_constraints:
-      - ["hall", "identifier__value"]
-      - ['identifier__value']
+      - ["identifier__value"]
     attributes:
       - name: identifier
         kind: Text
         label: "Identifier"
-        description: "InfiniBand RSU Identifier (A-Z: a character string unique to a data hall)"
+        description: "InfiniBand RSU Identifier (A-Z: a unique character string)"
         regex: "[A-Z]"
       - name: size
         kind: Number
@@ -363,11 +362,6 @@ nodes:
         peer: InfinibandSwitchInterface
         optional: true
         cardinality: many
-        kind: Attribute
-      - name: hall
-        peer: InfraHall
-        optional: false
-        cardinality: one
         kind: Attribute
 
   # ------------    Fabric    ------------
@@ -389,117 +383,6 @@ nodes:
         label: "Name"
         description: "InfiniBand Network Fabric Name"
         unique: true
-    relationships:
-      - name: pod
-        peer: InfraPod
-        optional: false
-        cardinality: many
-        kind: Attribute
-  # ------------    Hall    ------------
-  - name: Hall
-    namespace: Infra
-    description: "Data Hall"
-    label: "Data Hall"
-    human_friendly_id: ["identifier__value"]
-    order_by:
-      - name__value
-    display_labels:
-      - name__value
-    uniqueness_constraints:
-      - ["name__value"]
-      - ["identifier__value"]
-    include_in_menu: true
-    attributes:
-      - name: name
-        kind: Text
-        label: "Hall Name"
-        description: "Name of the data hall"
-        unique: false
-        optional: false
-      - name: identifier
-        kind: Text
-        label: "Hall Identifier"
-        description: "Identifier for the data hall"
-        unique: true
-        optional: false
-      - name: description
-        kind: Text
-        label: "Description"
-        description: "Description of the data hall"
-        unique: false
-        optional: true
-    relationships:
-      - name: pods
-        peer: InfraPod
-        cardinality: many
-        kind: Attribute
-        optional: true
-      - name: rsu
-        peer: InfinibandRSU
-        cardinality: many
-        kind: Attribute
-        optional: true
-
-  # ------------    Pod    ------------
-  - name: Pod
-    namespace: Infra
-    description: "Data Hall Pod"
-    label: "Pod"
-    order_by:
-      - name__value
-    display_labels:
-      - name__value
-    human_friendly_id:
-      - "identifier__value"
-    uniqueness_constraints:
-      - ["hall", "name__value"]
-      - ['identifier__value']
-    include_in_menu: true
-    attributes:
-      - name: identifier
-        kind: Text
-        label: "Pod Identifier"
-        description: "Identifier for the pod"
-        unique: true
-        optional: false
-      - name: name
-        kind: Text
-        label: "Pod Name"
-        description: "Name of the pod"
-        unique: false
-        optional: false
-      - name: pod_number
-        kind: Number
-        label: "Pod Number"
-        description: "Number of the pod"
-        unique: false
-        optional: false
-      - name: description
-        kind: Text
-        label: "Description"
-        description: "Description of the pod"
-        unique: false
-        optional: true
-    relationships:
-      - name: hall
-        peer: InfraHall
-        cardinality: one
-        kind: Parent
-        optional: false
-      - name: cabinets
-        peer: InfraCabinet
-        cardinality: many
-        kind: Attribute
-        optional: true
-      - name: ip_prefix
-        peer: BuiltinIPPrefix
-        optional: true
-        cardinality: one
-      - name: infiniband_fabrics
-        peer: InfinibandFabric
-        optional: true
-        cardinality: one
-        kind: Attribute
 
   # ------------    Cabinet    ------------
   - name: Cabinet
@@ -513,7 +396,7 @@ nodes:
     human_friendly_id:
       - "identifier__value"
     uniqueness_constraints:
-      - ["pod", "name__value"]
+      - ["name__value"]
       - ["identifier__value"]
     include_in_menu: true
     attributes:
@@ -547,11 +430,6 @@ nodes:
           - name: "Infiniband GPU Cabinet"
             label: "Infiniband GPU Cabinet"
     relationships:
-      - name: pod
-        peer: InfraPod
-        cardinality: one
-        kind: Parent
-        optional: false
       - name: devices
         peer: DcimGenericDevice
         cardinality: many
