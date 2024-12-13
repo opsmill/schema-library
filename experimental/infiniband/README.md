@@ -10,9 +10,6 @@ This schema extension adds support for InfiniBand switches.
 - InfiniBandSwitchIntfSpeedOptions
 - RSU
 - Fabric
-- Hall
-- Pod
-- Cabinet
 
 ## Dependencies
 
