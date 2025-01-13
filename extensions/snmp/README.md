@@ -59,12 +59,12 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 #### Attributes
 | name | kind | order_weight | label | enum | optional | choices |
 | ---- | ---- | ------------ | ----- | ---- | -------- | ------- |
-| username | Text | 1300 |  |  |  |  |
-| auth_protocol | Text | 1400 | Authentication Protocol | ['None', 'MD5', 'SHA'] |  |  |
-| auth_password | Password | 1500 | Authentication Password |  | True |  |
-| privacy_protocol | Text | 1600 | Privacy Protocol | ['None', 'DES', 'AES'] |  |  |
-| privacy_password | Password | 1700 | Privacy Password |  | True |  |
-| security_level | Dropdown | 1200 | Security Level |  |  | [{'name': 'noAuthNoPriv', 'label': 'NoAuthNoPriv', 'description': 'No authentication and no privacy.'}, {'name': 'authNoPriv', 'label': 'AuthNoPriv', 'description': 'Authentication but no privacy.'}, {'name': 'authPriv', 'label': 'AuthPriv', 'description': 'Both authentication and privacy.'}] |
+| username | Text | 1300 |  |  |  | `` |
+| auth_protocol | Text | 1400 | Authentication Protocol | ['None', 'MD5', 'SHA'] |  | `` |
+| auth_password | Password | 1500 | Authentication Password |  | True | `` |
+| privacy_protocol | Text | 1600 | Privacy Protocol | ['None', 'DES', 'AES'] |  | `` |
+| privacy_password | Password | 1700 | Privacy Password |  | True | `` |
+| security_level | Dropdown | 1200 | Security Level |  |  | `noAuthNoPriv, authNoPriv, authPriv` |
 
 ### **Client**
 - **Description:** Represents an SNMP client that interacts with SNMP Community.

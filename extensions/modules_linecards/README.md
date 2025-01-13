@@ -71,8 +71,8 @@ Dependencies: `base, extensions.modules`
 #### Attributes
 | name | kind | description | order_weight | choices |
 | ---- | ---- | ----------- | ------------ | ------- |
-| port_number | Number | Port number on the PIC | 1100 |  |
-| speed | Dropdown | Speed of the port | 1200 | [{'name': '10g', 'label': '10Gbps', 'description': '10 Gigabit per second', 'color': '#A9CCE3'}, {'name': '100g', 'label': '100Gbps', 'description': '100 Gigabit per second', 'color': '#9fbdf2'}] |
+| port_number | Number | Port number on the PIC | 1100 | `` |
+| speed | Dropdown | Speed of the port | 1200 | `10g, 100g` |
 
 #### Relationships
 | name | label | peer | optional | cardinality | kind | order_weight |

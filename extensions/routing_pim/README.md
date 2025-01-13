@@ -43,10 +43,10 @@ Dependencies: `base, extensions.routing`
 #### Attributes
 | name | kind | optional | description | order_weight | choices | default_value |
 | ---- | ---- | -------- | ----------- | ------------ | ------- | ------------- |
-| description | Text | False | Description of the OSPF interface. | 1100 |  |  |
-| pim_mode | Dropdown |  | PIM mode used for multicast routing on this interface. | 1150 | [{'name': 'sparse', 'label': 'Sparse Mode', 'description': 'Sparse Mode for efficient multicast forwarding.', 'color': '#E6E6FA'}, {'name': 'dense', 'label': 'Dense Mode', 'description': 'Dense Mode for heavy multicast traffic.', 'color': '#E6E6FA'}, {'name': 'bidirectional', 'label': 'Bidirectional Mode', 'description': 'Bidirectional PIM for efficient traffic forwarding.', 'color': '#E6E6FA'}] |  |
-| hello_interval | Number | True | Interval for PIM hello messages (in seconds). | 1300 |  | 30 |
-| dr_priority | Number | True | Designated Router priority on the interface. | 1250 |  | 1 |
+| description | Text | False | Description of the OSPF interface. | 1100 | `` |  |
+| pim_mode | Dropdown |  | PIM mode used for multicast routing on this interface. | 1150 | `sparse, dense, bidirectional` |  |
+| hello_interval | Number | True | Interval for PIM hello messages (in seconds). | 1300 | `` | 30 |
+| dr_priority | Number | True | Designated Router priority on the interface. | 1250 | `` | 1 |
 
 #### Relationships
 | name | label | peer | identifier | optional | cardinality | kind | order_weight |

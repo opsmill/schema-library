@@ -19,9 +19,9 @@ Dependencies: `base`
 #### Attributes
 | name | kind | order_weight | optional | choices |
 | ---- | ---- | ------------ | -------- | ------- |
-| name | Text | 1000 |  |  |
-| description | Text | 1100 | True |  |
-| status | Dropdown |  |  | [{'name': 'active', 'label': 'Active', 'description': 'Fully operational and currently in service.', 'color': '#7fbf7f'}, {'name': 'provisioning', 'label': 'Provisioning', 'description': 'In the process of being set up and configured.', 'color': '#ffff7f'}, {'name': 'maintenance', 'label': 'Maintenance', 'description': 'Undergoing routine maintenance or repairs.', 'color': '#ffd27f'}, {'name': 'drained', 'label': 'Drained', 'description': 'Temporarily taken out of service.', 'color': '#bfbfbf'}] |
+| name | Text | 1000 |  | `` |
+| description | Text | 1100 | True | `` |
+| status | Dropdown |  |  | `active, provisioning, maintenance, drained` |
 
 #### Relationships
 | name | peer | optional | cardinality | kind |
@@ -114,8 +114,8 @@ Dependencies: `base`
 #### Attributes
 | name | kind | choices |
 | ---- | ---- | ------- |
-| underlay | Dropdown | [{'name': 'ospf', 'label': 'OSPF'}, {'name': 'isis', 'label': 'ISIS'}, {'name': 'bgp', 'label': 'BGP'}] |
-| overlay | Dropdown | [{'name': 'ldp', 'label': 'LDP'}, {'name': 'rsvp', 'label': 'RSVP'}, {'name': 'segment_routing', 'label': 'Segment Routing'}] |
+| underlay | Dropdown | `ospf, isis, bgp` |
+| overlay | Dropdown | `ldp, rsvp, segment_routing` |
 
 ### **EVPNStrategy**
 - **Description:** Specific strategy attributes for EVPN.
@@ -131,8 +131,8 @@ Dependencies: `base`
 #### Attributes
 | name | kind | choices |
 | ---- | ---- | ------- |
-| underlay | Dropdown | [{'name': 'ebgp', 'label': 'EBGP'}, {'name': 'ospf', 'label': 'OSPF'}, {'name': 'isis', 'label': 'ISIS'}] |
-| overlay | Dropdown | [{'name': 'ebgp', 'label': 'EBGP'}, {'name': 'ibgp', 'label': 'IBGP'}] |
+| underlay | Dropdown | `ebgp, ospf, isis` |
+| overlay | Dropdown | `ebgp, ibgp` |
 
 ### **PhysicalElement**
 - **Description:** Physical aspect of topology elements.
@@ -148,10 +148,10 @@ Dependencies: `base`
 #### Attributes
 | name | kind | default_value | order_weight | label | choices |
 | ---- | ---- | ------------- | ------------ | ----- | ------- |
-| mtu | Number | 1500 | 3000 |  |  |
-| border | Boolean | False | 2400 | Is a Topology Border |  |
-| mlag_support | Boolean | False | 2500 | MLAG Support |  |
-| device_role | Dropdown |  | 1300 | Role | [{'name': 'spine', 'color': '#ffb3ba'}, {'name': 'leaf', 'color': '#ffdfba'}, {'name': 'pe_router', 'color': '#baffc9'}, {'name': 'p_router', 'color': '#bae1ff'}, {'name': 'route_reflector', 'color': '#ffbaba'}, {'name': 'cpe', 'color': '#f2bae1'}, {'name': 'firewall', 'color': '#c5a3ff'}] |
+| mtu | Number | 1500 | 3000 |  | `` |
+| border | Boolean | False | 2400 | Is a Topology Border | `` |
+| mlag_support | Boolean | False | 2500 | MLAG Support | `` |
+| device_role | Dropdown |  | 1300 | Role | `spine, leaf, pe_router, p_router, route_reflector, cpe, firewall` |
 
 #### Relationships
 | name | label | peer | optional | cardinality | kind | order_weight |

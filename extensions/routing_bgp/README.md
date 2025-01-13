@@ -46,13 +46,13 @@ Dependencies: `base, extensions.routing`
 #### Attributes
 | name | kind | optional | description | order_weight | regex | choices | default_value |
 | ---- | ---- | -------- | ----------- | ------------ | ----- | ------- | ------------- |
-| name | Text | False | Name of the BGP Group | 1000 |  |  |  |
-| import_policies | Text | True |  | 1300 |  |  |  |
-| export_policies | Text | True |  | 1350 |  |  |  |
-| maximum_routes | Number | True | Maximum routes for the BGP Group. | 1400 | ^[0-9]+$ |  |  |
-| local_pref | Number | True | Force Local Pref for this BGP Peer Group. | 1450 | ^[0-9]+$ |  |  |
-| send_community | Checkbox | True | Whether to send community attributes. | 1500 |  |  |  |
-| address_family | Dropdown |  | The address family for the routing policy indicating the type of IP address. | 1150 |  | [{'name': 'ipv4', 'label': 'IPv4', 'description': 'Policy applies to IPv4 addresses.', 'color': '#E6E6FA'}, {'name': 'ipv6', 'label': 'IPv6', 'description': 'Policy applies to IPv6 addresses.', 'color': '#E6E6FA'}] | ipv4 |
+| name | Text | False | Name of the BGP Group | 1000 |  | `` |  |
+| import_policies | Text | True |  | 1300 |  | `` |  |
+| export_policies | Text | True |  | 1350 |  | `` |  |
+| maximum_routes | Number | True | Maximum routes for the BGP Group. | 1400 | ^[0-9]+$ | `` |  |
+| local_pref | Number | True | Force Local Pref for this BGP Peer Group. | 1450 | ^[0-9]+$ | `` |  |
+| send_community | Checkbox | True | Whether to send community attributes. | 1500 |  | `` |  |
+| address_family | Dropdown |  | The address family for the routing policy indicating the type of IP address. | 1150 |  | `ipv4, ipv6` | ipv4 |
 
 #### Relationships
 | name | identifier | peer | optional | cardinality | kind |
@@ -73,11 +73,11 @@ Dependencies: `base, extensions.routing`
 #### Attributes
 | name | kind | optional | enum | description | order_weight | choices | regex |
 | ---- | ---- | -------- | ---- | ----------- | ------------ | ------- | ----- |
-| import_policies | Text | True |  |  |  |  |  |
-| export_policies | Text | True |  |  |  |  |  |
-| session_type | Text |  | ['EXTERNAL', 'INTERNAL'] | Type of BGP Session | 1200 |  |  |
-| role | Dropdown |  |  | Role of the BGP Session | 1600 | [{'name': 'backbone', 'label': 'Backbone', 'description': 'Provide main data routes.', 'color': '#E6E6FA'}, {'name': 'upstream', 'label': 'Upstream', 'description': 'Connect to Internet service provider.', 'color': '#E6E6FA'}, {'name': 'peering', 'label': 'Peering', 'description': 'Connect with other networks via IX.', 'color': '#E6E6FA'}] |  |
-| local_pref | Number | True |  | Force Local Pref for this BGP Peer Session. | 1450 |  | ^[0-9]+$ |
+| import_policies | Text | True |  |  |  | `` |  |
+| export_policies | Text | True |  |  |  | `` |  |
+| session_type | Text |  | ['EXTERNAL', 'INTERNAL'] | Type of BGP Session | 1200 | `` |  |
+| role | Dropdown |  |  | Role of the BGP Session | 1600 | `backbone, upstream, peering` |  |
+| local_pref | Number | True |  | Force Local Pref for this BGP Peer Session. | 1450 | `` | ^[0-9]+$ |
 
 #### Relationships
 | name | identifier | peer | optional | cardinality | kind |

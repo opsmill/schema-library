@@ -55,8 +55,8 @@ This schema extension contains models for Quality of Service (QoS)
 #### Attributes
 | name | kind | description | unique | order_weight | choices | default_value |
 | ---- | ---- | ----------- | ------ | ------------ | ------- | ------------- |
-| name | Text | Name of the traffic control profile. | True | 1000 |  |  |
-| status | Dropdown | Status of the traffic control profile (active/inactive). |  | 1200 | [{'name': 'active', 'label': 'Active'}, {'name': 'inactive', 'label': 'Inactive'}] | inactive |
+| name | Text | Name of the traffic control profile. | True | 1000 | `` |  |
+| status | Dropdown | Status of the traffic control profile (active/inactive). |  | 1200 | `active, inactive` | inactive |
 
 ### **Classifier**
 - **Description:** Represents a classifier mapping DSCP or EXP values to forwarding classes.
@@ -71,8 +71,8 @@ This schema extension contains models for Quality of Service (QoS)
 #### Attributes
 | name | kind | description | unique | order_weight | choices |
 | ---- | ---- | ----------- | ------ | ------------ | ------- |
-| name | Text | Name of the classifier. | True | 1000 |  |
-| classifier_type | Dropdown | Type of classifier (DSCP, EXP, etc.). |  | 1200 | [{'name': 'dscp', 'label': 'DSCP Classifier'}, {'name': 'exp', 'label': 'EXP Classifier'}, {'name': 'dscp-ipv6', 'label': 'DSCP-IPv6 Classifier'}] |
+| name | Text | Name of the classifier. | True | 1000 | `` |
+| classifier_type | Dropdown | Type of classifier (DSCP, EXP, etc.). |  | 1200 | `dscp, exp, dscp-ipv6` |
 
 #### Relationships
 | name | peer | description | cardinality | optional | order_weight |
@@ -92,11 +92,11 @@ This schema extension contains models for Quality of Service (QoS)
 #### Attributes
 | name | kind | description | unique | order_weight | label | choices | optional |
 | ---- | ---- | ----------- | ------ | ------------ | ----- | ------- | -------- |
-| name | Text | Name of the scheduler. | True | 1000 |  |  |  |
-| transmit_rate | Number | Transmit rate in percentage. |  | 1200 | Transmit Rate (%) |  |  |
-| buffer_size | Number | Buffer size in percentage. |  | 1300 | Buffer Size (%) |  |  |
-| priority | Dropdown | Priority of the scheduler. |  | 1400 |  | [{'name': 'low', 'label': 'Low Priority'}, {'name': 'high', 'label': 'High Priority'}, {'name': 'strict-high', 'label': 'Strict High Priority'}] | True |
-| excess_priority | Dropdown | Excess priority when applicable. |  | 1500 |  | [{'name': 'low', 'label': 'Low Excess Priority'}, {'name': 'high', 'label': 'High Excess Priority'}] | True |
+| name | Text | Name of the scheduler. | True | 1000 |  | `` |  |
+| transmit_rate | Number | Transmit rate in percentage. |  | 1200 | Transmit Rate (%) | `` |  |
+| buffer_size | Number | Buffer size in percentage. |  | 1300 | Buffer Size (%) | `` |  |
+| priority | Dropdown | Priority of the scheduler. |  | 1400 |  | `low, high, strict-high` | True |
+| excess_priority | Dropdown | Excess priority when applicable. |  | 1500 |  | `low, high` | True |
 
 ### **SchedulerMap**
 - **Description:** Defines mappings of schedulers to forwarding classes.

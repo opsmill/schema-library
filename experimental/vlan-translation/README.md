@@ -21,12 +21,12 @@ Dependencies: `base.dcim`
 #### Attributes
 | name | kind | description | label | order_weight | choices | optional |
 | ---- | ---- | ----------- | ----- | ------------ | ------- | -------- |
-| direction | Dropdown | Direction of the mapping | Map Direction | 1050 | [{'name': 'input', 'label': 'Input', 'description': 'Input direction', 'color': '#D2B4DE'}, {'name': 'output', 'label': 'Output', 'description': 'Output direction', 'color': '#A9CCE3'}] | True |
-| operation | Dropdown | Operation type | Map Operation | 1100 | [{'name': 'pop', 'label': 'POP', 'description': 'Single POP operation', 'color': '#B2D4E6'}, {'name': 'pop_pop', 'label': 'POP-POP', 'description': 'Double POP operation', 'color': '#AED6F1'}, {'name': 'pop_swap', 'label': 'POP-SWAP', 'description': 'POP then SWAP operation', 'color': '#A9DFBF'}, {'name': 'push', 'label': 'PUSH', 'description': 'Single PUSH operation', 'color': '#CDEACC'}, {'name': 'push_push', 'label': 'PUSH-PUSH', 'description': 'Double PUSH operation', 'color': '#9FA8DA'}, {'name': 'swap', 'label': 'SWAP', 'description': 'Single SWAP operation', 'color': '#D2B4DE'}, {'name': 'swap_push', 'label': 'SWAP-PUSH', 'description': 'SWAP then PUSH operation', 'color': '#C4B7E6'}, {'name': 'swap_swap', 'label': 'SWAP-SWAP', 'description': 'Double SWAP operation', 'color': '#CBC3E3'}] | True |
-| vlan_id_swap | Number | VLAN ID to swap to during SWAP operations | VLAN ID Swap | 1200 |  | True |
-| inner_vlan_id | Number | Inner VLAN ID for operations involving double VLAN tags | Inner VLAN ID | 1300 |  | True |
-| inner_tag_protocol_id | Number | Inner tag protocol ID (TPID) | Inner Tag Protocol ID | 1400 |  | True |
-| tag_protocol_id | Number | Tag protocol ID (TPID) for outer VLAN operations | Tag Protocol ID | 1500 |  | True |
+| direction | Dropdown | Direction of the mapping | Map Direction | 1050 | `input, output` | True |
+| operation | Dropdown | Operation type | Map Operation | 1100 | `pop, pop_pop, pop_swap, push, push_push, swap, swap_push, swap_swap` | True |
+| vlan_id_swap | Number | VLAN ID to swap to during SWAP operations | VLAN ID Swap | 1200 | `` | True |
+| inner_vlan_id | Number | Inner VLAN ID for operations involving double VLAN tags | Inner VLAN ID | 1300 | `` | True |
+| inner_tag_protocol_id | Number | Inner tag protocol ID (TPID) | Inner Tag Protocol ID | 1400 | `` | True |
+| tag_protocol_id | Number | Tag protocol ID (TPID) for outer VLAN operations | Tag Protocol ID | 1500 | `` | True |
 
 #### Relationships
 | name | kind | peer | description | cardinality | optional | label | order_weight |

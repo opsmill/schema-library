@@ -19,9 +19,9 @@ Dependencies: `base`
 #### Attributes
 | name | kind | unique | description | order_weight | optional | choices | default_value |
 | ---- | ---- | ------ | ----------- | ------------ | -------- | ------- | ------------- |
-| serial_number | Text | True | Unique serial number of the module. | 1000 |  |  |  |
-| description | Text |  |  | 1100 | True |  |  |
-| status | Dropdown |  |  | 1300 |  | [{'name': 'provisioning', 'label': 'Provisioning', 'description': 'Linecard is being provisioned.', 'color': '#A9DFBF'}, {'name': 'active', 'label': 'Active', 'description': 'Linecard is active and operational.', 'color': '#A9CCE3'}, {'name': 'maintenance', 'label': 'Maintenance', 'description': 'Linecard is under maintenance.', 'color': '#FFF2CC'}, {'name': 'disabled', 'label': 'Disabled', 'description': 'Linecard has been disabled.', 'color': '#D3D3D3'}, {'name': 'outage', 'label': 'Outage', 'description': 'Linecard is currently experiencing an outage.', 'color': '#F4CCCC'}] | active |
+| serial_number | Text | True | Unique serial number of the module. | 1000 |  | `` |  |
+| description | Text |  |  | 1100 | True | `` |  |
+| status | Dropdown |  |  | 1300 |  | `provisioning, active, maintenance, disabled, outage` | active |
 
 #### Relationships
 | name | peer | optional | cardinality | kind | order_weight | label | identifier |

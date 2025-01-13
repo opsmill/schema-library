@@ -20,9 +20,9 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.rout
 #### Attributes
 | name | kind | unique | description | order_weight | optional | choices | default_value |
 | ---- | ---- | ------ | ----------- | ------------ | -------- | ------- | ------------- |
-| name | Text | True | Name of the Internet Exchange | 1000 |  |  |  |
-| description | Text |  | An optional description of the Internet Exchange | 1100 | True |  |  |
-| status | Dropdown |  |  | 1200 |  | [{'name': 'enabled', 'label': 'Enabled', 'description': 'Internet Exchange is active and operational', 'color': '#a8dadc'}, {'name': 'disabled', 'label': 'Disabled', 'description': 'Internet Exchange is not operational', 'color': '#b0bec5'}] | enabled |
+| name | Text | True | Name of the Internet Exchange | 1000 |  | `` |  |
+| description | Text |  | An optional description of the Internet Exchange | 1100 | True | `` |  |
+| status | Dropdown |  |  | 1200 |  | `enabled, disabled` | enabled |
 
 #### Relationships
 | name | peer | optional | cardinality | kind | description | order_weight | label | identifier |
@@ -48,12 +48,12 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.rout
 #### Attributes
 | name | kind | unique | description | order_weight | optional | label | choices | default_value |
 | ---- | ---- | ------ | ----------- | ------------ | -------- | ----- | ------- | ------------- |
-| name | Text | True | Name of the IXP Connection | 1000 |  |  |  |  |
-| description | Text |  | Description of the IXP Connection | 1100 | True |  |  |  |
-| peeringdb_netixlan | Number |  | PeeringDB ID for the IXP connection | 1150 | True | PeeringDB Netixlan |  |  |
-| status | Dropdown |  |  | 1200 | True |  | [{'name': 'enabled', 'label': 'Enabled', 'description': 'The system is fully operational and functioning as expected.', 'color': '#a8dadc'}, {'name': 'pre-maintenance', 'label': 'Pre-Maintenance', 'description': 'Preparation stage before performing maintenance tasks.', 'color': '#f4a261'}, {'name': 'maintenance', 'label': 'Maintenance', 'description': 'Currently undergoing maintenance tasks.', 'color': '#e9c46a'}, {'name': 'post-maintenance', 'label': 'Post-Maintenance', 'description': 'Final checks and verifications after maintenance tasks.', 'color': '#f0e5de'}, {'name': 'disabled', 'label': 'Disabled', 'description': 'The system is not operational and cannot be used.', 'color': '#b0bec5'}] | enabled |
-| vlan | Number |  | VLAN ID for the connection | 1300 | True |  |  |  |
-| mac_address | MacAddress |  | MAC address associated with the connection | 1350 | True | MAC Address |  |  |
+| name | Text | True | Name of the IXP Connection | 1000 |  |  | `` |  |
+| description | Text |  | Description of the IXP Connection | 1100 | True |  | `` |  |
+| peeringdb_netixlan | Number |  | PeeringDB ID for the IXP connection | 1150 | True | PeeringDB Netixlan | `` |  |
+| status | Dropdown |  |  | 1200 | True |  | `enabled, pre-maintenance, maintenance, post-maintenance, disabled` | enabled |
+| vlan | Number |  | VLAN ID for the connection | 1300 | True |  | `` |  |
+| mac_address | MacAddress |  | MAC address associated with the connection | 1350 | True | MAC Address | `` |  |
 
 #### Relationships
 | name | label | description | peer | identifier | cardinality | kind | order_weight | optional |

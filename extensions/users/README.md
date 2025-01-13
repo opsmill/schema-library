@@ -20,10 +20,10 @@ Dependencies: `base`
 #### Attributes
 | name | kind | order_weight | optional | label | choices |
 | ---- | ---- | ------------ | -------- | ----- | ------- |
-| name | Text | 1000 |  |  |  |
-| description | Text | 1100 | True |  |  |
-| idle_timeout | Number | 1300 |  | Idle Timeout (s) |  |
-| permissions | Dropdown | 1200 | False |  | [{'name': 'admin', 'description': 'All rights on device.', 'color': '#E6E6FA'}, {'name': 'operator', 'description': 'Operator right on configuration.', 'color': '#E6E6FA'}, {'name': 'read-only', 'description': 'Read only right on configuration.', 'color': '#E6E6FA'}] |
+| name | Text | 1000 |  |  | `` |
+| description | Text | 1100 | True |  | `` |
+| idle_timeout | Number | 1300 |  | Idle Timeout (s) | `` |
+| permissions | Dropdown | 1200 | False |  | `admin, operator, read-only` |
 
 ### **Account**
 - **Description:** User login and authentication

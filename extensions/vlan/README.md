@@ -21,11 +21,11 @@ Dependencies: `base`
 #### Attributes
 | name | kind | optional | choices |
 | ---- | ---- | -------- | ------- |
-| name | Text |  |  |
-| description | Text | True |  |
-| vlan_id | Number |  |  |
-| status | Dropdown |  | [{'name': 'active', 'label': 'Active', 'description': 'Fully operational and currently in service.', 'color': '#7fbf7f'}, {'name': 'provisioning', 'label': 'Provisioning', 'description': 'In the process of being set up and configured.', 'color': '#ffff7f'}, {'name': 'maintenance', 'label': 'Maintenance', 'description': 'Undergoing routine maintenance or repairs.', 'color': '#ffd27f'}, {'name': 'drained', 'label': 'Drained', 'description': 'Temporarily taken out of service.', 'color': '#bfbfbf'}] |
-| role | Dropdown | True | [{'name': 'server', 'label': 'Server', 'description': 'Dedicated systems for managing networked resources.', 'color': '#c4bed7'}, {'name': 'management', 'label': 'Management', 'description': 'Network segments for administrative and control tasks.', 'color': '#9af1e1'}, {'name': 'user', 'label': 'User', 'description': 'Segments designed for end-user access and activities.', 'color': '#a0b78d'}] |
+| name | Text |  | `` |
+| description | Text | True | `` |
+| vlan_id | Number |  | `` |
+| status | Dropdown |  | `active, provisioning, maintenance, drained` |
+| role | Dropdown | True | `server, management, user` |
 
 #### Relationships
 | name | peer | optional | cardinality | kind | order_weight |

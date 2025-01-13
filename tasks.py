@@ -1,13 +1,14 @@
 import os
 from pathlib import Path
-import yaml
+import yaml # type: ignore
 
 from invoke import Context, task  # type: ignore
 
 # If no version is indicated, we will take the latest
 VERSION = os.getenv("INFRAHUB_VERSION", None)
 DOCKER_PROJECT = os.getenv("INFRAHUB_BUILD_NAME", "schema-library-ci")
-COMPOSE_COMMAND = f"curl https://infrahub.opsmill.io/{VERSION if VERSION else ''} | sed 's/8000:8000/0:8000/' | docker compose -p {DOCKER_PROJECT} -f -"
+COMPOSE_COMMAND = f"curl https://infrahub.opsmill.io/{VERSION if VERSION else ''} | sed 's/8000:8000/0:8000/' | docker compose -p {DOCKER_PROJECT} -f -"  # noqa: line-too-long
+MAIN_DIRECTORY_PATH = Path(__file__).parent
 
 
 def _parse_and_load_extensions(
@@ -74,12 +75,12 @@ def stop(context: Context) -> None:
 def generate_readme(schema, extension_dir: Path) -> None:
     schema_definition_files = {}
     for yml_file in extension_dir.glob("*.yml"):
-        with open(yml_file) as f:
+        with open(yml_file, "r", encoding="utf-8") as f:
             schema_definition_files[yml_file.stem] = yaml.safe_load(f)
 
     content = [
-        f"# {schema.get("name", "")}\n",
-        f"{schema.get("description", "")}\n\n",
+        f"# {schema.get('name', '')}\n",
+        f"{schema.get('description', '')}\n\n",
     ]
 
     if dependencies := schema.get("dependencies", []):
@@ -92,7 +93,15 @@ def generate_readme(schema, extension_dir: Path) -> None:
         for row in rows:
             table += f"| {' | '.join(row)} |\n"
         return table
-    
+
+    def format_data(header: str, data: dict):
+        if header == "choices":
+            choices = [choice.get("name", "") for choice in data.get(header, [])]
+            choices_str = ", ".join(choices)
+            return f"`{choices_str}`"
+
+        return str(data.get(header, ""))
+
     def generate_table_data(data: list):
         headers = []
         for attr in data:
@@ -102,23 +111,35 @@ def generate_readme(schema, extension_dir: Path) -> None:
 
         rows = []
         for attr in data:
-            row = [str(attr.get(header, "")) for header in headers]
+            row = [format_data(header, attr) for header in headers]
             rows.append(row)
 
         return headers, rows
 
     def generate_node_data(node: dict):
         node_markdown = []
-        node_markdown.append(f"### **{node.get("name")}**")
-        node_markdown.append(f"- **Description:** {node.get("description")}") if node.get("description") else ""
-        node_markdown.append(f"- **Label:** {node.get("label", "")}") if node.get("label") else ""
-        node_markdown.append(f"- **Icon:** {node.get("icon", "")}") if node.get("icon") else ""
-        node_markdown.append(f"- **Menu Placement:** {node.get("menu_placement", "")}") if node.get("menu_placement") else ""
-        node_markdown.append(f"- **Include in Menu:** {'✅' if node.get("include_in_menu") else '❌'}")
+        node_markdown.append(f"### **{node.get('name')}**")
+        if node.get("description"):
+            node_markdown.append(f"- **Description:** {node.get('description')}")
+        if node.get("label"):
+            node_markdown.append(f"- **Label:** {node.get('label', '')}")
+        if node.get("icon"):
+            node_markdown.append(f"- **Icon:** {node.get('icon', '')}")
+        if node.get("menu_placement"):
+            node_markdown.append(
+                f"- **Menu Placement:** {node.get('menu_placement', '')}"
+            )
+        node_markdown.append(
+            f"- **Include in Menu:** {'✅' if node.get('include_in_menu') else '❌'}"
+        )
         if node.get("order_by") or node.get("uniqueness_constraints"):
             node_markdown.append("\n#### Ordering and Constraints")
-            node_markdown.append(f"- **Order By:** {', '.join(node.get("order_by", []))}")
-            node_markdown.append(f"- **Uniqueness Constraints:** {', '.join([' + '.join(c) for c in node.get("uniqueness_constraints", [])])}")
+            node_markdown.append(
+                f"- **Order By:** {', '.join(node.get('order_by', []))}"
+            )
+            node_markdown.append(
+                f"- **Uniqueness Constraints:** {', '.join([' + '.join(c) for c in node.get('uniqueness_constraints', [])])}"
+            )
         node_markdown.append("---")
 
         if attributes := node.get("attributes", []):
@@ -132,7 +153,7 @@ def generate_readme(schema, extension_dir: Path) -> None:
             node_markdown.append(format_table(relationship_headers, relationship_rows))
         return node_markdown
 
-    for file, file_values in schema_definition_files.items():
+    for _, file_values in schema_definition_files.items():
         content.append("## Overview")
         content.append(f"- **Version:** {file_values['version']}")
 
@@ -145,12 +166,12 @@ def generate_readme(schema, extension_dir: Path) -> None:
             content.append("## Nodes")
             for node in nodes:
                 content.extend(generate_node_data(node))
-                
+
         if extensions := file_values.get("extensions", []):
             content.append("## Extensions")
             for node in extensions.get("nodes", []):
-                content.append(f"### {node.get("kind", "")}")
-                
+                content.append(f"### {node.get('kind', '')}")
+
                 if attributes := node.get("attributes", []):
                     content.append("#### Attributes")
                     headers, rows = generate_table_data(attributes)
@@ -163,8 +184,9 @@ def generate_readme(schema, extension_dir: Path) -> None:
 
     # Write README.md
     readme_path = extension_dir / "README.md"
-    with open(readme_path, "w") as f:
+    with open(readme_path, "w", encoding="utf-8") as f:
         f.writelines("\n".join(content))
+
 
 @task
 def build(context: Context) -> None:
@@ -175,20 +197,63 @@ def build(context: Context) -> None:
         Path("./experimental"),
     ]
 
-    with open(".metadata.yml") as f:
+    with open(".metadata.yml", "r", encoding="utf-8") as f:
         schema = yaml.safe_load(f)
 
     # Build Readme for base schemas
     base_path = Path("./base")
     generate_readme(schema[str(base_path)], base_path)
 
-    for dir in directories_to_parse:
-        for entry in os.listdir(dir):
-            if os.path.isdir(dir / entry):
-                path = (dir / entry)
+    for directory in directories_to_parse:
+        for entry in os.listdir(directory):
+            if os.path.isdir(directory / entry):
+                path = directory / entry
                 # print(path)
                 try:
                     generate_readme(schema[str(path)], path)
                 except KeyError:
                     print(f"Schema `{path}` is not added to the .metadata.yml file")
-                
+
+
+@task
+def format(context: Context) -> None:
+    """Run RUFF to format all Python files."""
+
+    exec_cmds = ["ruff format .", "ruff check . --fix"]
+    with context.cd(MAIN_DIRECTORY_PATH):
+        for cmd in exec_cmds:
+            context.run(cmd)
+
+
+@task
+def lint_yaml(context: Context) -> None:
+    """Run Linter to check all Python files."""
+    print(" - Check code with yamllint")
+    exec_cmd = "yamllint ."
+    with context.cd(MAIN_DIRECTORY_PATH):
+        context.run(exec_cmd)
+
+@task
+def lint_mypy(context: Context) -> None:
+    """Run Linter to check all Python files."""
+    print(" - Check code with mypy")
+    exec_cmd = "mypy --show-error-codes ."
+    with context.cd(MAIN_DIRECTORY_PATH):
+        context.run(exec_cmd)
+
+
+@task
+def lint_ruff(context: Context) -> None:
+    """Run Linter to check all Python files."""
+    print(" - Check code with ruff")
+    exec_cmd = "ruff check ."
+    with context.cd(MAIN_DIRECTORY_PATH):
+        context.run(exec_cmd)
+
+
+@task(name="lint")
+def lint_all(context: Context) -> None:
+    """Run all linters."""
+    lint_yaml(context)
+    lint_ruff(context)
+    lint_mypy(context)

@@ -20,9 +20,9 @@ Dependencies: `base`
 #### Attributes
 | name | kind | order_weight | optional | choices |
 | ---- | ---- | ------------ | -------- | ------- |
-| identifier | Text | 900 |  |  |
-| description | Text | 1300 | True |  |
-| status | Dropdown | 1200 | True | [{'name': 'connected', 'label': 'Connected', 'description': 'Fully operational and currently in connected', 'color': '#7fbf7f'}, {'name': 'planned', 'label': 'Planned', 'description': 'In the process of being set up', 'color': '#ffff7f'}, {'name': 'reserved', 'label': 'Reserved', 'description': 'Fully connected and reserved for a future use', 'color': '#9090de'}] |
+| identifier | Text | 900 |  | `` |
+| description | Text | 1300 | True | `` |
+| status | Dropdown | 1200 | True | `connected, planned, reserved` |
 
 #### Relationships
 | name | label | peer | optional | cardinality | kind | order_weight |

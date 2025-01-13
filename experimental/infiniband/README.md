@@ -20,20 +20,20 @@ Dependencies: `base, extensions.compute`
 #### Attributes
 | name | kind | unique | order_weight | optional | label | description | default_value | choices |
 | ---- | ---- | ------ | ------------ | -------- | ----- | ----------- | ------------- | ------- |
-| name | Text | True | 1000 |  |  |  |  |  |
-| description | Text |  | 2000 | True |  |  |  |  |
-| os_version | Text |  | 2200 | True |  |  |  |  |
-| rsu_rail_id | Number |  |  | True | RSU Rail ID | InfiniBand RSU Rail ID (numeric) assigned to the switch |  |  |
-| aaa_authentication_model | Dropdown |  |  | False | AAA Authentication Model | AAA authentication model to be used by the switch | local | [{'name': 'tacacs', 'label': 'TACACS+', 'description': 'Default AAA authentication will use TACACS+ server', 'color': '#7fbf71'}, {'name': 'local', 'label': 'local', 'description': 'Default AAA authentication will use local AAA configuration', 'color': '#7fbf72'}] |
-| aaa_accounting_model | Dropdown |  |  | False | AAA Accounting Model | AAA accounting model to be used by the switch | local | [{'name': 'tacacs', 'label': 'TACACS+', 'description': 'Default AAA accounting will use TACACS+ server', 'color': '#7fbf71'}, {'name': 'local', 'label': 'local', 'description': 'Default AAA accounting will use local AAA configuration', 'color': '#ffff7f'}] |
-| role | Dropdown |  |  |  | Switch Role | Role of the switch in the InfiniBand network |  | [{'name': 'spine', 'label': 'Spine', 'description': 'Spine Switch', 'color': '#7fbf7f'}, {'name': 'leaf', 'label': 'Leaf', 'description': 'Leaf Switch', 'color': '#ffff7f'}] |
-| split_ready | Boolean |  |  |  | Split Ready | Enable Split-Ready profile for switch | False |  |
-| ipv6_enable | Boolean |  |  |  | IPv6 Enable | Enable IPv6 on the switch | False |  |
-| cli_prefix_modes | Boolean |  |  |  | CLI Prefix Modes | Enable CLI prefix modes | True |  |
-| xml_gateway | Boolean |  |  |  | XML Gateway | Enable XML Gateway | False |  |
-| ssh_server_security_strict | Boolean |  |  |  | SSH Server Security Strict | Enable SSH Server Security Strict | False |  |
-| banner | Text |  |  |  | Banner | Banner to be displayed on login | NVIDIA MLNX-OS Switch Management |  |
-| password_hardening | Boolean |  |  |  | Password Hardening | Enable Password Hardening | False |  |
+| name | Text | True | 1000 |  |  |  |  | `` |
+| description | Text |  | 2000 | True |  |  |  | `` |
+| os_version | Text |  | 2200 | True |  |  |  | `` |
+| rsu_rail_id | Number |  |  | True | RSU Rail ID | InfiniBand RSU Rail ID (numeric) assigned to the switch |  | `` |
+| aaa_authentication_model | Dropdown |  |  | False | AAA Authentication Model | AAA authentication model to be used by the switch | local | `tacacs, local` |
+| aaa_accounting_model | Dropdown |  |  | False | AAA Accounting Model | AAA accounting model to be used by the switch | local | `tacacs, local` |
+| role | Dropdown |  |  |  | Switch Role | Role of the switch in the InfiniBand network |  | `spine, leaf` |
+| split_ready | Boolean |  |  |  | Split Ready | Enable Split-Ready profile for switch | False | `` |
+| ipv6_enable | Boolean |  |  |  | IPv6 Enable | Enable IPv6 on the switch | False | `` |
+| cli_prefix_modes | Boolean |  |  |  | CLI Prefix Modes | Enable CLI prefix modes | True | `` |
+| xml_gateway | Boolean |  |  |  | XML Gateway | Enable XML Gateway | False | `` |
+| ssh_server_security_strict | Boolean |  |  |  | SSH Server Security Strict | Enable SSH Server Security Strict | False | `` |
+| banner | Text |  |  |  | Banner | Banner to be displayed on login | NVIDIA MLNX-OS Switch Management | `` |
+| password_hardening | Boolean |  |  |  | Password Hardening | Enable Password Hardening | False | `` |
 
 #### Relationships
 | name | kind | cardinality | peer | optional |
@@ -55,18 +55,18 @@ Dependencies: `base, extensions.compute`
 #### Attributes
 | name | kind | order_weight | optional | default_value | label | description | enum | choices |
 | ---- | ---- | ------------ | -------- | ------------- | ----- | ----------- | ---- | ------- |
-| name | Text | 1000 |  |  |  |  |  |  |
-| description | Text | 1100 | True |  |  |  |  |  |
-| speed | Number | 1400 |  |  |  |  |  |  |
-| enabled | Boolean | 1200 |  | True |  |  |  |  |
-| width | Number |  | True | 7 | Width | Width value sets supported lane options for the interface | [1, 3, 5, 7] |  |
-| port_type | Number |  | True |  | Port Type: Split | Enable interface to be split X times (requires Split-Ready profile to be enabled on the switch) | [2] |  |
-| port_type_force | Boolean |  |  | False | Port Type Force | Force the configured port type setting; use in conjunction with Port Type |  |  |
-| operational_virtual_lanes | Number |  |  | 8 | Operational Virtual Lanes | Number of operational virtual lanes for an interface | [1, 2, 4, 8] |  |
-| mtu | Number |  |  |  | MTU (bytes) | Maximum Transmission Unit (bytes) | [256, 512, 1024, 2048, 4096] |  |
-| speed_forced | Boolean |  |  | False | Speed Forced | Force the configured speed setting(s); use in conjunction with Speed options |  |  |
-| sfp_type | Text |  | True |  | SFP Type | Type of SFP module used in the interface |  |  |
-| role | Dropdown |  | True |  | Interface Role | Role of the interface in the InfiniBand network |  | [{'name': 'endhost', 'label': 'Network Device Endhost Port', 'description': 'InfiniBand Switch Interface <> Server HCA', 'color': '#98b2d1'}, {'name': 'uplink', 'label': 'Uplink', 'description': 'InfiniBand Switch Interface <> InfiniBand Switch Interface', 'color': '#93e9be'}, {'name': 'reserved', 'label': 'Reserved', 'description': 'Reserved for future use', 'color': '#d3d3d3'}] |
+| name | Text | 1000 |  |  |  |  |  | `` |
+| description | Text | 1100 | True |  |  |  |  | `` |
+| speed | Number | 1400 |  |  |  |  |  | `` |
+| enabled | Boolean | 1200 |  | True |  |  |  | `` |
+| width | Number |  | True | 7 | Width | Width value sets supported lane options for the interface | [1, 3, 5, 7] | `` |
+| port_type | Number |  | True |  | Port Type: Split | Enable interface to be split X times (requires Split-Ready profile to be enabled on the switch) | [2] | `` |
+| port_type_force | Boolean |  |  | False | Port Type Force | Force the configured port type setting; use in conjunction with Port Type |  | `` |
+| operational_virtual_lanes | Number |  |  | 8 | Operational Virtual Lanes | Number of operational virtual lanes for an interface | [1, 2, 4, 8] | `` |
+| mtu | Number |  |  |  | MTU (bytes) | Maximum Transmission Unit (bytes) | [256, 512, 1024, 2048, 4096] | `` |
+| speed_forced | Boolean |  |  | False | Speed Forced | Force the configured speed setting(s); use in conjunction with Speed options |  | `` |
+| sfp_type | Text |  | True |  | SFP Type | Type of SFP module used in the interface |  | `` |
+| role | Dropdown |  | True |  | Interface Role | Role of the interface in the InfiniBand network |  | `endhost, uplink, reserved` |
 
 #### Relationships
 | name | peer | optional | cardinality | kind | max_count |
@@ -113,8 +113,8 @@ Dependencies: `base, extensions.compute`
 #### Attributes
 | name | kind | label | description | choices | unique |
 | ---- | ---- | ----- | ----------- | ------- | ------ |
-| speed | Dropdown | Speed | Speed of the interface | [{'name': 'SDR', 'label': 'SDR'}, {'name': 'NDR', 'label': 'NDR'}, {'name': 'QDR', 'label': 'QDR'}, {'name': 'FDR', 'label': 'FDR'}, {'name': 'EDR', 'label': 'EDR'}, {'name': 'HDR', 'label': 'HDR'}] |  |
-| description | Text | Description | Description of the speed option (must be unique) |  | True |
+| speed | Dropdown | Speed | Speed of the interface | `SDR, NDR, QDR, FDR, EDR, HDR` |  |
+| description | Text | Description | Description of the speed option (must be unique) | `` | True |
 
 #### Relationships
 | name | peer | optional | cardinality | kind |

@@ -330,7 +330,7 @@ Dependencies: `base`
 #### Attributes
 | name | kind | optional | choices |
 | ---- | ---- | -------- | ------- |
-| role | Dropdown | True | [{'name': 'edge_firewall', 'label': 'Edge firewall', 'description': 'Security boundary with external network', 'color': '#6a5acd'}] |
+| role | Dropdown | True | `edge_firewall` |
 
 #### Relationships
 | name | peer | label | cardinality | kind |

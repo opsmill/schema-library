@@ -20,10 +20,10 @@ Dependencies: `base, extentions.location_minimal`
 #### Attributes
 | name | kind | unique | optional | description | choices |
 | ---- | ---- | ------ | -------- | ----------- | ------- |
-| circuit_id | Text | True |  |  |  |
-| description | Text |  | True |  |  |
-| circuit_type | Dropdown |  |  | Specifies the type of circuit. | [{'name': 'upstream', 'label': 'Upstream', 'description': 'Connection to an upstream provider or Internet service provider (ISP)', 'color': '#1e90ff'}, {'name': 'peering', 'label': 'Peering', 'description': 'Connection to another network for exchange of traffic', 'color': '#20b2aa'}, {'name': 'dark_fiber', 'label': 'Dark Fiber', 'description': 'Leased, unlit fiber for customer management and operation', 'color': '#333333'}, {'name': 'mpls', 'label': 'MPLS', 'description': 'Multi-Protocol Label Switching circuit for QoS-based routing', 'color': '#7f00ff'}] |
-| status | Dropdown |  |  |  | [{'name': 'active', 'label': 'Active', 'description': 'Fully operational and currently in service.', 'color': '#7fbf7f'}, {'name': 'provisioning', 'label': 'Provisioning', 'description': 'In the process of being set up and configured.', 'color': '#ffff7f'}, {'name': 'maintenance', 'label': 'Maintenance', 'description': 'Undergoing routine maintenance or repairs.', 'color': '#ffd27f'}, {'name': 'drained', 'label': 'Drained', 'description': 'Temporarily taken out of service.', 'color': '#bfbfbf'}] |
+| circuit_id | Text | True |  |  | `` |
+| description | Text |  | True |  | `` |
+| circuit_type | Dropdown |  |  | Specifies the type of circuit. | `upstream, peering, dark_fiber, mpls` |
+| status | Dropdown |  |  |  | `active, provisioning, maintenance, drained` |
 
 #### Relationships
 | name | peer | optional | cardinality | kind | label | order_weight |
@@ -46,9 +46,9 @@ Dependencies: `base, extentions.location_minimal`
 #### Attributes
 | name | kind | description | order_weight | optional | choices |
 | ---- | ---- | ----------- | ------------ | -------- | ------- |
-| name | Text | Name of the circuit endoint, could be a MMR position for instance. | 1000 |  |  |
-| status | Dropdown |  |  | True | [{'name': 'active', 'label': 'Active', 'description': 'Fully operational and currently in service.', 'color': '#7fbf7f'}, {'name': 'provisioning', 'label': 'Provisioning', 'description': 'In the process of being set up and configured.', 'color': '#ffff7f'}, {'name': 'maintenance', 'label': 'Maintenance', 'description': 'Undergoing routine maintenance or repairs.', 'color': '#ffd27f'}, {'name': 'drained', 'label': 'Drained', 'description': 'Temporarily taken out of service.', 'color': '#bfbfbf'}] |
-| description | Text |  |  | True |  |
+| name | Text | Name of the circuit endoint, could be a MMR position for instance. | 1000 |  | `` |
+| status | Dropdown |  |  | True | `active, provisioning, maintenance, drained` |
+| description | Text |  |  | True | `` |
 
 #### Relationships
 | name | peer | order_weight | optional | cardinality | kind | label |

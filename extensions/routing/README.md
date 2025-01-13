@@ -16,8 +16,8 @@ Dependencies: `base, extensions.vlan`
 #### Attributes
 | name | kind | optional | description | order_weight | choices |
 | ---- | ---- | -------- | ----------- | ------------ | ------- |
-| description | Text | False | Description of the protocol | 1100 |  |
-| status | Dropdown |  | Status of the Protocol Configuration. | 1150 | [{'name': 'active', 'label': 'Active', 'description': 'Configuration is active and operational.', 'color': '#A9CCE3'}, {'name': 'disabled', 'label': 'Disabled', 'description': 'Configuration has been disabled.', 'color': '#D3D3D3'}, {'name': 'deleted', 'label': 'Deleted', 'description': 'Configuration has been deleted.', 'color': '#FAD7A0'}] |
+| description | Text | False | Description of the protocol | 1100 | `` |
+| status | Dropdown |  | Status of the Protocol Configuration. | 1150 | `active, disabled, deleted` |
 
 #### Relationships
 | name | peer | optional | cardinality | kind | order_weight | label |

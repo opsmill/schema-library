@@ -1,6 +1,8 @@
 # Base Schemas
 
-That's the foundation for every single schema extension you might want to use afterward. This one is mandatory and will unlock access to the extensions section.
+That's the foundation for every single schema extension you might want to use afterward. 
+This one is mandatory and will unlock access to the extensions section.
+
 
 
 ## Overview
@@ -38,9 +40,9 @@ That's the foundation for every single schema extension you might want to use af
 #### Attributes
 | name | label | description | kind | optional | order_weight | default_value | choices |
 | ---- | ----- | ----------- | ---- | -------- | ------------ | ------------- | ------- |
-| position | Position (U) | Lowest unit. | Number | True | 1500 |  |  |
-| serial |  |  | Text | True | 1500 |  |  |
-| rack_face | Rack Face | On which face of the rack the device is mounted. | Dropdown | False | 1515 | front | [{'name': 'front', 'label': 'Front', 'description': 'Device mounted on the front face of the rack.'}, {'name': 'rear', 'label': 'Rear', 'description': 'Device mounted on the rear face of the rack.'}] |
+| position | Position (U) | Lowest unit. | Number | True | 1500 |  | `` |
+| serial |  |  | Text | True | 1500 |  | `` |
+| rack_face | Rack Face | On which face of the rack the device is mounted. | Dropdown | False | 1515 | front | `front, rear` |
 
 #### Relationships
 | name | peer | optional | cardinality | kind | order_weight | label |
@@ -156,8 +158,8 @@ That's the foundation for every single schema extension you might want to use af
 #### Attributes
 | name | kind | optional | order_weight | choices |
 | ---- | ---- | -------- | ------------ | ------- |
-| status | Dropdown | False | 1100 | [{'name': 'active', 'label': 'Active', 'description': 'Fully operational and currently in service.', 'color': '#7fbf7f'}, {'name': 'provisioning', 'label': 'Provisioning', 'description': 'In the process of being set up and configured.', 'color': '#ffff7f'}, {'name': 'maintenance', 'label': 'Maintenance', 'description': 'Undergoing routine maintenance or repairs.', 'color': '#ffd27f'}, {'name': 'drained', 'label': 'Drained', 'description': 'Temporarily taken out of service.', 'color': '#bfbfbf'}] |
-| role | Dropdown | True | 1400 | [{'name': 'core', 'label': 'Core Router', 'description': 'Central part of the network.', 'color': '#7f7fff'}, {'name': 'edge', 'label': 'Edge Router', 'description': 'Network boundary with external networks.', 'color': '#bf7fbf'}, {'name': 'cpe', 'label': 'Customer Premise Equipment', 'description': "Devices located at the customer's premises.", 'color': '#bf7f7f'}, {'name': 'spine', 'label': 'Spine Router', 'description': 'Aggregation router part of a Fabric.', 'color': '#aeeeee'}, {'name': 'leaf', 'label': 'Leaf Switch', 'description': 'Top of Rack part of a Fabric.', 'color': '#e6e6fa'}, {'name': 'tor', 'label': 'Tor Switch', 'description': 'Tor switch part of a Fabric.', 'color': '#e8e7fd'}] |
+| status | Dropdown | False | 1100 | `active, provisioning, maintenance, drained` |
+| role | Dropdown | True | 1400 | `core, edge, cpe, spine, leaf, tor` |
 
 ### **InterfaceL3**
 - **Description:** Network Layer 3 Interface
@@ -173,8 +175,8 @@ That's the foundation for every single schema extension you might want to use af
 #### Attributes
 | name | kind | optional | choices | order_weight |
 | ---- | ---- | -------- | ------- | ------------ |
-| role | Dropdown | True | [{'name': 'backbone', 'label': 'Backbone', 'description': 'Provide main data routes.', 'color': '#6a5acd'}, {'name': 'upstream', 'label': 'upstream', 'description': 'Connect to Internet service provider.', 'color': '#9090de'}, {'name': 'peering', 'label': 'Peering', 'description': 'Connect with other networks via IX.', 'color': '#ffa07a'}, {'name': 'peer', 'label': 'Peer', 'description': 'Equal-status connections for direct interchange.', 'color': '#faa446'}, {'name': 'server', 'label': 'Server', 'description': 'Dedicated to interfaces connected to servers.', 'color': '#98b2d1'}, {'name': 'loopback', 'label': 'Loopback', 'description': 'Internal interface.', 'color': '#93e9be'}, {'name': 'management', 'label': 'Management', 'description': 'Dedicated network for control and monitoring.', 'color': '#ccc28a'}, {'name': 'uplink', 'label': 'Uplink', 'description': 'Connect to higher device.', 'color': '#ff6b6b'}, {'name': 'leaf', 'label': 'Leaf', 'description': 'Connect to leaf device.', 'color': '#e6e6fa'}, {'name': 'spare', 'label': 'Spare', 'description': 'Reserve resources for future use.', 'color': '#d3d3d3'}] | 1700 |
-| status | Dropdown | True | [{'name': 'active', 'label': 'Active', 'description': 'Fully operational and currently in service.', 'color': '#7fbf7f'}, {'name': 'provisioning', 'label': 'Provisioning', 'description': 'In the process of being set up and configured.', 'color': '#ffff7f'}, {'name': 'maintenance', 'label': 'Maintenance', 'description': 'Undergoing routine maintenance or repairs.', 'color': '#ffd27f'}, {'name': 'drained', 'label': 'Drained', 'description': 'Temporarily taken out of service.', 'color': '#bfbfbf'}] | 1300 |
+| role | Dropdown | True | `backbone, upstream, peering, peer, server, loopback, management, uplink, leaf, spare` | 1700 |
+| status | Dropdown | True | `active, provisioning, maintenance, drained` | 1300 |
 
 #### Relationships
 | name | peer | optional | cardinality | kind |
@@ -195,9 +197,9 @@ That's the foundation for every single schema extension you might want to use af
 #### Attributes
 | name | kind | optional | choices | order_weight | label | enum |
 | ---- | ---- | -------- | ------- | ------------ | ----- | ---- |
-| role | Dropdown | True | [{'name': 'backbone', 'label': 'Backbone', 'description': 'Provide main data routes.', 'color': '#6a5acd'}, {'name': 'upstream', 'label': 'upstream', 'description': 'Connect to Internet service provider.', 'color': '#9090de'}, {'name': 'peering', 'label': 'Peering', 'description': 'Connect with other networks via IX.', 'color': '#ffa07a'}, {'name': 'peer', 'label': 'Peer', 'description': 'Equal-status connections for direct interchange.', 'color': '#faa446'}, {'name': 'server', 'label': 'Server', 'description': 'Dedicated to interfaces connected to servers.', 'color': '#98b2d1'}, {'name': 'loopback', 'label': 'Loopback', 'description': 'Internal interface.', 'color': '#93e9be'}, {'name': 'management', 'label': 'Management', 'description': 'Dedicated network for control and monitoring.', 'color': '#ccc28a'}, {'name': 'uplink', 'label': 'Uplink', 'description': 'Connect to higher device.', 'color': '#ff6b6b'}, {'name': 'leaf', 'label': 'Leaf', 'description': 'Connect to leaf device.', 'color': '#e6e6fa'}, {'name': 'spare', 'label': 'Spare', 'description': 'Reserve resources for future use.', 'color': '#d3d3d3'}] | 1700 |  |  |
-| status | Dropdown | True | [{'name': 'active', 'label': 'Active', 'description': 'Fully operational and currently in service.', 'color': '#7fbf7f'}, {'name': 'provisioning', 'label': 'Provisioning', 'description': 'In the process of being set up and configured.', 'color': '#ffff7f'}, {'name': 'maintenance', 'label': 'Maintenance', 'description': 'Undergoing routine maintenance or repairs.', 'color': '#ffd27f'}, {'name': 'drained', 'label': 'Drained', 'description': 'Temporarily taken out of service.', 'color': '#bfbfbf'}] | 1300 |  |  |
-| l2_mode | Text |  |  | 1250 | Layer2 Mode | ['Access', 'Trunk', 'Tunnel'] |
+| role | Dropdown | True | `backbone, upstream, peering, peer, server, loopback, management, uplink, leaf, spare` | 1700 |  |  |
+| status | Dropdown | True | `active, provisioning, maintenance, drained` | 1300 |  |  |
+| l2_mode | Text |  | `` | 1250 | Layer2 Mode | ['Access', 'Trunk', 'Tunnel'] |
 
 ## Overview
 - **Version:** 1.0
@@ -313,8 +315,8 @@ That's the foundation for every single schema extension you might want to use af
 #### Attributes
 | name | kind | choices | optional |
 | ---- | ---- | ------- | -------- |
-| status | Dropdown | [{'name': 'active', 'label': 'Active'}, {'name': 'deprecated', 'label': 'Deprecated'}, {'name': 'reserved', 'label': 'Reserved'}] |  |
-| role | Dropdown | [{'name': 'loopback', 'label': 'Loopback', 'description': 'Represents internal communications.', 'color': '#B0A8B9'}, {'name': 'management', 'label': 'Management', 'description': 'Handles administrative operations.', 'color': '#AEC6CF'}, {'name': 'public', 'label': 'Public', 'description': 'Public facing network.', 'color': '#FDFD96'}, {'name': 'server', 'label': 'Server', 'description': 'Dedicated to server functions.', 'color': '#77DD77'}, {'name': 'supernet', 'label': 'Supernet', 'description': 'Covers multiple networks', 'color': '#FFB347'}, {'name': 'technical', 'label': 'Technical', 'description': 'Focused on technical aspects.', 'color': '#9678B6'}, {'name': 'loopback-vtep', 'label': 'Loopback VTEP', 'description': 'Facilitates virtualized network communications within loopback configurations.', 'color': '#CDB4DB'}] | True |
+| status | Dropdown | `active, deprecated, reserved` |  |
+| role | Dropdown | `loopback, management, public, server, supernet, technical, loopback-vtep` | True |
 
 #### Relationships
 | name | peer | optional | cardinality | kind | order_weight | label | identifier |
