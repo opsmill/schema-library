@@ -60,30 +60,18 @@ Dependencies: `base`
 
 ## Extensions
 ### DcimInterface
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |
 | plugged_sfp | DcimGenericSFP | one | True |
 
 ### LocationHosting
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |
 | spare_sfps | DcimGenericSFP | many | True |
 
 ### OrganizationManufacturer
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | label | peer | cardinality | optional |
 | ---- | ----- | ---- | ----------- | -------- |

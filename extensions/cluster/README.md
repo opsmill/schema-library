@@ -40,20 +40,12 @@ Dependencies: `base, extensions.compute`
 
 ## Extensions
 ### ComputeGenericUnit
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | identifier | label | peer | cardinality | description | optional |
 | ---- | ---------- | ----- | ---- | ----------- | ----------- | -------- |
 | worker_in_cluster | worker_in_cluster | Worker in cluster | ClusterGenericComputeUnitNodes | one | This device is a worker node of the specified cluster. | True |
 
 ### LocationGeneric
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | label | peer | cardinality | kind | description | optional |
 | ---- | ----- | ---- | ----------- | ---- | ----------- | -------- |

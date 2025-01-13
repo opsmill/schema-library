@@ -151,13 +151,15 @@ def generate_readme(schema, extension_dir: Path) -> None:
             for node in extensions.get("nodes", []):
                 content.append(f"### {node.get("kind", "")}")
                 
-                content.append("#### Attributes")
-                headers, rows = generate_table_data(node.get("attributes", []))
-                content.append(format_table(headers, rows))
+                if attributes := node.get("attributes", []):
+                    content.append("#### Attributes")
+                    headers, rows = generate_table_data(attributes)
+                    content.append(format_table(headers, rows))
 
-                content.append("#### Relationships")
-                headers, rows = generate_table_data(node.get("relationships", []))
-                content.append(format_table(headers, rows))
+                if relationships := node.get("relationships", []):
+                    content.append("#### Relationships")
+                    headers, rows = generate_table_data(relationships)
+                    content.append(format_table(headers, rows))
 
     # Write README.md
     readme_path = extension_dir / "README.md"

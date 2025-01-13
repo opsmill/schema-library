@@ -52,10 +52,6 @@ Dependencies: `base`
 
 ## Extensions
 ### OrganizationGeneric
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | kind | peer | description | cardinality |
 | ---- | ---- | ---- | ----------- | ----------- |

@@ -40,20 +40,12 @@ Dependencies: `extensions.circuit`
 
 ## Extensions
 ### OrganizationProvider
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |
 | circuit_services | CircuitService | many | True |
 
 ### CircuitEndpoint
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |

@@ -35,10 +35,6 @@ Dependencies: `base.dcim`
 
 ## Extensions
 ### DcimInterface
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | kind | peer | description | cardinality | label | order_weight |
 | ---- | ---- | ---- | ----------- | ----------- | ----- | ------------ |

@@ -92,20 +92,12 @@ Dependencies: `base, extensions.routing`
 
 ## Extensions
 ### DcimGenericDevice
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | peer | optional | cardinality | kind | order_weight |
 | ---- | ---- | -------- | ----------- | ---- | ------------ |
 | asn | RoutingAutonomousSystem | True | one | Attribute | 1600 |
 
 ### OrganizationGeneric
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | label | cardinality | optional | peer | order_weight |
 | ---- | ----- | ----------- | -------- | ---- | ------------ |

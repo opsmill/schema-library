@@ -53,10 +53,6 @@ Dependencies: `base`
 
 ## Extensions
 ### DcimPhysicalDevice
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | peer | identifier | cardinality | kind |
 | ---- | ---- | ---------- | ----------- | ---- |

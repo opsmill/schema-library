@@ -54,20 +54,12 @@ Dependencies: `base, base.dcim, base.ipam`
 
 ## Extensions
 ### DcimInterfaceL3
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | kind | peer | description | cardinality | label | order_weight |
 | ---- | ---- | ---- | ----------- | ----------- | ----- | ------------ |
 | vrrp | Component | NetworkVRRPInterface | VRRP Interface Configuration | one | VRRP | 1500 |
 
 ### IpamIPAddress
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | kind | peer | description | cardinality | label | order_weight |
 | ---- | ---- | ---- | ----------- | ----------- | ----- | ------------ |

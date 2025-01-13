@@ -31,10 +31,6 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp`
 
 ## Extensions
 ### RoutingBGPPeerGroup
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | label | peer | cardinality | kind | order_weight |
 | ---- | ----- | ---- | ----------- | ---- | ------------ |

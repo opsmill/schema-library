@@ -58,20 +58,12 @@ Dependencies: `base, extentions.location_minimal`
 
 ## Extensions
 ### OrganizationProvider
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |
 | circuits | DcimCircuit | many | True |
 
 ### LocationHosting
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |

@@ -52,20 +52,12 @@ Dependencies: `base`
 
 ## Extensions
 ### IpamPrefix
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | peer | optional | cardinality | kind | order_weight |
 | ---- | ---- | -------- | ----------- | ---- | ------------ |
 | vlan | IpamVLAN | True | one | Attribute | 1400 |
 
 ### DcimInterfaceL2
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | label | peer | optional | cardinality | kind | identifier |
 | ---- | ----- | ---- | -------- | ----------- | ---- | ---------- |
@@ -73,10 +65,6 @@ Dependencies: `base`
 | tagged_vlan | Tagged VLANs | IpamVLAN | True | many | Component | interface_l2__tagged_vlan |
 
 ### LocationHosting
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | label | peer | cardinality | optional |
 | ---- | ----- | ---- | ----------- | -------- |

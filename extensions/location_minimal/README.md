@@ -60,10 +60,6 @@ Dependencies: `base`
 
 ## Extensions
 ### OrganizationProvider
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |

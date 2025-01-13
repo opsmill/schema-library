@@ -268,20 +268,12 @@ Dependencies: `base`
 
 ## Extensions
 ### DcimGenericDevice
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | peer | optional | cardinality |
 | ---- | ---- | -------- | ----------- |
 | topology | TopologyTopology | True | one |
 
 ### IpamPrefix
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | label | peer | optional | cardinality | order_weight |
 | ---- | ----- | ---- | -------- | ----------- | ------------ |

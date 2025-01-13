@@ -55,20 +55,12 @@ Dependencies: `base`
 
 ## Extensions
 ### IpamPrefix
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | label | peer | optional | cardinality | kind | order_weight |
 | ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
 | vrf | VRF | IpamVRF | True | one | Attribute | 1150 |
 
 ### IpamIPAddress
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | label | peer | optional | cardinality | kind | order_weight |
 | ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |

@@ -383,10 +383,6 @@ Dependencies: `base`
 
 ## Extensions
 ### LocationGeneric
-#### Attributes
-|  |
-|  |
-
 #### Relationships
 | name | peer | cardinality | kind |
 | ---- | ---- | ----------- | ---- |
