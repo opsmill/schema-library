@@ -254,6 +254,7 @@ def lint_ruff(context: Context) -> None:
 @task(name="lint")
 def lint_all(context: Context) -> None:
     """Run all linters."""
+    sort_metadata(context)
     lint_yaml(context)
     lint_ruff(context)
     lint_mypy(context)
@@ -283,6 +284,7 @@ class PreserveLiteralStyleDumper(yaml.SafeDumper):
 
 @task(name="sort-metadata")
 def sort_metadata(contect: Context) -> None:
+    print(f" - Sort {METADATA_FILE}")
     with open(METADATA_FILE, "r", encoding="utf-8") as f:
         metadata = yaml.safe_load(f)
 
