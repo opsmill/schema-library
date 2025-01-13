@@ -1,16 +1,106 @@
-# 🧩 Azure
+# Azure
 
 This schema extension introduces cloud support for Microsoft Azure.
 
+
+Dependencies: `base`
+## Overview
+- **Version:** 1.0
+## Generics
+### **Resource**
+- **Label:** Azure
+- **Include in Menu:** ✅
+---
+#### Attributes
+| name | kind |
+| ---- | ---- |
+| name | Text |
+
+#### Relationships
+| name | cardinality | kind | peer | optional |
+| ---- | ----------- | ---- | ---- | -------- |
+| location | one | Attribute | AzureLocation |  |
+| resourcegroup | one | Parent | AzureResourceGroup | False |
+
 ## Nodes
+### **Location**
+- **Menu Placement:** AzureResource
+- **Include in Menu:** ❌
+---
+#### Attributes
+| name | kind |
+| ---- | ---- |
+| name | Text |
 
-- Azure Location
-- Azure Tenant
-- Azure Subscription
-- Azure Resource Group
-- Azure Virtual Network
-- Azure Virtual Network Subnet
+### **Tenant**
+- **Menu Placement:** AzureResource
+- **Include in Menu:** ❌
+---
+#### Attributes
+| name | kind |
+| ---- | ---- |
+| name | Text |
+| tenant_id | Text |
 
-## Dependencies
+#### Relationships
+| name | cardinality | peer | kind |
+| ---- | ----------- | ---- | ---- |
+| subscriptions | many | AzureSubscription | Component |
 
-- Base
+### **Subscription**
+- **Menu Placement:** AzureResource
+- **Include in Menu:** ❌
+---
+#### Attributes
+| name | kind |
+| ---- | ---- |
+| name | Text |
+| subscription_id | Text |
+
+#### Relationships
+| name | cardinality | peer | kind | optional |
+| ---- | ----------- | ---- | ---- | -------- |
+| tenant | one | AzureTenant | Parent | False |
+| resourcegroups | many | AzureResourceGroup | Component |  |
+
+### **ResourceGroup**
+- **Menu Placement:** AzureResource
+- **Include in Menu:** ❌
+---
+#### Attributes
+| name | kind |
+| ---- | ---- |
+| name | Text |
+
+#### Relationships
+| name | cardinality | kind | peer | optional |
+| ---- | ----------- | ---- | ---- | -------- |
+| location | one | Attribute | AzureLocation |  |
+| subscription | one | Parent | AzureSubscription | False |
+
+### **VirtualNetwork**
+- **Label:** Virtual Networks
+- **Menu Placement:** AzureResource
+- **Include in Menu:** ❌
+---
+#### Relationships
+| name | cardinality | kind | peer |
+| ---- | ----------- | ---- | ---- |
+| address_space | many | Attribute | BuiltinIPPrefix |
+| subnets | many | Component | AzureVirtualNetworkSubnet |
+
+### **VirtualNetworkSubnet**
+- **Label:** Subnets
+- **Menu Placement:** AzureResource
+- **Include in Menu:** ✅
+---
+#### Attributes
+| name | kind |
+| ---- | ---- |
+| name | Text |
+
+#### Relationships
+| name | cardinality | peer | kind | optional |
+| ---- | ----------- | ---- | ---- | -------- |
+| virtualnetwork | one | AzureVirtualNetwork | Parent | False |
+| address_prefixes | many | BuiltinIPPrefix | Attribute |  |

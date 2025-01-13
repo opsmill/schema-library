@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import yaml
 
 from invoke import Context, task  # type: ignore
 
@@ -68,3 +69,124 @@ def destroy(context: Context) -> None:
 @task
 def stop(context: Context) -> None:
     context.run(f"{COMPOSE_COMMAND} down")
+
+
+def generate_readme(schema, extension_dir: Path) -> None:
+    schema_definition_files = {}
+    for yml_file in extension_dir.glob("*.yml"):
+        with open(yml_file) as f:
+            schema_definition_files[yml_file.stem] = yaml.safe_load(f)
+
+    content = [
+        f"# {schema.get("name", "")}\n",
+        f"{schema.get("description", "")}\n\n",
+    ]
+
+    if dependencies := schema.get("dependencies", []):
+        content.append(f"Dependencies: `{', '.join(dependencies)}`")
+
+    def format_table(headers: list, rows: list):
+        """Generate a Markdown table."""
+        table = f"| {' | '.join(headers)} |\n"
+        table += f"| {' | '.join(['-' * len(header) for header in headers])} |\n"
+        for row in rows:
+            table += f"| {' | '.join(row)} |\n"
+        return table
+    
+    def generate_table_data(data: list):
+        headers = []
+        for attr in data:
+            for k in attr.keys():
+                if k not in headers:
+                    headers.append(k)
+
+        rows = []
+        for attr in data:
+            row = [str(attr.get(header, "")) for header in headers]
+            rows.append(row)
+
+        return headers, rows
+
+    def generate_node_data(node: dict):
+        node_markdown = []
+        node_markdown.append(f"### **{node.get("name")}**")
+        node_markdown.append(f"- **Description:** {node.get("description")}") if node.get("description") else ""
+        node_markdown.append(f"- **Label:** {node.get("label", "")}") if node.get("label") else ""
+        node_markdown.append(f"- **Icon:** {node.get("icon", "")}") if node.get("icon") else ""
+        node_markdown.append(f"- **Menu Placement:** {node.get("menu_placement", "")}") if node.get("menu_placement") else ""
+        node_markdown.append(f"- **Include in Menu:** {'✅' if node.get("include_in_menu") else '❌'}")
+        if node.get("order_by") or node.get("uniqueness_constraints"):
+            node_markdown.append("\n#### Ordering and Constraints")
+            node_markdown.append(f"- **Order By:** {', '.join(node.get("order_by", []))}")
+            node_markdown.append(f"- **Uniqueness Constraints:** {', '.join([' + '.join(c) for c in node.get("uniqueness_constraints", [])])}")
+        node_markdown.append("---")
+
+        if attributes := node.get("attributes", []):
+            node_markdown.append("#### Attributes")
+            attribute_headers, attribute_rows = generate_table_data(attributes)
+            node_markdown.append(format_table(attribute_headers, attribute_rows))
+
+        if relationships := node.get("relationships", []):
+            node_markdown.append("#### Relationships")
+            relationship_headers, relationship_rows = generate_table_data(relationships)
+            node_markdown.append(format_table(relationship_headers, relationship_rows))
+        return node_markdown
+
+    for file, file_values in schema_definition_files.items():
+        content.append("## Overview")
+        content.append(f"- **Version:** {file_values['version']}")
+
+        if generics := file_values.get("generics", []):
+            content.append("## Generics")
+            for generic in generics:
+                content.extend(generate_node_data(generic))
+
+        if nodes := file_values.get("nodes", []):
+            content.append("## Nodes")
+            for node in nodes:
+                content.extend(generate_node_data(node))
+                
+        if extensions := file_values.get("extensions", []):
+            content.append("## Extensions")
+            for node in extensions.get("nodes", []):
+                content.append(f"### {node.get("kind", "")}")
+                
+                content.append("#### Attributes")
+                headers, rows = generate_table_data(node.get("attributes", []))
+                content.append(format_table(headers, rows))
+
+                content.append("#### Relationships")
+                headers, rows = generate_table_data(node.get("relationships", []))
+                content.append(format_table(headers, rows))
+
+    # Write README.md
+    readme_path = extension_dir / "README.md"
+    with open(readme_path, "w") as f:
+        f.writelines("\n".join(content))
+
+@task
+def build(context: Context) -> None:
+    """Generate README.md files for all schema extensions"""
+    print("Building schema README.md files...")
+    directories_to_parse = [
+        Path("./extensions"),
+        Path("./experimental"),
+    ]
+
+    with open(".metadata.yml") as f:
+        schema = yaml.safe_load(f)
+
+    # Build Readme for base schemas
+    base_path = Path("./base")
+    generate_readme(schema[str(base_path)], base_path)
+
+    for dir in directories_to_parse:
+        for entry in os.listdir(dir):
+            if os.path.isdir(dir / entry):
+                path = (dir / entry)
+                # print(path)
+                try:
+                    generate_readme(schema[str(path)], path)
+                except KeyError:
+                    print(f"Schema `{path}` is not added to the .metadata.yml file")
+                

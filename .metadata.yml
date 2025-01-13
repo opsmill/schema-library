@@ -1,0 +1,282 @@
+base:
+  name: Base Schemas
+  description: That's the foundation for every single schema extension you might want to use afterward. This one is mandatory and will unlock access to the extensions section.
+experimental/azure:
+  name: Azure
+  description: This schema extension introduces cloud support for Microsoft Azure.
+  dependencies:
+    - base
+experimental/circuit_service:
+  name: Circuit Service
+  description: |
+    This schema extension contains model coming on top of circuit to capture a single
+    service shared across multiple circuits.
+    For example you have a MPLS network supported by a provider connecting multiple locations:
+    - One single CircuitService would be needed to store MPLS related information (e.g.
+    service id, provider ...)
+    - On each site we would create a circuit connecting on one side our device and the
+    CircuitService on the other side
+  dependencies:
+    - extensions.circuit
+experimental/infiniband:
+  name: Infiniband
+  description: This schema extension adds support for InfiniBand switches.
+  dependencies:
+    - base
+    - extensions.compute
+experimental/location_extended:
+  name: Location Extended
+  description: This schema extension is the most detailed when it comes to location, you'll find all the layers you can think of.
+  dependencies:
+    - base
+experimental/qos:
+  name: Quality of Service (QoS)
+  description: This schema extension contains models for Quality of Service (QoS)
+experimental/security:
+  name: Security
+  description: This schema extension contains models for implementing detailed security.
+  dependencies:
+    - base
+experimental/tenancy:
+  name: Tenancy
+  description: This schema extension introduces tenancy for some of the schema nodes (circuits...)
+  dependencies:
+    - base
+    - extensions.circuit
+    - experimental.location_extended
+experimental/topology:
+  name: Topology
+  description: A schema for defining and managing network topology, strategies, and services.
+  dependencies:
+    - base
+experimental/vlan-translation:
+  name: VLAN Translation
+  description: This schema extension is based on Juniper VLAN MAP, and not yet test out for other vendors.
+  dependencies:
+    - base.dcim
+extensions/cable:
+  name: Cable
+  description: This schema extension contains a basic Cable model allowing you to connect two endpoints.
+  dependencies:
+    - base
+extensions/circuit:
+  name: Circuit
+  description: This schema extension contains Circuits and ways to connect them with your infrastructure! The circuit could be a fiber connecting two sites, you would then have two endpoints, one on each site.
+  dependencies:
+    - base
+    - extentions.location_minimal
+extensions/cluster:
+  name: Cluster
+  description: This schema extension contains the foundations to capture clusters. With this one in place you can unlock various clusters flavors (hosting cluster able to host VMs, firewall clusters built with specific appliances ...)
+  dependencies:
+    - base
+    - extensions.compute
+extensions/compute:
+  name: Compute
+  description: With this schema extension in place you will be able to capture all your physical servers. It also gives you the baseline to build virtualization. You might consider HostingCluster extension to go with!
+  dependencies:
+    - base
+extensions/cross_connect:
+  name: Cross Connect
+  description: This extension contains schema to capture Cross Connect. You can see it as "a cable operated by a provider". You will be able to attach it to a location and then connect endpoints to it (e.g. rear interface of a patch panel, circuit endpoint ...)
+  dependencies:
+    - base
+extensions/dwdm:
+  name: DWDM
+  description: This schema extension contains models for OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies such as DWDM (Dense Wavelength Division Multiplexing) or CWDM (Coarse Wavelength Division Multiplexing). With some vendors, the tunable optics are not configured via the channel number but via the wavelength and/or the frequency. This model provides a unique entry in Infrahub for those.
+  dependencies:
+    - base
+    - extensions.sfp
+extensions/firewall_policer:
+  name: Firewall Policer
+  description: This schema extension contains models for VMs. You might consider Cluster or/and Hypervisor extension to go with!
+extensions/hosting_cluster:
+  name: Hosting Cluster
+  description: A rather generic cluster built with compute units (e.g. servers) and able to host VMs.
+  dependencies:
+    - base
+    - extensions.cluster
+    - extensions.compute
+extensions/location_minimal:
+  name: Location Minimal
+  description: This schema extension is minimal but will provide you with basic items to store location related data.
+  dependencies:
+    - base
+extensions/modules:
+  name: Modules
+  description: |
+    This schema extension allows you to capture Device Modules related information like the serial number or the satus. You can insert the Module into a Dcim Physcial Device.
+
+    > [!NOTE]
+    > This extension doesn't contain any Node, you can use the extension module_linecards or modules_routing_engine to use it
+  dependencies:
+    - base
+extensions/modules_linecards:
+  name: Linecards
+  description: This schema extension allows you to capture Linecard related information like the version. You can insert the Linecard into a Dcim Physcial Device and leverage the Linecard type model. The Linecard can accept PIC to help configure PORT informations like breakout-capabilities and configurations.
+  dependencies:
+    - base
+    - extensions.modules
+extensions/modules_routing_engine:
+  name: Routing Engine
+  description: This schema extension allows you to capture Routing Engine related information like the version. You can insert the Routing Engine into a Dcim Physcial Device and leverage the Routing Engine type model.
+  dependencies:
+    - base
+    - extensions.modules
+extensions/patch_panel:
+  name: Patch Panel
+  description: |
+    This schema extension allows you to capture patch pannel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture informations about potential modules you would insert into your patch panel.
+
+    > [!NOTE]
+    > This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
+extensions/peering_ixp:
+  name: Exchange Points (IXP)
+  description: This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)!
+  dependencies:
+    - base
+    - extensions.routing
+    - extensions.routing_bgp
+    - extensions.routing_bgp_community
+extensions/physical_disk:
+  name: Physical Disks
+  description: |
+    Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management.
+
+    > [!NOTE]
+    > This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares.
+  dependencies:
+    - base
+extensions/qinq:
+  name: QinQ
+  description: This schema extension brings extensions to VLAN model in order to support QinQ.
+  dependencies:
+    - base
+    - extensions.vlan
+extensions/routing:
+  name: Routing
+  description: This schema extension contains generics to create Routing Protocol "Instance". The idea is to create one Routing Protocol instance per IpamVRF + DcimDevice pair.
+  dependencies:
+    - base
+    - extensions.vlan
+extensions/routing_aggregate:
+  name: Aggregate
+  description: This schema extension contains all you need to model the Aggregate Routing Protocol.
+  dependencies:
+    - base
+    - extensions.routing
+extensions/routing_bgp:
+  name: BGP
+  description: This schema extension contains all you need to model your BGP platform.
+  dependencies:
+    - base
+    - extensions.routing
+extensions/routing_bgp_community:
+  name: BGP Communities
+  description: This schema extension adds the BGP Communities models.
+  dependencies:
+    - base
+    - extensions.routing
+extensions/routing_bgp_rr:
+  name: BGP Route Reflector
+  description: This schema extension extemd the BGP extension to add BGP Route Reflector Clustering.
+  dependencies:
+    - base
+    - extensions.routing
+    - extensions.routing_bgp
+extensions/routing_ospf:
+  name: OSPF
+  description: This schema extension contains all you need to model the OSPF Routing Protocol.
+  dependencies:
+    - base
+    - extensions.routing
+extensions/routing_pim:
+  name: PIM
+  description: This schema extension contains all you need to model the PIM Protocol.
+  dependencies:
+    - base
+    - extensions.routing
+extensions/routing_policies:
+  name: Routing Policies
+  description: |
+    This schema extension contains a generic to create Routing Policies.
+
+    This Generic can be extend for each Routing Protocols you may want to use.
+  dependencies:
+    - base
+extensions/routing_policies_aggregate:
+  name: Routing Policies Aggregate
+  description: This extension is using the Routing Policies extensions and the Routing Aggregate one together.
+  dependencies:
+    - base
+    - extensions.routing
+    - extensions.routing_policies
+    - extensions.routing_aggregate
+extensions/routing_policies_bgp:
+  name: Routing Policies BGP
+  description: This extension is using the Routing Policies extensions and the Routing BGP one together.
+  dependencies:
+    - base
+    - extensions.routing
+    - extensions.routing_policies
+    - extensions.routing_bgp
+extensions/routing_policies_ospf:
+  name: Routing Policies OSPF
+  description: This extension is using the Routing Policies extensions and the Routing OSPF one together.
+  dependencies:
+    - base
+    - extensions.routing
+    - extensions.routing_policies
+    - extensions.routing_ospf
+extensions/routing_policies_pim:
+  name: Routing Policies (PIM)
+  description: This schema inherits the `RoutingPolicy` schema and removes `import_policies` and `export_policies` attributes. However it adds a number of relatopnships to `RoutingPIM`.
+  dependencies:
+    - base
+    - extensions.routing
+    - extensions.routing_policies
+    - extensions.routing_pim
+extensions/sfp:
+  name: SFP
+  description: |
+    This schema extension gives you all the models you need to document Small Form-factor Pluggable (SFP).
+
+    You can either plug it into an interface or attach it to a location (e.g. it's a spare SFP stored in a rack).
+
+    Improvements:
+
+    - As of now there is no verification with type / form factor / protocol / distance ...
+    - You could plug any SFP into any equipment interface (e.g. a virtual interface ...)
+    - You could link a SFP to an interface AND a location ...
+  dependencies:
+    - base
+extensions/snmp:
+  name: SNMP
+  description: This schema extension contains models for SNMP Communities and SNMP Clients. As you can see this extension is not linked to Tenancy or Device, as you could decide to link the Community to different models based on your use case.
+extensions/topology:
+  name: Topology
+  description: This schema extension introduces abstract network pods and services running in the pods, such as MPLS and EVPN.
+  dependencies:
+    - base
+extensions/users:
+  name: Accounts Management
+  description: This schema extension contains models for Accounts management.
+  dependencies:
+    - base
+extensions/vlan:
+  name: VLAN
+  description: This schema extension contains models to support VLANs in you network.
+  dependencies:
+    - base
+extensions/vrf:
+  name: VRF
+  description: This schema extension contains models to support VRF in your network.
+  dependencies:
+    - base
+extensions/vrrp:
+  name: VRRP
+  description: This schema extension contains models for VRRP.
+  dependencies:
+    - base
+    - base.dcim
+    - base.ipam
