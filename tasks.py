@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 import yaml # type: ignore
-
+from collections import OrderedDict
 from invoke import Context, task  # type: ignore
 
 # If no version is indicated, we will take the latest
@@ -9,7 +9,7 @@ VERSION = os.getenv("INFRAHUB_VERSION", None)
 DOCKER_PROJECT = os.getenv("INFRAHUB_BUILD_NAME", "schema-library-ci")
 COMPOSE_COMMAND = f"curl https://infrahub.opsmill.io/{VERSION if VERSION else ''} | sed 's/8000:8000/0:8000/' | docker compose -p {DOCKER_PROJECT} -f -"  # noqa: line-too-long
 MAIN_DIRECTORY_PATH = Path(__file__).parent
-
+METADATA_FILE = ".metadata.yml"
 
 def _parse_and_load_extensions(
     context: Context, extensions_path: Path, allowed_to_fail: bool
@@ -197,7 +197,7 @@ def build(context: Context) -> None:
         Path("./experimental"),
     ]
 
-    with open(".metadata.yml", "r", encoding="utf-8") as f:
+    with open(METADATA_FILE, "r", encoding="utf-8") as f:
         schema = yaml.safe_load(f)
 
     # Build Readme for base schemas
@@ -212,7 +212,7 @@ def build(context: Context) -> None:
                 try:
                     generate_readme(schema[str(path)], path)
                 except KeyError:
-                    print(f"Schema `{path}` is not added to the .metadata.yml file")
+                    print(f"Schema `{path}` is not added to the {METADATA_FILE} file")
 
 
 @task
@@ -257,3 +257,37 @@ def lint_all(context: Context) -> None:
     lint_yaml(context)
     lint_ruff(context)
     lint_mypy(context)
+
+def sort_dict(d):
+    """
+    Recursively sort a dictionary by keys.
+    """
+    if isinstance(d, dict):
+        return OrderedDict(sorted((k, sort_dict(v)) for k, v in d.items()))
+    if isinstance(d, list):
+        return [sort_dict(item) for item in d]
+    return d
+
+class PreserveLiteralStyleDumper(yaml.SafeDumper):
+    """
+    Custom Dumper to preserve the literal style for multiline strings.
+    """
+
+    def increase_indent(self, flow=False, indentless=False):
+        return super(PreserveLiteralStyleDumper, self).increase_indent(flow, False)
+
+    def represent_scalar(self, tag, value, style=None):
+        if "\n" in value:  # If the string contains newlines, use literal style
+            style = "|"
+        return super().represent_scalar(tag, value, style=style)
+
+@task(name="sort-metadata")
+def sort_metadata(contect: Context) -> None:
+    with open(METADATA_FILE, "r", encoding="utf-8") as f:
+        metadata = yaml.safe_load(f)
+
+    with open(METADATA_FILE, "w", encoding="utf-8") as f:
+        f.write("---\n")
+        yaml.dump(metadata, f, Dumper=PreserveLiteralStyleDumper, default_flow_style=False, sort_keys=True, allow_unicode=True)
+
+    
