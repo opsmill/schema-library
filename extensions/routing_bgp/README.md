@@ -2,23 +2,28 @@
 
 This schema extension contains all you need to model your BGP platform.
 
-
 Dependencies: `base, extensions.routing`
+
 ## Overview
+
 - **Version:** 1.0
+
 ## Nodes
-### **AutonomousSystem**
+
+### AutonomousSystem
+
 - **Description:** An Autonomous System (AS) is a set of Internet routable IP prefixes belonging to a network
 - **Label:** Autonomous System
 - **Icon:** mdi:bank-circle-outline
 - **Menu Placement:** RoutingBGPSession
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** asn__value, name__value
 - **Uniqueness Constraints:** asn__value, name__value
----
 #### Attributes
+
 | name | kind | description | order_weight | optional |
 | ---- | ---- | ----------- | ------------ | -------- |
 | name | Text | Name of the Autonomous System | 1000 |  |
@@ -26,24 +31,27 @@ Dependencies: `base, extensions.routing`
 | description | Text | Description of the Autonomous System | 1100 | True |
 
 #### Relationships
+
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | organization | OrganizationGeneric | False | one | Attribute |
 | location | LocationGeneric | True | one | Attribute |
 | devices | DcimDevice | True | many | Attribute |
 
-### **BGPPeerGroup**
+### BGPPeerGroup
+
 - **Description:** A BGP Peer Group is used to regroup parameters that are shared across multiple peers
 - **Label:** BGP Peer Group
 - **Icon:** mdi:view-grid-plus-outline
 - **Menu Placement:** RoutingBGPSession
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** name__value
 - **Uniqueness Constraints:** name__value
----
 #### Attributes
+
 | name | kind | optional | description | order_weight | regex | choices | default_value |
 | ---- | ---- | -------- | ----------- | ------------ | ----- | ------- | ------------- |
 | name | Text | False | Name of the BGP Group | 1000 |  | `` |  |
@@ -55,22 +63,25 @@ Dependencies: `base, extensions.routing`
 | address_family | Dropdown |  | The address family for the routing policy indicating the type of IP address. | 1150 |  | `ipv4, ipv6` | ipv4 |
 
 #### Relationships
+
 | name | identifier | peer | optional | cardinality | kind |
 | ---- | ---------- | ---- | -------- | ----------- | ---- |
 | local_as | bgppeergroup__local_as | RoutingAutonomousSystem | True | one | Attribute |
 | remote_as | bgppeergroup__remote_as | RoutingAutonomousSystem | True | one | Attribute |
 
-### **BGPSession**
+### BGPSession
+
 - **Description:** A BGP Session represent a point to point connection between two routers
 - **Label:** BGP Session
 - **Icon:** mdi:router
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** remote_as__asn__value
 - **Uniqueness Constraints:** 
----
 #### Attributes
+
 | name | kind | optional | enum | description | order_weight | choices | regex |
 | ---- | ---- | -------- | ---- | ----------- | ------------ | ------- | ----- |
 | import_policies | Text | True |  |  |  | `` |  |
@@ -80,6 +91,7 @@ Dependencies: `base, extensions.routing`
 | local_pref | Number | True |  | Force Local Pref for this BGP Peer Session. | 1450 | `` | ^[0-9]+$ |
 
 #### Relationships
+
 | name | identifier | peer | optional | cardinality | kind |
 | ---- | ---------- | ---- | -------- | ----------- | ---- |
 | local_as | bgpsession__local_as | RoutingAutonomousSystem | True | one | Attribute |
@@ -93,12 +105,14 @@ Dependencies: `base, extensions.routing`
 ## Extensions
 ### DcimGenericDevice
 #### Relationships
+
 | name | peer | optional | cardinality | kind | order_weight |
 | ---- | ---- | -------- | ----------- | ---- | ------------ |
 | asn | RoutingAutonomousSystem | True | one | Attribute | 1600 |
 
 ### OrganizationGeneric
 #### Relationships
+
 | name | label | cardinality | optional | peer | order_weight |
 | ---- | ----- | ----------- | -------- | ---- | ------------ |
 | asn | Autonomous System | many | True | RoutingAutonomousSystem | 2000 |

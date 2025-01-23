@@ -2,21 +2,25 @@
 
 This schema extension contains models for VMs. You might consider Cluster or/and Hypervisor extension to go with!
 
-
 ## Overview
+
 - **Version:** 1.0
+
 ## Nodes
-### **Policer**
+
+### Policer
+
 - **Description:** A generic policer configuration.
 - **Label:** Network Policer
 - **Icon:** mdi:car-speed-limiter
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** name__value
 - **Uniqueness Constraints:** name__value
----
 #### Attributes
+
 | name | kind | label | description | order_weight | unique | optional | choices |
 | ---- | ---- | ----- | ----------- | ------------ | ------ | -------- | ------- |
 | name | Text | Name | Unique name of the policer. | 1000 | True |  | `` |

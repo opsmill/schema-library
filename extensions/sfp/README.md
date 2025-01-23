@@ -11,18 +11,23 @@ Improvements:
 - You could link a SFP to an interface AND a location ...
 
 
-
 Dependencies: `base`
+
 ## Overview
+
 - **Version:** 1.0
+
 ## Generics
-### **GenericSFP**
+
+### GenericSFP
+
 - **Description:** Generic base for all Small Form-factor Pluggable (SFP) transceivers.
 - **Label:** SFP
 - **Icon:** mdi:gpu
 - **Include in Menu:** ✅
----
+
 #### Attributes
+
 | name | kind | optional | order_weight | description | choices | default_value |
 | ---- | ---- | -------- | ------------ | ----------- | ------- | ------------- |
 | serial | Text | True | 1400 |  | `` |  |
@@ -31,6 +36,7 @@ Dependencies: `base`
 | form_factor | Dropdown | False | 1000 | The physical form factor of the SFP module. | `sfp, sfp_plus, qsfp, qsfp_plus, qsfp28, qsfp_dd, cfp, cfp2, cfp4, xfp, sfp56, qsfp56, osfp` |  |
 
 #### Relationships
+
 | name | peer | kind | optional | cardinality | order_weight |
 | ---- | ---- | ---- | -------- | ----------- | ------------ |
 | interface | DcimInterface | Attribute | True | one | 1200 |
@@ -38,21 +44,25 @@ Dependencies: `base`
 | manufacturer | OrganizationManufacturer | Attribute | True | one | 1350 |
 
 ## Nodes
-### **StandardSFP**
+
+### StandardSFP
+
 - **Description:** Standard SFP module for various types (e.g., LR, SR, T).
 - **Label:** Standard SFP
 - **Icon:** mdi:gpu
 - **Menu Placement:** DcimGenericSFP
 - **Include in Menu:** ❌
----
-### **BidiSFP**
+
+### BidiSFP
+
 - **Description:** Bidirectional SFP supporting two wavelengths for single-fiber operation.
 - **Label:** Bidirectional SFP
 - **Icon:** lineicons:arrow-both-direction-vertical-1
 - **Menu Placement:** DcimGenericSFP
 - **Include in Menu:** ❌
----
+
 #### Attributes
+
 | name | label | kind | optional | description | order_weight |
 | ---- | ----- | ---- | -------- | ----------- | ------------ |
 | wavelength_tx | Transmit Wavelength (nm) | Number | False | Transmit wavelength in nm. | 1175 |
@@ -61,18 +71,21 @@ Dependencies: `base`
 ## Extensions
 ### DcimInterface
 #### Relationships
+
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |
 | plugged_sfp | DcimGenericSFP | one | True |
 
 ### LocationHosting
 #### Relationships
+
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |
 | spare_sfps | DcimGenericSFP | many | True |
 
 ### OrganizationManufacturer
 #### Relationships
+
 | name | label | peer | cardinality | optional |
 | ---- | ----- | ---- | ----------- | -------- |
 | sfps | SFPs | DcimGenericSFP | many | True |

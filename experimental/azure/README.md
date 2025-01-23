@@ -2,104 +2,129 @@
 
 This schema extension introduces cloud support for Microsoft Azure.
 
-
 Dependencies: `base`
+
+Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)
+
 ## Overview
+
 - **Version:** 1.0
+
 ## Generics
-### **Resource**
+
+### Resource
+
 - **Label:** Azure
 - **Include in Menu:** ✅
----
+
 #### Attributes
+
 | name | kind |
 | ---- | ---- |
 | name | Text |
 
 #### Relationships
+
 | name | cardinality | kind | peer | optional |
 | ---- | ----------- | ---- | ---- | -------- |
 | location | one | Attribute | AzureLocation |  |
 | resourcegroup | one | Parent | AzureResourceGroup | False |
 
 ## Nodes
-### **Location**
+
+### Location
+
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ❌
----
+
 #### Attributes
+
 | name | kind |
 | ---- | ---- |
 | name | Text |
 
-### **Tenant**
+### Tenant
+
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ❌
----
+
 #### Attributes
+
 | name | kind |
 | ---- | ---- |
 | name | Text |
 | tenant_id | Text |
 
 #### Relationships
+
 | name | cardinality | peer | kind |
 | ---- | ----------- | ---- | ---- |
 | subscriptions | many | AzureSubscription | Component |
 
-### **Subscription**
+### Subscription
+
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ❌
----
+
 #### Attributes
+
 | name | kind |
 | ---- | ---- |
 | name | Text |
 | subscription_id | Text |
 
 #### Relationships
+
 | name | cardinality | peer | kind | optional |
 | ---- | ----------- | ---- | ---- | -------- |
 | tenant | one | AzureTenant | Parent | False |
 | resourcegroups | many | AzureResourceGroup | Component |  |
 
-### **ResourceGroup**
+### ResourceGroup
+
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ❌
----
+
 #### Attributes
+
 | name | kind |
 | ---- | ---- |
 | name | Text |
 
 #### Relationships
+
 | name | cardinality | kind | peer | optional |
 | ---- | ----------- | ---- | ---- | -------- |
 | location | one | Attribute | AzureLocation |  |
 | subscription | one | Parent | AzureSubscription | False |
 
-### **VirtualNetwork**
+### VirtualNetwork
+
 - **Label:** Virtual Networks
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ❌
----
+
 #### Relationships
+
 | name | cardinality | kind | peer |
 | ---- | ----------- | ---- | ---- |
 | address_space | many | Attribute | BuiltinIPPrefix |
 | subnets | many | Component | AzureVirtualNetworkSubnet |
 
-### **VirtualNetworkSubnet**
+### VirtualNetworkSubnet
+
 - **Label:** Subnets
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ✅
----
+
 #### Attributes
+
 | name | kind |
 | ---- | ---- |
 | name | Text |
 
 #### Relationships
+
 | name | cardinality | peer | kind | optional |
 | ---- | ----------- | ---- | ---- | -------- |
 | virtualnetwork | one | AzureVirtualNetwork | Parent | False |
