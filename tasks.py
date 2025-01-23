@@ -80,15 +80,18 @@ def generate_readme(schema, extension_dir: Path) -> None:
 
     content = [
         f"# {schema.get('name', '')}\n",
-        f"{schema.get('description', '')}\n\n",
+        f"{schema.get('description', '')}\n",
     ]
 
     if dependencies := schema.get("dependencies", []):
-        content.append(f"Dependencies: `{', '.join(dependencies)}`")
+        content.append(f"Dependencies: `{', '.join(dependencies)}`\n")
+
+    if attribution := schema.get("attribution", []):
+        content.append(f"Attribution: {attribution}\n")
 
     def format_table(headers: list, rows: list):
         """Generate a Markdown table."""
-        table = f"| {' | '.join(headers)} |\n"
+        table = f"\n| {' | '.join(headers)} |\n"
         table += f"| {' | '.join(['-' * len(header) for header in headers])} |\n"
         for row in rows:
             table += f"| {' | '.join(row)} |\n"
@@ -118,7 +121,7 @@ def generate_readme(schema, extension_dir: Path) -> None:
 
     def generate_node_data(node: dict):
         node_markdown = []
-        node_markdown.append(f"### **{node.get('name')}**")
+        node_markdown.append(f"### {node.get('name')}\n")
         if node.get("description"):
             node_markdown.append(f"- **Description:** {node.get('description')}")
         if node.get("label"):
@@ -130,7 +133,7 @@ def generate_readme(schema, extension_dir: Path) -> None:
                 f"- **Menu Placement:** {node.get('menu_placement', '')}"
             )
         node_markdown.append(
-            f"- **Include in Menu:** {'✅' if node.get('include_in_menu') else '❌'}"
+            f"- **Include in Menu:** {'✅' if node.get('include_in_menu') else '❌'}\n"
         )
         if node.get("order_by") or node.get("uniqueness_constraints"):
             node_markdown.append("\n#### Ordering and Constraints")
@@ -140,7 +143,7 @@ def generate_readme(schema, extension_dir: Path) -> None:
             node_markdown.append(
                 f"- **Uniqueness Constraints:** {', '.join([' + '.join(c) for c in node.get('uniqueness_constraints', [])])}"
             )
-        node_markdown.append("---")
+        # node_markdown.append("---\n")
 
         if attributes := node.get("attributes", []):
             node_markdown.append("#### Attributes")
@@ -154,16 +157,16 @@ def generate_readme(schema, extension_dir: Path) -> None:
         return node_markdown
 
     for _, file_values in schema_definition_files.items():
-        content.append("## Overview")
-        content.append(f"- **Version:** {file_values['version']}")
+        content.append("## Overview\n")
+        content.append(f"- **Version:** {file_values['version']}\n")
 
         if generics := file_values.get("generics", []):
-            content.append("## Generics")
+            content.append("## Generics\n")
             for generic in generics:
                 content.extend(generate_node_data(generic))
 
         if nodes := file_values.get("nodes", []):
-            content.append("## Nodes")
+            content.append("## Nodes\n")
             for node in nodes:
                 content.extend(generate_node_data(node))
 
@@ -283,7 +286,7 @@ class PreserveLiteralStyleDumper(yaml.SafeDumper):
         return super().represent_scalar(tag, value, style=style)
 
 @task(name="sort-metadata")
-def sort_metadata(contect: Context) -> None:
+def sort_metadata(context: Context) -> None:
     print(f" - Sort {METADATA_FILE}")
     with open(METADATA_FILE, "r", encoding="utf-8") as f:
         metadata = yaml.safe_load(f)
@@ -291,5 +294,3 @@ def sort_metadata(contect: Context) -> None:
     with open(METADATA_FILE, "w", encoding="utf-8") as f:
         f.write("---\n")
         yaml.dump(metadata, f, Dumper=PreserveLiteralStyleDumper, default_flow_style=False, sort_keys=True, allow_unicode=True)
-
-    

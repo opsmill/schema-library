@@ -2,22 +2,27 @@
 
 This schema extension contains all you need to model the OSPF Routing Protocol.
 
-
 Dependencies: `base, extensions.routing`
+
 ## Overview
+
 - **Version:** 1.0
+
 ## Nodes
-### **OSPF**
+
+### OSPF
+
 - **Description:** OSPF (Open Shortest Path First) instance on a Virtual Router.
 - **Label:** OSPF
 - **Icon:** mdi:network-outline
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** router_id__address__value, vrf__name__value, device__name__value
 - **Uniqueness Constraints:** device + vrf + version__value
----
 #### Attributes
+
 | name | kind | optional | default_value | description | order_weight | choices |
 | ---- | ---- | -------- | ------------- | ----------- | ------------ | ------- |
 | reference_bandwidth | Number | True | 1000 | Reference bandwidth for OSPF instance (in Mbps). | 1150 | `` |
@@ -26,22 +31,25 @@ Dependencies: `base, extensions.routing`
 | export_policies | Text | True |  |  | 1350 | `` |
 
 #### Relationships
+
 | name | peer | optional | cardinality | kind | label | identifier |
 | ---- | ---- | -------- | ----------- | ---- | ----- | ---------- |
 | router_id | IpamIPAddress | True | one | Attribute |  |  |
 | ospf_interfaces | RoutingOSPFInterface | True | many | Component | OSPF Interfaces | ospf__ospfinterfaces |
 
-### **OSPFInterface**
+### OSPFInterface
+
 - **Description:** Pivot table linking OSPF configuration to an interface.
 - **Label:** OSPF Interface
 - **Icon:** mdi:ethernet
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** description__value
 - **Uniqueness Constraints:** ospf + interface
----
 #### Attributes
+
 | name | kind | optional | description | order_weight | choices | default_value |
 | ---- | ---- | -------- | ----------- | ------------ | ------- | ------------- |
 | description | Text | False | Description of the OSPF interface. | 1500 | `` |  |
@@ -52,6 +60,7 @@ Dependencies: `base, extensions.routing`
 | area | Text |  | OSPF area associated with the interface. | 1200 | `` |  |
 
 #### Relationships
+
 | name | label | peer | identifier | optional | cardinality | kind | order_weight |
 | ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
 | ospf | OSPF | RoutingOSPF | ospf__ospfinterfaces | False | one | Parent | 1100 |

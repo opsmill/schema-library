@@ -2,18 +2,23 @@
 
 This schema extension contains a basic Cable model allowing you to connect two endpoints.
 
-
 Dependencies: `base`
+
 ## Overview
+
 - **Version:** 1.0
+
 ## Nodes
-### **Cable**
+
+### Cable
+
 - **Description:** Physical cable connecting two endpoints
 - **Label:** Cable
 - **Icon:** mdi:cable-data
 - **Include in Menu:** ❌
----
+
 #### Attributes
+
 | name | kind | optional | order_weight | choices | label |
 | ---- | ---- | -------- | ------------ | ------- | ----- |
 | status | Dropdown | True | 1000 | `connected, planned` |  |

@@ -2,22 +2,27 @@
 
 This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)!
 
-
 Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.routing_bgp_community`
+
 ## Overview
+
 - **Version:** 1.0
+
 ## Nodes
-### **IXP**
+
+### IXP
+
 - **Description:** An Internet Exchange Point (IXP) for peering
 - **Label:** Internet Exchange
 - **Icon:** mdi:network
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** name__value
 - **Uniqueness Constraints:** name__value
----
 #### Attributes
+
 | name | kind | unique | description | order_weight | optional | choices | default_value |
 | ---- | ---- | ------ | ----------- | ------------ | -------- | ------- | ------------- |
 | name | Text | True | Name of the Internet Exchange | 1000 |  | `` |  |
@@ -25,6 +30,7 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.rout
 | status | Dropdown |  |  | 1200 |  | `enabled, disabled` | enabled |
 
 #### Relationships
+
 | name | peer | optional | cardinality | kind | description | order_weight | label | identifier |
 | ---- | ---- | -------- | ----------- | ---- | ----------- | ------------ | ----- | ---------- |
 | connections | PeeringIXPConnection | True | many | Component | IXP connections associated with this Internet Exchange |  |  |  |
@@ -34,18 +40,20 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.rout
 | bgp_communities | RoutingBGPCommunity | True | many | Generic | BGP communities associated with the session |  | BGP Communities |  |
 | tags | BuiltinTag | True | many | Attribute |  | 3000 |  |  |
 
-### **IXPConnection**
+### IXPConnection
+
 - **Description:** A connection to an Internet Exchange Point (IXP)
 - **Label:** IXP Connection
 - **Icon:** mdi:lan-connect
 - **Menu Placement:** PeeringIXP
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** name__value
 - **Uniqueness Constraints:** name__value
----
 #### Attributes
+
 | name | kind | unique | description | order_weight | optional | label | choices | default_value |
 | ---- | ---- | ------ | ----------- | ------------ | -------- | ----- | ------- | ------------- |
 | name | Text | True | Name of the IXP Connection | 1000 |  |  | `` |  |
@@ -56,6 +64,7 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.rout
 | mac_address | MacAddress |  | MAC address associated with the connection | 1350 | True | MAC Address | `` |  |
 
 #### Relationships
+
 | name | label | description | peer | identifier | cardinality | kind | order_weight | optional |
 | ---- | ----- | ----------- | ---- | ---------- | ----------- | ---- | ------------ | -------- |
 | ipv6_address | IPv6 Address | IPv6 address assigned to the connection | IpamIPAddress | ixpconn__ipv6_address | one | Attribute | 1400 |  |

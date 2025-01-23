@@ -9,23 +9,28 @@ service id, provider ...)
 CircuitService on the other side
 
 
-
 Dependencies: `extensions.circuit`
+
 ## Overview
+
 - **Version:** 1.0
+
 ## Nodes
-### **Service**
+
+### Service
+
 - **Description:** Represent the boundary of a provider network, the details of which are unknown or unimportant
 - **Label:** Circuit Service
 - **Icon:** mdi:cloud
 - **Menu Placement:** DcimCircuit
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** name__value
 - **Uniqueness Constraints:** 
----
 #### Attributes
+
 | name | kind | unique | optional |
 | ---- | ---- | ------ | -------- |
 | name | Text | True |  |
@@ -33,6 +38,7 @@ Dependencies: `extensions.circuit`
 | description | Text |  | True |
 
 #### Relationships
+
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | provider | OrganizationProvider | False | one | Attribute |
@@ -41,12 +47,14 @@ Dependencies: `extensions.circuit`
 ## Extensions
 ### OrganizationProvider
 #### Relationships
+
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |
 | circuit_services | CircuitService | many | True |
 
 ### CircuitEndpoint
 #### Relationships
+
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |
 | circuit_service | CircuitService | one | True |

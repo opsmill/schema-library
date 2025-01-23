@@ -2,22 +2,27 @@
 
 This schema extension adds support for InfiniBand switches.
 
-
 Dependencies: `base, extensions.compute`
+
 ## Overview
+
 - **Version:** 1.0
+
 ## Nodes
-### **Switch**
+
+### Switch
+
 - **Description:** InfiniBand Switch
 - **Label:** InfiniBand Switch
 - **Icon:** mdi:server
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** name__value
 - **Uniqueness Constraints:** 
----
 #### Attributes
+
 | name | kind | unique | order_weight | optional | label | description | default_value | choices |
 | ---- | ---- | ------ | ------------ | -------- | ----- | ----------- | ------------- | ------- |
 | name | Text | True | 1000 |  |  |  |  | `` |
@@ -36,23 +41,26 @@ Dependencies: `base, extensions.compute`
 | password_hardening | Boolean |  |  |  | Password Hardening | Enable Password Hardening | False | `` |
 
 #### Relationships
+
 | name | kind | cardinality | peer | optional |
 | ---- | ---- | ----------- | ---- | -------- |
 | interfaces | Component | many | InfinibandSwitchInterface | True |
 | mgmt_interface | Component | one | InfinibandSwitchMgmtInterface | True |
 | rsu | Attribute | one | InfinibandRSU | True |
 
-### **SwitchInterface**
+### SwitchInterface
+
 - **Description:** InfiniBand Switch Interface
 - **Label:** InfiniBand Switch Interface
 - **Icon:** mdi:ethernet
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** name__value
 - **Uniqueness Constraints:** switch + name__value
----
 #### Attributes
+
 | name | kind | order_weight | optional | default_value | label | description | enum | choices |
 | ---- | ---- | ------------ | -------- | ------------- | ----- | ----------- | ---- | ------- |
 | name | Text | 1000 |  |  |  |  |  | `` |
@@ -69,22 +77,25 @@ Dependencies: `base, extensions.compute`
 | role | Dropdown |  | True |  | Interface Role | Role of the interface in the InfiniBand network |  | `endhost, uplink, reserved` |
 
 #### Relationships
+
 | name | peer | optional | cardinality | kind | max_count |
 | ---- | ---- | -------- | ----------- | ---- | --------- |
 | speed_option | InfinibandSwitchIntfSpeedOptions | True | many | Attribute | 6 |
 | switch | InfinibandSwitch | False | one | Parent |  |
 
-### **SwitchMgmtInterface**
+### SwitchMgmtInterface
+
 - **Description:** InfiniBand Switch Management Interface
 - **Label:** InfiniBand Mgmt Interface
 - **Icon:** mdi:ethernet
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** name__value
 - **Uniqueness Constraints:** switch + name__value
----
 #### Attributes
+
 | name | kind | order_weight | optional | label | default_value | description |
 | ---- | ---- | ------------ | -------- | ----- | ------------- | ----------- |
 | name | Text | 1000 |  |  |  |  |
@@ -95,65 +106,74 @@ Dependencies: `base, extensions.compute`
 | dhcp | Boolean |  |  | DHCP | True | Enable DHCP for the management interface |
 
 #### Relationships
+
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | switch | InfinibandSwitch | False | one | Parent |
 | ipv4_address | IpamIPAddress | True | one |  |
 
-### **SwitchIntfSpeedOptions**
+### SwitchIntfSpeedOptions
+
 - **Description:** InfiniBand Interface Speed Options
 - **Label:** InfiniBand Interface Speed Options
 - **Icon:** mdi:ethernet
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** speed__value
 - **Uniqueness Constraints:** 
----
 #### Attributes
+
 | name | kind | label | description | choices | unique |
 | ---- | ---- | ----- | ----------- | ------- | ------ |
 | speed | Dropdown | Speed | Speed of the interface | `SDR, NDR, QDR, FDR, EDR, HDR` |  |
 | description | Text | Description | Description of the speed option (must be unique) | `` | True |
 
 #### Relationships
+
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | switch | InfinibandSwitchInterface | False | one | Parent |
 
-### **RSU**
+### RSU
+
 - **Description:** InfiniBand Rail-Optimized Scalable Unit
 - **Label:** InfiniBand RSU
 - **Icon:** mdi:network
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** identifier__value
 - **Uniqueness Constraints:** identifier__value
----
 #### Attributes
+
 | name | kind | label | description | regex | optional |
 | ---- | ---- | ----- | ----------- | ----- | -------- |
 | identifier | Text | Identifier | InfiniBand RSU Identifier (A-Z: a unique character string) | [A-Z] |  |
 | size | Number | Size | Number of InfiniBand Leaf Switches (Rails) in the RSU |  | True |
 
 #### Relationships
+
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | switches | InfinibandSwitch | True | many | Attribute |
 | interfaces | InfinibandSwitchInterface | True | many | Attribute |
 
-### **Fabric**
+### Fabric
+
 - **Description:** InfiniBand Network Fabric
 - **Label:** InfiniBand Network Fabric
 - **Icon:** mdi:network
 - **Include in Menu:** ❌
 
+
 #### Ordering and Constraints
 - **Order By:** name__value
 - **Uniqueness Constraints:** 
----
 #### Attributes
+
 | name | kind | label | description | unique |
 | ---- | ---- | ----- | ----------- | ------ |
 | name | Text | Name | InfiniBand Network Fabric Name | True |
