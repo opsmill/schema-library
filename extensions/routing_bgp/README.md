@@ -4,7 +4,7 @@ This schema extension contains all you need to model your BGP platform.
 
 Dependencies: `base, extensions.routing`
 
-## Overview
+## bgp
 
 - **Version:** 1.0
 

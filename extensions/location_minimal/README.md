@@ -4,7 +4,7 @@ This schema extension is minimal but will provide you with basic items to store 
 
 Dependencies: `base`
 
-## Overview
+## location_minimal
 
 - **Version:** 1.0
 

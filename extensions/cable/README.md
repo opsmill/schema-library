@@ -4,7 +4,7 @@ This schema extension contains a basic Cable model allowing you to connect two e
 
 Dependencies: `base`
 
-## Overview
+## cable
 
 - **Version:** 1.0
 

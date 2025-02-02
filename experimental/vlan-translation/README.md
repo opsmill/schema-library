@@ -4,7 +4,7 @@ This schema extension is based on Juniper VLAN MAP, and not yet test out for oth
 
 Dependencies: `base.dcim`
 
-## Overview
+## vlan-translation
 
 - **Version:** 1.0
 

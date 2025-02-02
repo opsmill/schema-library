@@ -4,7 +4,7 @@ This schema extension contains generics to create Routing Protocol "Instance". T
 
 Dependencies: `base, extensions.vlan`
 
-## Overview
+## routing
 
 - **Version:** 1.0
 

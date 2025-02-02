@@ -4,7 +4,7 @@ This schema extension contains all you need to model the Aggregate Routing Proto
 
 Dependencies: `base, extensions.routing`
 
-## Overview
+## aggregate
 
 - **Version:** 1.0
 

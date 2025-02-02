@@ -7,7 +7,7 @@ Simple schema allowing you to capture physical disks information for the sake of
 
 Dependencies: `base`
 
-## Overview
+## physical_disk
 
 - **Version:** 1.0
 

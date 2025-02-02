@@ -4,7 +4,7 @@ This schema extension extend the BGP extension to add BGP Route Reflector Cluste
 
 Dependencies: `base, extensions.routing, extensions.routing_bgp`
 
-## Overview
+## bgp_rr
 
 - **Version:** 1.0
 

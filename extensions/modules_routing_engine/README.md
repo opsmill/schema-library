@@ -4,7 +4,7 @@ This schema extension allows you to capture Routing Engine related information l
 
 Dependencies: `base, extensions.modules`
 
-## Overview
+## routing_engine
 
 - **Version:** 1.0
 

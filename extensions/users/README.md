@@ -4,7 +4,7 @@ This schema extension contains models for Accounts management.
 
 Dependencies: `base`
 
-## Overview
+## users
 
 - **Version:** 1.0
 

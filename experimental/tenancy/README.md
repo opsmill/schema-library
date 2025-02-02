@@ -4,7 +4,7 @@ This schema extension introduces tenancy for some of the schema nodes (circuits.
 
 Dependencies: `base, extensions.circuit, experimental.location_extended`
 
-## Overview
+## tenancy
 
 - **Version:** 1.0
 

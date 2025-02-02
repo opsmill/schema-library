@@ -2,7 +2,7 @@
 
 This schema extension contains models for Quality of Service (QoS)
 
-## Overview
+## qos
 
 - **Version:** 1.0
 

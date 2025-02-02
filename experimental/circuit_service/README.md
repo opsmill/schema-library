@@ -8,7 +8,7 @@ For example you have a MPLS network supported by a provider connecting multiple 
 
 Dependencies: `extensions.circuit`
 
-## Overview
+## circuit_service
 
 - **Version:** 1.0
 

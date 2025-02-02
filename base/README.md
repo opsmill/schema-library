@@ -2,7 +2,7 @@
 
 The base schemas serve as the foundation for every single schema extension you might want to use afterward. This one is mandatory and will unlock access to the extensions section.
 
-## Overview
+## dcim
 
 - **Version:** 1.0
 
@@ -234,7 +234,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | status | Dropdown | True | \`active, provisioning, maintenance, drained\` | 1300 |  |  |
 | l2\_mode | Text |  | \`\` | 1250 | Layer2 Mode | \['Access', 'Trunk', 'Tunnel'\] |
 
-## Overview
+## organization
 
 - **Version:** 1.0
 
@@ -288,7 +288,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Menu Placement:** OrganizationGeneric
 - **Include in Menu:** ✅
 
-## Overview
+## location
 
 - **Version:** 1.0
 
@@ -332,7 +332,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | prefixes | Prefixes | IpamPrefix | many | True |
 | devices | Devices | DcimPhysicalDevice | many | True |
 
-## Overview
+## ipam
 
 - **Version:** 1.0
 
@@ -354,7 +354,7 @@ The base schemas serve as the foundation for every single schema extension you m
 
 | name | label | kind | optional | regex |
 | ---- | ----- | ---- | -------- | ----- |
-| fqdn | FQDN | Text | True | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
+| fqdn | FQDN | Text | True | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
 
 #### Relationships
 

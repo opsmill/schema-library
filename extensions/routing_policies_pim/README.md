@@ -4,7 +4,7 @@ This schema inherits the `RoutingPolicy` schema and removes `import_policies` an
 
 Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_pim`
 
-## Overview
+## routing_policies_pim
 
 - **Version:** 1.0
 

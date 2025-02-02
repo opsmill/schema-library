@@ -4,7 +4,7 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 
 Dependencies: `base, extensions.sfp`
 
-## Overview
+## dwdm
 
 - **Version:** 1.0
 

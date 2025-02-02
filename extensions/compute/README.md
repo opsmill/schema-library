@@ -4,7 +4,7 @@ With this schema extension in place you will be able to capture all your physica
 
 Dependencies: `base`
 
-## Overview
+## compute
 
 - **Version:** 1.0
 

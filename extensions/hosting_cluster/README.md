@@ -4,7 +4,7 @@ A rather generic cluster built with compute units (e.g. servers) and able to hos
 
 Dependencies: `base, extensions.cluster, extensions.compute`
 
-## Overview
+## hosting_cluster
 
 - **Version:** 1.0
 

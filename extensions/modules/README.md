@@ -7,7 +7,7 @@ This schema extension allows you to capture Device Modules related information l
 
 Dependencies: `base`
 
-## Overview
+## modules
 
 - **Version:** 1.0
 

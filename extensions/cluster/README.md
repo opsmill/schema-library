@@ -4,7 +4,7 @@ This schema extension contains the foundations to capture clusters. With this on
 
 Dependencies: `base, extensions.compute`
 
-## Overview
+## cluster
 
 - **Version:** 1.0
 

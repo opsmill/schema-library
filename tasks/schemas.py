@@ -118,6 +118,8 @@ def generate_readme(schema, extension_dir: Path) -> list:
                 ".",
                 "!",
                 "$",
+                "<",
+                ">",
             ]
 
             for char in special_chars:
@@ -177,7 +179,6 @@ def generate_readme(schema, extension_dir: Path) -> list:
             node_markdown.append(
                 f"- **Uniqueness Constraints:**{', '.join([' + '.join(c) for c in node.get('uniqueness_constraints', [])])}\n"
             )
-            # node_markdown.append("\n")
 
         if attributes := node.get("attributes", []):
             node_markdown.append("#### Attributes")
@@ -191,7 +192,8 @@ def generate_readme(schema, extension_dir: Path) -> list:
         return node_markdown
 
     for _, file_values in schema_definition_files.items():
-        content.append("## Overview\n")
+        # content.append(f"## {_}\n")
+        content.append(f"## {_}\n")
         content.append(f"- **Version:** {file_values['version']}\n")
 
         if generics := file_values.get("generics", []):
@@ -237,7 +239,7 @@ def build(context: Context) -> None:
     ]
 
     # Create docs directory if it doesn't exist
-    schema_docs_dir = DOCUMENTATION_DIRECTORY / "docs" / "schema-library"
+    schema_docs_dir = DOCUMENTATION_DIRECTORY / "docs"
     consolidated_doc = schema_docs_dir / "schema-library.mdx"
 
     all_content = []

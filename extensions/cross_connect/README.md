@@ -4,7 +4,7 @@ This extension contains schema to capture Cross Connect. You can see it as "a ca
 
 Dependencies: `base`
 
-## Overview
+## cross_connect
 
 - **Version:** 1.0
 

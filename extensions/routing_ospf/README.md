@@ -4,7 +4,7 @@ This schema extension contains all you need to model the OSPF Routing Protocol.
 
 Dependencies: `base, extensions.routing`
 
-## Overview
+## ospf
 
 - **Version:** 1.0
 

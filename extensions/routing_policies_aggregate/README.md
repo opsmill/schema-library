@@ -4,7 +4,7 @@ This extension is using the Routing Policies extensions and the Routing Aggregat
 
 Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_aggregate`
 
-## Overview
+## routing_policies_aggregate
 
 - **Version:** 1.0
 

@@ -4,7 +4,7 @@ This schema extension adds support for InfiniBand switches.
 
 Dependencies: `base, extensions.compute`
 
-## Overview
+## infiniband
 
 - **Version:** 1.0
 

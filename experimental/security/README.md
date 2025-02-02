@@ -4,7 +4,7 @@ This schema extension contains models for implementing detailed security.
 
 Dependencies: `base`
 
-## Overview
+## security
 
 - **Version:** 1.0
 
@@ -227,7 +227,7 @@ Dependencies: `base`
 
 | name | label | kind | optional | regex |
 | ---- | ----- | ---- | -------- | ----- |
-| fqdn | FQDN | Text | False | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
+| fqdn | FQDN | Text | False | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
 
 ### AddressGroup
 

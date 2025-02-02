@@ -4,7 +4,7 @@ This schema extension contains models to support VRF in your network.
 
 Dependencies: `base`
 
-## Overview
+## vrf
 
 - **Version:** 1.0
 

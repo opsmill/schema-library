@@ -4,7 +4,7 @@ This schema extension is the most detailed when it comes to location, you'll fin
 
 Dependencies: `base`
 
-## Overview
+## location_extended
 
 - **Version:** 1.0
 

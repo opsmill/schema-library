@@ -4,7 +4,7 @@ This schema extension adds the BGP Communities models.
 
 Dependencies: `base, extensions.routing`
 
-## Overview
+## bgp_community
 
 - **Version:** 1.0
 

@@ -4,7 +4,7 @@ This extension is using the Routing Policies extensions and the Routing BGP one 
 
 Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_bgp`
 
-## Overview
+## routing_policies_bgp
 
 - **Version:** 1.0
 

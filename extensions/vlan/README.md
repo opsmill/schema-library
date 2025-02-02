@@ -4,7 +4,7 @@ This schema extension contains models to support VLANs in you network.
 
 Dependencies: `base`
 
-## Overview
+## vlan
 
 - **Version:** 1.0
 

@@ -4,7 +4,7 @@ This schema extension contains Circuits and ways to connect them with your infra
 
 Dependencies: `base, extensions.location_minimal`
 
-## Overview
+## circuit
 
 - **Version:** 1.0
 

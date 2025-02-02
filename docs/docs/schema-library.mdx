@@ -1,10 +1,13 @@
+---
+title: Schema Library Documentation
+---
 <!-- markdownlint-disable-file MD025 -->
 
 # Base Schemas
 
 The base schemas serve as the foundation for every single schema extension you might want to use afterward. This one is mandatory and will unlock access to the extensions section.
 
-## Overview
+## dcim
 
 - **Version:** 1.0
 
@@ -236,7 +239,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | status | Dropdown | True | \`active, provisioning, maintenance, drained\` | 1300 |  |  |
 | l2\_mode | Text |  | \`\` | 1250 | Layer2 Mode | \['Access', 'Trunk', 'Tunnel'\] |
 
-## Overview
+## organization
 
 - **Version:** 1.0
 
@@ -290,7 +293,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Menu Placement:** OrganizationGeneric
 - **Include in Menu:** ✅
 
-## Overview
+## location
 
 - **Version:** 1.0
 
@@ -334,7 +337,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | prefixes | Prefixes | IpamPrefix | many | True |
 | devices | Devices | DcimPhysicalDevice | many | True |
 
-## Overview
+## ipam
 
 - **Version:** 1.0
 
@@ -356,7 +359,7 @@ The base schemas serve as the foundation for every single schema extension you m
 
 | name | label | kind | optional | regex |
 | ---- | ----- | ---- | -------- | ----- |
-| fqdn | FQDN | Text | True | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
+| fqdn | FQDN | Text | True | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
 
 #### Relationships
 
@@ -397,7 +400,7 @@ This schema inherits the `RoutingPolicy` schema and removes `import_policies` an
 
 Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_pim`
 
-## Overview
+## routing_policies_pim
 
 - **Version:** 1.0
 
@@ -434,7 +437,7 @@ This schema extension introduces abstract network pods and services running in t
 
 Dependencies: `base`
 
-## Overview
+## topology
 
 - **Version:** 1.0
 
@@ -465,7 +468,7 @@ This schema extension contains the foundations to capture clusters. With this on
 
 Dependencies: `base, extensions.compute`
 
-## Overview
+## cluster
 
 - **Version:** 1.0
 
@@ -532,7 +535,7 @@ This schema extension allows you to capture Routing Engine related information l
 
 Dependencies: `base, extensions.modules`
 
-## Overview
+## routing_engine
 
 - **Version:** 1.0
 
@@ -579,7 +582,7 @@ Dependencies: `base, extensions.modules`
 
 This schema extension contains models for SNMP Communities and SNMP Clients. As you can see this extension is not linked to Tenancy or Device, as you could decide to link the Community to different models based on your use case.
 
-## Overview
+## snmp
 
 - **Version:** 1.0
 
@@ -688,7 +691,7 @@ This schema extension allows you to capture Linecard related information like th
 
 Dependencies: `base, extensions.modules`
 
-## Overview
+## linecard
 
 - **Version:** 1.0
 
@@ -786,7 +789,7 @@ This extension is using the Routing Policies extensions and the Routing BGP one 
 
 Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_bgp`
 
-## Overview
+## routing_policies_bgp
 
 - **Version:** 1.0
 
@@ -839,7 +842,7 @@ This schema extension extend the BGP extension to add BGP Route Reflector Cluste
 
 Dependencies: `base, extensions.routing, extensions.routing_bgp`
 
-## Overview
+## bgp_rr
 
 - **Version:** 1.0
 
@@ -895,7 +898,7 @@ Improvements:
 
 Dependencies: `base`
 
-## Overview
+## sfp
 
 - **Version:** 1.0
 
@@ -982,7 +985,7 @@ This schema extension contains Circuits and ways to connect them with your infra
 
 Dependencies: `base, extensions.location_minimal`
 
-## Overview
+## circuit
 
 - **Version:** 1.0
 
@@ -1069,7 +1072,7 @@ This schema extension adds the BGP Communities models.
 
 Dependencies: `base, extensions.routing`
 
-## Overview
+## bgp_community
 
 - **Version:** 1.0
 
@@ -1108,7 +1111,7 @@ This extension contains schema to capture Cross Connect. You can see it as "a ca
 
 Dependencies: `base`
 
-## Overview
+## cross_connect
 
 - **Version:** 1.0
 
@@ -1147,7 +1150,7 @@ This extension is using the Routing Policies extensions and the Routing Aggregat
 
 Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_aggregate`
 
-## Overview
+## routing_policies_aggregate
 
 - **Version:** 1.0
 
@@ -1184,7 +1187,7 @@ This schema extension is minimal but will provide you with basic items to store 
 
 Dependencies: `base`
 
-## Overview
+## location_minimal
 
 - **Version:** 1.0
 
@@ -1266,7 +1269,7 @@ This schema extension contains models for VRRP.
 
 Dependencies: `base, base.dcim, base.ipam`
 
-## Overview
+## vrrp
 
 - **Version:** 1.0
 
@@ -1349,7 +1352,7 @@ This schema extension contains all you need to model anything revolving around i
 
 Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.routing_bgp_community`
 
-## Overview
+## peering_ixp
 
 - **Version:** 1.0
 
@@ -1426,7 +1429,7 @@ This schema extension contains models to support VLANs in you network.
 
 Dependencies: `base`
 
-## Overview
+## vlan
 
 - **Version:** 1.0
 
@@ -1515,7 +1518,7 @@ This extension is using the Routing Policies extensions and the Routing OSPF one
 
 Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_ospf`
 
-## Overview
+## routing_policies_ospf
 
 - **Version:** 1.0
 
@@ -1555,7 +1558,7 @@ Simple schema allowing you to capture physical disks information for the sake of
 
 Dependencies: `base`
 
-## Overview
+## physical_disk
 
 - **Version:** 1.0
 
@@ -1609,7 +1612,7 @@ With this schema extension in place you will be able to capture all your physica
 
 Dependencies: `base`
 
-## Overview
+## compute
 
 - **Version:** 1.0
 
@@ -1674,7 +1677,7 @@ This schema extension contains all you need to model the PIM Protocol.
 
 Dependencies: `base, extensions.routing`
 
-## Overview
+## pim
 
 - **Version:** 1.0
 
@@ -1741,7 +1744,7 @@ This schema extension contains a basic Cable model allowing you to connect two e
 
 Dependencies: `base`
 
-## Overview
+## cable
 
 - **Version:** 1.0
 
@@ -1771,7 +1774,7 @@ This schema extension allows you to capture patch panel related information like
 > [!NOTE]
 > This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
 
-## Overview
+## patch_panel
 
 - **Version:** 1.0
 
@@ -1892,7 +1895,7 @@ This schema extension contains all you need to model the Aggregate Routing Proto
 
 Dependencies: `base, extensions.routing`
 
-## Overview
+## aggregate
 
 - **Version:** 1.0
 
@@ -1925,7 +1928,7 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 
 Dependencies: `base, extensions.sfp`
 
-## Overview
+## dwdm
 
 - **Version:** 1.0
 
@@ -2057,7 +2060,7 @@ This schema extension contains models for Accounts management.
 
 Dependencies: `base`
 
-## Overview
+## users
 
 - **Version:** 1.0
 
@@ -2133,7 +2136,7 @@ Dependencies: `base, extensions.vlan`
 
 This schema extension contains models for VMs. You might consider Cluster or/and Hypervisor extension to go with!
 
-## Overview
+## firewall_policer
 
 - **Version:** 1.0
 
@@ -2170,7 +2173,7 @@ This schema extension contains models to support VRF in your network.
 
 Dependencies: `base`
 
-## Overview
+## vrf
 
 - **Version:** 1.0
 
@@ -2254,7 +2257,7 @@ This schema extension contains generics to create Routing Protocol "Instance". T
 
 Dependencies: `base, extensions.vlan`
 
-## Overview
+## routing
 
 - **Version:** 1.0
 
@@ -2287,7 +2290,7 @@ This schema extension contains all you need to model your BGP platform.
 
 Dependencies: `base, extensions.routing`
 
-## Overview
+## bgp
 
 - **Version:** 1.0
 
@@ -2415,7 +2418,7 @@ This schema extension allows you to capture Device Modules related information l
 
 Dependencies: `base`
 
-## Overview
+## modules
 
 - **Version:** 1.0
 
@@ -2486,7 +2489,7 @@ This Generic can be extend for each Routing Protocols you may want to use.
 
 Dependencies: `base`
 
-## Overview
+## routing_policies
 
 - **Version:** 1.0
 
@@ -2519,7 +2522,7 @@ A rather generic cluster built with compute units (e.g. servers) and able to hos
 
 Dependencies: `base, extensions.cluster, extensions.compute`
 
-## Overview
+## hosting_cluster
 
 - **Version:** 1.0
 
@@ -2546,7 +2549,7 @@ This schema extension contains all you need to model the OSPF Routing Protocol.
 
 Dependencies: `base, extensions.routing`
 
-## Overview
+## ospf
 
 - **Version:** 1.0
 
@@ -2616,7 +2619,7 @@ This schema extension adds support for InfiniBand switches.
 
 Dependencies: `base, extensions.compute`
 
-## Overview
+## infiniband
 
 - **Version:** 1.0
 
@@ -2802,7 +2805,7 @@ This schema extension is the most detailed when it comes to location, you'll fin
 
 Dependencies: `base`
 
-## Overview
+## location_extended
 
 - **Version:** 1.0
 
@@ -2917,7 +2920,7 @@ A schema for defining and managing network topology, strategies, and services.
 
 Dependencies: `base`
 
-## Overview
+## topology
 
 - **Version:** 1.0
 
@@ -3252,7 +3255,7 @@ This schema extension contains models for implementing detailed security.
 
 Dependencies: `base`
 
-## Overview
+## security
 
 - **Version:** 1.0
 
@@ -3475,7 +3478,7 @@ Dependencies: `base`
 
 | name | label | kind | optional | regex |
 | ---- | ----- | ---- | -------- | ----- |
-| fqdn | FQDN | Text | False | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
+| fqdn | FQDN | Text | False | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
 
 ### AddressGroup
 
@@ -3717,7 +3720,7 @@ Dependencies: `base`
 
 Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)
 
-## Overview
+## azure
 
 - **Version:** 1.0
 
@@ -3847,7 +3850,7 @@ This schema extension introduces tenancy for some of the schema nodes (circuits.
 
 Dependencies: `base, extensions.circuit, experimental.location_extended`
 
-## Overview
+## tenancy
 
 - **Version:** 1.0
 
@@ -3871,7 +3874,7 @@ Dependencies: `base, extensions.circuit, experimental.location_extended`
 
 This schema extension contains models for Quality of Service (QoS)
 
-## Overview
+## qos
 
 - **Version:** 1.0
 
@@ -4021,7 +4024,7 @@ For example you have a MPLS network supported by a provider connecting multiple 
 
 Dependencies: `extensions.circuit`
 
-## Overview
+## circuit_service
 
 - **Version:** 1.0
 
@@ -4079,7 +4082,7 @@ This schema extension is based on Juniper VLAN MAP, and not yet test out for oth
 
 Dependencies: `base.dcim`
 
-## Overview
+## vlan-translation
 
 - **Version:** 1.0
 

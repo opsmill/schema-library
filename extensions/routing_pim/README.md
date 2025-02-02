@@ -4,7 +4,7 @@ This schema extension contains all you need to model the PIM Protocol.
 
 Dependencies: `base, extensions.routing`
 
-## Overview
+## pim
 
 - **Version:** 1.0
 

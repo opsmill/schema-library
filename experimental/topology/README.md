@@ -4,7 +4,7 @@ A schema for defining and managing network topology, strategies, and services.
 
 Dependencies: `base`
 
-## Overview
+## topology
 
 - **Version:** 1.0
 

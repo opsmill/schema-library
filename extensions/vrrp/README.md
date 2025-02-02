@@ -4,7 +4,7 @@ This schema extension contains models for VRRP.
 
 Dependencies: `base, base.dcim, base.ipam`
 
-## Overview
+## vrrp
 
 - **Version:** 1.0
 

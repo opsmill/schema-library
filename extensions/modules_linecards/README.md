@@ -4,7 +4,7 @@ This schema extension allows you to capture Linecard related information like th
 
 Dependencies: `base, extensions.modules`
 
-## Overview
+## linecard
 
 - **Version:** 1.0
 

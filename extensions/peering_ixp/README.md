@@ -4,7 +4,7 @@ This schema extension contains all you need to model anything revolving around i
 
 Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.routing_bgp_community`
 
-## Overview
+## peering_ixp
 
 - **Version:** 1.0
 
