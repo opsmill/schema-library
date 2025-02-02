@@ -201,4 +201,4 @@ jobs:
         env:
           VALE_VERSION: ${{ env.VALE_VERSION }}
       - name: "Validate documentation style"
-        run: ./vale $(find ./docs -type f \( -name "*.mdx" -o -name "*.md" \) )
+        run: ./vale --config='./.vale.ini' $(find ./docs -type f \( -name "*.mdx" -o -name "*.md" \) )
