@@ -74,7 +74,7 @@ jobs:
       - name: "Mypy Tests"
         run: "poetry run mypy --show-error-codes ."
       - name: "Pylint Tests"
-        run: "poetry run pylint ."
+        run: "poetry run pylint --ignore .venv ."
 
   yaml-lint:
     name: Run yaml lint
