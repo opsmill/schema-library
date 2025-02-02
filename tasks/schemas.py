@@ -224,7 +224,7 @@ def build(context: Context) -> None:
     consolidated_doc = schema_docs_dir / "schema-library.mdx"
 
     all_content = []
-    all_content.append("<!-- markdownlint-disable-file MD025 -->\n")
+    all_content.append("---\ntitle: Schema Library Documentation\n---\n<!-- markdownlint-disable-file MD025 -->\n")
 
     with open(METADATA_FILE, "r", encoding="utf-8") as f:
         schema = yaml.safe_load(f)
