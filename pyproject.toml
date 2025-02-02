@@ -9,12 +9,13 @@ package-mode = false
 python = "^3.10, < 3.13"
 infrahub-sdk = { version = "^1", extras = ["all"]}
 invoke = "^2.1.2"
-pylint = "^3.3.4"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.9.1"
 yamllint = "^1.35.1"
 mypy = "^1.14.1"
+pylint = "^3.3.4"
+vale = "^3.9.4.0"
 
 [tool.pylint.messages_control]
 # Line length is enforced by Black, so pylint doesn't need to check it.
