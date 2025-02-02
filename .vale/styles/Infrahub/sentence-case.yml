@@ -1,0 +1,75 @@
+---
+extends: capitalization
+message: "'%s' should use sentence case"
+level: warning
+scope:
+  - heading.h1
+  - heading.h2
+  - heading.h3
+  - heading.h4
+  - heading.h5
+  - heading.h6
+match: $sentence
+exceptions:
+  - Alpha
+  - Ansible
+  - API
+  - Attributes
+  - AWS S3
+  - Beta
+  - BGP
+  - CA certificates
+  - CI
+  - Codespaces
+  - CoreArtifactTarget
+  - CoreRepository
+  - CoreGroup
+  - Docker Compose
+  - E2E
+  - Generics
+  - Git
+  - GitHub
+  - GitHub Codespaces
+  - GitLab
+  - GitPod
+  - GraphQL
+  - GraphQLQuery
+  - include_in_menu & menu_placement
+  - Helm
+  - High Availability
+  - Human Friendly Identifier
+  - Infrahub
+  - infrahubctl
+  - IPHost
+  - IP
+  - IPAM
+  - IPNetwork
+  - IP Fabric
+  - JavaScript
+  - JetStream
+  - Jinja
+  - Jinja2
+  - JWT
+  - Namespace
+  - NATS
+  - Node
+  - OAuth2
+  - OIDC
+  - Open ID Connect
+  - OpsMill
+  - Pydantic
+  - Python
+  - RabbitMQ
+  - REST
+  - RFile
+  - SDK
+  - Single sign-on
+  - SSO
+  - TLS
+  - Tony Stark
+  - TransformPython
+  - UI
+  - Vale
+  - VS Code
+  - VS Code extensions
+  - WebUI

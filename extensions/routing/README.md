@@ -4,7 +4,7 @@ This schema extension contains generics to create Routing Protocol "Instance". T
 
 Dependencies: `base, extensions.vlan`
 
-## Overview
+## routing
 
 - **Version:** 1.0
 
@@ -21,8 +21,8 @@ Dependencies: `base, extensions.vlan`
 
 | name | kind | optional | description | order_weight | choices |
 | ---- | ---- | -------- | ----------- | ------------ | ------- |
-| description | Text | False | Description of the protocol | 1100 | `` |
-| status | Dropdown |  | Status of the Protocol Configuration. | 1150 | `active, disabled, deleted` |
+| description | Text | False | Description of the protocol | 1100 | \`\` |
+| status | Dropdown |  | Status of the Protocol Configuration\. | 1150 | \`active, disabled, deleted\` |
 
 #### Relationships
 

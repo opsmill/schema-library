@@ -4,7 +4,7 @@ This schema extension contains the foundations to capture clusters. With this on
 
 Dependencies: `base, extensions.compute`
 
-## Overview
+## cluster
 
 - **Version:** 1.0
 
@@ -17,15 +17,16 @@ Dependencies: `base, extensions.compute`
 - **Icon:** mdi:dots-hexagon
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | description | unique | order_weight | optional |
 | ---- | ---- | ----------- | ------ | ------------ | -------- |
-| name | Text | Name of the cluster. | True | 1000 |  |
+| name | Text | Name of the cluster\. | True | 1000 |  |
 | description | Text |  |  |  | True |
 
 #### Relationships
@@ -44,19 +45,22 @@ Dependencies: `base, extensions.compute`
 
 | name | label | identifier | cardinality | peer | kind |
 | ---- | ----- | ---------- | ----------- | ---- | ---- |
-| nodes | Nodes | worker_in_cluster | many | ComputeGenericUnit | Component |
+| nodes | Nodes | worker\_in\_cluster | many | ComputeGenericUnit | Component |
 
 ## Extensions
+
 ### ComputeGenericUnit
+
 #### Relationships
 
 | name | identifier | label | peer | cardinality | description | optional |
 | ---- | ---------- | ----- | ---- | ----------- | ----------- | -------- |
-| worker_in_cluster | worker_in_cluster | Worker in cluster | ClusterGenericComputeUnitNodes | one | This device is a worker node of the specified cluster. | True |
+| worker\_in\_cluster | worker\_in\_cluster | Worker in cluster | ClusterGenericComputeUnitNodes | one | This device is a worker node of the specified cluster\. | True |
 
 ### LocationGeneric
+
 #### Relationships
 
 | name | label | peer | cardinality | kind | description | optional |
 | ---- | ----- | ---- | ----------- | ---- | ----------- | -------- |
-| clusters | Clusters | ClusterGeneric | many | Component | All clusters available on that location. | True |
+| clusters | Clusters | ClusterGeneric | many | Component | All clusters available on that location\. | True |

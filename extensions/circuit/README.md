@@ -4,7 +4,7 @@ This schema extension contains Circuits and ways to connect them with your infra
 
 Dependencies: `base, extensions.location_minimal`
 
-## Overview
+## circuit
 
 - **Version:** 1.0
 
@@ -17,18 +17,19 @@ Dependencies: `base, extensions.location_minimal`
 - **Icon:** mdi:cable-data
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** circuit_id__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**circuit_id__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | unique | optional | description | choices |
 | ---- | ---- | ------ | -------- | ----------- | ------- |
-| circuit_id | Text | True |  |  | `` |
-| description | Text |  | True |  | `` |
-| circuit_type | Dropdown |  |  | Specifies the type of circuit. | `upstream, peering, dark_fiber, mpls` |
-| status | Dropdown |  |  |  | `active, provisioning, maintenance, drained` |
+| circuit\_id | Text | True |  |  | \`\` |
+| description | Text |  | True |  | \`\` |
+| circuit\_type | Dropdown |  |  | Specifies the type of circuit\. | \`upstream, peering, dark\_fiber, mpls\` |
+| status | Dropdown |  |  |  | \`active, provisioning, maintenance, drained\` |
 
 #### Relationships
 
@@ -46,17 +47,18 @@ Dependencies: `base, extensions.location_minimal`
 - **Menu Placement:** DcimCircuit
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** circuit + name__value
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**circuit + name__value
+
 #### Attributes
 
 | name | kind | description | order_weight | optional | choices |
 | ---- | ---- | ----------- | ------------ | -------- | ------- |
-| name | Text | Name of the circuit endoint, could be a MMR position for instance. | 1000 |  | `` |
-| status | Dropdown |  |  | True | `active, provisioning, maintenance, drained` |
-| description | Text |  |  | True | `` |
+| name | Text | Name of the circuit endoint, could be a MMR position for instance\. | 1000 |  | \`\` |
+| status | Dropdown |  |  | True | \`active, provisioning, maintenance, drained\` |
+| description | Text |  |  | True | \`\` |
 
 #### Relationships
 
@@ -66,7 +68,9 @@ Dependencies: `base, extensions.location_minimal`
 | location | LocationHosting | 1500 | False | one | Attribute | Location |
 
 ## Extensions
+
 ### OrganizationProvider
+
 #### Relationships
 
 | name | peer | cardinality | optional |
@@ -74,6 +78,7 @@ Dependencies: `base, extensions.location_minimal`
 | circuits | DcimCircuit | many | True |
 
 ### LocationHosting
+
 #### Relationships
 
 | name | peer | cardinality | optional |

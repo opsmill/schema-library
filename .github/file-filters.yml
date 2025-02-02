@@ -6,8 +6,20 @@ ci_config: &ci_config
 github_workflows: &github_workflows
   - ".github/workflows/*.yml"
 
+doc_files: &doc_files
+  - "docs/**"
+  - package.json
+  - package-lock.json
+
+python_all: &python_all
+  - "**/*.py"
+
 yaml_all: &yaml_all
   - "**/*.{yml,yaml}"
 
 markdown_all: &markdown_all
   - "**/*.{md,mdx}"
+
+documentation_all:
+  - *doc_files
+  - *markdown_all

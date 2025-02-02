@@ -6,7 +6,7 @@ Dependencies: `base`
 
 Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)
 
-## Overview
+## azure
 
 - **Version:** 1.0
 
@@ -53,7 +53,7 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 | name | kind |
 | ---- | ---- |
 | name | Text |
-| tenant_id | Text |
+| tenant\_id | Text |
 
 #### Relationships
 
@@ -71,7 +71,7 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 | name | kind |
 | ---- | ---- |
 | name | Text |
-| subscription_id | Text |
+| subscription\_id | Text |
 
 #### Relationships
 
@@ -108,7 +108,7 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 
 | name | cardinality | kind | peer |
 | ---- | ----------- | ---- | ---- |
-| address_space | many | Attribute | BuiltinIPPrefix |
+| address\_space | many | Attribute | BuiltinIPPrefix |
 | subnets | many | Component | AzureVirtualNetworkSubnet |
 
 ### VirtualNetworkSubnet
@@ -128,4 +128,4 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 | name | cardinality | peer | kind | optional |
 | ---- | ----------- | ---- | ---- | -------- |
 | virtualnetwork | one | AzureVirtualNetwork | Parent | False |
-| address_prefixes | many | BuiltinIPPrefix | Attribute |  |
+| address\_prefixes | many | BuiltinIPPrefix | Attribute |  |
