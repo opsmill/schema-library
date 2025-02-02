@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-import yaml # type: ignore
+import yaml  # type: ignore
 from invoke import Context, task  # type: ignore
 
 # If no version is indicated, we will take the latest
@@ -12,6 +12,7 @@ MAIN_DIRECTORY_PATH = Path(__file__).parent
 DOCUMENTATION_DIRECTORY = CURRENT_DIRECTORY.parent.resolve() / "docs"
 
 METADATA_FILE = CURRENT_DIRECTORY.parent / ".metadata.yml"
+
 
 def _parse_and_load_extensions(
     context: Context, extensions_path: Path, allowed_to_fail: bool
@@ -85,10 +86,10 @@ def generate_readme(schema, extension_dir: Path) -> list:
     #     f"{schema.get('description', '')}\n",
     # ]
 
-    description = schema.get('description', '')
+    description = schema.get("description", "")
     content = [
         f"# {schema.get('name', '')}\n",
-        f"{description}\n" if not description.endswith('\n') else description
+        f"{description}\n" if not description.endswith("\n") else description,
     ]
 
     if dependencies := schema.get("dependencies", []):
@@ -99,12 +100,28 @@ def generate_readme(schema, extension_dir: Path) -> list:
 
     def format_table(headers: list, rows: list):
         """Generate a Markdown table."""
+
         def escape_markdown(text: str) -> str:
             # Escape special markdown characters
-            special_chars = ['|', '_', '*', '`', '[', ']', '(', ')', '#', '+', '-', '.', '!', '$']
+            special_chars = [
+                "|",
+                "_",
+                "*",
+                "`",
+                "[",
+                "]",
+                "(",
+                ")",
+                "#",
+                "+",
+                "-",
+                ".",
+                "!",
+                "$",
+            ]
 
             for char in special_chars:
-                text = text.replace(char, f'\\{char}')
+                text = text.replace(char, f"\\{char}")
             return text
 
         table = f"\n| {' | '.join(headers)} |\n"
@@ -155,10 +172,10 @@ def generate_readme(schema, extension_dir: Path) -> list:
         if node.get("order_by") or node.get("uniqueness_constraints"):
             node_markdown.append("#### Ordering and Constraints\n")
             node_markdown.append(
-                f"- **Order By:**{', ' .join(node.get('order_by', []))}"
+                f"- **Order By:**{', '.join(node.get('order_by', []))}"
             )
             node_markdown.append(
-                f"- **Uniqueness Constraints:**{', ' .join([' + '.join(c) for c in node.get('uniqueness_constraints', [])])}\n"
+                f"- **Uniqueness Constraints:**{', '.join([' + '.join(c) for c in node.get('uniqueness_constraints', [])])}\n"
             )
             # node_markdown.append("\n")
 
@@ -224,7 +241,9 @@ def build(context: Context) -> None:
     consolidated_doc = schema_docs_dir / "schema-library.mdx"
 
     all_content = []
-    all_content.append("---\ntitle: Schema Library Documentation\n---\n<!-- markdownlint-disable-file MD025 -->\n")
+    all_content.append(
+        "---\ntitle: Schema Library Documentation\n---\n<!-- markdownlint-disable-file MD025 -->\n"
+    )
 
     with open(METADATA_FILE, "r", encoding="utf-8") as f:
         schema = yaml.safe_load(f)
@@ -261,4 +280,3 @@ def build(context: Context) -> None:
     #                 generate_readme(schema[str(path)], path)
     #             except KeyError:
     #                 print(f"Schema `{path}` is not added to the {METADATA_FILE} file")
-

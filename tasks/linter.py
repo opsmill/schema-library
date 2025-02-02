@@ -1,7 +1,7 @@
 from pathlib import Path
-import yaml # type: ignore
+import yaml  # type: ignore
 from collections import OrderedDict
-from invoke import Context, task # type: ignore
+from invoke import Context, task  # type: ignore
 
 CURRENT_DIRECTORY = Path(__file__).resolve()
 DOCUMENTATION_DIRECTORY = CURRENT_DIRECTORY.parent / "docs"
@@ -26,6 +26,7 @@ def lint_yaml(context: Context) -> None:
     exec_cmd = "yamllint ."
     with context.cd(MAIN_DIRECTORY_PATH):
         context.run(exec_cmd)
+
 
 @task
 def lint_mypy(context: Context) -> None:
@@ -53,6 +54,7 @@ def lint_all(context: Context) -> None:
     lint_ruff(context)
     # lint_mypy(context)
 
+
 def sort_dict(d):
     """
     Recursively sort a dictionary by keys.
@@ -62,6 +64,7 @@ def sort_dict(d):
     if isinstance(d, list):
         return [sort_dict(item) for item in d]
     return d
+
 
 class PreserveLiteralStyleDumper(yaml.SafeDumper):
     """
@@ -76,6 +79,7 @@ class PreserveLiteralStyleDumper(yaml.SafeDumper):
             style = "|"
         return super().represent_scalar(tag, value, style=style)
 
+
 @task(name="sort-metadata")
 def sort_metadata(context: Context) -> None:
     print(f" - Sort {METADATA_FILE}")
@@ -84,4 +88,11 @@ def sort_metadata(context: Context) -> None:
 
     with open(METADATA_FILE, "w", encoding="utf-8") as f:
         f.write("---\n")
-        yaml.dump(metadata, f, Dumper=PreserveLiteralStyleDumper, default_flow_style=False, sort_keys=True, allow_unicode=True)
+        yaml.dump(
+            metadata,
+            f,
+            Dumper=PreserveLiteralStyleDumper,
+            default_flow_style=False,
+            sort_keys=True,
+            allow_unicode=True,
+        )

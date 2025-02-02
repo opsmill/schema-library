@@ -1,4 +1,4 @@
-from invoke import Collection, Context, task # type: ignore
+from invoke import Collection, Context, task  # type: ignore
 
 from . import docusaurus, linter, schemas
 
@@ -17,6 +17,7 @@ def lint_all(context: Context) -> None:
 @task(name="format")
 def format(context: Context) -> None:
     linter.format(context)
+
 
 # @task(name="docusaurus")
 # def docusaurus(context: Context) -> None:
