@@ -49,8 +49,8 @@ Dependencies: `base`
 
 | name | kind | unique | optional | order_weight |
 | ---- | ---- | ------ | -------- | ------------ |
-| facility_id | Text | False | True | 1100 |
-| physical_address | Text | False | True | 1500 |
+| facility\_id | Text | False | True | 1100 |
+| physical\_address | Text | False | True | 1500 |
 
 #### Relationships
 
@@ -76,7 +76,7 @@ Dependencies: `base`
 
 | name | kind | unique | optional | order_weight |
 | ---- | ---- | ------ | -------- | ------------ |
-| facility_id | Text | False | True | 1100 |
+| facility\_id | Text | False | True | 1100 |
 
 #### Relationships
 
@@ -95,7 +95,7 @@ Dependencies: `base`
 
 | name | kind | unique | optional | order_weight |
 | ---- | ---- | ------ | -------- | ------------ |
-| facility_id | Text | False | True | 1100 |
+| facility\_id | Text | False | True | 1100 |
 
 #### Relationships
 
@@ -104,7 +104,9 @@ Dependencies: `base`
 | owner | OrganizationGeneric | True | one |
 
 ## Extensions
+
 ### OrganizationProvider
+
 #### Relationships
 
 | name | peer | cardinality | optional |

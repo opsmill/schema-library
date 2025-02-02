@@ -16,24 +16,25 @@ Dependencies: `base`
 - **Label:** Network Management Servers
 - **Include in Menu:** ✅
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | order_weight | optional | choices |
 | ---- | ---- | ------------ | -------- | ------- |
-| name | Text | 1000 |  | `` |
-| description | Text | 1100 | True | `` |
-| status | Dropdown |  |  | `active, provisioning, maintenance, drained` |
+| name | Text | 1000 |  | \`\` |
+| description | Text | 1100 | True | \`\` |
+| status | Dropdown |  |  | \`active, provisioning, maintenance, drained\` |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | location | LocationGeneric | True | many |  |
-| ip_addresses | InfraIPAddress | True | many | Component |
+| ip\_addresses | InfraIPAddress | True | many | Component |
 
 ### GenericElement
 
@@ -43,10 +44,11 @@ Dependencies: `base`
 - **Menu Placement:** TopologyTopology
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | order_weight | optional |
@@ -69,10 +71,11 @@ Dependencies: `base`
 - **Menu Placement:** TopologyTopology
 - **Include in Menu:** ✅
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | order_weight | optional |
@@ -95,10 +98,11 @@ Dependencies: `base`
 - **Icon:** carbon:network-3
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | unique | order_weight | optional |
@@ -114,7 +118,7 @@ Dependencies: `base`
 | strategy | TopologyNetworkStrategy | True | one | Component |
 | location | LocationGeneric | True | one | Attribute |
 | devices | DcimGenericDevice | True | many | Component |
-| network_services | TopologyNetworkService | True | many | Component |
+| network\_services | TopologyNetworkService | True | many | Component |
 
 ### MPLSStrategy
 
@@ -124,16 +128,17 @@ Dependencies: `base`
 - **Menu Placement:** TopologyNetworkStrategy
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | choices |
 | ---- | ---- | ------- |
-| underlay | Dropdown | `ospf, isis, bgp` |
-| overlay | Dropdown | `ldp, rsvp, segment_routing` |
+| underlay | Dropdown | \`ospf, isis, bgp\` |
+| overlay | Dropdown | \`ldp, rsvp, segment\_routing\` |
 
 ### EVPNStrategy
 
@@ -143,16 +148,17 @@ Dependencies: `base`
 - **Menu Placement:** TopologyNetworkStrategy
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | choices |
 | ---- | ---- | ------- |
-| underlay | Dropdown | `ebgp, ospf, isis` |
-| overlay | Dropdown | `ebgp, ibgp` |
+| underlay | Dropdown | \`ebgp, ospf, isis\` |
+| overlay | Dropdown | \`ebgp, ibgp\` |
 
 ### PhysicalElement
 
@@ -162,24 +168,25 @@ Dependencies: `base`
 - **Menu Placement:** TopologyTopology
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | default_value | order_weight | label | choices |
 | ---- | ---- | ------------- | ------------ | ----- | ------- |
-| mtu | Number | 1500 | 3000 |  | `` |
-| border | Boolean | False | 2400 | Is a Topology Border | `` |
-| mlag_support | Boolean | False | 2500 | MLAG Support | `` |
-| device_role | Dropdown |  | 1300 | Role | `spine, leaf, pe_router, p_router, route_reflector, cpe, firewall` |
+| mtu | Number | 1500 | 3000 |  | \`\` |
+| border | Boolean | False | 2400 | Is a Topology Border | \`\` |
+| mlag\_support | Boolean | False | 2500 | MLAG Support | \`\` |
+| device\_role | Dropdown |  | 1300 | Role | \`spine, leaf, pe\_router, p\_router, route\_reflector, cpe, firewall\` |
 
 #### Relationships
 
 | name | label | peer | optional | cardinality | kind | order_weight |
 | ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
-| device_type | Type | DcimDeviceType | True | one | Attribute | 1400 |
+| device\_type | Type | DcimDeviceType | True | one | Attribute | 1400 |
 
 ### DhcpOption
 
@@ -189,17 +196,18 @@ Dependencies: `base`
 - **Menu Placement:** NetworkManagementServer
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | order_weight | optional |
 | ---- | ---- | ------------ | -------- |
 | name | Text | 1000 |  |
 | description | Text | 1100 | True |
-| option_code | Number | 2000 |  |
+| option\_code | Number | 2000 |  |
 | content | Text | 2100 |  |
 
 ### DhcpServer
@@ -210,21 +218,22 @@ Dependencies: `base`
 - **Menu Placement:** NetworkManagementServer
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | order_weight |
 | ---- | ---- | ------------ |
-| lease_time | Text | 2100 |
+| lease\_time | Text | 2100 |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| dhcp_options | NetworkDhcpOption | True | many | Component |
+| dhcp\_options | NetworkDhcpOption | True | many | Component |
 
 ### NameServer
 
@@ -234,10 +243,11 @@ Dependencies: `base`
 - **Menu Placement:** NetworkManagementServer
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 ### NTPServer
 
 - **Description:** Represents a NTP server in the network.
@@ -246,10 +256,11 @@ Dependencies: `base`
 - **Menu Placement:** NetworkManagementServer
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 ### NetworkServiceIdentifier
 
 - **Description:** Generic model for different types of identifiers used in network services.
@@ -258,10 +269,11 @@ Dependencies: `base`
 - **Menu Placement:** TopologyNetworkService
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** identifier__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**identifier__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind |
@@ -281,17 +293,18 @@ Dependencies: `base`
 - **Icon:** carbon:ibm-cloud-internet-services
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | label | kind | order_weight | enum |
 | ---- | ----- | ---- | ------------ | ---- |
 | name | Service Name | Text | 1000 |  |
 | description |  | Text | 1100 |  |
-| service_type |  | Text | 1200 | ['Layer2', 'Layer3'] |
+| service\_type |  | Text | 1200 | \['Layer2', 'Layer3'\] |
 
 #### Relationships
 
@@ -303,7 +316,9 @@ Dependencies: `base`
 | prefix | InfraPrefix | one | Component | True | 1400 |
 
 ## Extensions
+
 ### DcimGenericDevice
+
 #### Relationships
 
 | name | peer | optional | cardinality |
@@ -311,8 +326,9 @@ Dependencies: `base`
 | topology | TopologyTopology | True | one |
 
 ### IpamPrefix
+
 #### Relationships
 
 | name | label | peer | optional | cardinality | order_weight |
 | ---- | ----- | ---- | -------- | ----------- | ------------ |
-| network_service | Network Service | TopologyNetworkService | True | one | 1400 |
+| network\_service | Network Service | TopologyNetworkService | True | one | 1400 |

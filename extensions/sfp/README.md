@@ -10,7 +10,6 @@ Improvements:
 - You could plug any SFP into any equipment interface (e.g. a virtual interface ...)
 - You could link a SFP to an interface AND a location ...
 
-
 Dependencies: `base`
 
 ## Overview
@@ -30,17 +29,17 @@ Dependencies: `base`
 
 | name | kind | optional | order_weight | description | choices | default_value |
 | ---- | ---- | -------- | ------------ | ----------- | ------- | ------------- |
-| serial | Text | True | 1400 |  | `` |  |
-| sfp_type | Dropdown | False | 1100 | Type of SFP, such as LR, SR, T. | `lr, sr, lrm, t, sr4, lr4, zr, er, dac, aoc` |  |
-| status | Dropdown | False | 1300 |  | `plugged, spare, decommissioned` | plugged |
-| form_factor | Dropdown | False | 1000 | The physical form factor of the SFP module. | `sfp, sfp_plus, qsfp, qsfp_plus, qsfp28, qsfp_dd, cfp, cfp2, cfp4, xfp, sfp56, qsfp56, osfp` |  |
+| serial | Text | True | 1400 |  | \`\` |  |
+| sfp\_type | Dropdown | False | 1100 | Type of SFP, such as LR, SR, T\. | \`lr, sr, lrm, t, sr4, lr4, zr, er, dac, aoc\` |  |
+| status | Dropdown | False | 1300 |  | \`plugged, spare, decommissioned\` | plugged |
+| form\_factor | Dropdown | False | 1000 | The physical form factor of the SFP module\. | \`sfp, sfp\_plus, qsfp, qsfp\_plus, qsfp28, qsfp\_dd, cfp, cfp2, cfp4, xfp, sfp56, qsfp56, osfp\` |  |
 
 #### Relationships
 
 | name | peer | kind | optional | cardinality | order_weight |
 | ---- | ---- | ---- | -------- | ----------- | ------------ |
 | interface | DcimInterface | Attribute | True | one | 1200 |
-| spare_location | LocationHosting | Attribute | True | one | 1500 |
+| spare\_location | LocationHosting | Attribute | True | one | 1500 |
 | manufacturer | OrganizationManufacturer | Attribute | True | one | 1350 |
 
 ## Nodes
@@ -65,25 +64,29 @@ Dependencies: `base`
 
 | name | label | kind | optional | description | order_weight |
 | ---- | ----- | ---- | -------- | ----------- | ------------ |
-| wavelength_tx | Transmit Wavelength (nm) | Number | False | Transmit wavelength in nm. | 1175 |
-| wavelength_rx | Receive Wavelength (nm) | Number | False | Receive wavelength in nm. | 1150 |
+| wavelength\_tx | Transmit Wavelength \(nm\) | Number | False | Transmit wavelength in nm\. | 1175 |
+| wavelength\_rx | Receive Wavelength \(nm\) | Number | False | Receive wavelength in nm\. | 1150 |
 
 ## Extensions
+
 ### DcimInterface
+
 #### Relationships
 
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |
-| plugged_sfp | DcimGenericSFP | one | True |
+| plugged\_sfp | DcimGenericSFP | one | True |
 
 ### LocationHosting
+
 #### Relationships
 
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |
-| spare_sfps | DcimGenericSFP | many | True |
+| spare\_sfps | DcimGenericSFP | many | True |
 
 ### OrganizationManufacturer
+
 #### Relationships
 
 | name | label | peer | cardinality | optional |

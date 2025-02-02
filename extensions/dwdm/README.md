@@ -21,9 +21,9 @@ Dependencies: `base, extensions.sfp`
 
 | name | kind | order_weight | optional | choices |
 | ---- | ---- | ------------ | -------- | ------- |
-| name | Text | 1000 |  | `` |
-| description | Text | 2000 | True | `` |
-| connector_type | Dropdown | 1100 |  | `FC, LC, LC_PC, LC_UPC, LC_APC, LSH, LSH_PC, LSH_UPC, LSH_APC, LX_5, LX_5_PC, LX_5_UPC, LX_5_APC, MPO, MTRJ, SC, SC_PC, SC_UPC, SC_APC, ST, CS, SN, SMA_905, SMA_906, URM_P2` |
+| name | Text | 1000 |  | \`\` |
+| description | Text | 2000 | True | \`\` |
+| connector\_type | Dropdown | 1100 |  | \`FC, LC, LC\_PC, LC\_UPC, LC\_APC, LSH, LSH\_PC, LSH\_UPC, LSH\_APC, LX\_5, LX\_5\_PC, LX\_5\_UPC, LX\_5\_APC, MPO, MTRJ, SC, SC\_PC, SC\_UPC, SC\_APC, ST, CS, SN, SMA\_905, SMA\_906, URM\_P2\` |
 
 ## Nodes
 
@@ -34,24 +34,25 @@ Dependencies: `base, extensions.sfp`
 - **Icon:** mdi:transit-connection-variant
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | order_weight | description | optional | choices | default_value |
 | ---- | ---- | ------------ | ----------- | -------- | ------- | ------------- |
-| name | Text | 1000 |  |  | `` |  |
-| wdm_type | Dropdown | 1110 | Type of WDM (e.g CWDM. DWDM) | False | `cwdm, dwdm` | dwdm |
-| description | Text | 2000 |  | True | `` |  |
+| name | Text | 1000 |  |  | \`\` |  |
+| wdm\_type | Dropdown | 1110 | Type of WDM \(e\.g CWDM\. DWDM\) | False | \`cwdm, dwdm\` | dwdm |
+| description | Text | 2000 |  | True | \`\` |  |
 
 #### Relationships
 
 | name | peer | identifier | optional | cardinality | kind |
 | ---- | ---- | ---------- | -------- | ----------- | ---- |
-| front_interfaces | DcimOadmFrontInterface | front_interfaces | True | many | Component |
-| rear_interface | DcimOadmRearInterface | rear_interfaces | True | one | Component |
+| front\_interfaces | DcimOadmFrontInterface | front\_interfaces | True | many | Component |
+| rear\_interface | DcimOadmRearInterface | rear\_interfaces | True | one | Component |
 
 ### OadmFrontInterface
 
@@ -59,15 +60,16 @@ Dependencies: `base, extensions.sfp`
 - **Menu Placement:** DcimGenericOadmInterface
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** optical_multiplexer__name__value, name__value
-- **Uniqueness Constraints:** optical_multiplexer + name__value
+
+- **Order By:**optical_multiplexer__name__value, name__value
+- **Uniqueness Constraints:**optical_multiplexer + name__value
+
 #### Relationships
 
 | name | peer | order_weight | identifier | optional | cardinality | kind |
 | ---- | ---- | ------------ | ---------- | -------- | ----------- | ---- |
-| optical_multiplexer | DcimOpticalMultiplexer | 900 | front_interfaces | False | one | Parent |
+| optical\_multiplexer | DcimOpticalMultiplexer | 900 | front\_interfaces | False | one | Parent |
 | channels | DcimWdmChannel | 1200 |  | True | many | Attribute |
 
 ### OadmRearInterface
@@ -76,15 +78,16 @@ Dependencies: `base, extensions.sfp`
 - **Menu Placement:** DcimGenericOadmInterface
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** optical_multiplexer__name__value, name__value
-- **Uniqueness Constraints:** optical_multiplexer + name__value
+
+- **Order By:**optical_multiplexer__name__value, name__value
+- **Uniqueness Constraints:**optical_multiplexer + name__value
+
 #### Relationships
 
 | name | peer | order_weight | identifier | optional | cardinality | kind |
 | ---- | ---- | ------------ | ---------- | -------- | ----------- | ---- |
-| optical_multiplexer | DcimOpticalMultiplexer | 900 | rear_interface | False | one | Parent |
+| optical\_multiplexer | DcimOpticalMultiplexer | 900 | rear\_interface | False | one | Parent |
 
 ### WdmChannel
 
@@ -93,18 +96,19 @@ Dependencies: `base, extensions.sfp`
 - **Icon:** game-icons:laser-warning
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** wdm_type__value, channel__value
-- **Uniqueness Constraints:** wdm_type__value + channel__value + wavelength__value + frequency__value, wdm_type__value + channel__value
+
+- **Order By:**wdm_type__value, channel__value
+- **Uniqueness Constraints:**wdm_type__value + channel__value + wavelength__value + frequency__value, wdm_type__value + channel__value
+
 #### Attributes
 
 | name | kind | description | order_weight | optional | choices | default_value | label |
 | ---- | ---- | ----------- | ------------ | -------- | ------- | ------------- | ----- |
-| channel | Number | WDM channel number. |  |  | `` |  |  |
-| wdm_type | Dropdown | Type of WDM (e.g CWDM. DWDM) | 1110 | False | `cwdm, dwdm` | dwdm |  |
-| wavelength | Text | Wavelength of the channel in nm. |  |  | `` |  | Wavelength (nm) |
-| frequency | Text | Frequency of the channel in GHz. |  |  | `` |  | Frequency (GHz) |
+| channel | Number | WDM channel number\. |  |  | \`\` |  |  |
+| wdm\_type | Dropdown | Type of WDM \(e\.g CWDM\. DWDM\) | 1110 | False | \`cwdm, dwdm\` | dwdm |  |
+| wavelength | Text | Wavelength of the channel in nm\. |  |  | \`\` |  | Wavelength \(nm\) |
+| frequency | Text | Frequency of the channel in GHz\. |  |  | \`\` |  | Frequency \(GHz\) |
 
 ### WdmSFP
 
@@ -118,10 +122,10 @@ Dependencies: `base, extensions.sfp`
 
 | name | kind | description | order_weight | optional | choices | default_value |
 | ---- | ---- | ----------- | ------------ | -------- | ------- | ------------- |
-| wdm_type | Dropdown | Type of WDM (e.g CWDM. DWDM) | 1110 | False | `cwdm, dwdm` | dwdm |
+| wdm\_type | Dropdown | Type of WDM \(e\.g CWDM\. DWDM\) | 1110 | False | \`cwdm, dwdm\` | dwdm |
 
 #### Relationships
 
 | name | label | peer | kind | cardinality | optional | order_weight |
 | ---- | ----- | ---- | ---- | ----------- | -------- | ------------ |
-| wdm_channel | WDM Channel | DcimWdmChannel | Attribute | one | False | 1150 |
+| wdm\_channel | WDM Channel | DcimWdmChannel | Attribute | one | False | 1150 |

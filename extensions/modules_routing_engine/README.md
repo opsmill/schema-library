@@ -20,7 +20,7 @@ Dependencies: `base, extensions.modules`
 
 | name | peer | cardinality | kind | description |
 | ---- | ---- | ----------- | ---- | ----------- |
-| routing_engines | InfraRoutingEngine | many | Generic | Routing engines of this type. |
+| routing\_engines | InfraRoutingEngine | many | Generic | Routing engines of this type\. |
 
 ### RoutingEngine
 
@@ -29,19 +29,20 @@ Dependencies: `base, extensions.modules`
 - **Icon:** mdi:cpu-64-bit
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** device__name__value, slot__value
-- **Uniqueness Constraints:** serial_number__value
+
+- **Order By:**device__name__value, slot__value
+- **Uniqueness Constraints:**serial_number__value
+
 #### Attributes
 
 | name | kind | description | order_weight | label | optional |
 | ---- | ---- | ----------- | ------------ | ----- | -------- |
 | slot | Number | The slot number where the Routing Engine is installed within the device | 1100 |  |  |
-| version | Text | Firmware version of the Routing Engine. | 1200 | Version | True |
+| version | Text | Firmware version of the Routing Engine\. | 1200 | Version | True |
 
 #### Relationships
 
 | name | label | peer | optional | cardinality | kind | order_weight |
 | ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
-| routing_engine_type | RE Type | InfraRoutingEngineType | False | one | Attribute | 1150 |
+| routing\_engine\_type | RE Type | InfraRoutingEngineType | False | one | Attribute | 1150 |

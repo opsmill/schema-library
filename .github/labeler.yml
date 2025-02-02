@@ -1,0 +1,8 @@
+---
+"group/ci":
+  - changed-files:
+      - any-glob-to-any-file: [".github/**"]
+
+"type/documentation":
+  - changed-files:
+      - any-glob-to-any-file: ["docs/**"]

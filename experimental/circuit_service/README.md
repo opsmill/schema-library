@@ -1,13 +1,10 @@
 # Circuit Service
 
-This schema extension contains model coming on top of circuit to capture a single
-service shared across multiple circuits.
+This schema extension contains model coming on top of circuit to capture a single service shared across multiple circuits.
 For example you have a MPLS network supported by a provider connecting multiple locations:
-- One single CircuitService would be needed to store MPLS related information (e.g.
-service id, provider ...)
-- On each site we would create a circuit connecting on one side our device and the
-CircuitService on the other side
 
+- One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...)
+- On each site we would create a circuit connecting on one side our device and the CircuitService on the other side
 
 Dependencies: `extensions.circuit`
 
@@ -25,16 +22,17 @@ Dependencies: `extensions.circuit`
 - **Menu Placement:** DcimCircuit
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | unique | optional |
 | ---- | ---- | ------ | -------- |
 | name | Text | True |  |
-| service_id | Text |  | True |
+| service\_id | Text |  | True |
 | description | Text |  | True |
 
 #### Relationships
@@ -42,19 +40,22 @@ Dependencies: `extensions.circuit`
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | provider | OrganizationProvider | False | one | Attribute |
-| circuit_endpoints | CircuitEndpoint | True | many | Component |
+| circuit\_endpoints | CircuitEndpoint | True | many | Component |
 
 ## Extensions
+
 ### OrganizationProvider
+
 #### Relationships
 
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |
-| circuit_services | CircuitService | many | True |
+| circuit\_services | CircuitService | many | True |
 
 ### CircuitEndpoint
+
 #### Relationships
 
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |
-| circuit_service | CircuitService | one | True |
+| circuit\_service | CircuitService | one | True |

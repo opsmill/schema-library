@@ -15,10 +15,11 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 - **Icon:** iconoir:community
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | order_weight | optional |
@@ -42,16 +43,17 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 - **Menu Placement:** SnmpCommunity
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | order_weight | enum |
 | ---- | ---- | ------------ | ---- |
-| community_string | Password | 1300 |  |
-| access | Text | 1200 | ['Read-Only', 'Read-Write'] |
+| community\_string | Password | 1300 |  |
+| access | Text | 1200 | \['Read\-Only', 'Read\-Write'\] |
 
 ### CommunityV3
 
@@ -61,20 +63,21 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 - **Menu Placement:** SnmpCommunity
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | order_weight | label | enum | optional | choices |
 | ---- | ---- | ------------ | ----- | ---- | -------- | ------- |
-| username | Text | 1300 |  |  |  | `` |
-| auth_protocol | Text | 1400 | Authentication Protocol | ['None', 'MD5', 'SHA'] |  | `` |
-| auth_password | Password | 1500 | Authentication Password |  | True | `` |
-| privacy_protocol | Text | 1600 | Privacy Protocol | ['None', 'DES', 'AES'] |  | `` |
-| privacy_password | Password | 1700 | Privacy Password |  | True | `` |
-| security_level | Dropdown | 1200 | Security Level |  |  | `noAuthNoPriv, authNoPriv, authPriv` |
+| username | Text | 1300 |  |  |  | \`\` |
+| auth\_protocol | Text | 1400 | Authentication Protocol | \['None', 'MD5', 'SHA'\] |  | \`\` |
+| auth\_password | Password | 1500 | Authentication Password |  | True | \`\` |
+| privacy\_protocol | Text | 1600 | Privacy Protocol | \['None', 'DES', 'AES'\] |  | \`\` |
+| privacy\_password | Password | 1700 | Privacy Password |  | True | \`\` |
+| security\_level | Dropdown | 1200 | Security Level |  |  | \`noAuthNoPriv, authNoPriv, authPriv\` |
 
 ### Client
 
@@ -84,16 +87,17 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 - **Menu Placement:** SnmpCommunity
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | order_weight | label | optional |
 | ---- | ---- | ------------ | ----- | -------- |
 | name | Text | 1000 |  |  |
-| client_description | Text | 1100 | Description | True |
+| client\_description | Text | 1100 | Description | True |
 
 #### Relationships
 

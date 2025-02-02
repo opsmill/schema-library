@@ -1,26 +1,24 @@
 ---
 base:
-  description: That's the foundation for every single schema extension you might want
-    to use afterward. This one is mandatory and will unlock access to the extensions
-    section.
+  description: The base schemas serve as the foundation for every single schema extension
+    you might want to use afterward. This one is mandatory and will unlock access
+    to the extensions section.
   name: Base Schemas
 experimental/azure:
+  attribution: '[Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)'
   dependencies:
     - base
   description: This schema extension introduces cloud support for Microsoft Azure.
   name: Azure
-  attribution: "[Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)"
 experimental/circuit_service:
   dependencies:
     - extensions.circuit
   description: |
-    This schema extension contains model coming on top of circuit to capture a single
-    service shared across multiple circuits.
+    This schema extension contains model coming on top of circuit to capture a single service shared across multiple circuits.
     For example you have a MPLS network supported by a provider connecting multiple locations:
-    - One single CircuitService would be needed to store MPLS related information (e.g.
-    service id, provider ...)
-    - On each site we would create a circuit connecting on one side our device and the
-    CircuitService on the other side
+
+    - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...)
+    - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side
   name: Circuit Service
 experimental/infiniband:
   dependencies:

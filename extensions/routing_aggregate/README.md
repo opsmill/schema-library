@@ -22,11 +22,11 @@ Dependencies: `base, extensions.routing`
 | name | label | kind | optional | default_value | order_weight |
 | ---- | ----- | ---- | -------- | ------------- | ------------ |
 | discard | Discard | Boolean | True | False | 1275 |
-| import_policies |  | Text | True |  | 1300 |
-| export_policies |  | Text | True |  | 1350 |
+| import\_policies |  | Text | True |  | 1300 |
+| export\_policies |  | Text | True |  | 1350 |
 
 #### Relationships
 
 | name | kind | peer | description | order_weight |
 | ---- | ---- | ---- | ----------- | ------------ |
-| destination | Attribute | IpamPrefix | Destination network for the static route. | 1200 |
+| destination | Attribute | IpamPrefix | Destination network for the static route\. | 1200 |

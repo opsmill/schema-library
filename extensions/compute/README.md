@@ -24,7 +24,7 @@ Dependencies: `base`
 
 | name | cardinality | peer | kind | optional |
 | ---- | ----------- | ---- | ---- | -------- |
-| virtual_machines | many | VirtualizationVirtualMachine | Component | True |
+| virtual\_machines | many | VirtualizationVirtualMachine | Component | True |
 
 ## Nodes
 
@@ -39,7 +39,7 @@ Dependencies: `base`
 
 | name | kind | optional | order_weight | choices |
 | ---- | ---- | -------- | ------------ | ------- |
-| status | Dropdown | False | 1100 | `active, provisioning, maintenance, drained` |
+| status | Dropdown | False | 1100 | \`active, provisioning, maintenance, drained\` |
 
 ### VirtualMachine
 
@@ -52,10 +52,10 @@ Dependencies: `base`
 
 | name | kind | optional | description | order_weight | choices |
 | ---- | ---- | -------- | ----------- | ------------ | ------- |
-| role | Dropdown | True | Role of the virtual machine. | 1400 | `application, storage` |
-| vcpu | Number | True | Number of CPU cores assigned to the VM. | 1900 | `` |
-| memory | Number | True | Amount of memory (in GB) assigned to the VM. | 1900 | `` |
-| disk | Number | True | Disk space (in GB) assigned to the VM. | 1900 | `` |
+| role | Dropdown | True | Role of the virtual machine\. | 1400 | \`application, storage\` |
+| vcpu | Number | True | Number of CPU cores assigned to the VM\. | 1900 | \`\` |
+| memory | Number | True | Amount of memory \(in GB\) assigned to the VM\. | 1900 | \`\` |
+| disk | Number | True | Disk space \(in GB\) assigned to the VM\. | 1900 | \`\` |
 
 #### Relationships
 

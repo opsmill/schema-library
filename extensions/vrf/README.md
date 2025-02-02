@@ -17,16 +17,17 @@ Dependencies: `base`
 - **Icon:** mdi:router
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | optional | unique | label | order_weight |
 | ---- | ---- | -------- | ------ | ----- | ------------ |
 | name | Text | False | True |  |  |
-| vrf_rd | Text | True |  | Route Distinguisher |  |
+| vrf\_rd | Text | True |  | Route Distinguisher |  |
 | description | Text | True |  |  | 1200 |
 
 #### Relationships
@@ -34,8 +35,8 @@ Dependencies: `base`
 | name | peer | optional | cardinality | kind | identifier | label |
 | ---- | ---- | -------- | ----------- | ---- | ---------- | ----- |
 | namespace | BuiltinIPNamespace | False | one | Attribute |  |  |
-| import_rt | IpamRouteTarget | True | one | Attribute | vrf__import | Import Targets |
-| export_rt | IpamRouteTarget | True | one | Attribute | vrf__export | Export Targets |
+| import\_rt | IpamRouteTarget | True | one | Attribute | vrf\_\_import | Import Targets |
+| export\_rt | IpamRouteTarget | True | one | Attribute | vrf\_\_export | Export Targets |
 
 ### RouteTarget
 
@@ -45,10 +46,11 @@ Dependencies: `base`
 - **Menu Placement:** IpamVRF
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | unique | optional |
@@ -63,7 +65,9 @@ Dependencies: `base`
 | vrf | IpamVRF | True | many |
 
 ## Extensions
+
 ### IpamPrefix
+
 #### Relationships
 
 | name | label | peer | optional | cardinality | kind | order_weight |
@@ -71,6 +75,7 @@ Dependencies: `base`
 | vrf | VRF | IpamVRF | True | one | Attribute | 1150 |
 
 ### IpamIPAddress
+
 #### Relationships
 
 | name | label | peer | optional | cardinality | kind | order_weight |

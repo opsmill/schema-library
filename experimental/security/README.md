@@ -52,7 +52,7 @@ Dependencies: `base`
 
 | name | label | peer | cardinality | optional |
 | ---- | ----- | ---- | ----------- | -------- |
-| address_groups | Address Groups | SecurityGenericAddressGroup | many | True |
+| address\_groups | Address Groups | SecurityGenericAddressGroup | many | True |
 
 ### GenericServiceGroup
 
@@ -86,7 +86,7 @@ Dependencies: `base`
 
 | name | label | peer | cardinality | optional |
 | ---- | ----- | ---- | ----------- | -------- |
-| service_groups | Service Groups | SecurityGenericServiceGroup | many | True |
+| service\_groups | Service Groups | SecurityGenericServiceGroup | many | True |
 
 ## Nodes
 
@@ -128,7 +128,7 @@ Dependencies: `base`
 
 | name | peer | cardinality | kind | optional |
 | ---- | ---- | ----------- | ---- | -------- |
-| ip_address | InfraIPAddress | one | Attribute | False |
+| ip\_address | InfraIPAddress | one | Attribute | False |
 
 ### IPAMIPPrefix
 
@@ -148,7 +148,7 @@ Dependencies: `base`
 
 | name | peer | cardinality | kind | optional |
 | ---- | ---- | ----------- | ---- | -------- |
-| ip_prefix | InfraPrefix | one | Attribute | False |
+| ip\_prefix | InfraPrefix | one | Attribute | False |
 
 ### IPAddress
 
@@ -158,10 +158,11 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-
 #### Ordering and Constraints
-- **Order By:** address__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**address__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | optional |
@@ -177,10 +178,11 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | optional | unique |
@@ -196,10 +198,11 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | label | kind | optional |
@@ -215,15 +218,16 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-
 #### Ordering and Constraints
-- **Order By:** name__value, fqdn__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value, fqdn__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | label | kind | optional | regex |
 | ---- | ----- | ---- | -------- | ----- |
-| fqdn | FQDN | Text | False | (?=^.{1,253}$)(^(((?!-)[a-zA-Z0-9-]{1,63}(?<!-))|((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63})$) |
+| fqdn | FQDN | Text | False | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
 
 ### AddressGroup
 
@@ -241,10 +245,11 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | optional |
@@ -259,10 +264,11 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind |
@@ -273,7 +279,7 @@ Dependencies: `base`
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| ip_protocol | SecurityIPProtocol | True | one | Attribute |
+| ip\_protocol | SecurityIPProtocol | True | one | Attribute |
 
 ### ServiceRange
 
@@ -283,10 +289,11 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | optional |
@@ -298,7 +305,7 @@ Dependencies: `base`
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| ip_protocol | SecurityIPProtocol | False | one | Attribute |
+| ip\_protocol | SecurityIPProtocol | False | one | Attribute |
 
 ### ServiceGroup
 
@@ -308,19 +315,21 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 ### Policy
 
 - **Label:** Security Policy
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | label | kind | optional |
@@ -333,8 +342,8 @@ Dependencies: `base`
 | name | peer | cardinality | kind | optional |
 | ---- | ---- | ----------- | ---- | -------- |
 | rules | SecurityPolicyRule | many | Component |  |
-| location_target | LocationGeneric | one | Attribute | True |
-| device_target | SecurityFirewall | one | Attribute | True |
+| location\_target | LocationGeneric | one | Attribute | True |
+| device\_target | SecurityFirewall | one | Attribute | True |
 
 ### PolicyRule
 
@@ -344,17 +353,18 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-
 #### Ordering and Constraints
-- **Order By:** source_zone__name__value, destination_zone__name__value, index__value
-- **Uniqueness Constraints:** index__value + source_zone + destination_zone + policy
+
+- **Order By:**source_zone__name__value, destination_zone__name__value, index__value
+- **Uniqueness Constraints:**index__value + source_zone + destination_zone + policy
+
 #### Attributes
 
 | name | label | kind | optional | order_weight | enum | default_value |
 | ---- | ----- | ---- | -------- | ------------ | ---- | ------------- |
 | index | Index | Number | False | 99999 |  |  |
 | name | Name | Text | False |  |  |  |
-| action | Action | Text | False |  | ['permit', 'deny'] | permit |
+| action | Action | Text | False |  | \['permit', 'deny'\] | permit |
 | log | Log | Boolean | True | 99998 |  | False |
 
 #### Relationships
@@ -362,16 +372,16 @@ Dependencies: `base`
 | name | peer | kind | cardinality | optional | order_weight | identifier |
 | ---- | ---- | ---- | ----------- | -------- | ------------ | ---------- |
 | policy | SecurityPolicy | Attribute | one | False |  |  |
-| source_zone | SecurityZone | Attribute | one | False | 1 | policy_rule__source_zone |
-| destination_zone | SecurityZone | Attribute | one | False | 2 | policy_rule__destination_zone |
-| source_address | SecurityGenericAddress | Attribute | many | True |  | policy_rule__source_address |
-| source_groups | SecurityGenericAddressGroup | Attribute | many | True |  | policy_rule__source_address_group |
-| source_services | SecurityGenericService | Attribute | many | True |  | policy_rule__source_service |
-| source_service_groups | SecurityGenericServiceGroup | Attribute | many | True |  | policy_rule__source_service_group |
-| destination_address | SecurityGenericAddress | Attribute | many | True |  | policy_rule__destination_address |
-| destination_groups | SecurityGenericAddressGroup | Attribute | many | True |  | policy_rule__destination_address_group |
-| destination_services | SecurityGenericService | Attribute | many | True |  | policy_rule__destination_service |
-| destination_service_groups | SecurityGenericServiceGroup | Attribute | many | True |  | policy_rule__destination_service_group |
+| source\_zone | SecurityZone | Attribute | one | False | 1 | policy\_rule\_\_source\_zone |
+| destination\_zone | SecurityZone | Attribute | one | False | 2 | policy\_rule\_\_destination\_zone |
+| source\_address | SecurityGenericAddress | Attribute | many | True |  | policy\_rule\_\_source\_address |
+| source\_groups | SecurityGenericAddressGroup | Attribute | many | True |  | policy\_rule\_\_source\_address\_group |
+| source\_services | SecurityGenericService | Attribute | many | True |  | policy\_rule\_\_source\_service |
+| source\_service\_groups | SecurityGenericServiceGroup | Attribute | many | True |  | policy\_rule\_\_source\_service\_group |
+| destination\_address | SecurityGenericAddress | Attribute | many | True |  | policy\_rule\_\_destination\_address |
+| destination\_groups | SecurityGenericAddressGroup | Attribute | many | True |  | policy\_rule\_\_destination\_address\_group |
+| destination\_services | SecurityGenericService | Attribute | many | True |  | policy\_rule\_\_destination\_service |
+| destination\_service\_groups | SecurityGenericServiceGroup | Attribute | many | True |  | policy\_rule\_\_destination\_service\_group |
 
 ### Firewall
 
@@ -383,7 +393,7 @@ Dependencies: `base`
 
 | name | kind | optional | choices |
 | ---- | ---- | -------- | ------- |
-| role | Dropdown | True | `edge_firewall` |
+| role | Dropdown | True | \`edge\_firewall\` |
 
 #### Relationships
 
@@ -397,34 +407,35 @@ Dependencies: `base`
 - **Label:** Policy rule
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** source_zone__name__value, destination_zone__name__value, index__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**source_zone__name__value, destination_zone__name__value, index__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | label | kind | optional | order_weight | enum | default_value |
 | ---- | ----- | ---- | -------- | ------------ | ---- | ------------- |
 | index | Index | Number | False | 99999 |  |  |
 | name | Name | Text | False |  |  |  |
-| action | Action | Text | False |  | ['permit', 'deny'] | permit |
+| action | Action | Text | False |  | \['permit', 'deny'\] | permit |
 | log | Log | Boolean | True | 99998 |  | False |
 
 #### Relationships
 
 | name | peer | kind | cardinality | optional | identifier | order_weight |
 | ---- | ---- | ---- | ----------- | -------- | ---------- | ------------ |
-| source_policy | SecurityPolicy | Attribute | one | False |  |  |
-| source_zone | SecurityZone | Attribute | one | False | rendered_policy_rule__source_zone | 1 |
-| destination_zone | SecurityZone | Attribute | one | False | rendered_policy_rule__destination_zone | 2 |
-| source_address | SecurityGenericAddress | Attribute | many | True | rendered_policy_rule__source_address |  |
-| source_groups | SecurityGenericAddressGroup | Attribute | many | True | rendered_policy_rule__source_address_group |  |
-| source_services | SecurityGenericService | Attribute | many | True | rendered_policy_rule__source_service |  |
-| source_service_groups | SecurityGenericServiceGroup | Attribute | many | True | rendered_policy_rule__source_service_group |  |
-| destination_address | SecurityGenericAddress | Attribute | many | True | rendered_policy_rule__destination_address |  |
-| destination_groups | SecurityGenericAddressGroup | Attribute | many | True | rendered_policy_rule__destination_address_group |  |
-| destination_services | SecurityGenericService | Attribute | many | True | rendered_policy_rule__destination_service |  |
-| destination_service_groups | SecurityGenericServiceGroup | Attribute | many | True | rendered_policy_rule__destination_service_group |  |
+| source\_policy | SecurityPolicy | Attribute | one | False |  |  |
+| source\_zone | SecurityZone | Attribute | one | False | rendered\_policy\_rule\_\_source\_zone | 1 |
+| destination\_zone | SecurityZone | Attribute | one | False | rendered\_policy\_rule\_\_destination\_zone | 2 |
+| source\_address | SecurityGenericAddress | Attribute | many | True | rendered\_policy\_rule\_\_source\_address |  |
+| source\_groups | SecurityGenericAddressGroup | Attribute | many | True | rendered\_policy\_rule\_\_source\_address\_group |  |
+| source\_services | SecurityGenericService | Attribute | many | True | rendered\_policy\_rule\_\_source\_service |  |
+| source\_service\_groups | SecurityGenericServiceGroup | Attribute | many | True | rendered\_policy\_rule\_\_source\_service\_group |  |
+| destination\_address | SecurityGenericAddress | Attribute | many | True | rendered\_policy\_rule\_\_destination\_address |  |
+| destination\_groups | SecurityGenericAddressGroup | Attribute | many | True | rendered\_policy\_rule\_\_destination\_address\_group |  |
+| destination\_services | SecurityGenericService | Attribute | many | True | rendered\_policy\_rule\_\_destination\_service |  |
+| destination\_service\_groups | SecurityGenericServiceGroup | Attribute | many | True | rendered\_policy\_rule\_\_destination\_service\_group |  |
 
 ### FirewallInterface
 
@@ -437,11 +448,13 @@ Dependencies: `base`
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| ip_addresses | InfraIPAddress | True | many | Component |
-| security_zone | SecurityZone | False | one | Attribute |
+| ip\_addresses | InfraIPAddress | True | many | Component |
+| security\_zone | SecurityZone | False | one | Attribute |
 
 ## Extensions
+
 ### LocationGeneric
+
 #### Relationships
 
 | name | peer | cardinality | kind |

@@ -1,6 +1,6 @@
 # Base Schemas
 
-That's the foundation for every single schema extension you might want to use afterward. This one is mandatory and will unlock access to the extensions section.
+The base schemas serve as the foundation for every single schema extension you might want to use afterward. This one is mandatory and will unlock access to the extensions section.
 
 ## Overview
 
@@ -15,17 +15,18 @@ That's the foundation for every single schema extension you might want to use af
 - **Icon:** mdi:server
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | unique | order_weight | optional |
 | ---- | ---- | ------ | ------------ | -------- |
 | name | Text | True | 1000 |  |
 | description | Text |  | 2000 | True |
-| os_version | Text |  | 2200 | True |
+| os\_version | Text |  | 2200 | True |
 
 #### Relationships
 
@@ -33,7 +34,7 @@ That's the foundation for every single schema extension you might want to use af
 | ---- | ---- | -------- | ----------- | ---- | ------------ | ----- |
 | interfaces | DcimInterface | True | many | Component |  |  |
 | tags | BuiltinTag | True | many | Attribute | 2000 |  |
-| primary_address | IpamIPAddress | True | one | Attribute | 1700 | Primary IP Address |
+| primary\_address | IpamIPAddress | True | one | Attribute | 1700 | Primary IP Address |
 | platform | DcimPlatform | True | one | Attribute | 1250 |  |
 
 ### PhysicalDevice
@@ -45,15 +46,15 @@ That's the foundation for every single schema extension you might want to use af
 
 | name | label | description | kind | optional | order_weight | default_value | choices |
 | ---- | ----- | ----------- | ---- | -------- | ------------ | ------------- | ------- |
-| position | Position (U) | Lowest unit. | Number | True | 1500 |  | `` |
-| serial |  |  | Text | True | 1500 |  | `` |
-| rack_face | Rack Face | On which face of the rack the device is mounted. | Dropdown | False | 1515 | front | `front, rear` |
+| position | Position \(U\) | Lowest unit\. | Number | True | 1500 |  | \`\` |
+| serial |  |  | Text | True | 1500 |  | \`\` |
+| rack\_face | Rack Face | On which face of the rack the device is mounted\. | Dropdown | False | 1515 | front | \`front, rear\` |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind | order_weight | label |
 | ---- | ---- | -------- | ----------- | ---- | ------------ | ----- |
-| device_type | DcimDeviceType | True | one | Attribute | 1200 |  |
+| device\_type | DcimDeviceType | True | one | Attribute | 1200 |  |
 | location | LocationHosting | False | one | Attribute | 1500 | Location |
 
 ### Interface
@@ -64,10 +65,11 @@ That's the foundation for every single schema extension you might want to use af
 - **Menu Placement:** DcimGenericDevice
 - **Include in Menu:** ✅
 
-
 #### Ordering and Constraints
-- **Order By:** device__name__value, name__value
-- **Uniqueness Constraints:** device + name__value
+
+- **Order By:**device__name__value, name__value
+- **Uniqueness Constraints:**device + name__value
+
 #### Attributes
 
 | name | kind | order_weight | optional | label | default_value |
@@ -105,7 +107,7 @@ That's the foundation for every single schema extension you might want to use af
 
 | name | peer | optional | cardinality | order_weight | kind |
 | ---- | ---- | -------- | ----------- | ------------ | ---- |
-| connected_endpoints | DcimEndpoint | True | many | 1500 | Generic |
+| connected\_endpoints | DcimEndpoint | True | many | 1500 | Generic |
 
 ## Nodes
 
@@ -116,20 +118,21 @@ That's the foundation for every single schema extension you might want to use af
 - **Icon:** mdi:poll
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** manufacturer__name__value, name__value
-- **Uniqueness Constraints:** manufacturer + name__value
+
+- **Order By:**manufacturer__name__value, name__value
+- **Uniqueness Constraints:**manufacturer + name__value
+
 #### Attributes
 
 | name | kind | unique | order_weight | optional | label | default_value |
 | ---- | ---- | ------ | ------------ | -------- | ----- | ------------- |
 | name | Text | True | 1000 |  |  |  |
 | description | Text |  | 1100 | True |  |  |
-| part_number | Text |  | 1200 | True | Part Number |  |
-| height | Number |  | 1400 | False | Height (U) | 1 |
-| full_depth | Boolean |  | 1500 |  | Full Depth | True |
-| weight | Number |  | 1600 | True | Weight (kg) |  |
+| part\_number | Text |  | 1200 | True | Part Number |  |
+| height | Number |  | 1400 | False | Height \(U\) | 1 |
+| full\_depth | Boolean |  | 1500 |  | Full Depth | True |
+| weight | Number |  | 1600 | True | Weight \(kg\) |  |
 
 #### Relationships
 
@@ -146,21 +149,22 @@ That's the foundation for every single schema extension you might want to use af
 - **Icon:** mdi:application-cog-outline
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** manufacturer__name__value, name__value
-- **Uniqueness Constraints:** name__value
+
+- **Order By:**manufacturer__name__value, name__value
+- **Uniqueness Constraints:**name__value
+
 #### Attributes
 
 | name | kind | unique | order_weight | optional |
 | ---- | ---- | ------ | ------------ | -------- |
 | name | Text | True | 1000 |  |
 | description | Text |  | 1200 | True |
-| nornir_platform | Text |  | 1500 | True |
-| napalm_driver | Text |  | 1600 | True |
-| netmiko_device_type | Text |  | 1700 | True |
-| ansible_network_os | Text |  | 1800 | True |
-| containerlab_os | Text |  | 1900 | True |
+| nornir\_platform | Text |  | 1500 | True |
+| napalm\_driver | Text |  | 1600 | True |
+| netmiko\_device\_type | Text |  | 1700 | True |
+| ansible\_network\_os | Text |  | 1800 | True |
+| containerlab\_os | Text |  | 1900 | True |
 
 #### Relationships
 
@@ -180,8 +184,8 @@ That's the foundation for every single schema extension you might want to use af
 
 | name | kind | optional | order_weight | choices |
 | ---- | ---- | -------- | ------------ | ------- |
-| status | Dropdown | False | 1100 | `active, provisioning, maintenance, drained` |
-| role | Dropdown | True | 1400 | `core, edge, cpe, spine, leaf, tor` |
+| status | Dropdown | False | 1100 | \`active, provisioning, maintenance, drained\` |
+| role | Dropdown | True | 1400 | \`core, edge, cpe, spine, leaf, tor\` |
 
 ### InterfaceL3
 
@@ -191,22 +195,23 @@ That's the foundation for every single schema extension you might want to use af
 - **Menu Placement:** DcimInterface
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | optional | choices | order_weight |
 | ---- | ---- | -------- | ------- | ------------ |
-| role | Dropdown | True | `backbone, upstream, peering, peer, server, loopback, management, uplink, leaf, spare` | 1700 |
-| status | Dropdown | True | `active, provisioning, maintenance, drained` | 1300 |
+| role | Dropdown | True | \`backbone, upstream, peering, peer, server, loopback, management, uplink, leaf, spare\` | 1700 |
+| status | Dropdown | True | \`active, provisioning, maintenance, drained\` | 1300 |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| ip_addresses | IpamIPAddress | True | many | Component |
+| ip\_addresses | IpamIPAddress | True | many | Component |
 
 ### InterfaceL2
 
@@ -216,17 +221,18 @@ That's the foundation for every single schema extension you might want to use af
 - **Menu Placement:** DcimInterface
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | optional | choices | order_weight | label | enum |
 | ---- | ---- | -------- | ------- | ------------ | ----- | ---- |
-| role | Dropdown | True | `backbone, upstream, peering, peer, server, loopback, management, uplink, leaf, spare` | 1700 |  |  |
-| status | Dropdown | True | `active, provisioning, maintenance, drained` | 1300 |  |  |
-| l2_mode | Text |  | `` | 1250 | Layer2 Mode | ['Access', 'Trunk', 'Tunnel'] |
+| role | Dropdown | True | \`backbone, upstream, peering, peer, server, loopback, management, uplink, leaf, spare\` | 1700 |  |  |
+| status | Dropdown | True | \`active, provisioning, maintenance, drained\` | 1300 |  |  |
+| l2\_mode | Text |  | \`\` | 1250 | Layer2 Mode | \['Access', 'Trunk', 'Tunnel'\] |
 
 ## Overview
 
@@ -241,10 +247,11 @@ That's the foundation for every single schema extension you might want to use af
 - **Icon:** mdi:domain
 - **Include in Menu:** ✅
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | unique | order_weight | optional |
@@ -271,7 +278,7 @@ That's the foundation for every single schema extension you might want to use af
 
 | name | peer | cardinality | optional |
 | ---- | ---- | ----------- | -------- |
-| device_type | DcimDeviceType | many | True |
+| device\_type | DcimDeviceType | many | True |
 | platform | DcimPlatform | many | True |
 
 ### Provider
@@ -294,10 +301,11 @@ That's the foundation for every single schema extension you might want to use af
 - **Icon:** mingcute:location-line
 - **Include in Menu:** ✅
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** 
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
 #### Attributes
 
 | name | kind | order_weight | unique | optional |
@@ -337,15 +345,16 @@ That's the foundation for every single schema extension you might want to use af
 - **Icon:** mdi:ip
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** address__value
-- **Uniqueness Constraints:** ip_namespace + address__value
+
+- **Order By:**address__value
+- **Uniqueness Constraints:**ip_namespace + address__value
+
 #### Attributes
 
 | name | label | kind | optional | regex |
 | ---- | ----- | ---- | -------- | ----- |
-| fqdn | FQDN | Text | True | (?=^.{1,253}$)(^(((?!-)[a-zA-Z0-9-]{1,63}(?<!-))|((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63})$) |
+| fqdn | FQDN | Text | True | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
 
 #### Relationships
 
@@ -360,16 +369,17 @@ That's the foundation for every single schema extension you might want to use af
 - **Icon:** mdi:ip-network
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** prefix__value
-- **Uniqueness Constraints:** ip_namespace + prefix__value
+
+- **Order By:**prefix__value
+- **Uniqueness Constraints:**ip_namespace + prefix__value
+
 #### Attributes
 
 | name | kind | choices | optional |
 | ---- | ---- | ------- | -------- |
-| status | Dropdown | `active, deprecated, reserved` |  |
-| role | Dropdown | `loopback, management, public, server, supernet, technical, loopback-vtep` | True |
+| status | Dropdown | \`active, deprecated, reserved\` |  |
+| role | Dropdown | \`loopback, management, public, server, supernet, technical, loopback\-vtep\` | True |
 
 #### Relationships
 
@@ -377,4 +387,4 @@ That's the foundation for every single schema extension you might want to use af
 | ---- | ---- | -------- | ----------- | ---- | ------------ | ----- | ---------- |
 | organization | OrganizationGeneric | True | one | Attribute | 1200 |  |  |
 | location | LocationHosting | True | one | Attribute | 1300 |  |  |
-| gateway | IpamIPAddress | True | one | Attribute | 1500 | L3 Gateway | prefix__gateway |
+| gateway | IpamIPAddress | True | one | Attribute | 1500 | L3 Gateway | prefix\_\_gateway |
