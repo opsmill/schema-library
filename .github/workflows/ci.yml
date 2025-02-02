@@ -74,7 +74,7 @@ jobs:
       - name: "Mypy Tests"
         run: "poetry run mypy --show-error-codes ."
       - name: "Pylint Tests"
-        run: "poetry run pylint . *.py"
+        run: "poetry run pylint ."
 
   yaml-lint:
     name: Run yaml lint

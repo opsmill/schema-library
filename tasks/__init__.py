@@ -14,10 +14,10 @@ def lint_all(context: Context) -> None:
     linter.lint_all(context)
 
 
-@task(name="format")
-def format(context: Context) -> None:
-    linter.format(context)
+@task(name="format_code")
+def format_code(context: Context) -> None:
+    linter.format_code(context)
 
 
 ns.add_task(lint_all)
-ns.add_task(format)
+ns.add_task(format_code)

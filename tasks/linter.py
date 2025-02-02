@@ -9,8 +9,8 @@ MAIN_DIRECTORY_PATH = Path(__file__).parent
 METADATA_FILE = ".metadata.yml"
 
 
-@task
-def format(context: Context) -> None:
+@task(name="format_code")
+def format_code(context: Context) -> None:
     """Run RUFF to format all Python files."""
 
     exec_cmds = ["ruff format .", "ruff check . --fix"]
@@ -72,7 +72,7 @@ class PreserveLiteralStyleDumper(yaml.SafeDumper):
     """
 
     def increase_indent(self, flow=False, indentless=False):
-        return super(PreserveLiteralStyleDumper, self).increase_indent(flow, False)
+        return super().increase_indent(flow, False)
 
     def represent_scalar(self, tag, value, style=None):
         if "\n" in value:  # If the string contains newlines, use literal style
@@ -87,7 +87,7 @@ def sort_metadata(context: Context) -> None:
         metadata = yaml.safe_load(f)
 
     with open(METADATA_FILE, "w", encoding="utf-8") as f:
-        f.write("---\n")
+        f.write("---\n# yamllint disable rule:line-length\n")
         yaml.dump(
             metadata,
             f,

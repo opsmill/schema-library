@@ -9,6 +9,7 @@ package-mode = false
 python = "^3.10, < 3.13"
 infrahub-sdk = { version = "^1", extras = ["all"]}
 invoke = "^2.1.2"
+pylint = "^3.3.4"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.9.1"
