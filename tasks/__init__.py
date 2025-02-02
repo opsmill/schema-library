@@ -4,9 +4,9 @@ from . import docusaurus, linter, schemas
 
 ns = Collection()
 
-ns.add_collection(linter)
-ns.add_collection(docusaurus)
-ns.add_collection(schemas)
+ns.add_collection(Collection.from_module(linter))
+ns.add_collection(Collection.from_module(docusaurus))
+ns.add_collection(Collection.from_module(schemas))
 
 
 @task(name="lint")
@@ -19,11 +19,5 @@ def format(context: Context) -> None:
     linter.format(context)
 
 
-# @task(name="docusaurus")
-# def docusaurus(context: Context) -> None:
-#     docusaurus.docusaurus(context)
-
-
 ns.add_task(lint_all)
 ns.add_task(format)
-# ns.add_task(docusaurus)

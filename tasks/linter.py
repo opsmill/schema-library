@@ -52,7 +52,7 @@ def lint_all(context: Context) -> None:
     sort_metadata(context)
     lint_yaml(context)
     lint_ruff(context)
-    # lint_mypy(context)
+    lint_mypy(context)
 
 
 def sort_dict(d):
