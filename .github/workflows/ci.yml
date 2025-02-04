@@ -201,6 +201,4 @@ jobs:
         env:
           VALE_VERSION: ${{ env.VALE_VERSION }}
       - name: "Validate documentation style"
-        # run: ./vale --config='./.vale.ini' $(find ./docs -type f \( -name "*.mdx" -o -name "*.md" \) )
-        run: ./vale ./docs/docs/readme.mdx
-
+        run: ./vale --config=.vale.ini --glob='!{docs/docs/schema-library.*}' ./docs/docs $(find ./docs/docs -type f \( -name "*.mdx" -o -name "*.md" \) )
