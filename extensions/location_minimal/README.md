@@ -4,7 +4,7 @@ This schema extension is minimal but will provide you with basic items to store 
 
 Dependencies: `base`
 
-## Overview
+## location_minimal
 
 - **Version:** 1.0
 
@@ -41,8 +41,8 @@ Dependencies: `base`
 
 | name | kind | unique | optional | order_weight |
 | ---- | ---- | ------ | -------- | ------------ |
-| facility_id | Text | False | True | 1100 |
-| physical_address | Text | False | True | 1500 |
+| facility\_id | Text | False | True | 1100 |
+| physical\_address | Text | False | True | 1500 |
 
 #### Relationships
 
@@ -61,8 +61,8 @@ Dependencies: `base`
 
 | name | kind | unique | optional | order_weight | label | default_value |
 | ---- | ---- | ------ | -------- | ------------ | ----- | ------------- |
-| facility_id | Text | False | True | 1100 |  |  |
-| height | Number |  | False | 1300 | Height (U) | 42 |
+| facility\_id | Text | False | True | 1100 |  |  |
+| height | Number |  | False | 1300 | Height \(U\) | 42 |
 
 #### Relationships
 
@@ -71,7 +71,9 @@ Dependencies: `base`
 | owner | OrganizationGeneric | True | one |
 
 ## Extensions
+
 ### OrganizationProvider
+
 #### Relationships
 
 | name | peer | cardinality | optional |

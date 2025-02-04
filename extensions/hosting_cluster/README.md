@@ -4,7 +4,7 @@ A rather generic cluster built with compute units (e.g. servers) and able to hos
 
 Dependencies: `base, extensions.cluster, extensions.compute`
 
-## Overview
+## hosting_cluster
 
 - **Version:** 1.0
 
@@ -22,5 +22,5 @@ Dependencies: `base, extensions.cluster, extensions.compute`
 
 | name | kind | order_weight | description | choices | optional |
 | ---- | ---- | ------------ | ----------- | ------- | -------- |
-| cluster_type | Dropdown | 1200 | Type of the cluster. | `aws, kvm, gcp, vmware` |  |
-| status | Dropdown | 1300 |  | `active, provisioning, maintenance, drained` | False |
+| cluster\_type | Dropdown | 1200 | Type of the cluster\. | \`aws, kvm, gcp, vmware\` |  |
+| status | Dropdown | 1300 |  | \`active, provisioning, maintenance, drained\` | False |

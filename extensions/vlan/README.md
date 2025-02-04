@@ -4,7 +4,7 @@ This schema extension contains models to support VLANs in you network.
 
 Dependencies: `base`
 
-## Overview
+## vlan
 
 - **Version:** 1.0
 
@@ -18,19 +18,20 @@ Dependencies: `base`
 - **Menu Placement:** IpamL2Domain
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** name__value
-- **Uniqueness Constraints:** l2domain + vlan_id__value
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**l2domain + vlan_id__value
+
 #### Attributes
 
 | name | kind | optional | choices |
 | ---- | ---- | -------- | ------- |
-| name | Text |  | `` |
-| description | Text | True | `` |
-| vlan_id | Number |  | `` |
-| status | Dropdown |  | `active, provisioning, maintenance, drained` |
-| role | Dropdown | True | `server, management, user` |
+| name | Text |  | \`\` |
+| description | Text | True | \`\` |
+| vlan\_id | Number |  | \`\` |
+| status | Dropdown |  | \`active, provisioning, maintenance, drained\` |
+| role | Dropdown | True | \`server, management, user\` |
 
 #### Relationships
 
@@ -60,7 +61,9 @@ Dependencies: `base`
 | vlans | IpamVLAN | True | many | Component |
 
 ## Extensions
+
 ### IpamPrefix
+
 #### Relationships
 
 | name | peer | optional | cardinality | kind | order_weight |
@@ -68,14 +71,16 @@ Dependencies: `base`
 | vlan | IpamVLAN | True | one | Attribute | 1400 |
 
 ### DcimInterfaceL2
+
 #### Relationships
 
 | name | label | peer | optional | cardinality | kind | identifier |
 | ---- | ----- | ---- | -------- | ----------- | ---- | ---------- |
-| untagged_vlan | Untagged VLAN | IpamVLAN | True | one | Component | interface_l2__untagged_vlan |
-| tagged_vlan | Tagged VLANs | IpamVLAN | True | many | Component | interface_l2__tagged_vlan |
+| untagged\_vlan | Untagged VLAN | IpamVLAN | True | one | Component | interface\_l2\_\_untagged\_vlan |
+| tagged\_vlan | Tagged VLANs | IpamVLAN | True | many | Component | interface\_l2\_\_tagged\_vlan |
 
 ### LocationHosting
+
 #### Relationships
 
 | name | label | peer | cardinality | optional |

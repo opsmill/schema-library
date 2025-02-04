@@ -4,7 +4,7 @@ This schema inherits the `RoutingPolicy` schema and removes `import_policies` an
 
 Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_pim`
 
-## Overview
+## routing_policies_pim
 
 - **Version:** 1.0
 
@@ -18,17 +18,19 @@ Dependencies: `base, extensions.routing, extensions.routing_policies, extensions
 - **Include in Menu:** ❌
 
 ## Extensions
+
 ### RoutingPIM
+
 #### Attributes
 
 | name | kind | state |
 | ---- | ---- | ----- |
-| import_policies | Text | absent |
-| export_policies | Text | absent |
+| import\_policies | Text | absent |
+| export\_policies | Text | absent |
 
 #### Relationships
 
 | name | label | peer | identifier | description | kind | cardinality |
 | ---- | ----- | ---- | ---------- | ----------- | ---- | ----------- |
-| import_routing_policies | Import Routing Policies | RoutingPolicyPIM | pim__import_policies | The routing-policies used by this instance for import. | Generic | many |
-| export_routing_policies | Export Routing Policies | RoutingPolicyPIM | pim__export_policies | The routing-policies used by this instance for export. | Generic | many |
+| import\_routing\_policies | Import Routing Policies | RoutingPolicyPIM | pim\_\_import\_policies | The routing\-policies used by this instance for import\. | Generic | many |
+| export\_routing\_policies | Export Routing Policies | RoutingPolicyPIM | pim\_\_export\_policies | The routing\-policies used by this instance for export\. | Generic | many |

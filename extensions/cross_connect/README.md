@@ -4,7 +4,7 @@ This extension contains schema to capture Cross Connect. You can see it as "a ca
 
 Dependencies: `base`
 
-## Overview
+## cross_connect
 
 - **Version:** 1.0
 
@@ -17,17 +17,18 @@ Dependencies: `base`
 - **Icon:** streamline:arrow-crossover-right-solid
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** provider__name__value
-- **Uniqueness Constraints:** provider + identifier__value
+
+- **Order By:**provider__name__value
+- **Uniqueness Constraints:**provider + identifier__value
+
 #### Attributes
 
 | name | kind | order_weight | optional | choices |
 | ---- | ---- | ------------ | -------- | ------- |
-| identifier | Text | 900 |  | `` |
-| description | Text | 1300 | True | `` |
-| status | Dropdown | 1200 | True | `connected, planned, reserved` |
+| identifier | Text | 900 |  | \`\` |
+| description | Text | 1300 | True | \`\` |
+| status | Dropdown | 1200 | True | \`connected, planned, reserved\` |
 
 #### Relationships
 

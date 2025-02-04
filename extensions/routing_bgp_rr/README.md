@@ -4,7 +4,7 @@ This schema extension extend the BGP extension to add BGP Route Reflector Cluste
 
 Dependencies: `base, extensions.routing, extensions.routing_bgp`
 
-## Overview
+## bgp_rr
 
 - **Version:** 1.0
 
@@ -17,10 +17,11 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp`
 - **Icon:** mdi:router-network
 - **Include in Menu:** ❌
 
-
 #### Ordering and Constraints
-- **Order By:** 
-- **Uniqueness Constraints:** name__value
+
+- **Order By:**
+- **Uniqueness Constraints:**name__value
+
 #### Attributes
 
 | name | kind | description | order_weight | optional |
@@ -32,13 +33,15 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp`
 
 | name | label | peer | description | cardinality | kind | optional | order_weight |
 | ---- | ----- | ---- | ----------- | ----------- | ---- | -------- | ------------ |
-| cluster_id | Cluster ID | IpamIPAddress | Cluster ID represented as a reference to an IP Address | one | Attribute | False | 1200 |
-| peer_groups | BGP Peer Groups | RoutingBGPPeerGroup |  | many | Generic | True |  |
+| cluster\_id | Cluster ID | IpamIPAddress | Cluster ID represented as a reference to an IP Address | one | Attribute | False | 1200 |
+| peer\_groups | BGP Peer Groups | RoutingBGPPeerGroup |  | many | Generic | True |  |
 
 ## Extensions
+
 ### RoutingBGPPeerGroup
+
 #### Relationships
 
 | name | label | peer | cardinality | kind | order_weight |
 | ---- | ----- | ---- | ----------- | ---- | ------------ |
-| rr_cluster | RR Cluster | RoutingBGPRRCluster | one | Attribute | 1600 |
+| rr\_cluster | RR Cluster | RoutingBGPRRCluster | one | Attribute | 1600 |
