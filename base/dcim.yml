@@ -511,7 +511,7 @@ nodes:
       - DcimInterface
       - InterfaceLayer2
       - InterfaceLayer3
-      - InterfaceHasSubInterface
+      # - InterfaceHasSubInterface # Depending if you want your virtual interfaces to have sub interface
     include_in_menu: false
     relationships:
       - name: parent_interface
