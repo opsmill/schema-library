@@ -17,7 +17,6 @@ extensions:
             - name: customer
               label: Customer
               description: A VLAN assigned to customer traffic.
-    - kind: IpamVLAN
       relationships:
         - name: svlan
           label: Supplier vlan
