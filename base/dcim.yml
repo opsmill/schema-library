@@ -159,31 +159,31 @@ generics:
           - name: provisioning
             label: Provisioning
             description: "Interface is being provisioned."
-            color: "#A9DFBF"  # light pastel green
+            color: "#A9DFBF" # light pastel green
           - name: free
             label: Free
             description: "Interface is unused."
-            color: "#CDEACC"  # slightly darker pastel green
+            color: "#CDEACC" # slightly darker pastel green
           - name: active
             label: Active
             description: "Interface is active and operational."
-            color: "#A9CCE3"  # pastel blue
+            color: "#A9CCE3" # pastel blue
           - name: maintenance
             label: Maintenance
             description: "Interface is under maintenance."
-            color: "#FFF2CC"  # pastel yellow
+            color: "#FFF2CC" # pastel yellow
           - name: disabled
             label: Disabled
             description: "Interface has been disabled."
-            color: "#D3D3D3"  # light grey
+            color: "#D3D3D3" # light grey
           - name: deleted
             label: Deleted
             description: "Interface has been deleted."
-            color: "#FAD7A0"  # pastel orange
+            color: "#FAD7A0" # pastel orange
           - name: outage
             label: Outage
             description: "Interface is currently experiencing an outage."
-            color: "#F4CCCC"  # pastel red
+            color: "#F4CCCC" # pastel red
         default_value: "active"
         order_weight: 1200
       - name: role
@@ -194,31 +194,31 @@ generics:
           - name: lag
             label: Lag
             description: "Interface LAG."
-            color: "#A9DFBF"  # light pastel green
+            color: "#A9DFBF" # light pastel green
           - name: core
             label: Core Interface
             description: "Central part of the network."
-            color: "#A9CCE3"  # pastel blue
+            color: "#A9CCE3" # pastel blue
           - name: cust
             label: Customer Interface
             description: "Interface dedicated to customer connections."
-            color: "#D2B4DE"  # pastel purple
+            color: "#D2B4DE" # pastel purple
           - name: access
             label: Access Interfaces
             description: "Interface connecting endpoint devices."
-            color: "#B4E0DC"  # pastel teal
+            color: "#B4E0DC" # pastel teal
           - name: management
             label: Management Interface
             description: "Interface dedicated to device management."
-            color: "#E3DAC9"  # pastel cream
+            color: "#E3DAC9" # pastel cream
           - name: peering
             label: Peering Interface
             description: "Interface dedicated to peering with other networks."
-            color: "#C4B7E6"  # pastel purple
+            color: "#C4B7E6" # pastel purple
           - name: upstream
             label: Upstream Interface
             description: "Interface dedicated to upstream traffic between networks."
-            color: "#B2D4E6"  # pastel sky blue
+            color: "#B2D4E6" # pastel sky blue
         order_weight: 1250
     relationships:
       - name: device
@@ -285,6 +285,21 @@ generics:
         description: "List of IP addresses associated with the interface"
         order_weight: 1150
 
+  - name: HasSubInterface
+    namespace: Interface
+    description: A generic interface that can have sub-interfaces
+    include_in_menu: false
+    relationships:
+      - name: sub_interfaces
+        label: "Sub-interface(s)"
+        peer: InterfaceVirtual
+        direction: outbound
+        identifier: "sub__interface"
+        optional: true
+        cardinality: many
+        kind: Attribute
+        description: "Sub-interfaces of this interface"
+        order_weight: 1750
 
 nodes:
   # --------------------  Device (Types, Platforms, Device, Interfaces )  --------------------
@@ -476,50 +491,16 @@ nodes:
       - InterfaceLayer2
       - InterfaceLayer3
       - DcimEndpoint
+      - InterfaceHasSubInterface
     include_in_menu: false
-    attributes:
-      - name: breakout_capability
-        kind: Boolean
-        optional: false
-        default_value: false
-        description: "Indicates if the port supports breakout capability"
     relationships:
-      - name: breakout_interfaces
-        peer: InterfacePhysical
-        optional: true
-        cardinality: many
-        kind: Attribute
-        identifier: "physcial__breakout"
-        direction: outbound
-        description: "Interfaces resulting from the breakout"
-        order_weight: 1650
-      - name: parent_interface
-        peer: InterfacePhysical
-        optional: true
-        cardinality: one
-        kind: Attribute
-        identifier: "physcial__breakout"
-        direction: inbound
-        description: "Interface from which breakout is created"
-        order_weight: 1700
-      - name: children_interfaces
-        label: Sub-interfaces
-        peer: InterfaceSub
-        optional: true
-        cardinality: many
-        kind: Attribute
-        identifier: "interface__parent"
-        direction: inbound
-        description: "Sub-interfaces of the Physical interface"
-        order_weight: 1750
-      - name: lacp_parent
+      - name: lag_parent
         label: "LAG"
         peer: InterfaceLag
-        identifier: "lag__members"
         optional: true
         cardinality: one
         kind: Attribute
-        description: "LACP Interface using this Physical interface"
+        description: "LAG Interface using this Physical interface"
         order_weight: 1800
 
   - name: Virtual
@@ -530,38 +511,16 @@ nodes:
       - DcimInterface
       - InterfaceLayer2
       - InterfaceLayer3
-    include_in_menu: false
-    relationships:
-      - name: children_interfaces
-        label: "Sub-interface(s)"
-        peer: InterfaceSub
-        optional: true
-        cardinality: many
-        kind: Attribute
-        description: "Sub-interfaces of the Virtual interface"
-        order_weight: 1900
-
-  - name: Sub
-    namespace: Interface
-    label: Sub-Interface
-    description: "Sub-interface for physical, logical, or aggregate interface"
-    human_friendly_id:
-      - "device__name__value"
-      - "parent_interface__name__value"
-      - "name__value"
-    inherit_from:
-      - DcimInterface
-      - InterfaceLayer2
-      - InterfaceLayer3
+      - InterfaceHasSubInterface
     include_in_menu: false
     relationships:
       - name: parent_interface
-        peer: DcimInterface
+        peer: InterfaceHasSubInterface
         optional: false
         cardinality: one
         kind: Attribute
-        identifier: "interface__parent"
-        direction: outbound
+        identifier: "sub__interface"
+        direction: inbound
         description: "Parent interface to which this sub-interface belongs"
 
   - name: Lag
@@ -572,6 +531,7 @@ nodes:
       - DcimInterface
       - InterfaceLayer2
       - InterfaceLayer3
+      - InterfaceHasSubInterface
     include_in_menu: false
     attributes:
       - name: lacp_rate
@@ -580,10 +540,10 @@ nodes:
         choices:
           - name: slow
             label: Slow
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
           - name: fast
             label: Fast
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
         default_value: fast
         description: "LACP rate for the aggregated interface"
         order_weight: 1700
@@ -593,32 +553,21 @@ nodes:
         choices:
           - name: active
             label: Active
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
           - name: passive
             label: Passive
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
           - name: disabled
             label: Disabled
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
         description: "LACP mode for the aggregated interface"
         default_value: active
         order_weight: 1750
     relationships:
-      - name: member_interfaces
+      - name: lag_members
         label: "Member(s)"
         peer: InterfacePhysical
-        identifier: "lag__members"
         cardinality: many
         kind: Attribute
-        description: "Interfaces that are members of the aggregate"
+        description: "Physical Interfaces that are members of this aggregate"
         order_weight: 1800
-      - name: children_interfaces
-        label: "Sub-interface(s)"
-        peer: InterfaceSub
-        optional: true
-        cardinality: many
-        kind: Attribute
-        identifier: "interface__parent"
-        direction: inbound
-        description: "Sub-interfaces of the aggregated interface"
-        order_weight: 1900
