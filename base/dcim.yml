@@ -106,6 +106,9 @@ generics:
     include_in_menu: true
     display_labels:
       - name__value
+    human_friendly_id:
+      - device__name__value
+      - name__value
     order_by:
       - device__name__value
       - name__value

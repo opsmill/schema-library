@@ -2,9 +2,21 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
 
-# TODO: Override L2 interface to add trunnel option for l2 mode
+# TODO: Override L2 interface to add tunnel option for l2 mode
 extensions:
   nodes:
+    - kind: IpamVLAN
+      attributes:
+        - name: qinq_role
+          kind: Dropdown
+          optional: true
+          choices:
+            - name: suplier
+              label: Suplier
+              description: A VLAN used to encapsulate multiple CVLANs.
+            - name: customer
+              label: Customer
+              description: A VLAN assigned to customer traffic.
     - kind: IpamVLAN
       relationships:
         - name: svlan
