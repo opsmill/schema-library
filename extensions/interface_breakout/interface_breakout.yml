@@ -1,0 +1,34 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+version: "1.0"
+
+extensions:
+  nodes:
+    - kind: InterfacePhysical
+      attributes:
+        - name: breakout_capability
+          kind: Boolean
+          optional: false
+          default_value: false
+          description: "Indicates if the port supports breakout capability"
+      relationships:
+        - name: breakout_child_interfaces
+          peer: InterfacePhysical
+          label: "Breakout child interface(s)"
+          optional: true
+          cardinality: many
+          kind: Attribute
+          identifier: "physical__breakout"
+          direction: outbound
+          description: "Interfaces resulting from the breakout"
+          order_weight: 1650
+        - name: breakout_parent_interface
+          peer: InterfacePhysical
+          label: "Breakout parent interface"
+          optional: true
+          cardinality: one
+          kind: Attribute
+          identifier: "physical__breakout"
+          direction: inbound
+          description: "Interface from which breakout is created"
+          order_weight: 1700
