@@ -63,7 +63,7 @@ nodes:
             description: "Category 8 twisted pair cable."
             color: "#99ccff" # Light Blue
 
-          # Fiber Cables (Multimode)
+          # Fiber Cables (Multi-mode)
           - name: mmf-om1
             label: Multimode Fiber OM1
             description: "Multimode fiber (62.5/125 µm)."
@@ -85,7 +85,7 @@ nodes:
             description: "Wideband multimode fiber (50/125 µm)."
             color: "#ff9933" # Dark Orange
 
-          # Fiber Cables (Singlemode)
+          # Fiber Cables (Single-mode)
           - name: smf-os1
             label: Singlemode Fiber OS1
             description: "Standard singlemode fiber."
@@ -213,7 +213,7 @@ nodes:
         kind: Text
         optional: true
         order_weight: 1200
-      # As we can't put float in Number "forcing" legnth in cm
+      # As we can't put float in Number "forcing" length in cm
       - name: length
         label: Length (in cm)
         kind: Number
