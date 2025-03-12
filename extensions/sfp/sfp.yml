@@ -2,81 +2,24 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 version: "1.0"
 
-nodes:
-  - name: SFP
+generics:
+  - name: GenericSFP
     namespace: Dcim
-    description: Small Form-factor Pluggable (SFP)
+    description: Generic base for all Small Form-factor Pluggable (SFP) transceivers.
     label: SFP
     icon: mdi:gpu
     include_in_menu: true
-    human_friendly_id:
-      - form_factor__value
-      - type__value
     display_labels:
       - form_factor__value
-      - type__value
+      - sfp_type__value
     attributes:
-      - name: form_factor
+      - name: serial
+        kind: Text
+        optional: true
+        order_weight: 1400
+      - name: sfp_type
         kind: Dropdown
-        description: The physical form factor of the SFP module.
-        order_weight: 1000
-        optional: false
-        choices:
-          - name: sfp
-            label: SFP
-            description: Standard SFP transceiver for up to 1G Ethernet.
-            color: "#009933"
-          - name: sfp_plus
-            label: SFP+
-            description: Enhanced SFP for up to 10G Ethernet.
-            color: "#cc66ff"
-          - name: qsfp
-            label: QSFP
-            description: Quad Small Form-factor Pluggable, supporting up to 40G Ethernet.
-            color: "#6666ff"
-          - name: qsfp_plus
-            label: QSFP+
-            description: Enhanced QSFP for higher data rates, supporting up to 40G Ethernet.
-            color: "#3366ff"
-          - name: qsfp28
-            label: QSFP28
-            description: QSFP supporting up to 100G Ethernet.
-            color: "#336699"
-          - name: qsfp_dd
-            label: QSFP-DD
-            description: Double-Density QSFP, supporting up to 400G Ethernet.
-            color: "#ff9900"
-          - name: cfp
-            label: CFP
-            description: 100G Form-factor Pluggable transceiver for long-haul applications.
-            color: "#cc3300"
-          - name: cfp2
-            label: CFP2
-            description: Smaller, improved version of CFP.
-            color: "#ff6600"
-          - name: cfp4
-            label: CFP4
-            description: Further miniaturized version of CFP for 100G applications.
-            color: "#b35900"
-          - name: xfp
-            label: XFP
-            description: 10G transceiver, typically for longer distances.
-            color: "#6699ff"
-          - name: sfp56
-            label: SFP56
-            description: SFP form factor supporting 50G Ethernet.
-            color: "#9966ff"
-          - name: qsfp56
-            label: QSFP56
-            description: QSFP form factor supporting 200G Ethernet.
-            color: "#9933cc"
-          - name: osfp
-            label: OSFP
-            description: Octal Small Form-factor Pluggable, supports 400G Ethernet.
-            color: "#0099cc"
-      - name: type
-        kind: Dropdown
-        description: Specific type of SFP module, such as LR, SR, T, and others.
+        description: "Type of SFP, such as LR, SR, T."
         order_weight: 1100
         optional: false
         choices:
@@ -120,18 +63,6 @@ nodes:
             label: AOC (Active Optical Cable)
             description: Active Optical Cable, used for short connections over fiber.
             color: "#6699ff"
-          - name: bidi
-            label: BiDi (Bi-Directional)
-            description: Bi-Directional SFP, allows two-way communication over a single fiber.
-            color: "#9966ff"
-          - name: cwdm
-            label: CWDM (Coarse Wavelength Division Multiplexing)
-            description: Supports multiple wavelengths for long-distance communication.
-            color: "#0099cc"
-          - name: dwdm
-            label: DWDM (Dense Wavelength Division Multiplexing)
-            description: Supports dense wavelengths for long-distance communication.
-            color: "#9933cc"
       - name: status
         kind: Dropdown
         optional: false
@@ -150,52 +81,121 @@ nodes:
             label: Decommissioned
             description: Decommissioned might be broken or not used anymore.
             color: "#ffd27f"
-      - name: serial
-        kind: Text
-        optional: true
-        order_weight: 1400
-      - name: distance
-        kind: Number
-        label: Distance (KM)
-        description: Maximum transmission distance supported by the SFP in kilometers.
-        order_weight: 1500
-        optional: true
+      - name: form_factor
+        kind: Dropdown
+        description: "The physical form factor of the SFP module."
+        order_weight: 1000
+        optional: false
+        choices:
+          - name: sfp
+            label: SFP
+            color: "#009933"
+          - name: sfp_plus
+            label: SFP+
+            color: "#cc66ff"
+          - name: qsfp
+            label: QSFP
+            color: "#6666ff"
+          - name: qsfp_plus
+            label: QSFP+
+            color: "#3366ff"
+          - name: qsfp28
+            label: QSFP28
+            color: "#336699"
+          - name: qsfp_dd
+            label: QSFP-DD
+            color: "#ff9900"
+          - name: cfp
+            label: CFP
+            color: "#cc3300"
+          - name: cfp2
+            label: CFP2
+            color: "#ff6600"
+          - name: cfp4
+            label: CFP4
+            color: "#b35900"
+          - name: xfp
+            label: XFP
+            color: "#6699ff"
+          - name: sfp56
+            label: SFP56
+            color: "#9966ff"
+          - name: qsfp56
+            label: QSFP56
+            color: "#9933cc"
+          - name: osfp
+            label: OSFP
+            color: "#0099cc"
     relationships:
       - name: interface
         peer: DcimInterface
         kind: Attribute
         optional: true
         cardinality: one
+        order_weight: 1200
       - name: spare_location
         peer: LocationHosting
         kind: Attribute
         optional: true
         cardinality: one
+        order_weight: 1500
       - name: manufacturer
         peer: OrganizationManufacturer
         cardinality: one
         kind: Attribute
-        order_weight: 1350
         optional: true
+        order_weight: 1350
+
+nodes:
+  - name: StandardSFP
+    namespace: Dcim
+    inherit_from:
+      - DcimGenericSFP
+    description: Standard SFP module for various types (e.g., LR, SR, T).
+    label: Standard SFP
+    icon: mdi:gpu
+    menu_placement: DcimGenericSFP
+
+  - name: BidiSFP
+    namespace: Dcim
+    inherit_from:
+      - DcimGenericSFP
+    description: "Bidirectional SFP supporting two wavelengths for single-fiber operation."
+    label: Bidirectional SFP
+    icon: lineicons:arrow-both-direction-vertical-1
+    menu_placement: DcimGenericSFP
+    attributes:
+      - name: wavelength_tx
+        label: "Transmit Wavelength (nm)"
+        kind: Number
+        optional: false
+        description: "Transmit wavelength in nm."
+        order_weight: 1175
+      - name: wavelength_rx
+        label: "Receive Wavelength (nm)"
+        kind: Number
+        optional: false
+        description: "Receive wavelength in nm."
+        order_weight: 1150
 
 extensions:
   nodes:
     - kind: DcimInterface
       relationships:
         - name: plugged_sfp
-          peer: DcimSFP
+          peer: DcimGenericSFP
           cardinality: one
           optional: true
     - kind: LocationHosting
       relationships:
         - name: spare_sfps
-          peer: DcimSFP
+          peer: DcimGenericSFP
           cardinality: many
           optional: true
     - kind: OrganizationManufacturer
       relationships:
         - name: sfps
           label: SFPs
-          peer: DcimSFP
+          peer: DcimGenericSFP
           cardinality: many
           optional: true

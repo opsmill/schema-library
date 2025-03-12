@@ -1,6 +1,13 @@
 ---
 extends: default
 
+ignore:
+  - ".venv/"
+  - "schema-library/"
+  - /.git
+  - /.github
+  - "/docs/node_modules/"
+
 rules:
   new-lines: disable
   comments-indentation: disable

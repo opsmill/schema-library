@@ -11,8 +11,6 @@ nodes:
     icon: mdi:cable-data
     human_friendly_id:
       - circuit_id__value
-    inherit_from:
-      - DcimConnector
     order_by:
       - circuit_id__value
     display_labels:
@@ -24,7 +22,7 @@ nodes:
       - name: description
         kind: Text
         optional: true
-      - name: type
+      - name: circuit_type
         kind: Dropdown
         description: Specifies the type of circuit.
         choices:
@@ -69,6 +67,71 @@ nodes:
         optional: false
         cardinality: one
         kind: Attribute
+      - name: location
+        label: Location
+        peer: LocationHosting
+        optional: true
+        cardinality: one
+        kind: Attribute
+        order_weight: 1500
+      - name: enpoints
+        peer: DcimCircuitEndpoint
+        optional: true
+        cardinality: many
+        kind: Component
+
+  - name: CircuitEndpoint
+    namespace: Dcim
+    description: A circuit endpoint, could be a position in a MMR...
+    label: Circuit Endpoint
+    inherit_from:
+      - DcimEndpoint
+    icon: mdi:ethernet
+    menu_placement: DcimCircuit
+    human_friendly_id:
+      - circuit__circuit_id__value
+      - name__value
+    uniqueness_constraints:
+      - [circuit, name__value]
+    order_by:
+      - name__value
+    display_labels:
+      - name__value
+    attributes:
+      - name: name
+        kind: Text
+        description: Name of the circuit endoint, could be a MMR position for instance.
+        order_weight: 1000
+      - name: status
+        kind: Dropdown
+        optional: true
+        choices:
+          - name: active
+            label: Active
+            description: Fully operational and currently in service.
+            color: "#7fbf7f"
+          - name: provisioning
+            label: Provisioning
+            description: In the process of being set up and configured.
+            color: "#ffff7f"
+          - name: maintenance
+            label: Maintenance
+            description: Undergoing routine maintenance or repairs.
+            color: "#ffd27f"
+          - name: drained
+            label: Drained
+            description: Temporarily taken out of service.
+            color: "#bfbfbf"
+      - name: description
+        kind: Text
+        optional: true
+    relationships:
+      - name: circuit
+        peer: DcimCircuit
+        order_weight: 900
+        optional: false
+        cardinality: one
+        kind: Parent
       - name: location
         label: Location
         peer: LocationHosting

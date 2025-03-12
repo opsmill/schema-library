@@ -1,0 +1,146 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+
+version: '1.0'
+
+nodes:
+  - name: LinecardType
+    namespace: Device
+    description: "Linecard Type information, detailing specifications such as part number and manufacturer."
+    label: "Linecard Type"
+    inherit_from:
+      - DeviceGenericModuleType
+    relationships:
+      - name: linecards
+        peer: InfraLinecard
+        cardinality: many
+        kind: Generic
+        description: "Linecards of this type."
+
+  - name: Linecard
+    namespace: Device
+    description: "A Linecard installed in a device, specifying slot, power status, and functionalities."
+    label: "Linecard"
+    icon: "bi:pci-card"
+    inherit_from:
+      - DeviceGenericModule
+    uniqueness_constraints:
+      - ["serial_number__value"]
+      #  # Only one Linecard per Device Slot
+      # - ["device", "slot__value"]
+    human_friendly_id:
+      - device__name__value
+      - slot__value
+    order_by:
+      - device__name__value
+      - slot__value
+    display_labels:
+      - serial_number__value
+    attributes:
+      - name: slot
+        kind: Number
+        description: "The slot number where the Linecard is installed within the device"
+        order_weight: 1050
+      - name: bng_enabled
+        label: BNG Enabled
+        description: "BNG activated or deactivated on the Linecard"
+        kind: Boolean
+        optional: true
+        default_value: false
+        order_weight: 1400
+    relationships:
+      - name: linecard_type
+        label: Linecard Type
+        peer: DeviceLinecardType
+        optional: false
+        cardinality: one
+        kind: Attribute
+        order_weight: 1150
+      - name: pics
+        label: PICs
+        peer: DevicePic
+        optional: true
+        cardinality: many
+        # As there is not a lot of Attributes and it will stay a low number, using Attribute instead of Component
+        kind: Attribute
+        order_weight: 1500
+
+  # PIC (Physical Interface Card) model, representing submodules in the Linecard
+  - name: Pic
+    namespace: Device
+    description: "Physical Interface Card (PIC) installed in the Linecard, containing multiple ports."
+    label: "PIC"
+    uniqueness_constraints:
+      # Only one PIC per slot within a Linecard
+      - ["linecard", "slot__value"]
+    human_friendly_id:
+      - linecard__serial_number__value
+      - slot__value
+    display_labels:
+      - slot__value
+    order_by:
+      - linecard__serial_number__value
+      - slot__value
+    attributes:
+      - name: slot
+        kind: Number
+        description: "Slot number of the PIC within the Linecard"
+        order_weight: 1200
+    relationships:
+      - name: linecard
+        label: Linecard
+        peer: DeviceLinecard
+        identifier: linecard__pics
+        optional: false
+        cardinality: one
+        kind: Parent
+        order_weight: 1000
+      - name: ports
+        label: Ports
+        peer: InfraPort
+        optional: true
+        cardinality: many
+        kind: Component
+        order_weight: 1100
+
+  # Port model representing individual ports on a PIC
+  - name: Port
+    namespace: Device
+    description: "A network port on a PIC, specifying speed and port number."
+    label: "Port"
+    uniqueness_constraints:
+      - ["pic", "port_number__value"]  # Each port must be unique within a PIC
+    human_friendly_id:
+      - pic__slot__value
+      - port_number__value
+    display_labels:
+      - port_number__value
+    order_by:
+      - pic__slot__value
+      - port_number__value
+    attributes:
+      - name: port_number
+        kind: Number
+        description: "Port number on the PIC"
+        order_weight: 1100
+      - name: speed
+        kind: Dropdown
+        description: "Speed of the port"
+        choices:
+          - name: 10g
+            label: 10Gbps
+            description: "10 Gigabit per second"
+            color: "#A9CCE3"
+          - name: 100g
+            label: 100Gbps
+            description: "100 Gigabit per second"
+            color: "#9fbdf2"
+        order_weight: 1200
+    relationships:
+      - name: pic
+        label: PIC
+        peer: DevicePic
+        optional: false
+        cardinality: one
+        kind: Parent
+        order_weight: 1000

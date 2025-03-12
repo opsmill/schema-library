@@ -13,6 +13,7 @@ concurrency:
 
 env:
   GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
+  VALE_VERSION: "3.7.1"
 
 jobs:
   files-changed:
@@ -20,16 +21,60 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
+      documentation: ${{ steps.changes.outputs.documentation_all }}
+      python: ${{ steps.changes.outputs.python_all }}
       yaml: ${{ steps.changes.outputs.yaml_all }}
     steps:
       - name: "Check out repository code"
         uses: "actions/checkout@v4"
       - name: Check for file changes
-        uses: dorny/paths-filter@v3
+        uses: opsmill/paths-filter@v3.0.2
         id: changes
         with:
           token: ${{ github.token }}
           filters: .github/file-filters.yml
+
+  python-lint:
+    if: needs.files-changed.outputs.python == 'true'
+    needs: ["files-changed"]
+    runs-on: "ubuntu-latest"
+    strategy:
+      matrix:
+        python-version:
+          - "3.12"
+        poetry-version:
+          - "1.8.5"
+    timeout-minutes: 5
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v4"
+
+      - name: "Set up Python ${{ matrix.python-version }}"
+        uses: "actions/setup-python@v5"
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: "Install Poetry ${{ matrix.poetry-version }}"
+        uses: "snok/install-poetry@v1"
+        with:
+          version: ${{ matrix.poetry-version }}
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+      - name: "Setup Python environment"
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry env use ${{ matrix.python-version }}
+      - name: "Install dependencies"
+        run: "poetry install --no-interaction --no-ansi --with dev"
+
+      - name: "Linting: ruff check"
+        run: "poetry run ruff check ."
+      - name: "Linting: ruff format"
+        run: "poetry run ruff format --check --diff ."
+      - name: "Mypy Tests"
+        run: "poetry run mypy --show-error-codes ."
+      - name: "Pylint Tests"
+        run: "poetry run pylint --ignore .venv ."
 
   yaml-lint:
     name: Run yaml lint
@@ -45,7 +90,6 @@ jobs:
       - name: "Linting: yamllint"
         run: "yamllint -s ."
 
-  # FIXME: This should be triggered only when some YAML schema changes...
   schema-test:
     name: Test all schema files
     needs:
@@ -54,7 +98,9 @@ jobs:
     if: |
       always() && !cancelled() &&
       !contains(needs.*.result, 'failure') &&
-      !contains(needs.*.result, 'cancelled')
+      !contains(needs.*.result, 'cancelled') &&
+      needs.files-changed.outputs.yaml == 'true'
+
     runs-on:
       group: huge-runners
     env:
@@ -81,7 +127,7 @@ jobs:
         run: echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
 
       - name: Initialize Infrahub
-        run: invoke start
+        run: invoke schemas.start
 
       - name: Set infrahub address
         run: |
@@ -92,11 +138,67 @@ jobs:
         run: echo TEST_START_TIME=$(date +%s)000 >> $GITHUB_ENV
 
       - name: Test base schema files
-        run: invoke load-schema-base
+        run: invoke schemas.load-schema-base
 
       - name: Test extensions schema files
-        run: invoke load-schema-extensions
+        run: invoke schemas.load-schema-extensions
 
       - name: "Clear docker environment and force vmagent to stop"
         if: always()
         run: docker compose -p $INFRAHUB_BUILD_NAME down -v --remove-orphans --rmi local
+
+  documentation:
+    defaults:
+      run:
+        working-directory: ./docs
+    if: |
+      always() && !cancelled() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      needs.files-changed.outputs.documentation == 'true'
+    needs: ["files-changed", "yaml-lint", "python-lint"]
+    runs-on: "ubuntu-22.04"
+    timeout-minutes: 5
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v4"
+        with:
+          submodules: true
+      - name: Install NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: docs/package-lock.json
+      - name: "Install dependencies"
+        run: npm install
+      - name: "Setup Python environment"
+        run: "pip install invoke toml"
+      - name: "Build docs website"
+        run: "invoke docusaurus.docs"
+
+  validate-documentation-style:
+    if: |
+      always() && !cancelled() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      needs.files-changed.outputs.documentation == 'true'
+    needs: ["files-changed", "yaml-lint", "python-lint"]
+    runs-on: "ubuntu-22.04"
+    timeout-minutes: 5
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v4"
+        with:
+          submodules: true
+
+      # The official GitHub Action for Vale doesn't work, installing manually instead:
+      # https://github.com/errata-ai/vale-action/issues/103
+      - name: Download Vale
+        run: |
+          curl -sL "https://github.com/errata-ai/vale/releases/download/v${VALE_VERSION}/vale_${VALE_VERSION}_Linux_64-bit.tar.gz" -o vale.tar.gz
+          tar -xzf vale.tar.gz
+        env:
+          VALE_VERSION: ${{ env.VALE_VERSION }}
+      - name: "Validate documentation style"
+        run: ./vale --config=.vale.ini --glob='!{docs/docs/schema-library.*}' ./docs/docs $(find ./docs/docs -type f \( -name "*.mdx" -o -name "*.md" \) )

@@ -108,7 +108,7 @@ nodes:
         description: Name of the classifier.
         unique: true
         order_weight: 1000
-      - name: type
+      - name: classifier_type
         kind: Dropdown
         description: Type of classifier (DSCP, EXP, etc.).
         choices:

@@ -1,13 +1,26 @@
-# 🧩 Hosting cluster
+# Hosting Cluster
 
 A rather generic cluster built with compute units (e.g. servers) and able to host VMs.
 
+Dependencies: `base, extensions.cluster, extensions.compute`
+
+## hosting_cluster
+
+- **Version:** 1.0
+
 ## Nodes
 
-- ClusterHosting
+### Hosting
 
-## Dependencies
+- **Description:** A cluster hosting virtual machines.
+- **Label:** Hosting Cluster
+- **Icon:** mdi:dots-hexagon
+- **Menu Placement:** ClusterGeneric
+- **Include in Menu:** ❌
 
-- Base
-- Cluster
-- Compute
+#### Attributes
+
+| name | kind | order_weight | description | choices | optional |
+| ---- | ---- | ------------ | ----------- | ------- | -------- |
+| cluster\_type | Dropdown | 1200 | Type of the cluster\. | \`aws, kvm, gcp, vmware\` |  |
+| status | Dropdown | 1300 |  | \`active, provisioning, maintenance, drained\` | False |

@@ -1,0 +1,108 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+---
+version: '1.0'
+
+nodes:
+  - name: Group
+    namespace: User
+    description: "User Group"
+    label: "User Groups"
+    icon: "iconoir:group"
+    display_labels:
+      - name__value
+    order_by:
+      - name__value
+    uniqueness_constraints:
+      - ["name__value"]
+    human_friendly_id:
+      - "name__value"
+    attributes:
+      - name: name
+        kind: Text
+        order_weight: 1000
+      - name: description
+        kind: Text
+        optional: true
+        order_weight: 1100
+      - name: idle_timeout
+        label: Idle Timeout (s)
+        kind: Number
+        order_weight: 1300
+      - name: permissions
+        kind: Dropdown
+        optional: false
+        choices:
+          - name: admin
+            description: "All rights on device."
+            color: "#E6E6FA"  # lavender
+          - name: operator
+            description: "Operator right on configuration."
+            color: "#E6E6FA"  # lavender
+          - name: read-only
+            description: "Read only right on configuration."
+            color: "#E6E6FA"  # lavender
+        order_weight: 1200
+
+  - name: Account
+    namespace: User
+    description: "User login and authentication"
+    label: "User Account"
+    icon: "mdi:account-key"
+    display_labels:
+      - name__value
+    order_by:
+      - name__value
+    uniqueness_constraints:
+      - ["name__value"]
+    human_friendly_id:
+      - "name__value"
+    attributes:
+      - name: name
+        label: Username
+        kind: Text
+        optional: false
+        description: "The login username"
+        order_weight: 1000
+      - name: full_name
+        kind: Text
+        optional: true
+        description: "Full name of the account"
+        order_weight: 1100
+      - name: ssh_key
+        kind: Password
+        optional: true
+        description: "SSH key for secure access"
+        order_weight: 1300
+      - name: password
+        kind: Password
+        optional: true
+        description: "Password for login (alternative to SSH key)"
+        order_weight: 1400
+      - name: mfa_enabled
+        kind: Boolean
+        default_value: false
+        description: "Whether multi-factor authentication is enabled"
+        order_weight: 1500
+    relationships:
+      - name: user_group
+        peer: UserGroup
+        cardinality: one
+        optional: false
+        kind: Attribute
+        order_weight: 1200
+      - name: organization
+        peer: OrganizationGeneric
+        optional: false
+        cardinality: one
+        kind: Parent
+
+extensions:
+  nodes:
+    # Organization Extensions
+    - kind: OrganizationGeneric
+      relationships:
+        - name: accounts
+          kind: Component
+          peer: UserAccount
+          description: "List of Accounts under this organization"
+          cardinality: many

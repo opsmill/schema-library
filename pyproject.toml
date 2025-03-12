@@ -7,8 +7,49 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10, < 3.13"
-infrahub-sdk = {version = "^0,>=0.9.1", extras = ["all"]}
+infrahub-sdk = { version = "^1", extras = ["all"]}
 invoke = "^2.1.2"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.9.1"
+yamllint = "^1.35.1"
+mypy = "^1.14.1"
+pylint = "^3.3.4"
+vale = "^3.9.4.0"
+
+[tool.pylint.messages_control]
+# Line length is enforced by Black, so pylint doesn't need to check it.
+# Pylint and Black disagree about how to format multi-line arrays; Black wins.
+# Rules already covered by RUFF
+# - too-many-statements
+# - unused-argument
+disable = """,
+    line-too-long,
+    missing-module-docstring,
+    missing-function-docstring,
+    missing-class-docstring,
+    consider-using-from-import,
+    invalid-name,
+    too-many-arguments,
+    too-many-locals,
+    keyword-arg-before-vararg,
+    too-few-public-methods,
+    too-many-instance-attributes,
+    too-many-statements,
+    fixme,
+    consider-using-f-string,
+    protected-access,
+    import-self,
+    wrong-import-order,
+    multiple-statements,
+    unused-argument,
+    """
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

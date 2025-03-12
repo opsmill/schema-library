@@ -14,7 +14,7 @@ nodes:
       - VirtualizationHostVirtualMachine # Means we can get VM running on this one
       - ClusterGenericComputeUnitNodes # Means it's built out of regular compute unit (e.g. server)
     attributes:
-      - name: type
+      - name: cluster_type
         kind: Dropdown
         order_weight: 1200
         description: Type of the cluster.
