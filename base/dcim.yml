@@ -32,6 +32,7 @@ generics:
         peer: DcimInterface
         optional: true
         cardinality: many
+        identifier: device__interface
         kind: Component
       - name: tags
         peer: BuiltinTag
@@ -125,7 +126,7 @@ generics:
   - name: Interface
     namespace: Dcim
     description: "Generic Network Interface"
-    label: "Interface"
+    label: Interface
     include_in_menu: false
     display_labels:
       - name__value
@@ -133,10 +134,10 @@ generics:
       - device__name__value
       - name__value
     uniqueness_constraints:
-      - ["device", "name__value"]
+      - [device, name__value]
     human_friendly_id:
-      - "device__name__value"
-      - "name__value"
+      - device__name__value
+      - name__value
     attributes:
       - name: name
         kind: Text
@@ -223,7 +224,7 @@ generics:
     relationships:
       - name: device
         peer: DcimGenericDevice
-        identifier: "device__interface"
+        identifier: device__interface
         optional: false
         cardinality: one
         kind: Parent
@@ -293,7 +294,6 @@ generics:
       - name: sub_interfaces
         label: "Sub-interface(s)"
         peer: InterfaceVirtual
-        direction: outbound
         identifier: "sub__interface"
         optional: true
         cardinality: many
@@ -425,7 +425,7 @@ nodes:
     label: Network Device
     description: A configurable network device for managing and directing data traffic, including routers, switches...
     icon: clarity:network-switch-solid
-    generate_template: true
+    # generate_template: true
     namespace: Dcim
     inherit_from:
       - CoreArtifactTarget
@@ -494,15 +494,6 @@ nodes:
       - DcimEndpoint
       - InterfaceHasSubInterface
     include_in_menu: false
-    relationships:
-      - name: lag_parent
-        label: "LAG"
-        peer: InterfaceLag
-        optional: true
-        cardinality: one
-        kind: Attribute
-        description: "LAG Interface using this Physical interface"
-        order_weight: 1800
 
   - name: Virtual
     namespace: Interface
@@ -517,58 +508,7 @@ nodes:
     relationships:
       - name: parent_interface
         peer: InterfaceHasSubInterface
-        optional: false
         cardinality: one
         kind: Attribute
         identifier: "sub__interface"
-        direction: inbound
         description: "Parent interface to which this sub-interface belongs"
-
-  - name: Lag
-    namespace: Interface
-    label: LAG Interface
-    description: "LAG interface"
-    inherit_from:
-      - DcimInterface
-      - InterfaceLayer2
-      - InterfaceLayer3
-      - InterfaceHasSubInterface
-    include_in_menu: false
-    attributes:
-      - name: lacp_rate
-        label: "LACP Rate"
-        kind: Dropdown
-        choices:
-          - name: slow
-            label: Slow
-            color: "#E6E6FA" # lavender
-          - name: fast
-            label: Fast
-            color: "#E6E6FA" # lavender
-        default_value: fast
-        description: "LACP rate for the aggregated interface"
-        order_weight: 1700
-      - name: lacp_mode
-        label: LACP Mode
-        kind: Dropdown
-        choices:
-          - name: active
-            label: Active
-            color: "#E6E6FA" # lavender
-          - name: passive
-            label: Passive
-            color: "#E6E6FA" # lavender
-          - name: disabled
-            label: Disabled
-            color: "#E6E6FA" # lavender
-        description: "LACP mode for the aggregated interface"
-        default_value: active
-        order_weight: 1750
-    relationships:
-      - name: lag_members
-        label: "Member(s)"
-        peer: InterfacePhysical
-        cardinality: many
-        kind: Attribute
-        description: "Physical Interfaces that are members of this aggregate"
-        order_weight: 1800
