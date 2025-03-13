@@ -70,14 +70,14 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- | ------------ |
 | vlan | IpamVLAN | True | one | Attribute | 1400 |
 
-### DcimInterfaceL2
+### InterfaceLayer2
 
 #### Relationships
 
 | name | label | peer | optional | cardinality | kind | identifier |
 | ---- | ----- | ---- | -------- | ----------- | ---- | ---------- |
-| untagged\_vlan | Untagged VLAN | IpamVLAN | True | one | Component | interface\_l2\_\_untagged\_vlan |
-| tagged\_vlan | Tagged VLANs | IpamVLAN | True | many | Component | interface\_l2\_\_tagged\_vlan |
+| untagged\_vlan | Untagged VLAN | IpamVLAN | True | one | Generic | interface\_l2\_\_untagged\_vlan |
+| tagged\_vlan | Tagged VLANs | IpamVLAN | True | many | Generic | interface\_l2\_\_tagged\_vlan |
 
 ### LocationHosting
 
