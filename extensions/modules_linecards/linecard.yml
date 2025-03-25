@@ -1,7 +1,7 @@
 ---
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 
-version: '1.0'
+version: "1.0"
 
 nodes:
   - name: LinecardType
@@ -12,7 +12,7 @@ nodes:
       - DeviceGenericModuleType
     relationships:
       - name: linecards
-        peer: InfraLinecard
+        peer: DeviceLinecard
         cardinality: many
         kind: Generic
         description: "Linecards of this type."
@@ -109,7 +109,7 @@ nodes:
     description: "A network port on a PIC, specifying speed and port number."
     label: "Port"
     uniqueness_constraints:
-      - ["pic", "port_number__value"]  # Each port must be unique within a PIC
+      - ["pic", "port_number__value"] # Each port must be unique within a PIC
     human_friendly_id:
       - pic__slot__value
       - port_number__value
