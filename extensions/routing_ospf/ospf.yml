@@ -79,8 +79,7 @@ nodes:
     uniqueness_constraints:
       - ["ospf", "interface"]
     human_friendly_id:
-      - "ospf__description__value"
-      - "interface__name__value"
+      - "description__value"
     attributes:
       # Could be computed later on based on OSPF Instance / Interface Name
       - name: description
