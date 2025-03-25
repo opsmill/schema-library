@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 import yaml  # type: ignore
 from invoke import Context, task  # type: ignore
 
@@ -14,9 +15,7 @@ DOCUMENTATION_DIRECTORY = CURRENT_DIRECTORY.parent.resolve() / "docs"
 METADATA_FILE = CURRENT_DIRECTORY.parent / ".metadata.yml"
 
 
-def _parse_and_load_extensions(
-    context: Context, extensions_path: Path, allowed_to_fail: bool
-) -> None:
+def _parse_and_load_extensions(context: Context, extensions_path: Path, allowed_to_fail: bool) -> None:
     # Looping over all entries in extensions dir
     for entry in os.listdir(extensions_path):
         # Make sure it's a dir
@@ -59,7 +58,7 @@ def load_schema_extensions(context: Context) -> None:
 
     # Third loop: all the dependencies are loaded it MUST work
     print("Loading all extensions third time ...")
-    _parse_and_load_extensions(context, extensions_path, True)
+    _parse_and_load_extensions(context, extensions_path, False)
 
     # FIXME: If we have 4 degrees of dependencies it won't work
     print("All good!")
@@ -165,17 +164,11 @@ def generate_readme(schema, extension_dir: Path) -> list:
         if node.get("icon"):
             node_markdown.append(f"- **Icon:** {node.get('icon', '')}")
         if node.get("menu_placement"):
-            node_markdown.append(
-                f"- **Menu Placement:** {node.get('menu_placement', '')}"
-            )
-        node_markdown.append(
-            f"- **Include in Menu:** {'✅' if node.get('include_in_menu') else '❌'}\n"
-        )
+            node_markdown.append(f"- **Menu Placement:** {node.get('menu_placement', '')}")
+        node_markdown.append(f"- **Include in Menu:** {'✅' if node.get('include_in_menu') else '❌'}\n")
         if node.get("order_by") or node.get("uniqueness_constraints"):
             node_markdown.append("#### Ordering and Constraints\n")
-            node_markdown.append(
-                f"- **Order By:**{', '.join(node.get('order_by', []))}"
-            )
+            node_markdown.append(f"- **Order By:**{', '.join(node.get('order_by', []))}")
             node_markdown.append(
                 f"- **Uniqueness Constraints:**{', '.join([' + '.join(c) for c in node.get('uniqueness_constraints', [])])}\n"
             )
@@ -243,9 +236,7 @@ def build(context: Context) -> None:
     consolidated_doc = schema_docs_dir / "schema-library.mdx"
 
     all_content = []
-    all_content.append(
-        "---\ntitle: Schema Library Documentation\n---\n<!-- markdownlint-disable-file MD025 -->\n"
-    )
+    all_content.append("---\ntitle: Schema Library Documentation\n---\n<!-- markdownlint-disable-file MD025 -->\n")
 
     with open(METADATA_FILE, "r", encoding="utf-8") as f:
         schema = yaml.safe_load(f)
