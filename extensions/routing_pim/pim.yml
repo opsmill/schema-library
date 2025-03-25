@@ -64,8 +64,7 @@ nodes:
     uniqueness_constraints:
       - ["pim", "interface"]
     human_friendly_id:
-      - "pim__description__value"
-      - "interface__name__value"
+      - "description__value"
     attributes:
       # Could be computed later on based on PIM Instance / Interface Name
       - name: description
