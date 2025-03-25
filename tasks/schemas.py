@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 import yaml  # type: ignore
 from invoke import Context, task  # type: ignore
 
@@ -59,7 +60,7 @@ def load_schema_extensions(context: Context) -> None:
 
     # Third loop: all the dependencies are loaded it MUST work
     print("Loading all extensions third time ...")
-    _parse_and_load_extensions(context, extensions_path, True)
+    _parse_and_load_extensions(context, extensions_path, False)
 
     # FIXME: If we have 4 degrees of dependencies it won't work
     print("All good!")
