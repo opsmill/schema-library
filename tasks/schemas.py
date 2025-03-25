@@ -52,14 +52,20 @@ def load_schema_extensions(context: Context) -> None:
     # require developer to explicitly maintain it
 
     # First/second loop: here we allow to fail so it will load as much as it can
-    print("Loading all extensions once ...")
+    print("#" * 80)
+    print("#  Loading all extensions once ...  #")
+    print("#" * 80)
     _parse_and_load_extensions(context, extensions_path, True)
 
-    print("Loading all extensions second time ...")
+    print("#" * 80)
+    print("#  Loading all extensions second time ...  #")
+    print("#" * 80)
     _parse_and_load_extensions(context, extensions_path, True)
 
     # Third loop: all the dependencies are loaded it MUST work
-    print("Loading all extensions third time ...")
+    print("#" * 80)
+    print("#  Loading all extensions third time ...  #")
+    print("#" * 80)
     _parse_and_load_extensions(context, extensions_path, False)
 
     # FIXME: If we have 4 degrees of dependencies it won't work
