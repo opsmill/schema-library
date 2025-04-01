@@ -14,7 +14,7 @@ MAIN_DIRECTORY_PATH = Path(__file__).parent
 DOCUMENTATION_DIRECTORY = CURRENT_DIRECTORY.parent.resolve() / "docs"
 METADATA_FILE = CURRENT_DIRECTORY.parent / ".metadata.yml"
 # Flag if we need to test experimental section or not
-TEST_EXPERIMENTAL = os.getenv("TEST_EXPERIMENTAL", "False")
+TEST_EXPERIMENTAL = os.getenv("TEST_EXPERIMENTAL", None)
 
 
 def _load_extension(context: Context, path: Path) -> None:
@@ -22,7 +22,7 @@ def _load_extension(context: Context, path: Path) -> None:
     # TODO: here if in extensions folder we have a dir without schema it will fail
     if os.path.isdir(path):
         print("#" * 80)
-        print(f"🏗️ Loading `{path}`")
+        print(f"🏗️  Loading `{path}`")
 
         # Load extensions
         # TODO: Maybe improve what we return here...
