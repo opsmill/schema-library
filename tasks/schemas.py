@@ -1,4 +1,5 @@
 import os
+from collections import defaultdict, deque
 from pathlib import Path
 
 import yaml  # type: ignore
@@ -11,26 +12,76 @@ COMPOSE_COMMAND = f"curl https://infrahub.opsmill.io/{VERSION if VERSION else ''
 CURRENT_DIRECTORY = Path(__file__).parent.resolve()
 MAIN_DIRECTORY_PATH = Path(__file__).parent
 DOCUMENTATION_DIRECTORY = CURRENT_DIRECTORY.parent.resolve() / "docs"
-
 METADATA_FILE = CURRENT_DIRECTORY.parent / ".metadata.yml"
+# Flag if we need to test experimental section or not
+TEST_EXPERIMENTAL = os.getenv("TEST_EXPERIMENTAL", None)
 
 
-def _parse_and_load_extensions(
-    context: Context, extensions_path: Path, allowed_to_fail: bool
-) -> None:
-    # Looping over all entries in extensions dir
-    for entry in os.listdir(extensions_path):
-        # Make sure it's a dir
-        # TODO: here if in extensions folder we have a dir without schema it will fail
-        if os.path.isdir(extensions_path / entry):
-            print(f"Loading `{entry}`")
+def _load_extension(context: Context, path: Path) -> None:
+    # Make sure it's a dir
+    # TODO: here if in extensions folder we have a dir without schema it will fail
+    if os.path.isdir(path):
+        print("#" * 80)
+        print(f"🏗️  Loading `{path}`")
 
-            # Load extensions
-            # TODO: Maybe improve what we return here...
-            context.run(
-                f"infrahubctl schema load {extensions_path / entry}",
-                warn=allowed_to_fail,
-            )
+        # Load extensions
+        # TODO: Maybe improve what we return here...
+        context.run(f"infrahubctl schema load {path}")
+        print("#" * 80)
+
+
+def _load_yaml_metadata():
+    with open(METADATA_FILE, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+
+# Build the dependency `graph`
+# i.e. `extension_abc` => list of all extensions **depending** on it
+# Build `all_extensions` list
+# i.e. `extension_abc` => list of all dependencies
+def _build_dependency_graph(metadata):
+    print("🌱 Building dependency graph...")
+    graph = defaultdict(list)  # Graph of dependencies
+    all_extensions = defaultdict(dict)  # Dict of all extension with dependencies
+
+    # Parse the metadata list
+    for key, value in metadata.items():
+        dependencies = value.get("dependencies", [])
+        for dep in dependencies:
+            graph[dep].append(key)
+        all_extensions[key] = dependencies
+
+    return graph, all_extensions
+
+
+# Topological sort to determine a safe load order
+def _resolve_load_order(graph, all_extensions):
+    load_order = []  # List to store the final load order
+
+    # Queue here is used to keep track of extension to proceed
+    queue = deque(["base"])  # Start with base anyway
+
+    # While we have something to proceed
+    while queue:
+        # Pick first element in the queue and add it to the result
+        current = queue.popleft()
+        load_order.append(current)
+
+        # We will update dependencies that we cleared an extension
+        for dependency in graph[current]:
+            # As we loaded current, remove it from the dependency list
+            all_extensions[dependency].remove(current)
+
+            # If it happens the current was the last needed for a given
+            if len(all_extensions[dependency]) == 0:
+                # We add it to the queue to be proceed!
+                queue.append(dependency)
+
+    if len(load_order) != len(all_extensions):
+        # If not all nodes are processed, there's a cycle
+        raise ValueError("Cycle detected in dependency graph!")
+
+    return load_order
 
 
 @task
@@ -39,31 +90,25 @@ def start(context: Context) -> None:
 
 
 @task
-def load_schema_base(context: Context) -> None:
-    base_path = Path("./base")
-    context.run(f"infrahubctl schema load {base_path}")
+def load_all_schemas(context: Context) -> None:
+    # Parse metadata file
+    metadata = _load_yaml_metadata()
 
+    # Build dependency graph
+    graph, all_extensions = _build_dependency_graph(metadata)
 
-@task
-def load_schema_extensions(context: Context) -> None:
-    extensions_path = Path("./extensions")
+    # Determine the correct order to load extensions
+    load_order = _resolve_load_order(graph, all_extensions)
 
-    # FIXME: Find a more efficient way to deal with dependencies that doesn't
-    # require developer to explicitly maintain it
+    # Load each extension respecting dependencies
+    for extension in load_order:
+        # If it's experimental extension and flag is false we skip
+        if extension.startswith("experimental/") and not TEST_EXPERIMENTAL:
+            continue
 
-    # First/second loop: here we allow to fail so it will load as much as it can
-    print("Loading all extensions once ...")
-    _parse_and_load_extensions(context, extensions_path, True)
+        _load_extension(context, Path(extension))
 
-    print("Loading all extensions second time ...")
-    _parse_and_load_extensions(context, extensions_path, True)
-
-    # Third loop: all the dependencies are loaded it MUST work
-    print("Loading all extensions third time ...")
-    _parse_and_load_extensions(context, extensions_path, False)
-
-    # FIXME: If we have 4 degrees of dependencies it won't work
-    print("All good!")
+    print("All good! ✨")
 
 
 @task

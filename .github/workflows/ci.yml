@@ -137,11 +137,8 @@ jobs:
       - name: "Store start time"
         run: echo TEST_START_TIME=$(date +%s)000 >> $GITHUB_ENV
 
-      - name: Test base schema files
-        run: invoke schemas.load-schema-base
-
-      - name: Test extensions schema files
-        run: invoke schemas.load-schema-extensions
+      - name: Load all schemas files
+        run: invoke schemas.load-all-schemas
 
       - name: "Clear docker environment and force vmagent to stop"
         if: always()

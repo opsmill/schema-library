@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
-version: '1.0'
+version: "1.0"
 
 nodes:
   - name: RoutingEngineType
@@ -11,7 +11,7 @@ nodes:
       - DeviceGenericModuleType
     relationships:
       - name: routing_engines
-        peer: InfraRoutingEngine
+        peer: DeviceRoutingEngine
         cardinality: many
         kind: Generic
         description: "Routing engines of this type."
@@ -49,7 +49,7 @@ nodes:
     relationships:
       - name: routing_engine_type
         label: RE Type
-        peer: InfraRoutingEngineType
+        peer: DeviceRoutingEngineType
         optional: false
         cardinality: one
         kind: Attribute
