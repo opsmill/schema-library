@@ -30,12 +30,12 @@ The base schemas serve as the foundation for every single schema extension you m
 
 #### Relationships
 
-| name | peer | optional | cardinality | kind | order_weight | label |
-| ---- | ---- | -------- | ----------- | ---- | ------------ | ----- |
-| interfaces | DcimInterface | True | many | Component |  |  |
-| tags | BuiltinTag | True | many | Attribute | 2000 |  |
-| primary\_address | IpamIPAddress | True | one | Attribute | 1700 | Primary IP Address |
-| platform | DcimPlatform | True | one | Attribute | 1250 |  |
+| name | peer | optional | cardinality | identifier | kind | order_weight | label |
+| ---- | ---- | -------- | ----------- | ---------- | ---- | ------------ | ----- |
+| interfaces | DcimInterface | True | many | device\_\_interface | Component |  |  |
+| tags | BuiltinTag | True | many |  | Attribute | 2000 |  |
+| primary\_address | IpamIPAddress | True | one |  | Attribute | 1700 | Primary IP Address |
+| platform | DcimPlatform | True | one |  | Attribute | 1250 |  |
 
 ### PhysicalDevice
 
@@ -56,36 +56,6 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ---- | -------- | ----------- | ---- | ------------ | ----- |
 | device\_type | DcimDeviceType | True | one | Attribute | 1200 |  |
 | location | LocationHosting | False | one | Attribute | 1500 | Location |
-
-### Interface
-
-- **Description:** Generic Network Interface.
-- **Label:** Interface
-- **Icon:** mdi:ethernet
-- **Menu Placement:** DcimGenericDevice
-- **Include in Menu:** ✅
-
-#### Ordering and Constraints
-
-- **Order By:**device__name__value, name__value
-- **Uniqueness Constraints:**device + name__value
-
-#### Attributes
-
-| name | kind | order_weight | optional | label | default_value |
-| ---- | ---- | ------------ | -------- | ----- | ------------- |
-| name | Text | 1000 |  |  |  |
-| description | Text | 1100 | True |  |  |
-| speed | Number | 1400 |  |  |  |
-| mtu | Number | 1500 |  | MTU | 1500 |
-| enabled | Boolean | 1200 |  |  | True |
-
-#### Relationships
-
-| name | peer | optional | cardinality | kind |
-| ---- | ---- | -------- | ----------- | ---- |
-| device | DcimGenericDevice | False | one | Parent |
-| tags | BuiltinTag | True | many | Attribute |
 
 ### Endpoint
 
@@ -108,6 +78,76 @@ The base schemas serve as the foundation for every single schema extension you m
 | name | peer | optional | cardinality | order_weight | kind |
 | ---- | ---- | -------- | ----------- | ------------ | ---- |
 | connected\_endpoints | DcimEndpoint | True | many | 1500 | Generic |
+
+### Interface
+
+- **Description:** Generic Network Interface
+- **Label:** Interface
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**device__name__value, name__value
+- **Uniqueness Constraints:**device + name__value
+
+#### Attributes
+
+| name | kind | description | order_weight | optional | label | default_value | choices |
+| ---- | ---- | ----------- | ------------ | -------- | ----- | ------------- | ------- |
+| name | Text | Name of the interface | 1000 |  |  |  | \`\` |
+| description | Text | A brief description of the interface | 1100 | True |  |  | \`\` |
+| mtu | Number |  | 1300 |  | MTU | 1514 | \`\` |
+| status | Dropdown | The status of the interface | 1200 |  |  | active | \`provisioning, free, active, maintenance, disabled, deleted, outage\` |
+| role | Dropdown | The role of the interface in the network | 1250 | True |  |  | \`lag, core, cust, access, management, peering, upstream\` |
+
+#### Relationships
+
+| name | peer | identifier | optional | cardinality | kind | order_weight |
+| ---- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
+| device | DcimGenericDevice | device\_\_interface | False | one | Parent | 1025 |
+| tags | BuiltinTag |  | True | many | Attribute | 3000 |
+
+### Layer2
+
+- **Description:** Layer 2 specific attributes for network interfaces
+- **Label:** Layer 2 Interface
+- **Include in Menu:** ❌
+
+#### Attributes
+
+| name | label | kind | optional | choices | description | order_weight |
+| ---- | ----- | ---- | -------- | ------- | ----------- | ------------ |
+| l2\_mode | Layer2 Mode | Dropdown | True | \`access, trunk, trunk\_all\` | Layer 2 mode of the interface | 1500 |
+
+### Layer3
+
+- **Description:** Layer 3 specific attributes for network interfaces
+- **Label:** Layer 3 Interface
+- **Include in Menu:** ❌
+
+#### Attributes
+
+| name | label | kind | description | order_weight | optional |
+| ---- | ----- | ---- | ----------- | ------------ | -------- |
+| dot1q\_id | VLAN ID \(dot1q\) | Number | Dot1Q VLAN ID | 1600 | True |
+| mac\_address | Mac Address | Text |  | 1550 | True |
+
+#### Relationships
+
+| name | label | peer | cardinality | kind | optional | description | order_weight |
+| ---- | ----- | ---- | ----------- | ---- | -------- | ----------- | ------------ |
+| ip\_addresses | IP Addresses | IpamIPAddress | many | Attribute | True | List of IP addresses associated with the interface | 1150 |
+
+### HasSubInterface
+
+- **Description:** A generic interface that can have sub-interfaces
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | label | peer | identifier | optional | cardinality | kind | description | order_weight |
+| ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ----------- | ------------ |
+| sub\_interfaces | Sub\-interface\(s\) | InterfaceVirtual | sub\_\_interface | True | many | Attribute | Sub\-interfaces of this interface | 1750 |
 
 ## Nodes
 
@@ -187,52 +227,23 @@ The base schemas serve as the foundation for every single schema extension you m
 | status | Dropdown | False | 1100 | \`active, provisioning, maintenance, drained\` |
 | role | Dropdown | True | 1400 | \`core, edge, cpe, spine, leaf, tor\` |
 
-### InterfaceL3
+### Physical
 
-- **Description:** Network Layer 3 Interface
-- **Label:** Interface L3
-- **Icon:** mdi:ethernet
-- **Menu Placement:** DcimInterface
+- **Description:** Physical network port on a device
+- **Label:** Physical Interface
 - **Include in Menu:** ❌
 
-#### Ordering and Constraints
+### Virtual
 
-- **Order By:**name__value
-- **Uniqueness Constraints:**
-
-#### Attributes
-
-| name | kind | optional | choices | order_weight |
-| ---- | ---- | -------- | ------- | ------------ |
-| role | Dropdown | True | \`backbone, upstream, peering, peer, server, loopback, management, uplink, leaf, spare\` | 1700 |
-| status | Dropdown | True | \`active, provisioning, maintenance, drained\` | 1300 |
+- **Description:** Virtual interface like VLAN or Loopback
+- **Label:** Virtual Interface
+- **Include in Menu:** ❌
 
 #### Relationships
 
-| name | peer | optional | cardinality | kind |
-| ---- | ---- | -------- | ----------- | ---- |
-| ip\_addresses | IpamIPAddress | True | many | Component |
-
-### InterfaceL2
-
-- **Description:** Network Layer 2 Interface
-- **Label:** Interface L2
-- **Icon:** mdi:ethernet
-- **Menu Placement:** DcimInterface
-- **Include in Menu:** ❌
-
-#### Ordering and Constraints
-
-- **Order By:**name__value
-- **Uniqueness Constraints:**
-
-#### Attributes
-
-| name | kind | optional | choices | order_weight | label | enum |
-| ---- | ---- | -------- | ------- | ------------ | ----- | ---- |
-| role | Dropdown | True | \`backbone, upstream, peering, peer, server, loopback, management, uplink, leaf, spare\` | 1700 |  |  |
-| status | Dropdown | True | \`active, provisioning, maintenance, drained\` | 1300 |  |  |
-| l2\_mode | Text |  | \`\` | 1250 | Layer2 Mode | \['Access', 'Trunk', 'Tunnel'\] |
+| name | peer | cardinality | kind | identifier | description |
+| ---- | ---- | ----------- | ---- | ---------- | ----------- |
+| parent\_interface | InterfaceHasSubInterface | one | Attribute | sub\_\_interface | Parent interface to which this sub\-interface belongs |
 
 ## organization
 
@@ -360,7 +371,7 @@ The base schemas serve as the foundation for every single schema extension you m
 
 | name | peer | optional | cardinality |
 | ---- | ---- | -------- | ----------- |
-| interface | DcimInterfaceL3 | True | one |
+| interface | InterfaceLayer3 | True | one |
 
 ### Prefix
 

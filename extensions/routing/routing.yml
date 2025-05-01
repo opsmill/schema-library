@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
-version: '1.0'
+version: "1.0"
 
 generics:
   - name: Protocol
@@ -14,6 +14,7 @@ generics:
       - name: description
         kind: Text
         optional: false
+        unique: true
         description: "Description of the protocol"
         order_weight: 1100
       - name: status
@@ -22,15 +23,15 @@ generics:
           - name: active
             label: Active
             description: "Configuration is active and operational."
-            color: "#A9CCE3"  # pastel blue
+            color: "#A9CCE3" # pastel blue
           - name: disabled
             label: Disabled
             description: "Configuration has been disabled."
-            color: "#D3D3D3"  # light grey
+            color: "#D3D3D3" # light grey
           - name: deleted
             label: Deleted
             description: "Configuration has been deleted."
-            color: "#FAD7A0"  # pastel orange
+            color: "#FAD7A0" # pastel orange
         description: "Status of the Protocol Configuration."
         order_weight: 1150
     relationships:

@@ -84,7 +84,7 @@ nodes:
       - name: interface
         description: Interface L3
         label: Interface
-        peer: DcimInterfaceL3
+        peer: InterfaceLayer3
         optional: false
         cardinality: one
         kind: Attribute
@@ -92,7 +92,7 @@ nodes:
 
 extensions:
   nodes:
-    - kind: DcimInterfaceL3
+    - kind: InterfaceLayer3
       relationships:
         - name: vrrp
           kind: Component

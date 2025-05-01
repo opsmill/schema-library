@@ -36,11 +36,11 @@ nodes:
           - name: ospf
             label: OSPFv2
             description: "Open Shortest Path First version 2."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
           - name: ospfv3
             label: OSPFv3
             description: "Open Shortest Path First version 3."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
         default_value: ospf
         description: "Version of the OSPF protocol."
         order_weight: 1100
@@ -79,13 +79,13 @@ nodes:
     uniqueness_constraints:
       - ["ospf", "interface"]
     human_friendly_id:
-      - "ospf__description__value"
-      - "interface__name__value"
+      - "description__value"
     attributes:
       # Could be computed later on based on OSPF Instance / Interface Name
       - name: description
         kind: Text
         optional: false
+        unique: true
         description: "Description of the OSPF interface."
         order_weight: 1500
       - name: metric
@@ -99,15 +99,15 @@ nodes:
           - name: normal
             label: Normal
             description: "Standard OSPF interface mode."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
           - name: passive
             label: Passive
             description: "Interface will not send OSPF hello packets."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
           - name: peer_to_peer
             label: Peer-to-Peer
             description: "OSPF peer-to-peer interface mode."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
         default_value: normal
         description: "Mode of the OSPF interface."
         order_weight: 1300
@@ -121,10 +121,10 @@ nodes:
         choices:
           - name: md5
             label: MD5
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
           - name: sha1
             label: SHA1
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
         optional: true
         order_weight: 1225
       - name: area
@@ -140,9 +140,8 @@ nodes:
         cardinality: one
         kind: Parent
         order_weight: 1100
-      # should be changed based on PR28 (https://github.com/opsmill/schema-library/pull/28)
       - name: interface
-        peer: DcimInterfaceL3
+        peer: InterfaceLayer3
         optional: false
         cardinality: one
         kind: Attribute

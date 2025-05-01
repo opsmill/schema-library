@@ -113,8 +113,8 @@ nodes:
       WDM (Wavelength Division Multiplexing) technologies.
     icon: mdi:transit-connection-variant
     namespace: Dcim
-    # human_friendly_id:
-    #   - name__value
+    human_friendly_id:
+      - name__value
     order_by:
       - name__value
     display_labels:
@@ -124,6 +124,7 @@ nodes:
     attributes:
       - name: name
         kind: Text
+        unique: true
         order_weight: 1000
       - name: wdm_type
         kind: Dropdown
