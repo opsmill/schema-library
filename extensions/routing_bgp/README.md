@@ -1,16 +1,13 @@
-# BGP
+## BGP
 
 This schema extension contains all you need to model your BGP platform.
 
-Dependencies: `base, extensions/routing`
-
-## bgp
-
+- **Dependencies:** `base, extensions/routing`
 - **Version:** 1.0
 
 ### Nodes
 
-### AutonomousSystem
+#### AutonomousSystem
 
 - **Description:** An Autonomous System (AS) is a set of Internet routable IP prefixes belonging to a network
 - **Label:** Autonomous System
@@ -23,7 +20,7 @@ Dependencies: `base, extensions/routing`
 - **Order By:**asn__value, name__value
 - **Uniqueness Constraints:**asn__value, name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | optional |
 | ---- | ---- | ----------- | ------------ | -------- |
@@ -39,7 +36,7 @@ Dependencies: `base, extensions/routing`
 | location | LocationGeneric | True | one | Attribute |
 | devices | DcimDevice | True | many | Attribute |
 
-### BGPPeerGroup
+#### BGPPeerGroup
 
 - **Description:** A BGP Peer Group is used to regroup parameters that are shared across multiple peers
 - **Label:** BGP Peer Group
@@ -52,7 +49,7 @@ Dependencies: `base, extensions/routing`
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | description | order_weight | regex | choices | default_value |
 | ---- | ---- | -------- | ----------- | ------------ | ----- | ------- | ------------- |
@@ -71,7 +68,7 @@ Dependencies: `base, extensions/routing`
 | local\_as | bgppeergroup\_\_local\_as | RoutingAutonomousSystem | True | one | Attribute |
 | remote\_as | bgppeergroup\_\_remote\_as | RoutingAutonomousSystem | True | one | Attribute |
 
-### BGPSession
+#### BGPSession
 
 - **Description:** A BGP Session represent a point to point connection between two routers
 - **Label:** BGP Session
@@ -83,7 +80,7 @@ Dependencies: `base, extensions/routing`
 - **Order By:**remote_as__asn__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | enum | description | order_weight | choices | regex |
 | ---- | ---- | -------- | ---- | ----------- | ------------ | ------- | ----- |

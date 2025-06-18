@@ -1,25 +1,22 @@
-# Modules
+## Modules
 
 This schema extension allows you to capture Device Modules related information like the serial number or the status. You can insert the Module into a Dcim Physical Device.
 
 > [!NOTE]
 > This extension doesn't contain any Node, you can use the extension module_linecards or modules_routing_engine to use it
 
-Dependencies: `base`
-
-## modules
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
 ### Generics
 
-### GenericModule
+#### GenericModule
 
 - **Description:** A generic module, such as a Linecard or Routing Engine, installed in a device.
 - **Label:** Module
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | description | order_weight | optional | choices | default_value |
 | ---- | ---- | ------ | ----------- | ------------ | -------- | ------- | ------------- |
@@ -34,7 +31,7 @@ Dependencies: `base`
 | module\_type | DeviceGenericModuleType | False | one | Attribute | 1150 |  |  |
 | device | DcimPhysicalDevice | True | one | Attribute | 1000 | Device | device\_\_modules |
 
-### GenericModuleType
+#### GenericModuleType
 
 - **Description:** A generic module type, with common specifications like part number and manufacturer.
 - **Label:** Module Type
@@ -45,7 +42,7 @@ Dependencies: `base`
 - **Order By:**manufacturer__name__value, name__value
 - **Uniqueness Constraints:**part_number__value, name__value + manufacturer
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | description | order_weight | optional | label |
 | ---- | ---- | ------ | ----------- | ------------ | -------- | ----- |

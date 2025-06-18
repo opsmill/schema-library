@@ -1,23 +1,20 @@
-# Topology
+## Topology
 
 This schema extension introduces abstract network pods and services running in the pods, such as MPLS and EVPN.
 
-Dependencies: `base`
-
-## topology
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
 ### Generics
 
-### Generic
+#### Generic
 
 - **Description:** Generic model for topology.
 - **Label:** Topology
 - **Icon:** carbon:network-3
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional |
 | ---- | ---- | ------------ | -------- |

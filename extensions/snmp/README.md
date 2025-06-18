@@ -1,16 +1,13 @@
-# SNMP
+## SNMP
 
 This schema extension contains models for SNMP Communities and SNMP Clients. As you can see this extension is not linked to Tenancy or Device, as you could decide to link the Community to different models based on your use case.
 
-Dependencies: `base`
-
-## snmp
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
 ### Generics
 
-### Community
+#### Community
 
 - **Description:** Generic model for SNMP community configurations.
 - **Label:** SNMP Community
@@ -22,7 +19,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional |
 | ---- | ---- | ------------ | -------- |
@@ -37,7 +34,7 @@ Dependencies: `base`
 
 ### Nodes
 
-### CommunityV2
+#### CommunityV2
 
 - **Description:** SNMP v1/v2c community configuration.
 - **Label:** SNMP v1/v2c
@@ -50,14 +47,14 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | enum |
 | ---- | ---- | ------------ | ---- |
 | community\_string | Password | 1300 |  |
 | access | Text | 1200 | \['Read\-Only', 'Read\-Write'\] |
 
-### CommunityV3
+#### CommunityV3
 
 - **Description:** SNMP version 3 configuration with enhanced security.
 - **Label:** SNMP v3
@@ -70,7 +67,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | label | enum | optional | choices |
 | ---- | ---- | ------------ | ----- | ---- | -------- | ------- |
@@ -81,7 +78,7 @@ Dependencies: `base`
 | privacy\_password | Password | 1700 | Privacy Password |  | True | \`\` |
 | security\_level | Dropdown | 1200 | Security Level |  |  | \`noAuthNoPriv, authNoPriv, authPriv\` |
 
-### Client
+#### Client
 
 - **Description:** Represents an SNMP client that interacts with SNMP Community.
 - **Label:** SNMP Client
@@ -94,7 +91,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | label | optional |
 | ---- | ---- | ------------ | ----- | -------- |

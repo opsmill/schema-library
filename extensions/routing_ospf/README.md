@@ -1,16 +1,13 @@
-# OSPF
+## OSPF
 
 This schema extension contains all you need to model the OSPF Routing Protocol.
 
-Dependencies: `base, extensions/routing`
-
-## ospf
-
+- **Dependencies:** `base, extensions/routing`
 - **Version:** 1.0
 
 ### Nodes
 
-### OSPF
+#### OSPF
 
 - **Description:** OSPF (Open Shortest Path First) instance on a Virtual Router.
 - **Label:** OSPF
@@ -22,7 +19,7 @@ Dependencies: `base, extensions/routing`
 - **Order By:**router_id__address__value, vrf__name__value, device__name__value
 - **Uniqueness Constraints:**device + vrf + version__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | default_value | description | order_weight | choices |
 | ---- | ---- | -------- | ------------- | ----------- | ------------ | ------- |
@@ -38,7 +35,7 @@ Dependencies: `base, extensions/routing`
 | router\_id | IpamIPAddress | True | one | Attribute |  |  |
 | ospf\_interfaces | RoutingOSPFInterface | True | many | Component | OSPF Interfaces | ospf\_\_ospfinterfaces |
 
-### OSPFInterface
+#### OSPFInterface
 
 - **Description:** Pivot table linking OSPF configuration to an interface.
 - **Label:** OSPF Interface
@@ -50,7 +47,7 @@ Dependencies: `base, extensions/routing`
 - **Order By:**description__value
 - **Uniqueness Constraints:**ospf + interface
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | unique | description | order_weight | choices | default_value |
 | ---- | ---- | -------- | ------ | ----------- | ------------ | ------- | ------------- |

@@ -1,16 +1,13 @@
-# BGP Route Reflector
+## BGP Route Reflector
 
 This schema extension extend the BGP extension to add BGP Route Reflector Clustering.
 
-Dependencies: `base, extensions/routing, extensions/routing_bgp`
-
-## bgp_rr
-
+- **Dependencies:** `base, extensions/routing, extensions/routing_bgp`
 - **Version:** 1.0
 
 ### Nodes
 
-### BGPRRCluster
+#### BGPRRCluster
 
 - **Description:** A Route Reflector (RR) Cluster used for grouping internal peers
 - **Label:** Route Reflector Cluster
@@ -22,7 +19,7 @@ Dependencies: `base, extensions/routing, extensions/routing_bgp`
 - **Order By:**
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | optional |
 | ---- | ---- | ----------- | ------------ | -------- |

@@ -1,18 +1,15 @@
-# Routing Policies
+## Routing Policies
 
 This schema extension contains a generic to create Routing Policies.
 
 This Generic can be extend for each Routing Protocols you may want to use.
 
-Dependencies: `base`
-
-## routing_policies
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
 ### Generics
 
-### Policy
+#### Policy
 
 - **Description:** Policy defining the rules for routing traffic in a network.
 - **Icon:** carbon:deployment-policy
@@ -23,7 +20,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | optional | order_weight | label | choices | default_value |
 | ---- | ---- | ----------- | ------ | -------- | ------------ | ----- | ------- | ------------- |

@@ -1,16 +1,13 @@
-# VLAN Translation
+## VLAN Translation
 
 This schema extension is based on Juniper VLAN MAP, and not yet test out for other vendors.
 
-Dependencies: `base`
-
-## vlan-translation
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
 ### Nodes
 
-### MapInOut
+#### MapInOut
 
 - **Description:** VLAN Mapping for In/Out operations
 - **Label:** VLAN Map In/Out
@@ -23,7 +20,7 @@ Dependencies: `base`
 - **Order By:**interface__name__value, direction__value, operation__value
 - **Uniqueness Constraints:**interface + direction__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | label | order_weight | choices | optional |
 | ---- | ---- | ----------- | ----- | ------------ | ------- | -------- |

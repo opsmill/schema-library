@@ -1,16 +1,13 @@
-# Routing Engine Module
+## Routing Engine Module
 
 This schema extension allows you to capture Routing Engine related information like the version. You can insert the Routing Engine into a Dcim Physical Device and leverage the Routing Engine type model.
 
-Dependencies: `base, extensions/modules`
-
-## routing_engine
-
+- **Dependencies:** `base, extensions/modules`
 - **Version:** 1.0
 
 ### Nodes
 
-### RoutingEngineType
+#### RoutingEngineType
 
 - **Description:** Routing Engine Type information, detailing specifications such as part number and manufacturer.
 - **Label:** Routing Engine Type
@@ -22,7 +19,7 @@ Dependencies: `base, extensions/modules`
 | ---- | ---- | ----------- | ---- | ----------- |
 | routing\_engines | DeviceRoutingEngine | many | Generic | Routing engines of this type\. |
 
-### RoutingEngine
+#### RoutingEngine
 
 - **Description:** A Routing Engine (RE) installed in a device, responsible for routing functionalities.
 - **Label:** Routing Engine
@@ -34,7 +31,7 @@ Dependencies: `base, extensions/modules`
 - **Order By:**device__name__value, slot__value
 - **Uniqueness Constraints:**serial_number__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | label | optional |
 | ---- | ---- | ----------- | ------------ | ----- | -------- |

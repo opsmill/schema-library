@@ -1,16 +1,13 @@
-# VRRP
+## VRRP
 
 This schema extension contains models for VRRP.
 
-Dependencies: `base`
-
-## vrrp
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
 ### Nodes
 
-### VRRPGroup
+#### VRRPGroup
 
 - **Description:** VRRP Group configuration
 - **Label:** VRRP Group
@@ -22,7 +19,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | unique | description | order_weight | optional |
 | ---- | ---- | ----- | ------ | ----------- | ------------ | -------- |
@@ -37,7 +34,7 @@ Dependencies: `base`
 | ip\_address | cascade | VRRP IP \(v4 or v6\) | IP Address | IpamIPAddress | True | many | Attribute | 1200 |
 | vrrp\_interfaces | cascade |  | VRRP Interfaces | NetworkVRRPInterface |  | many | Component | 1300 |
 
-### VRRPInterface
+#### VRRPInterface
 
 - **Description:** VRRP Interface configuration
 - **Label:** VRRP Interface
@@ -50,7 +47,7 @@ Dependencies: `base`
 - **Order By:**priority__value
 - **Uniqueness Constraints:**vrrp_group + interface
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | description | regex | default_value | order_weight |
 | ---- | ---- | ----- | ----------- | ----- | ------------- | ------------ |

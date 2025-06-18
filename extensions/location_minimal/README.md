@@ -1,43 +1,40 @@
-# Location Minimal
+## Location Minimal
 
 This schema extension is minimal but will provide you with basic items to store location related data.
 
-Dependencies: `base`
-
-## location_minimal
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
 ### Nodes
 
-### Country
+#### Country
 
 - **Label:** Country
 - **Icon:** gis:search-country
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | order_weight |
 | ---- | ---- | -------- | ------------ |
 | timezone | Text | True | 1300 |
 
-### Metro
+#### Metro
 
 - **Label:** Metro
 - **Icon:** healthicons:city
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ❌
 
-### Site
+#### Site
 
 - **Label:** Site
 - **Icon:** ri:building-line
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional | order_weight |
 | ---- | ---- | ------ | -------- | ------------ |
@@ -50,14 +47,14 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | owner | OrganizationGeneric | True | one |
 
-### Rack
+#### Rack
 
 - **Label:** Rack
 - **Icon:** clarity:rack-server-line
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional | order_weight | label | default_value |
 | ---- | ---- | ------ | -------- | ------------ | ----- | ------------- |

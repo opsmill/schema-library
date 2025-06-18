@@ -1,4 +1,4 @@
-# Circuit Service
+## Circuit Service
 
 This schema extension contains model coming on top of circuit to capture a single service shared across multiple circuits.
 For example you have a MPLS network supported by a provider connecting multiple locations:
@@ -6,15 +6,12 @@ For example you have a MPLS network supported by a provider connecting multiple 
 - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...)
 - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side
 
-Dependencies: `extensions/circuit`
-
-## circuit_service
-
+- **Dependencies:** `extensions/circuit`
 - **Version:** 1.0
 
 ### Nodes
 
-### Service
+#### Service
 
 - **Description:** Represent the boundary of a provider network, the details of which are unknown or unimportant
 - **Label:** Circuit Service
@@ -27,7 +24,7 @@ Dependencies: `extensions/circuit`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional |
 | ---- | ---- | ------ | -------- |

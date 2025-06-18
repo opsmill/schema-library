@@ -1,23 +1,20 @@
-# Azure
+## Azure
 
 This schema extension introduces cloud support for Microsoft Azure.
 
-Dependencies: `base`
-
-Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)
-
-## azure
+- **Dependencies:** `base`
+- **Attribution**: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)
 
 - **Version:** 1.0
 
 ### Generics
 
-### Resource
+#### Resource
 
 - **Label:** Azure
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
@@ -32,23 +29,23 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 
 ### Nodes
 
-### Location
+#### Location
 
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
 | name | Text |
 
-### Tenant
+#### Tenant
 
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
@@ -61,12 +58,12 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 | ---- | ----------- | ---- | ---- |
 | subscriptions | many | AzureSubscription | Component |
 
-### Subscription
+#### Subscription
 
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
@@ -80,12 +77,12 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 | tenant | one | AzureTenant | Parent | False |
 | resourcegroups | many | AzureResourceGroup | Component |  |
 
-### ResourceGroup
+#### ResourceGroup
 
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
@@ -98,7 +95,7 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 | location | one | Attribute | AzureLocation |  |
 | subscription | one | Parent | AzureSubscription | False |
 
-### VirtualNetwork
+#### VirtualNetwork
 
 - **Label:** Virtual Networks
 - **Menu Placement:** AzureResource
@@ -111,13 +108,13 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 | address\_space | many | Attribute | BuiltinIPPrefix |
 | subnets | many | Component | AzureVirtualNetworkSubnet |
 
-### VirtualNetworkSubnet
+#### VirtualNetworkSubnet
 
 - **Label:** Subnets
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |

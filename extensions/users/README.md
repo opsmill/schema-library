@@ -1,16 +1,13 @@
-# Accounts Management
+## Accounts Management
 
 This schema extension contains models for Accounts management.
 
-Dependencies: `base`
-
-## users
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
 ### Nodes
 
-### Group
+#### Group
 
 - **Description:** User Group
 - **Label:** User Groups
@@ -22,7 +19,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional | label | choices |
 | ---- | ---- | ------------ | -------- | ----- | ------- |
@@ -31,7 +28,7 @@ Dependencies: `base`
 | idle\_timeout | Number | 1300 |  | Idle Timeout \(s\) | \`\` |
 | permissions | Dropdown | 1200 | False |  | \`admin, operator, read\-only\` |
 
-### Account
+#### Account
 
 - **Description:** User login and authentication
 - **Label:** User Account
@@ -43,7 +40,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | description | order_weight | default_value |
 | ---- | ----- | ---- | -------- | ----------- | ------------ | ------------- |

@@ -1,16 +1,13 @@
-# Tenancy
+## Tenancy
 
 This schema extension introduces tenancy for some of the schema nodes (circuits...)
 
-Dependencies: `base, extensions/circuit`
-
-## tenancy
-
+- **Dependencies:** `base, extensions/circuit`
 - **Version:** 1.0
 
 ### Nodes
 
-### Tenant
+#### Tenant
 
 - **Description:** A tenant is owning the corresponding entity
 - **Icon:** mdi:domain

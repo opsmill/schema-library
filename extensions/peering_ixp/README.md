@@ -1,16 +1,13 @@
-# Exchange Points (IXP)
+## Exchange Points (IXP)
 
 This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)!
 
-Dependencies: `base, extensions/routing, extensions/routing_bgp, extensions/routing_bgp_community`
-
-## peering_ixp
-
+- **Dependencies:** `base, extensions/routing, extensions/routing_bgp, extensions/routing_bgp_community`
 - **Version:** 1.0
 
 ### Nodes
 
-### IXP
+#### IXP
 
 - **Description:** An Internet Exchange Point (IXP) for peering
 - **Label:** Internet Exchange
@@ -22,7 +19,7 @@ Dependencies: `base, extensions/routing, extensions/routing_bgp, extensions/rout
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | description | order_weight | optional | choices | default_value |
 | ---- | ---- | ------ | ----------- | ------------ | -------- | ------- | ------------- |
@@ -41,7 +38,7 @@ Dependencies: `base, extensions/routing, extensions/routing_bgp, extensions/rout
 | bgp\_communities | RoutingBGPCommunity | True | many | Generic | BGP communities associated with the session |  | BGP Communities |  |
 | tags | BuiltinTag | True | many | Attribute |  | 3000 |  |  |
 
-### IXPConnection
+#### IXPConnection
 
 - **Description:** A connection to an Internet Exchange Point (IXP)
 - **Label:** IXP Connection
@@ -54,7 +51,7 @@ Dependencies: `base, extensions/routing, extensions/routing_bgp, extensions/rout
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | description | order_weight | optional | label | choices | default_value |
 | ---- | ---- | ------ | ----------- | ------------ | -------- | ----- | ------- | ------------- |

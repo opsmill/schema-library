@@ -1,16 +1,13 @@
-# BGP Communities
+## BGP Communities
 
 This schema extension adds the BGP Communities models.
 
-Dependencies: `base, extensions/routing`
-
-## bgp_community
-
+- **Dependencies:** `base, extensions/routing`
 - **Version:** 1.0
 
 ### Nodes
 
-### BGPCommunity
+#### BGPCommunity
 
 - **Description:** Defines a BGP community.
 - **Label:** BGP Community
@@ -22,7 +19,7 @@ Dependencies: `base, extensions/routing`
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value, community__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | optional |
 | ---- | ---- | ----------- | ------------ | -------- |

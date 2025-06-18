@@ -1,14 +1,12 @@
-# Base Schemas
+## Base Schemas
 
 The base schemas serve as the foundation for every single schema extension you might want to use afterward. This one is mandatory and will unlock access to the extensions section.
-
-## dcim
 
 - **Version:** 1.0
 
 ### Generics
 
-### GenericDevice
+#### GenericDevice
 
 - **Description:** Generic Device object.
 - **Label:** Device
@@ -20,7 +18,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | optional |
 | ---- | ---- | ------ | ------------ | -------- |
@@ -37,12 +35,12 @@ The base schemas serve as the foundation for every single schema extension you m
 | primary\_address | IpamIPAddress | True | one |  | Attribute | 1700 | Primary IP Address |
 | platform | DcimPlatform | True | one |  | Attribute | 1250 |  |
 
-### PhysicalDevice
+#### PhysicalDevice
 
 - **Description:** Generic holding attributes and relationships relevant for physical device.
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | label | description | kind | optional | order_weight | default_value | choices |
 | ---- | ----- | ----------- | ---- | -------- | ------------ | ------------- | ------- |
@@ -57,7 +55,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | device\_type | DcimDeviceType | True | one | Attribute | 1200 |  |
 | location | LocationHosting | False | one | Attribute | 1500 | Location |
 
-### Endpoint
+#### Endpoint
 
 - **Description:** Generic Endpoint to receive a connector.
 - **Include in Menu:** ❌
@@ -68,7 +66,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ---- | -------- | ----------- | ------------ | ---- |
 | connector | DcimConnector | True | one | 1500 | Attribute |
 
-### Connector
+#### Connector
 
 - **Description:** Generic Connector to link two endpoints together.
 - **Include in Menu:** ❌
@@ -79,7 +77,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ---- | -------- | ----------- | ------------ | ---- |
 | connected\_endpoints | DcimEndpoint | True | many | 1500 | Generic |
 
-### Interface
+#### Interface
 
 - **Description:** Generic Network Interface
 - **Label:** Interface
@@ -90,7 +88,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**device__name__value, name__value
 - **Uniqueness Constraints:**device + name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | optional | label | default_value | choices |
 | ---- | ---- | ----------- | ------------ | -------- | ----- | ------------- | ------- |
@@ -107,25 +105,25 @@ The base schemas serve as the foundation for every single schema extension you m
 | device | DcimGenericDevice | device\_\_interface | False | one | Parent | 1025 |
 | tags | BuiltinTag |  | True | many | Attribute | 3000 |
 
-### Layer2
+#### Layer2
 
 - **Description:** Layer 2 specific attributes for network interfaces
 - **Label:** Layer 2 Interface
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | choices | description | order_weight |
 | ---- | ----- | ---- | -------- | ------- | ----------- | ------------ |
 | l2\_mode | Layer2 Mode | Dropdown | True | \`access, trunk, trunk\_all\` | Layer 2 mode of the interface | 1500 |
 
-### Layer3
+#### Layer3
 
 - **Description:** Layer 3 specific attributes for network interfaces
 - **Label:** Layer 3 Interface
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | description | order_weight | optional |
 | ---- | ----- | ---- | ----------- | ------------ | -------- |
@@ -138,7 +136,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ----- | ---- | ----------- | ---- | -------- | ----------- | ------------ |
 | ip\_addresses | IP Addresses | IpamIPAddress | many | Attribute | True | List of IP addresses associated with the interface | 1150 |
 
-### HasSubInterface
+#### HasSubInterface
 
 - **Description:** A generic interface that can have sub-interfaces
 - **Include in Menu:** ❌
@@ -151,7 +149,7 @@ The base schemas serve as the foundation for every single schema extension you m
 
 ### Nodes
 
-### DeviceType
+#### DeviceType
 
 - **Description:** A model of device
 - **Label:** Device Type
@@ -163,7 +161,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**manufacturer__name__value, name__value
 - **Uniqueness Constraints:**manufacturer + name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | optional | label | default_value |
 | ---- | ---- | ------ | ------------ | -------- | ----- | ------------- |
@@ -182,7 +180,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | manufacturer | OrganizationManufacturer | one | Attribute | 1250 | False |
 | tags | BuiltinTag | many | Attribute | 2000 | True |
 
-### Platform
+#### Platform
 
 - **Description:** A Platform represent the type of software running on a device.
 - **Label:** Platform
@@ -194,7 +192,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**manufacturer__name__value, name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | optional |
 | ---- | ---- | ------ | ------------ | -------- |
@@ -213,27 +211,27 @@ The base schemas serve as the foundation for every single schema extension you m
 | devices | DcimGenericDevice | True | many | 1350 |  |
 | manufacturer | OrganizationManufacturer |  | one | 1300 | Attribute |
 
-### Device
+#### Device
 
 - **Description:** A configurable network device for managing and directing data traffic, including routers, switches...
 - **Label:** Network Device
 - **Icon:** clarity:network-switch-solid
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | order_weight | choices |
 | ---- | ---- | -------- | ------------ | ------- |
 | status | Dropdown | False | 1100 | \`active, provisioning, maintenance, drained\` |
 | role | Dropdown | True | 1400 | \`core, edge, cpe, spine, leaf, tor\` |
 
-### Physical
+#### Physical
 
 - **Description:** Physical network port on a device
 - **Label:** Physical Interface
 - **Include in Menu:** ❌
 
-### Virtual
+#### Virtual
 
 - **Description:** Virtual interface like VLAN or Loopback
 - **Label:** Virtual Interface
@@ -245,13 +243,11 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ---- | ----------- | ---- | ---------- | ----------- |
 | parent\_interface | InterfaceHasSubInterface | one | Attribute | sub\_\_interface | Parent interface to which this sub\-interface belongs |
 
-## organization
-
 - **Version:** 1.0
 
 ### Generics
 
-### Generic
+#### Generic
 
 - **Description:** An organization represent a legal entity, a company.
 - **Label:** Organization
@@ -263,7 +259,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | optional |
 | ---- | ---- | ------ | ------------ | -------- |
@@ -278,7 +274,7 @@ The base schemas serve as the foundation for every single schema extension you m
 
 ### Nodes
 
-### Manufacturer
+#### Manufacturer
 
 - **Description:** Device Manufacturer
 - **Icon:** mdi:domain
@@ -292,20 +288,18 @@ The base schemas serve as the foundation for every single schema extension you m
 | device\_type | DcimDeviceType | many | True |
 | platform | DcimPlatform | many | True |
 
-### Provider
+#### Provider
 
 - **Description:** Circuit or Location Provider
 - **Icon:** mdi:domain
 - **Menu Placement:** OrganizationGeneric
 - **Include in Menu:** ✅
 
-## location
-
 - **Version:** 1.0
 
 ### Generics
 
-### Generic
+#### Generic
 
 - **Description:** Generic Location, could be a country, city ...
 - **Label:** Location
@@ -317,7 +311,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | unique | optional |
 | ---- | ---- | ------------ | ------ | -------- |
@@ -331,7 +325,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ---- | ---- | -------- | ----------- |
 | tags | BuiltinTag | Attribute | True | many |
 
-### Hosting
+#### Hosting
 
 - **Description:** Location directly hosting device and services.
 - **Include in Menu:** ❌
@@ -343,13 +337,11 @@ The base schemas serve as the foundation for every single schema extension you m
 | prefixes | Prefixes | IpamPrefix | many | True |
 | devices | Devices | DcimPhysicalDevice | many | True |
 
-## ipam
-
 - **Version:** 1.0
 
 ### Nodes
 
-### IPAddress
+#### IPAddress
 
 - **Description:** IP Address
 - **Label:** IP Address
@@ -361,7 +353,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**address__value
 - **Uniqueness Constraints:**ip_namespace + address__value
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | regex |
 | ---- | ----- | ---- | -------- | ----- |
@@ -373,7 +365,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ---- | -------- | ----------- |
 | interface | InterfaceLayer3 | True | one |
 
-### Prefix
+#### Prefix
 
 - **Description:** IPv4 or IPv6 network (with mask)
 - **Label:** Prefix
@@ -385,7 +377,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**prefix__value
 - **Uniqueness Constraints:**ip_namespace + prefix__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | choices | optional |
 | ---- | ---- | ------- | -------- |

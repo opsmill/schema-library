@@ -1,26 +1,23 @@
-# Patch Panel
+## Patch Panel
 
 This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture information about potential modules you would insert into your patch panel.
 
 > [!NOTE]
 > This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
 
-Dependencies: `base`
-
-## patch_panel
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
 ### Generics
 
-### GenericPatchPanelInterface
+#### GenericPatchPanelInterface
 
 - **Label:** Patch Panel Interfaces
 - **Icon:** mdi:ethernet
 - **Menu Placement:** DcimPatchPanel
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional | choices |
 | ---- | ---- | ------------ | -------- | ------- |
@@ -30,7 +27,7 @@ Dependencies: `base`
 
 ### Nodes
 
-### PatchPanel
+#### PatchPanel
 
 - **Description:** A Patch Panel used for managing network cable connections in a data center or telecom setup.
 - **Label:** Patch Panel
@@ -42,7 +39,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | label | optional | description |
 | ---- | ---- | ------ | ------------ | ----- | -------- | ----------- |
@@ -58,7 +55,7 @@ Dependencies: `base`
 | rear\_interfaces | DcimRearPatchPanelInterface | rear\_interfaces | True | many | Component |
 | modules | DcimPatchPanelModule |  | True | many | Component |
 
-### FrontPatchPanelInterface
+#### FrontPatchPanelInterface
 
 - **Label:** Patch Panel Front Interfaces
 - **Menu Placement:** DcimGenericPatchPanelInterface
@@ -76,7 +73,7 @@ Dependencies: `base`
 | corresponding\_front\_rear | Corresponding rear interface | DcimRearPatchPanelInterface | 1200 | True | one | Attribute |  |
 | patch\_panel |  | DcimPatchPanel | 900 | False | one | Parent | front\_interfaces |
 
-### RearPatchPanelInterface
+#### RearPatchPanelInterface
 
 - **Label:** Patch Panel Rear Interfaces
 - **Menu Placement:** DcimGenericPatchPanelInterface
@@ -94,7 +91,7 @@ Dependencies: `base`
 | corresponding\_front\_rear | Corresponding front interfaces | DcimFrontPatchPanelInterface | 1200 | True | many | Attribute |  |
 | patch\_panel |  | DcimPatchPanel | 900 | False | one | Parent | rear\_interfaces |
 
-### PatchPanelModule
+#### PatchPanelModule
 
 - **Label:** Patch Panel Module
 - **Icon:** mdi:expansion-card
@@ -106,7 +103,7 @@ Dependencies: `base`
 - **Order By:**patch_panel__name__value, position__value
 - **Uniqueness Constraints:**patch_panel + position__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | description | label | optional | choices |
 | ---- | ---- | ------------ | ----------- | ----- | -------- | ------- |

@@ -1,16 +1,13 @@
-# Topology
+## Topology
 
 A schema for defining and managing network topology, strategies, and services.
 
-Dependencies: `base`
-
-## topology
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
 ### Generics
 
-### ManagementServer
+#### ManagementServer
 
 - **Description:** Generic model for network management server (dns, ntp, and dhcp).
 - **Label:** Network Management Servers
@@ -21,7 +18,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional | choices |
 | ---- | ---- | ------------ | -------- | ------- |
@@ -36,7 +33,7 @@ Dependencies: `base`
 | location | LocationGeneric | True | many |  |
 | ip\_addresses | InfraIPAddress | True | many | Component |
 
-### GenericElement
+#### GenericElement
 
 - **Description:** Base model for elements
 - **Label:** Generic Topology Element
@@ -49,7 +46,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional |
 | ---- | ---- | ------------ | -------- |
@@ -63,7 +60,7 @@ Dependencies: `base`
 | ---- | ---- | ----------- | ---- | -------- |
 | topology | TopologyTopology | one | Parent | False |
 
-### NetworkStrategy
+#### NetworkStrategy
 
 - **Description:** Generic model for network strategies (underlays and overlays).
 - **Label:** Network Strategy
@@ -76,7 +73,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional |
 | ---- | ---- | ------------ | -------- |
@@ -91,7 +88,7 @@ Dependencies: `base`
 
 ### Nodes
 
-### Topology
+#### Topology
 
 - **Description:** A Topology represents the entire network pod.
 - **Label:** Topology
@@ -103,7 +100,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | optional |
 | ---- | ---- | ------ | ------------ | -------- |
@@ -120,7 +117,7 @@ Dependencies: `base`
 | devices | DcimGenericDevice | True | many | Component |
 | network\_services | TopologyNetworkService | True | many | Component |
 
-### MPLSStrategy
+#### MPLSStrategy
 
 - **Description:** Specific strategy attributes for MPLS.
 - **Label:** MPLS Strategy
@@ -133,14 +130,14 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | choices |
 | ---- | ---- | ------- |
 | underlay | Dropdown | \`ospf, isis, bgp\` |
 | overlay | Dropdown | \`ldp, rsvp, segment\_routing\` |
 
-### EVPNStrategy
+#### EVPNStrategy
 
 - **Description:** Specific strategy attributes for EVPN.
 - **Label:** EVPN Strategy
@@ -153,14 +150,14 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | choices |
 | ---- | ---- | ------- |
 | underlay | Dropdown | \`ebgp, ospf, isis\` |
 | overlay | Dropdown | \`ebgp, ibgp\` |
 
-### PhysicalElement
+#### PhysicalElement
 
 - **Description:** Physical aspect of topology elements.
 - **Label:** Physical Topology Element
@@ -173,7 +170,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | default_value | order_weight | label | choices |
 | ---- | ---- | ------------- | ------------ | ----- | ------- |
@@ -188,7 +185,7 @@ Dependencies: `base`
 | ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
 | device\_type | Type | DcimDeviceType | True | one | Attribute | 1400 |
 
-### DhcpOption
+#### DhcpOption
 
 - **Description:** Represents a configurable option within a Dhcp server.
 - **Label:** Dhcp Option
@@ -201,7 +198,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional |
 | ---- | ---- | ------------ | -------- |
@@ -210,7 +207,7 @@ Dependencies: `base`
 | option\_code | Number | 2000 |  |
 | content | Text | 2100 |  |
 
-### DhcpServer
+#### DhcpServer
 
 - **Description:** Represents a Dhcp server in the network.
 - **Label:** Dhcp Server
@@ -223,7 +220,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight |
 | ---- | ---- | ------------ |
@@ -235,7 +232,7 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- |
 | dhcp\_options | NetworkDhcpOption | True | many | Component |
 
-### NameServer
+#### NameServer
 
 - **Description:** Represents a DNS server in the network.
 - **Label:** DNS Server
@@ -248,7 +245,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-### NTPServer
+#### NTPServer
 
 - **Description:** Represents a NTP server in the network.
 - **Label:** NTP Server
@@ -261,7 +258,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-### NetworkServiceIdentifier
+#### NetworkServiceIdentifier
 
 - **Description:** Generic model for different types of identifiers used in network services.
 - **Label:** Network Service Identifier
@@ -274,7 +271,7 @@ Dependencies: `base`
 - **Order By:**identifier__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
@@ -286,7 +283,7 @@ Dependencies: `base`
 | ---- | ----- | ---- | ----------- | -------- |
 | service | Network Service | TopologyNetworkService | one | True |
 
-### NetworkService
+#### NetworkService
 
 - **Description:** Network services attached to a Topology.
 - **Label:** Network Service
@@ -298,7 +295,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | order_weight | enum |
 | ---- | ----- | ---- | ------------ | ---- |

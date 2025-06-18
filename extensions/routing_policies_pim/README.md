@@ -1,16 +1,13 @@
-# Routing Policies (PIM)
+## Routing Policies (PIM)
 
 This schema inherits the `RoutingPolicy` schema and removes `import_policies` and `export_policies` attributes. However it adds a number of relationships to `RoutingPIM`.
 
-Dependencies: `base, extensions/routing, extensions/routing_policies, extensions/routing_pim`
-
-## routing_policies_pim
-
+- **Dependencies:** `base, extensions/routing, extensions/routing_policies, extensions/routing_pim`
 - **Version:** 1.0
 
 ### Nodes
 
-### PolicyPIM
+#### PolicyPIM
 
 - **Description:** A routing policiers for PIM
 - **Label:** PIM Routing Policies

@@ -1,16 +1,13 @@
-# PIM
+## PIM
 
 This schema extension contains all you need to model the PIM Protocol.
 
-Dependencies: `base, extensions/routing`
-
-## pim
-
+- **Dependencies:** `base, extensions/routing`
 - **Version:** 1.0
 
 ### Nodes
 
-### PIM
+#### PIM
 
 - **Description:** Protocol Independent Multicast (PIM) instance on a Virtual Router.
 - **Label:** PIM
@@ -22,7 +19,7 @@ Dependencies: `base, extensions/routing`
 - **Order By:**vrf__name__value, device__name__value
 - **Uniqueness Constraints:**device + vrf
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | default_value | description | order_weight |
 | ---- | ---- | -------- | ------------- | ----------- | ------------ |
@@ -37,7 +34,7 @@ Dependencies: `base, extensions/routing`
 | rp\_address | IpamIPAddress | True | Rendezvous Point \(RP\) address for PIM\. | one | Attribute |  |  |
 | pim\_interfaces | RoutingPIMInterface | True |  | many | Component | PIM Interfaces | pim\_\_piminterfaces |
 
-### PIMInterface
+#### PIMInterface
 
 - **Description:** Interface configuration for PIM.
 - **Label:** PIM Interface
@@ -49,7 +46,7 @@ Dependencies: `base, extensions/routing`
 - **Order By:**description__value
 - **Uniqueness Constraints:**pim + interface
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | unique | description | order_weight | choices | default_value |
 | ---- | ---- | -------- | ------ | ----------- | ------------ | ------- | ------------- |

@@ -1,16 +1,13 @@
-# Circuit
+## Circuit
 
 This schema extension contains Circuits and ways to connect them with your infrastructure! The circuit could be a fiber connecting two sites, you would then have two endpoints, one on each site.
 
-Dependencies: `base, extensions/location_minimal`
-
-## circuit
-
+- **Dependencies:** `base, extensions/location_minimal`
 - **Version:** 1.0
 
 ### Nodes
 
-### Circuit
+#### Circuit
 
 - **Description:** A Circuit represent service operated by a provider.
 - **Label:** Circuit
@@ -22,7 +19,7 @@ Dependencies: `base, extensions/location_minimal`
 - **Order By:**circuit_id__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional | description | choices |
 | ---- | ---- | ------ | -------- | ----------- | ------- |
@@ -39,7 +36,7 @@ Dependencies: `base, extensions/location_minimal`
 | location | LocationHosting | True | one | Attribute | Location | 1500 |
 | enpoints | DcimCircuitEndpoint | True | many | Component |  |  |
 
-### CircuitEndpoint
+#### CircuitEndpoint
 
 - **Description:** A circuit endpoint, could be a position in a MMR...
 - **Label:** Circuit Endpoint
@@ -52,7 +49,7 @@ Dependencies: `base, extensions/location_minimal`
 - **Order By:**name__value
 - **Uniqueness Constraints:**circuit + name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | optional | choices |
 | ---- | ---- | ----------- | ------------ | -------- | ------- |

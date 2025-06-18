@@ -129,15 +129,15 @@ def generate_readme(schema, extension_dir: Path) -> list:
 
     description = schema.get("description", "")
     content = [
-        f"# {schema.get('name', '')}\n",
+        f"## {schema.get('name', '')}\n",
         f"{description}\n" if not description.endswith("\n") else description,
     ]
 
     if dependencies := schema.get("dependencies", []):
-        content.append(f"Dependencies: `{', '.join(dependencies)}`\n")
+        content.append(f"- **Dependencies:** `{', '.join(dependencies)}`")
 
     if attribution := schema.get("attribution", []):
-        content.append(f"Attribution: {attribution}\n")
+        content.append(f"- **Attribution**: {attribution}\n")
 
     def format_table(headers: list, rows: list):
         """Generate a Markdown table."""
@@ -198,7 +198,7 @@ def generate_readme(schema, extension_dir: Path) -> list:
 
     def generate_node_data(node: dict):
         node_markdown = []
-        node_markdown.append(f"### {node.get('name')}\n")
+        node_markdown.append(f"#### {node.get('name')}\n")
         if node.get("description"):
             node_markdown.append(f"- **Description:** {node.get('description')}")
         if node.get("label"):
@@ -222,7 +222,7 @@ def generate_readme(schema, extension_dir: Path) -> list:
             )
 
         if attributes := node.get("attributes", []):
-            node_markdown.append("#### Attributes")
+            node_markdown.append("##### Attributes")
             attribute_headers, attribute_rows = generate_table_data(attributes)
             node_markdown.append(format_table(attribute_headers, attribute_rows))
 
@@ -234,7 +234,7 @@ def generate_readme(schema, extension_dir: Path) -> list:
 
     for _, file_values in schema_definition_files.items():
         # content.append(f"## {_}\n")
-        content.append(f"## {_}\n")
+        # content.append(f"## {_}\n")
         content.append(f"- **Version:** {file_values['version']}\n")
 
         if generics := file_values.get("generics", []):
