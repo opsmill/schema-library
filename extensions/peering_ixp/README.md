@@ -8,7 +8,7 @@ Dependencies: `base, extensions/routing, extensions/routing_bgp, extensions/rout
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### IXP
 

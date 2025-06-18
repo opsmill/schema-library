@@ -10,7 +10,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### Policy
 

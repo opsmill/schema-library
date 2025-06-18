@@ -8,7 +8,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### MapInOut
 
@@ -40,9 +40,9 @@ Dependencies: `base`
 | ---- | ---- | ---- | ----------- | ----------- | -------- | ----- | ------------ |
 | interface | Parent | DcimInterface | Interface to which the Input/Output VLAN mapping is applied | one | False | Interface | 1000 |
 
-## Extensions
+### Extensions
 
-### DcimInterface
+#### DcimInterface
 
 #### Relationships
 

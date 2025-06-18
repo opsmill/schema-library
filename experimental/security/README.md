@@ -8,7 +8,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### PolicyAssignment
 
@@ -88,7 +88,7 @@ Dependencies: `base`
 | ---- | ----- | ---- | ----------- | -------- |
 | service\_groups | Service Groups | SecurityGenericServiceGroup | many | True |
 
-## Nodes
+### Nodes
 
 ### Zone
 
@@ -451,9 +451,9 @@ Dependencies: `base`
 | ip\_addresses | InfraIPAddress | True | many | Component |
 | security\_zone | SecurityZone | False | one | Attribute |
 
-## Extensions
+### Extensions
 
-### LocationGeneric
+#### LocationGeneric
 
 #### Relationships
 

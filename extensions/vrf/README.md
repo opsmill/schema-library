@@ -8,7 +8,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### VRF
 
@@ -64,9 +64,9 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | vrf | IpamVRF | True | many |
 
-## Extensions
+### Extensions
 
-### IpamPrefix
+#### IpamPrefix
 
 #### Relationships
 
@@ -74,7 +74,7 @@ Dependencies: `base`
 | ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
 | vrf | VRF | IpamVRF | True | one | Attribute | 1150 |
 
-### IpamIPAddress
+#### IpamIPAddress
 
 #### Relationships
 

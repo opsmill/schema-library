@@ -8,7 +8,7 @@ Dependencies: `base, extensions/routing`
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### AutonomousSystem
 
@@ -105,9 +105,9 @@ Dependencies: `base, extensions/routing`
 | peer\_group |  | RoutingBGPPeerGroup | True | one | Attribute |
 | peer\_session |  | RoutingBGPSession | True | one | Attribute |
 
-## Extensions
+### Extensions
 
-### DcimGenericDevice
+#### DcimGenericDevice
 
 #### Relationships
 
@@ -115,7 +115,7 @@ Dependencies: `base, extensions/routing`
 | ---- | ---- | -------- | ----------- | ---- | ------------ |
 | asn | RoutingAutonomousSystem | True | one | Attribute | 1600 |
 
-### OrganizationGeneric
+#### OrganizationGeneric
 
 #### Relationships
 

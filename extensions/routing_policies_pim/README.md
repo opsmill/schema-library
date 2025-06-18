@@ -8,7 +8,7 @@ Dependencies: `base, extensions/routing, extensions/routing_policies, extensions
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### PolicyPIM
 
@@ -17,9 +17,9 @@ Dependencies: `base, extensions/routing, extensions/routing_policies, extensions
 - **Icon:** carbon:deployment-policy
 - **Include in Menu:** ❌
 
-## Extensions
+### Extensions
 
-### RoutingPIM
+#### RoutingPIM
 
 #### Attributes
 

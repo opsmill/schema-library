@@ -8,9 +8,9 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Extensions
+### Extensions
 
-### InterfacePhysical
+#### InterfacePhysical
 
 #### Attributes
 

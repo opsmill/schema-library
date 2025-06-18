@@ -11,7 +11,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### GenericModule
 
@@ -60,9 +60,9 @@ Dependencies: `base`
 | manufacturer | OrganizationManufacturer | manufacturer\_\_moduletype | one | False | Attribute | Manufacturer of the module type\. | 1250 |
 | tags | BuiltinTag |  | many | True | Attribute | Tags associated with the module type\. | 3000 |
 
-## Extensions
+### Extensions
 
-### DcimPhysicalDevice
+#### DcimPhysicalDevice
 
 #### Relationships
 

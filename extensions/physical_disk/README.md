@@ -11,7 +11,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### DeviceWithPhysicalDisks
 
@@ -24,7 +24,7 @@ Dependencies: `base`
 | ---- | ----------- | ---- | -------- | ---- |
 | physical\_disks | many | DcimPhysicalDisk | True | Component |
 
-## Nodes
+### Nodes
 
 ### PhysicalDisk
 

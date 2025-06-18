@@ -8,7 +8,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### VRRPGroup
 
@@ -63,9 +63,9 @@ Dependencies: `base`
 | vrrp\_group | VRRP Group | VRRP Group | NetworkVRRPGroup | False | one | Attribute | 1200 |
 | interface | Interface L3 | Interface | InterfaceLayer3 | False | one | Attribute | 1300 |
 
-## Extensions
+### Extensions
 
-### InterfaceLayer3
+#### InterfaceLayer3
 
 #### Relationships
 
@@ -73,7 +73,7 @@ Dependencies: `base`
 | ---- | ---- | ---- | ----------- | ----------- | ----- | ------------ |
 | vrrp | Component | NetworkVRRPInterface | VRRP Interface Configuration | one | VRRP | 1500 |
 
-### IpamIPAddress
+#### IpamIPAddress
 
 #### Relationships
 

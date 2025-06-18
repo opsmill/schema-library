@@ -16,7 +16,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### GenericSFP
 
@@ -42,7 +42,7 @@ Dependencies: `base`
 | spare\_location | LocationHosting | Attribute | True | one | 1500 |
 | manufacturer | OrganizationManufacturer | Attribute | True | one | 1350 |
 
-## Nodes
+### Nodes
 
 ### StandardSFP
 
@@ -67,9 +67,9 @@ Dependencies: `base`
 | wavelength\_tx | Transmit Wavelength \(nm\) | Number | False | Transmit wavelength in nm\. | 1175 |
 | wavelength\_rx | Receive Wavelength \(nm\) | Number | False | Receive wavelength in nm\. | 1150 |
 
-## Extensions
+### Extensions
 
-### DcimInterface
+#### DcimInterface
 
 #### Relationships
 
@@ -77,7 +77,7 @@ Dependencies: `base`
 | ---- | ---- | ----------- | -------- |
 | plugged\_sfp | DcimGenericSFP | one | True |
 
-### LocationHosting
+#### LocationHosting
 
 #### Relationships
 
@@ -85,7 +85,7 @@ Dependencies: `base`
 | ---- | ---- | ----------- | -------- |
 | spare\_sfps | DcimGenericSFP | many | True |
 
-### OrganizationManufacturer
+#### OrganizationManufacturer
 
 #### Relationships
 

@@ -127,11 +127,6 @@ def generate_readme(schema, extension_dir: Path) -> list:
         with open(yml_file, "r", encoding="utf-8") as f:
             schema_definition_files[yml_file.stem] = yaml.safe_load(f)
 
-    # content = [
-    #     f"# {schema.get('name', '')}\n",
-    #     f"{schema.get('description', '')}\n",
-    # ]
-
     description = schema.get("description", "")
     content = [
         f"# {schema.get('name', '')}\n",
@@ -243,19 +238,19 @@ def generate_readme(schema, extension_dir: Path) -> list:
         content.append(f"- **Version:** {file_values['version']}\n")
 
         if generics := file_values.get("generics", []):
-            content.append("## Generics\n")
+            content.append("### Generics\n")
             for generic in generics:
                 content.extend(generate_node_data(generic))
 
         if nodes := file_values.get("nodes", []):
-            content.append("## Nodes\n")
+            content.append("### Nodes\n")
             for node in nodes:
                 content.extend(generate_node_data(node))
 
         if extensions := file_values.get("extensions", []):
-            content.append("## Extensions\n")
+            content.append("### Extensions\n")
             for node in extensions.get("nodes", []):
-                content.append(f"### {node.get('kind', '')}\n")
+                content.append(f"#### {node.get('kind', '')}\n")
 
                 if attributes := node.get("attributes", []):
                     content.append("#### Attributes")
@@ -306,17 +301,17 @@ def build(context: Context) -> None:
     toc.append("## Base\n")
     for yml_file in sorted(base_path.glob("*.yml")):
         name = yml_file.stem
-        toc.append(f"- [{name}](#base-schemas)")
+        toc.append(f"- [{name}](#{name})")
     toc.append("\n## Extensions\n")
     for entry in sorted(os.listdir("./extensions")):
         ext_path = Path("./extensions") / entry
         if ext_path.is_dir():
-            toc.append(f"- [{entry}](#extension-{entry})")
+            toc.append(f"- [{entry}](#{entry})")
     toc.append("\n## Experimental\n")
     for entry in sorted(os.listdir("./experimental")):
         exp_path = Path("./experimental") / entry
         if exp_path.is_dir():
-            toc.append(f"- [{entry}](#experimental-{entry})")
+            toc.append(f"- [{entry}](#{entry})")
     all_content.insert(1, "\n".join(toc) + "\n")
     # --- End Table of Contents ---
 
@@ -333,17 +328,3 @@ def build(context: Context) -> None:
     # Write consolidated documentation
     with open(consolidated_doc, "w", encoding="utf-8") as f:
         f.write("\n".join(all_content))
-
-    # Build Readme for base schemas
-    # base_path = Path("./base")
-    # generate_readme(schema[str(base_path)], base_path)
-
-    # for directory in directories_to_parse:
-    #     for entry in os.listdir(directory):
-    #         if os.path.isdir(directory / entry):
-    #             path = directory / entry
-    #             # print(path)
-    #             try:
-    #                 generate_readme(schema[str(path)], path)
-    #             except KeyError:
-    #                 print(f"Schema `{path}` is not added to the {METADATA_FILE} file")

@@ -8,7 +8,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### Continent
 
@@ -103,9 +103,9 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | owner | OrganizationGeneric | True | one |
 
-## Extensions
+### Extensions
 
-### OrganizationProvider
+#### OrganizationProvider
 
 #### Relationships
 

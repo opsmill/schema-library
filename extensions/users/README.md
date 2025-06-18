@@ -8,7 +8,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### Group
 
@@ -60,9 +60,9 @@ Dependencies: `base`
 | user\_group | UserGroup | one | False | Attribute | 1200 |
 | organization | OrganizationGeneric | one | False | Parent |  |
 
-## Extensions
+### Extensions
 
-### OrganizationGeneric
+#### OrganizationGeneric
 
 #### Relationships
 

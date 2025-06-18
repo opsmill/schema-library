@@ -8,7 +8,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### Lag
 
@@ -29,9 +29,9 @@ Dependencies: `base`
 | ---- | ----- | ---- | ----------- | ---- | ----------- | ------------ |
 | lag\_members | Member\(s\) | InterfacePhysical | many | Attribute | Physical Interfaces that are members of this aggregate | 1800 |
 
-## Extensions
+### Extensions
 
-### InterfacePhysical
+#### InterfacePhysical
 
 #### Relationships
 

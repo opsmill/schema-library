@@ -8,7 +8,7 @@ Dependencies: `base, extensions/compute`
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### Generic
 
@@ -47,9 +47,9 @@ Dependencies: `base, extensions/compute`
 | ---- | ----- | ---------- | ----------- | ---- | ---- |
 | nodes | Nodes | worker\_in\_cluster | many | ComputeGenericUnit | Component |
 
-## Extensions
+### Extensions
 
-### ComputeGenericUnit
+#### ComputeGenericUnit
 
 #### Relationships
 
@@ -57,7 +57,7 @@ Dependencies: `base, extensions/compute`
 | ---- | ---------- | ----- | ---- | ----------- | ----------- | -------- |
 | worker\_in\_cluster | worker\_in\_cluster | Worker in cluster | ClusterGenericComputeUnitNodes | one | This device is a worker node of the specified cluster\. | True |
 
-### LocationGeneric
+#### LocationGeneric
 
 #### Relationships
 

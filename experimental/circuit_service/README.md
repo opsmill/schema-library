@@ -12,7 +12,7 @@ Dependencies: `extensions/circuit`
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### Service
 
@@ -42,9 +42,9 @@ Dependencies: `extensions/circuit`
 | provider | OrganizationProvider | False | one | Attribute |
 | circuit\_endpoints | CircuitEndpoint | True | many | Component |
 
-## Extensions
+### Extensions
 
-### OrganizationProvider
+#### OrganizationProvider
 
 #### Relationships
 
@@ -52,7 +52,7 @@ Dependencies: `extensions/circuit`
 | ---- | ---- | ----------- | -------- |
 | circuit\_services | CircuitService | many | True |
 
-### CircuitEndpoint
+#### CircuitEndpoint
 
 #### Relationships
 

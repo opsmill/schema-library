@@ -8,7 +8,7 @@ Dependencies: `base, extensions/vlan`
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### Protocol
 

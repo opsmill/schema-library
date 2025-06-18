@@ -6,7 +6,7 @@ The base schemas serve as the foundation for every single schema extension you m
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### GenericDevice
 
@@ -149,7 +149,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ----------- | ------------ |
 | sub\_interfaces | Sub\-interface\(s\) | InterfaceVirtual | sub\_\_interface | True | many | Attribute | Sub\-interfaces of this interface | 1750 |
 
-## Nodes
+### Nodes
 
 ### DeviceType
 
@@ -249,7 +249,7 @@ The base schemas serve as the foundation for every single schema extension you m
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### Generic
 
@@ -276,7 +276,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ---- | ----------- | ---- | -------- | ------------ |
 | tags | BuiltinTag | many | Attribute | True | 3000 |
 
-## Nodes
+### Nodes
 
 ### Manufacturer
 
@@ -303,7 +303,7 @@ The base schemas serve as the foundation for every single schema extension you m
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### Generic
 
@@ -347,7 +347,7 @@ The base schemas serve as the foundation for every single schema extension you m
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### IPAddress
 

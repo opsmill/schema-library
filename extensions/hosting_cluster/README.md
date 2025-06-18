@@ -8,7 +8,7 @@ Dependencies: `base, extensions/cluster, extensions/compute`
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### Hosting
 

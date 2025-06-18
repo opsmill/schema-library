@@ -8,7 +8,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### Community
 
@@ -35,7 +35,7 @@ Dependencies: `base`
 | ---- | ---- | ----------- | ---- |
 | clients | SnmpClient | many | Component |
 
-## Nodes
+### Nodes
 
 ### CommunityV2
 

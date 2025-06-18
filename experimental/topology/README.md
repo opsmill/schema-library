@@ -8,7 +8,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### ManagementServer
 
@@ -89,7 +89,7 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | topology | TopologyTopology | True | many |
 
-## Nodes
+### Nodes
 
 ### Topology
 
@@ -315,9 +315,9 @@ Dependencies: `base`
 | vlan | InfraVLAN | one | Component | True | 1500 |
 | prefix | InfraPrefix | one | Component | True | 1400 |
 
-## Extensions
+### Extensions
 
-### DcimGenericDevice
+#### DcimGenericDevice
 
 #### Relationships
 
@@ -325,7 +325,7 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | topology | TopologyTopology | True | one |
 
-### IpamPrefix
+#### IpamPrefix
 
 #### Relationships
 

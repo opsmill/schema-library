@@ -10,7 +10,7 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### Resource
 
@@ -30,7 +30,7 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 | location | one | Attribute | AzureLocation |  |
 | resourcegroup | one | Parent | AzureResourceGroup | False |
 
-## Nodes
+### Nodes
 
 ### Location
 

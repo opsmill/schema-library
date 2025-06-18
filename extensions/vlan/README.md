@@ -8,7 +8,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### VLAN
 
@@ -60,9 +60,9 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- |
 | vlans | IpamVLAN | True | many | Component |
 
-## Extensions
+### Extensions
 
-### IpamPrefix
+#### IpamPrefix
 
 #### Relationships
 
@@ -70,7 +70,7 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- | ------------ |
 | vlan | IpamVLAN | True | one | Attribute | 1400 |
 
-### InterfaceLayer2
+#### InterfaceLayer2
 
 #### Relationships
 
@@ -79,7 +79,7 @@ Dependencies: `base`
 | untagged\_vlan | Untagged VLAN | IpamVLAN | True | one | Generic | interface\_l2\_\_untagged\_vlan |
 | tagged\_vlan | Tagged VLANs | IpamVLAN | True | many | Generic | interface\_l2\_\_tagged\_vlan |
 
-### LocationHosting
+#### LocationHosting
 
 #### Relationships
 

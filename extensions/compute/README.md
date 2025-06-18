@@ -8,7 +8,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### GenericUnit
 
@@ -26,7 +26,7 @@ Dependencies: `base`
 | ---- | ----------- | ---- | ---- | -------- |
 | virtual\_machines | many | VirtualizationVirtualMachine | Component | True |
 
-## Nodes
+### Nodes
 
 ### PhysicalServer
 

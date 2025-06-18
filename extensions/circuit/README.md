@@ -8,7 +8,7 @@ Dependencies: `base, extensions/location_minimal`
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### Circuit
 
@@ -67,9 +67,9 @@ Dependencies: `base, extensions/location_minimal`
 | circuit | DcimCircuit | 900 | False | one | Parent |  |
 | location | LocationHosting | 1500 | False | one | Attribute | Location |
 
-## Extensions
+### Extensions
 
-### OrganizationProvider
+#### OrganizationProvider
 
 #### Relationships
 
@@ -77,7 +77,7 @@ Dependencies: `base, extensions/location_minimal`
 | ---- | ---- | ----------- | -------- |
 | circuits | DcimCircuit | many | True |
 
-### LocationHosting
+#### LocationHosting
 
 #### Relationships
 

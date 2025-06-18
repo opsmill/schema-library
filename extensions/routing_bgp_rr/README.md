@@ -8,7 +8,7 @@ Dependencies: `base, extensions/routing, extensions/routing_bgp`
 
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
 ### BGPRRCluster
 
@@ -36,9 +36,9 @@ Dependencies: `base, extensions/routing, extensions/routing_bgp`
 | cluster\_id | Cluster ID | IpamIPAddress | Cluster ID represented as a reference to an IP Address | one | Attribute | False | 1200 |
 | peer\_groups | BGP Peer Groups | RoutingBGPPeerGroup |  | many | Generic | True |  |
 
-## Extensions
+### Extensions
 
-### RoutingBGPPeerGroup
+#### RoutingBGPPeerGroup
 
 #### Relationships
 

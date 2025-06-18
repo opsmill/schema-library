@@ -11,7 +11,7 @@ Dependencies: `base`
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
 ### GenericPatchPanelInterface
 
@@ -28,7 +28,7 @@ Dependencies: `base`
 | description | Text | 2000 | True | \`\` |
 | connector\_type | Dropdown | 1100 |  | \`FC, LC, LC\_PC, LC\_UPC, LC\_APC, LSH, LSH\_PC, LSH\_UPC, LSH\_APC, LX\_5, LX\_5\_PC, LX\_5\_UPC, LX\_5\_APC, MPO, MTRJ, SC, SC\_PC, SC\_UPC, SC\_APC, ST, CS, SN, SMA\_905, SMA\_906, URM\_P2\` |
 
-## Nodes
+### Nodes
 
 ### PatchPanel
 
