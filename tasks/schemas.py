@@ -293,21 +293,24 @@ def build(context: Context) -> None:
 
     # Build Readme for base schemas
     base_path = Path("./base")
-    content = generate_readme(schema[str(base_path)], base_path)
-    all_content.extend(content)
+    for key in sorted(schema.keys()):
+        if key.startswith("base/"):
+            name = key.split("/", 1)[1]
+            yml_path = base_path / f"{name}.yml"
+            if yml_path.exists():
+                content = generate_readme(schema[key], base_path)
+                all_content.extend(content)
 
     # --- Table of Contents Generation ---
     toc = ["# Schema Library Documentation\n"]
     toc.append("## Base\n")
     toc.append("| name | description |")
     toc.append("| ---- | ----------- |")
-    for yml_file in sorted(base_path.glob("*.yml")):
-        name = yml_file.stem
-        # Try to get description from schema if available
-        desc = ""
-        if name in schema[str(base_path)]:
-            desc = schema[str(base_path)][name].get("description", "")
-        toc.append(f"| [{name}](#{name}) | {desc} |")
+    for key in sorted(schema.keys()):
+        if key.startswith("base/"):
+            name = key.split("/", 1)[1]
+            desc = schema[key].get("description", "")
+            toc.append(f"| [{name}](#{name}) | {desc} |")
     toc.append("\n## Extensions\n")
     toc.append("| name | description |")
     toc.append("| ---- | ----------- |")

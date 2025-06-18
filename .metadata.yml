@@ -1,11 +1,21 @@
 ---
 # yamllint disable rule:line-length
-base:
+base/dcim:
   description:
-    The base schemas serve as the foundation for every single schema extension
-    you might want to use afterward. This one is mandatory and will unlock access
-    to the extensions section.
-  name: Base Schemas
+    Basic DCIM schema to capture devices, racks, interfaces, and related information.
+  name: Base DCIM
+base/ipam:
+  description:
+    Basic IPAM schema to capture IP addresses, subnets, and related information.
+  name: Base IPAM
+base/location:
+  description:
+    Basic Location schema to capture locations, sites, and related information.
+  name: Base Locations
+base/organization:
+  description:
+    Basic Organization schema to capture organizations, vendors, and related information.
+  name: Base Organizations
 experimental/azure:
   attribution: "[Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)"
   dependencies:

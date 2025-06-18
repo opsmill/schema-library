@@ -1,6 +1,6 @@
-## Base Schemas
+## Base Organizations
 
-The base schemas serve as the foundation for every single schema extension you might want to use afterward. This one is mandatory and will unlock access to the extensions section.
+Basic Organization schema to capture organizations, vendors, and related information.
 
 - **Version:** 1.0
 
