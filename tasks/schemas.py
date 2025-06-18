@@ -264,6 +264,10 @@ def generate_readme(schema, extension_dir: Path) -> list:
 
     # Write README.md
     readme_path = extension_dir / "README.md"
+    # Ensure the parent directory exists
+    import os
+
+    os.makedirs(readme_path.parent, exist_ok=True)
     with open(readme_path, "w", encoding="utf-8") as f:
         f.writelines("\n".join(content))
 
