@@ -297,21 +297,37 @@ def build(context: Context) -> None:
     all_content.extend(content)
 
     # --- Table of Contents Generation ---
-    toc = ["# Table of Contents\n"]
+    toc = ["# Schema Library Documentation\n"]
     toc.append("## Base\n")
+    toc.append("| name | description |")
+    toc.append("| ---- | ----------- |")
     for yml_file in sorted(base_path.glob("*.yml")):
         name = yml_file.stem
-        toc.append(f"- [{name}](#{name})")
+        # Try to get description from schema if available
+        desc = ''
+        if name in schema[str(base_path)]:
+            desc = schema[str(base_path)][name].get('description', '')
+        toc.append(f"| [{name}](#{name}) | {desc} |")
     toc.append("\n## Extensions\n")
+    toc.append("| name | description |")
+    toc.append("| ---- | ----------- |")
     for entry in sorted(os.listdir("./extensions")):
         ext_path = Path("./extensions") / entry
         if ext_path.is_dir():
-            toc.append(f"- [{entry}](#{entry})")
+            desc = ''
+            if str(ext_path) in schema and 'description' in schema[str(ext_path)]:
+                desc = schema[str(ext_path)]['description']
+            toc.append(f"| [{entry}](#{entry}) | {desc} |")
     toc.append("\n## Experimental\n")
+    toc.append("| name | description |")
+    toc.append("| ---- | ----------- |")
     for entry in sorted(os.listdir("./experimental")):
         exp_path = Path("./experimental") / entry
         if exp_path.is_dir():
-            toc.append(f"- [{entry}](#{entry})")
+            desc = ''
+            if str(exp_path) in schema and 'description' in schema[str(exp_path)]:
+                desc = schema[str(exp_path)]['description']
+            toc.append(f"| [{entry}](#{entry}) | {desc} |")
     all_content.insert(1, "\n".join(toc) + "\n")
     # --- End Table of Contents ---
 
