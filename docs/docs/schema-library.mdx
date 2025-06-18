@@ -3,6 +3,67 @@ title: Schema Library Documentation
 ---
 <!-- markdownlint-disable-file MD025 -->
 
+# Table of Contents
+
+## Base
+
+- [dcim](#base-schemas)
+- [ipam](#base-schemas)
+- [location](#base-schemas)
+- [organization](#base-schemas)
+
+## Extensions
+
+- [cable](#extension-cable)
+- [circuit](#extension-circuit)
+- [cluster](#extension-cluster)
+- [compute](#extension-compute)
+- [cross_connect](#extension-cross_connect)
+- [dwdm](#extension-dwdm)
+- [firewall_policer](#extension-firewall_policer)
+- [hosting_cluster](#extension-hosting_cluster)
+- [interface_breakout](#extension-interface_breakout)
+- [lag](#extension-lag)
+- [location_minimal](#extension-location_minimal)
+- [modules](#extension-modules)
+- [patch_panel](#extension-patch_panel)
+- [peering_ixp](#extension-peering_ixp)
+- [physical_disk](#extension-physical_disk)
+- [qinq](#extension-qinq)
+- [routing](#extension-routing)
+- [routing_aggregate](#extension-routing_aggregate)
+- [routing_bgp](#extension-routing_bgp)
+- [routing_bgp_community](#extension-routing_bgp_community)
+- [routing_bgp_rr](#extension-routing_bgp_rr)
+- [routing_ospf](#extension-routing_ospf)
+- [routing_pim](#extension-routing_pim)
+- [routing_policies](#extension-routing_policies)
+- [routing_policies_aggregate](#extension-routing_policies_aggregate)
+- [routing_policies_bgp](#extension-routing_policies_bgp)
+- [routing_policies_ospf](#extension-routing_policies_ospf)
+- [routing_policies_pim](#extension-routing_policies_pim)
+- [sfp](#extension-sfp)
+- [snmp](#extension-snmp)
+- [topology](#extension-topology)
+- [users](#extension-users)
+- [vlan](#extension-vlan)
+- [vrf](#extension-vrf)
+- [vrrp](#extension-vrrp)
+
+## Experimental
+
+- [azure](#experimental-azure)
+- [circuit_service](#experimental-circuit_service)
+- [infiniband](#experimental-infiniband)
+- [location_extended](#experimental-location_extended)
+- [modules_linecards](#experimental-modules_linecards)
+- [modules_routing_engine](#experimental-modules_routing_engine)
+- [qos](#experimental-qos)
+- [security](#experimental-security)
+- [tenancy](#experimental-tenancy)
+- [topology](#experimental-topology)
+- [vlan-translation](#experimental-vlan-translation)
+
 # Base Schemas
 
 The base schemas serve as the foundation for every single schema extension you might want to use afterward. This one is mandatory and will unlock access to the extensions section.
@@ -409,7 +470,7 @@ The base schemas serve as the foundation for every single schema extension you m
 
 This schema inherits the `RoutingPolicy` schema and removes `import_policies` and `export_policies` attributes. However it adds a number of relationships to `RoutingPIM`.
 
-Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_pim`
+Dependencies: `base, extensions/routing, extensions/routing_policies, extensions/routing_pim`
 
 ## routing_policies_pim
 
@@ -477,7 +538,7 @@ Dependencies: `base`
 
 This schema extension contains the foundations to capture clusters. With this one in place you can unlock various clusters flavors (hosting cluster able to host VMs, firewall clusters built with specific appliances ...)
 
-Dependencies: `base, extensions.compute`
+Dependencies: `base, extensions/compute`
 
 ## cluster
 
@@ -540,58 +601,11 @@ Dependencies: `base, extensions.compute`
 | ---- | ----- | ---- | ----------- | ---- | ----------- | -------- |
 | clusters | Clusters | ClusterGeneric | many | Component | All clusters available on that location\. | True |
 
-# Routing Engine
-
-This schema extension allows you to capture Routing Engine related information like the version. You can insert the Routing Engine into a Dcim Physical Device and leverage the Routing Engine type model.
-
-Dependencies: `base, extensions.modules`
-
-## routing_engine
-
-- **Version:** 1.0
-
-## Nodes
-
-### RoutingEngineType
-
-- **Description:** Routing Engine Type information, detailing specifications such as part number and manufacturer.
-- **Label:** Routing Engine Type
-- **Include in Menu:** ❌
-
-#### Relationships
-
-| name | peer | cardinality | kind | description |
-| ---- | ---- | ----------- | ---- | ----------- |
-| routing\_engines | InfraRoutingEngine | many | Generic | Routing engines of this type\. |
-
-### RoutingEngine
-
-- **Description:** A Routing Engine (RE) installed in a device, responsible for routing functionalities.
-- **Label:** Routing Engine
-- **Icon:** mdi:cpu-64-bit
-- **Include in Menu:** ❌
-
-#### Ordering and Constraints
-
-- **Order By:**device__name__value, slot__value
-- **Uniqueness Constraints:**serial_number__value
-
-#### Attributes
-
-| name | kind | description | order_weight | label | optional |
-| ---- | ---- | ----------- | ------------ | ----- | -------- |
-| slot | Number | The slot number where the Routing Engine is installed within the device | 1100 |  |  |
-| version | Text | Firmware version of the Routing Engine\. | 1200 | Version | True |
-
-#### Relationships
-
-| name | label | peer | optional | cardinality | kind | order_weight |
-| ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
-| routing\_engine\_type | RE Type | InfraRoutingEngineType | False | one | Attribute | 1150 |
-
 # SNMP
 
 This schema extension contains models for SNMP Communities and SNMP Clients. As you can see this extension is not linked to Tenancy or Device, as you could decide to link the Community to different models based on your use case.
+
+Dependencies: `base`
 
 ## snmp
 
@@ -696,104 +710,6 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 | ---- | ---- | ----------- | ------------ |
 | community | SnmpCommunity | many | 1200 |
 
-# Linecards
-
-This schema extension allows you to capture Linecard related information like the version. You can insert the Linecard into a Dcim Physical Device and leverage the Linecard type model. The Linecard can accept PIC to help configure PORT information like breakout-capabilities and configurations.
-
-Dependencies: `base, extensions.modules`
-
-## linecard
-
-- **Version:** 1.0
-
-## Nodes
-
-### LinecardType
-
-- **Description:** Linecard Type information, detailing specifications such as part number and manufacturer.
-- **Label:** Linecard Type
-- **Include in Menu:** ❌
-
-#### Relationships
-
-| name | peer | cardinality | kind | description |
-| ---- | ---- | ----------- | ---- | ----------- |
-| linecards | InfraLinecard | many | Generic | Linecards of this type\. |
-
-### Linecard
-
-- **Description:** A Linecard installed in a device, specifying slot, power status, and functionalities.
-- **Label:** Linecard
-- **Icon:** bi:pci-card
-- **Include in Menu:** ❌
-
-#### Ordering and Constraints
-
-- **Order By:**device__name__value, slot__value
-- **Uniqueness Constraints:**serial_number__value
-
-#### Attributes
-
-| name | kind | description | order_weight | label | optional | default_value |
-| ---- | ---- | ----------- | ------------ | ----- | -------- | ------------- |
-| slot | Number | The slot number where the Linecard is installed within the device | 1050 |  |  |  |
-| bng\_enabled | Boolean | BNG activated or deactivated on the Linecard | 1400 | BNG Enabled | True | False |
-
-#### Relationships
-
-| name | label | peer | optional | cardinality | kind | order_weight |
-| ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
-| linecard\_type | Linecard Type | DeviceLinecardType | False | one | Attribute | 1150 |
-| pics | PICs | DevicePic | True | many | Attribute | 1500 |
-
-### Pic
-
-- **Description:** Physical Interface Card (PIC) installed in the Linecard, containing multiple ports.
-- **Label:** PIC
-- **Include in Menu:** ❌
-
-#### Ordering and Constraints
-
-- **Order By:**linecard__serial_number__value, slot__value
-- **Uniqueness Constraints:**linecard + slot__value
-
-#### Attributes
-
-| name | kind | description | order_weight |
-| ---- | ---- | ----------- | ------------ |
-| slot | Number | Slot number of the PIC within the Linecard | 1200 |
-
-#### Relationships
-
-| name | label | peer | identifier | optional | cardinality | kind | order_weight |
-| ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
-| linecard | Linecard | DeviceLinecard | linecard\_\_pics | False | one | Parent | 1000 |
-| ports | Ports | InfraPort |  | True | many | Component | 1100 |
-
-### Port
-
-- **Description:** A network port on a PIC, specifying speed and port number.
-- **Label:** Port
-- **Include in Menu:** ❌
-
-#### Ordering and Constraints
-
-- **Order By:**pic__slot__value, port_number__value
-- **Uniqueness Constraints:**pic + port_number__value
-
-#### Attributes
-
-| name | kind | description | order_weight | choices |
-| ---- | ---- | ----------- | ------------ | ------- |
-| port\_number | Number | Port number on the PIC | 1100 | \`\` |
-| speed | Dropdown | Speed of the port | 1200 | \`10g, 100g\` |
-
-#### Relationships
-
-| name | label | peer | optional | cardinality | kind | order_weight |
-| ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
-| pic | PIC | DevicePic | False | one | Parent | 1000 |
-
 # Interface Breakdown
 
 This schema extension introduces relationships to support breakout interfaces, enabling you to document the breakdown of a physical interface into smaller physical interfaces.
@@ -825,7 +741,7 @@ Dependencies: `base`
 
 This extension is using the Routing Policies extensions and the Routing BGP one together.
 
-Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_bgp`
+Dependencies: `base, extensions/routing, extensions/routing_policies, extensions/routing_bgp`
 
 ## routing_policies_bgp
 
@@ -878,7 +794,7 @@ Dependencies: `base, extensions.routing, extensions.routing_policies, extensions
 
 This schema extension extend the BGP extension to add BGP Route Reflector Clustering.
 
-Dependencies: `base, extensions.routing, extensions.routing_bgp`
+Dependencies: `base, extensions/routing, extensions/routing_bgp`
 
 ## bgp_rr
 
@@ -1021,7 +937,7 @@ Dependencies: `base`
 
 This schema extension contains Circuits and ways to connect them with your infrastructure! The circuit could be a fiber connecting two sites, you would then have two endpoints, one on each site.
 
-Dependencies: `base, extensions.location_minimal`
+Dependencies: `base, extensions/location_minimal`
 
 ## circuit
 
@@ -1108,7 +1024,7 @@ Dependencies: `base, extensions.location_minimal`
 
 This schema extension adds the BGP Communities models.
 
-Dependencies: `base, extensions.routing`
+Dependencies: `base, extensions/routing`
 
 ## bgp_community
 
@@ -1186,7 +1102,7 @@ Dependencies: `base`
 
 This extension is using the Routing Policies extensions and the Routing Aggregate one together.
 
-Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_aggregate`
+Dependencies: `base, extensions/routing, extensions/routing_policies, extensions/routing_aggregate`
 
 ## routing_policies_aggregate
 
@@ -1200,24 +1116,6 @@ Dependencies: `base, extensions.routing, extensions.routing_policies, extensions
 - **Label:** Aggregate Routing Policies
 - **Icon:** carbon:deployment-policy
 - **Include in Menu:** ❌
-
-## Extensions
-
-### RoutingAggregate
-
-#### Attributes
-
-| name | kind | state |
-| ---- | ---- | ----- |
-| import\_policies | Text | absent |
-| export\_policies | Text | absent |
-
-#### Relationships
-
-| name | label | peer | identifier | description | kind | cardinality |
-| ---- | ----- | ---- | ---------- | ----------- | ---- | ----------- |
-| import\_routing\_policies | Import Routing Policies | RoutingPolicyAggregate | aggregate\_\_import\_policies | The routing\-policies used by this instance for import\. | Generic | many |
-| export\_routing\_policies | Export Routing Policies | RoutingPolicyAggregate | aggregate\_\_export\_policies | The routing\-policies used by this instance for export\. | Generic | many |
 
 # Location Minimal
 
@@ -1305,7 +1203,7 @@ Dependencies: `base`
 
 This schema extension contains models for VRRP.
 
-Dependencies: `base, base.dcim, base.ipam`
+Dependencies: `base`
 
 ## vrrp
 
@@ -1364,11 +1262,11 @@ Dependencies: `base, base.dcim, base.ipam`
 | name | description | label | peer | optional | cardinality | kind | order_weight |
 | ---- | ----------- | ----- | ---- | -------- | ----------- | ---- | ------------ |
 | vrrp\_group | VRRP Group | VRRP Group | NetworkVRRPGroup | False | one | Attribute | 1200 |
-| interface | Interface L3 | Interface | DcimInterfaceL3 | False | one | Attribute | 1300 |
+| interface | Interface L3 | Interface | InterfaceLayer3 | False | one | Attribute | 1300 |
 
 ## Extensions
 
-### DcimInterfaceL3
+### InterfaceLayer3
 
 #### Relationships
 
@@ -1388,7 +1286,7 @@ Dependencies: `base, base.dcim, base.ipam`
 
 This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)!
 
-Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.routing_bgp_community`
+Dependencies: `base, extensions/routing, extensions/routing_bgp, extensions/routing_bgp_community`
 
 ## peering_ixp
 
@@ -1554,7 +1452,7 @@ Dependencies: `base`
 
 This extension is using the Routing Policies extensions and the Routing OSPF one together.
 
-Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_ospf`
+Dependencies: `base, extensions/routing, extensions/routing_policies, extensions/routing_ospf`
 
 ## routing_policies_ospf
 
@@ -1713,7 +1611,7 @@ Dependencies: `base`
 
 This schema extension contains all you need to model the PIM Protocol.
 
-Dependencies: `base, extensions.routing`
+Dependencies: `base, extensions/routing`
 
 ## pim
 
@@ -1762,19 +1660,19 @@ Dependencies: `base, extensions.routing`
 
 #### Attributes
 
-| name | kind | optional | description | order_weight | choices | default_value |
-| ---- | ---- | -------- | ----------- | ------------ | ------- | ------------- |
-| description | Text | False | Description of the OSPF interface\. | 1100 | \`\` |  |
-| pim\_mode | Dropdown |  | PIM mode used for multicast routing on this interface\. | 1150 | \`sparse, dense, bidirectional\` |  |
-| hello\_interval | Number | True | Interval for PIM hello messages \(in seconds\)\. | 1300 | \`\` | 30 |
-| dr\_priority | Number | True | Designated Router priority on the interface\. | 1250 | \`\` | 1 |
+| name | kind | optional | unique | description | order_weight | choices | default_value |
+| ---- | ---- | -------- | ------ | ----------- | ------------ | ------- | ------------- |
+| description | Text | False | True | Description of the OSPF interface\. | 1100 | \`\` |  |
+| pim\_mode | Dropdown |  |  | PIM mode used for multicast routing on this interface\. | 1150 | \`sparse, dense, bidirectional\` |  |
+| hello\_interval | Number | True |  | Interval for PIM hello messages \(in seconds\)\. | 1300 | \`\` | 30 |
+| dr\_priority | Number | True |  | Designated Router priority on the interface\. | 1250 | \`\` | 1 |
 
 #### Relationships
 
 | name | label | peer | identifier | optional | cardinality | kind | order_weight |
 | ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
 | pim | PIM | RoutingPIM | pim\_\_piminterfaces | False | one | Parent |  |
-| interface |  | DcimInterfaceL3 |  | False | one | Attribute | 1200 |
+| interface |  | InterfaceLayer3 |  | False | one | Attribute | 1200 |
 
 # Cable
 
@@ -1811,6 +1709,8 @@ This schema extension allows you to capture patch panel related information like
 
 > [!NOTE]
 > This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
+
+Dependencies: `base`
 
 ## patch_panel
 
@@ -1931,7 +1831,7 @@ This schema extension allows you to capture patch panel related information like
 
 This schema extension contains all you need to model the Aggregate Routing Protocol.
 
-Dependencies: `base, extensions.routing`
+Dependencies: `base, extensions/routing`
 
 ## aggregate
 
@@ -1964,7 +1864,7 @@ Dependencies: `base, extensions.routing`
 
 This schema extension contains models for OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies such as DWDM (Dense Wavelength Division Multiplexing) or CWDM (Coarse Wavelength Division Multiplexing). With some vendors, the tunable optics are not configured via the channel number but via the wavelength and/or the frequency. This model provides a unique entry in Infrahub for those.
 
-Dependencies: `base, extensions.sfp`
+Dependencies: `base, extensions/sfp`
 
 ## dwdm
 
@@ -2003,11 +1903,11 @@ Dependencies: `base, extensions.sfp`
 
 #### Attributes
 
-| name | kind | order_weight | description | optional | choices | default_value |
-| ---- | ---- | ------------ | ----------- | -------- | ------- | ------------- |
-| name | Text | 1000 |  |  | \`\` |  |
-| wdm\_type | Dropdown | 1110 | Type of WDM \(e\.g CWDM\. DWDM\) | False | \`cwdm, dwdm\` | dwdm |
-| description | Text | 2000 |  | True | \`\` |  |
+| name | kind | unique | order_weight | description | optional | choices | default_value |
+| ---- | ---- | ------ | ------------ | ----------- | -------- | ------- | ------------- |
+| name | Text | True | 1000 |  |  | \`\` |  |
+| wdm\_type | Dropdown |  | 1110 | Type of WDM \(e\.g CWDM\. DWDM\) | False | \`cwdm, dwdm\` | dwdm |
+| description | Text |  | 2000 |  | True | \`\` |  |
 
 #### Relationships
 
@@ -2168,11 +2068,13 @@ Dependencies: `base`
 
 This schema extension brings extensions to VLAN model in order to support QinQ.
 
-Dependencies: `base, extensions.vlan`
+Dependencies: `base, extensions/vlan`
 
 # Firewall Policer
 
 This schema extension contains models for VMs. You might consider Cluster or/and Hypervisor extension to go with!
+
+Dependencies: `base`
 
 ## firewall_policer
 
@@ -2334,7 +2236,7 @@ Dependencies: `base`
 
 This schema extension contains generics to create Routing Protocol "Instance". The idea is to create one Routing Protocol instance per IpamVRF + DcimDevice pair.
 
-Dependencies: `base, extensions.vlan`
+Dependencies: `base, extensions/vlan`
 
 ## routing
 
@@ -2351,10 +2253,10 @@ Dependencies: `base, extensions.vlan`
 
 #### Attributes
 
-| name | kind | optional | description | order_weight | choices |
-| ---- | ---- | -------- | ----------- | ------------ | ------- |
-| description | Text | False | Description of the protocol | 1100 | \`\` |
-| status | Dropdown |  | Status of the Protocol Configuration\. | 1150 | \`active, disabled, deleted\` |
+| name | kind | optional | unique | description | order_weight | choices |
+| ---- | ---- | -------- | ------ | ----------- | ------------ | ------- |
+| description | Text | False | True | Description of the protocol | 1100 | \`\` |
+| status | Dropdown |  |  | Status of the Protocol Configuration\. | 1150 | \`active, disabled, deleted\` |
 
 #### Relationships
 
@@ -2367,7 +2269,7 @@ Dependencies: `base, extensions.vlan`
 
 This schema extension contains all you need to model your BGP platform.
 
-Dependencies: `base, extensions.routing`
+Dependencies: `base, extensions/routing`
 
 ## bgp
 
@@ -2599,7 +2501,7 @@ Dependencies: `base`
 
 A rather generic cluster built with compute units (e.g. servers) and able to host VMs.
 
-Dependencies: `base, extensions.cluster, extensions.compute`
+Dependencies: `base, extensions/cluster, extensions/compute`
 
 ## hosting_cluster
 
@@ -2626,7 +2528,7 @@ Dependencies: `base, extensions.cluster, extensions.compute`
 
 This schema extension contains all you need to model the OSPF Routing Protocol.
 
-Dependencies: `base, extensions.routing`
+Dependencies: `base, extensions/routing`
 
 ## ospf
 
@@ -2676,27 +2578,27 @@ Dependencies: `base, extensions.routing`
 
 #### Attributes
 
-| name | kind | optional | description | order_weight | choices | default_value |
-| ---- | ---- | -------- | ----------- | ------------ | ------- | ------------- |
-| description | Text | False | Description of the OSPF interface\. | 1500 | \`\` |  |
-| metric | Number | True | OSPF metric for the interface\. | 1400 | \`\` |  |
-| mode | Dropdown |  | Mode of the OSPF interface\. | 1300 | \`normal, passive, peer\_to\_peer\` | normal |
-| authentication\_key | Password | True | Shared secret used to authenticate and secure routing messages between neighboring routers\. | 1250 | \`\` |  |
-| authentication\_mode | Dropdown | True |  | 1225 | \`md5, sha1\` |  |
-| area | Text |  | OSPF area associated with the interface\. | 1200 | \`\` |  |
+| name | kind | optional | unique | description | order_weight | choices | default_value |
+| ---- | ---- | -------- | ------ | ----------- | ------------ | ------- | ------------- |
+| description | Text | False | True | Description of the OSPF interface\. | 1500 | \`\` |  |
+| metric | Number | True |  | OSPF metric for the interface\. | 1400 | \`\` |  |
+| mode | Dropdown |  |  | Mode of the OSPF interface\. | 1300 | \`normal, passive, peer\_to\_peer\` | normal |
+| authentication\_key | Password | True |  | Shared secret used to authenticate and secure routing messages between neighboring routers\. | 1250 | \`\` |  |
+| authentication\_mode | Dropdown | True |  |  | 1225 | \`md5, sha1\` |  |
+| area | Text |  |  | OSPF area associated with the interface\. | 1200 | \`\` |  |
 
 #### Relationships
 
 | name | label | peer | identifier | optional | cardinality | kind | order_weight |
 | ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
 | ospf | OSPF | RoutingOSPF | ospf\_\_ospfinterfaces | False | one | Parent | 1100 |
-| interface |  | DcimInterfaceL3 |  | False | one | Attribute | 1200 |
+| interface |  | InterfaceLayer3 |  | False | one | Attribute | 1200 |
 
 # Infiniband
 
 This schema extension adds support for InfiniBand switches.
 
-Dependencies: `base, extensions.compute`
+Dependencies: `base, extensions/compute`
 
 ## infiniband
 
@@ -3328,6 +3230,153 @@ Dependencies: `base`
 | ---- | ----- | ---- | -------- | ----------- | ------------ |
 | network\_service | Network Service | TopologyNetworkService | True | one | 1400 |
 
+# Routing Engine Module
+
+This schema extension allows you to capture Routing Engine related information like the version. You can insert the Routing Engine into a Dcim Physical Device and leverage the Routing Engine type model.
+
+Dependencies: `base, extensions/modules`
+
+## routing_engine
+
+- **Version:** 1.0
+
+## Nodes
+
+### RoutingEngineType
+
+- **Description:** Routing Engine Type information, detailing specifications such as part number and manufacturer.
+- **Label:** Routing Engine Type
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | peer | cardinality | kind | description |
+| ---- | ---- | ----------- | ---- | ----------- |
+| routing\_engines | DeviceRoutingEngine | many | Generic | Routing engines of this type\. |
+
+### RoutingEngine
+
+- **Description:** A Routing Engine (RE) installed in a device, responsible for routing functionalities.
+- **Label:** Routing Engine
+- **Icon:** mdi:cpu-64-bit
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**device__name__value, slot__value
+- **Uniqueness Constraints:**serial_number__value
+
+#### Attributes
+
+| name | kind | description | order_weight | label | optional |
+| ---- | ---- | ----------- | ------------ | ----- | -------- |
+| slot | Number | The slot number where the Routing Engine is installed within the device | 1100 |  |  |
+| version | Text | Firmware version of the Routing Engine\. | 1200 | Version | True |
+
+#### Relationships
+
+| name | label | peer | optional | cardinality | kind | order_weight |
+| ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
+| routing\_engine\_type | RE Type | DeviceRoutingEngineType | False | one | Attribute | 1150 |
+
+# Linecard Module
+
+This schema extension allows you to capture Linecard related information like the version. You can insert the Linecard into a Dcim Physical Device and leverage the Linecard type model. The Linecard can accept PIC to help configure PORT information like breakout-capabilities and configurations.
+
+Dependencies: `base, extensions/modules`
+
+## linecard
+
+- **Version:** 1.0
+
+## Nodes
+
+### LinecardType
+
+- **Description:** Linecard Type information, detailing specifications such as part number and manufacturer.
+- **Label:** Linecard Type
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | peer | cardinality | kind | description |
+| ---- | ---- | ----------- | ---- | ----------- |
+| linecards | DeviceLinecard | many | Generic | Linecards of this type\. |
+
+### Linecard
+
+- **Description:** A Linecard installed in a device, specifying slot, power status, and functionalities.
+- **Label:** Linecard
+- **Icon:** bi:pci-card
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**device__name__value, slot__value
+- **Uniqueness Constraints:**serial_number__value
+
+#### Attributes
+
+| name | kind | description | order_weight | label | optional | default_value |
+| ---- | ---- | ----------- | ------------ | ----- | -------- | ------------- |
+| slot | Number | The slot number where the Linecard is installed within the device | 1050 |  |  |  |
+| bng\_enabled | Boolean | BNG activated or deactivated on the Linecard | 1400 | BNG Enabled | True | False |
+
+#### Relationships
+
+| name | label | peer | optional | cardinality | kind | order_weight |
+| ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
+| linecard\_type | Linecard Type | DeviceLinecardType | False | one | Attribute | 1150 |
+| pics | PICs | DevicePic | True | many | Attribute | 1500 |
+
+### Pic
+
+- **Description:** Physical Interface Card (PIC) installed in the Linecard, containing multiple ports.
+- **Label:** PIC
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**linecard__serial_number__value, slot__value
+- **Uniqueness Constraints:**linecard + slot__value
+
+#### Attributes
+
+| name | kind | description | order_weight |
+| ---- | ---- | ----------- | ------------ |
+| slot | Number | Slot number of the PIC within the Linecard | 1200 |
+
+#### Relationships
+
+| name | label | peer | identifier | optional | cardinality | kind | order_weight |
+| ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
+| linecard | Linecard | DeviceLinecard | linecard\_\_pics | False | one | Parent | 1000 |
+| ports | Ports | InfraPort |  | True | many | Component | 1100 |
+
+### Port
+
+- **Description:** A network port on a PIC, specifying speed and port number.
+- **Label:** Port
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**pic__slot__value, port_number__value
+- **Uniqueness Constraints:**pic + port_number__value
+
+#### Attributes
+
+| name | kind | description | order_weight | choices |
+| ---- | ---- | ----------- | ------------ | ------- |
+| port\_number | Number | Port number on the PIC | 1100 | \`\` |
+| speed | Dropdown | Speed of the port | 1200 | \`10g, 100g\` |
+
+#### Relationships
+
+| name | label | peer | optional | cardinality | kind | order_weight |
+| ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
+| pic | PIC | DevicePic | False | one | Parent | 1000 |
+
 # Security
 
 This schema extension contains models for implementing detailed security.
@@ -3927,7 +3976,7 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 
 This schema extension introduces tenancy for some of the schema nodes (circuits...)
 
-Dependencies: `base, extensions.circuit, experimental.location_extended`
+Dependencies: `base, extensions/circuit`
 
 ## tenancy
 
@@ -3952,6 +4001,8 @@ Dependencies: `base, extensions.circuit, experimental.location_extended`
 # Quality of Service (QoS)
 
 This schema extension contains models for Quality of Service (QoS)
+
+Dependencies: `base`
 
 ## qos
 
@@ -4101,7 +4152,7 @@ For example you have a MPLS network supported by a provider connecting multiple 
 - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...)
 - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side
 
-Dependencies: `extensions.circuit`
+Dependencies: `extensions/circuit`
 
 ## circuit_service
 
@@ -4159,7 +4210,7 @@ Dependencies: `extensions.circuit`
 
 This schema extension is based on Juniper VLAN MAP, and not yet test out for other vendors.
 
-Dependencies: `base.dcim`
+Dependencies: `base`
 
 ## vlan-translation
 

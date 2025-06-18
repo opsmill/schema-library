@@ -2,7 +2,7 @@
 
 This schema extension contains all you need to model the OSPF Routing Protocol.
 
-Dependencies: `base, extensions.routing`
+Dependencies: `base, extensions/routing`
 
 ## ospf
 
@@ -52,18 +52,18 @@ Dependencies: `base, extensions.routing`
 
 #### Attributes
 
-| name | kind | optional | description | order_weight | choices | default_value |
-| ---- | ---- | -------- | ----------- | ------------ | ------- | ------------- |
-| description | Text | False | Description of the OSPF interface\. | 1500 | \`\` |  |
-| metric | Number | True | OSPF metric for the interface\. | 1400 | \`\` |  |
-| mode | Dropdown |  | Mode of the OSPF interface\. | 1300 | \`normal, passive, peer\_to\_peer\` | normal |
-| authentication\_key | Password | True | Shared secret used to authenticate and secure routing messages between neighboring routers\. | 1250 | \`\` |  |
-| authentication\_mode | Dropdown | True |  | 1225 | \`md5, sha1\` |  |
-| area | Text |  | OSPF area associated with the interface\. | 1200 | \`\` |  |
+| name | kind | optional | unique | description | order_weight | choices | default_value |
+| ---- | ---- | -------- | ------ | ----------- | ------------ | ------- | ------------- |
+| description | Text | False | True | Description of the OSPF interface\. | 1500 | \`\` |  |
+| metric | Number | True |  | OSPF metric for the interface\. | 1400 | \`\` |  |
+| mode | Dropdown |  |  | Mode of the OSPF interface\. | 1300 | \`normal, passive, peer\_to\_peer\` | normal |
+| authentication\_key | Password | True |  | Shared secret used to authenticate and secure routing messages between neighboring routers\. | 1250 | \`\` |  |
+| authentication\_mode | Dropdown | True |  |  | 1225 | \`md5, sha1\` |  |
+| area | Text |  |  | OSPF area associated with the interface\. | 1200 | \`\` |  |
 
 #### Relationships
 
 | name | label | peer | identifier | optional | cardinality | kind | order_weight |
 | ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
 | ospf | OSPF | RoutingOSPF | ospf\_\_ospfinterfaces | False | one | Parent | 1100 |
-| interface |  | DcimInterfaceL3 |  | False | one | Attribute | 1200 |
+| interface |  | InterfaceLayer3 |  | False | one | Attribute | 1200 |

@@ -2,7 +2,7 @@
 
 This schema extension contains all you need to model the Aggregate Routing Protocol.
 
-Dependencies: `base, extensions.routing`
+Dependencies: `base, extensions/routing`
 
 ## aggregate
 

@@ -2,7 +2,7 @@
 
 This schema extension contains Circuits and ways to connect them with your infrastructure! The circuit could be a fiber connecting two sites, you would then have two endpoints, one on each site.
 
-Dependencies: `base, extensions.location_minimal`
+Dependencies: `base, extensions/location_minimal`
 
 ## circuit
 

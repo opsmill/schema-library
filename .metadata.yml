@@ -35,6 +35,25 @@ experimental/location_extended:
     This schema extension is the most detailed when it comes to location,
     you'll find all the layers you can think of.
   name: Location Extended
+experimental/modules_linecards:
+  dependencies:
+    - base
+    - extensions/modules
+  description:
+    This schema extension allows you to capture Linecard related information
+    like the version. You can insert the Linecard into a Dcim Physical Device
+    and leverage the Linecard type model. The Linecard can accept PIC to help
+    configure PORT information like breakout-capabilities and configurations.
+  name: Linecard Module
+experimental/modules_routing_engine:
+  dependencies:
+    - base
+    - extensions/modules
+  description:
+    This schema extension allows you to capture Routing Engine related information
+    like the version. You can insert the Routing Engine into a Dcim Physical Device
+    and leverage the Routing Engine type model.
+  name: Routing Engine Module
 experimental/qos:
   dependencies:
     - base

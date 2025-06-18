@@ -2,6 +2,8 @@
 
 This schema extension contains models for Quality of Service (QoS)
 
+Dependencies: `base`
+
 ## qos
 
 - **Version:** 1.0

@@ -2,7 +2,7 @@
 
 This schema extension contains models for OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies such as DWDM (Dense Wavelength Division Multiplexing) or CWDM (Coarse Wavelength Division Multiplexing). With some vendors, the tunable optics are not configured via the channel number but via the wavelength and/or the frequency. This model provides a unique entry in Infrahub for those.
 
-Dependencies: `base, extensions.sfp`
+Dependencies: `base, extensions/sfp`
 
 ## dwdm
 
@@ -41,11 +41,11 @@ Dependencies: `base, extensions.sfp`
 
 #### Attributes
 
-| name | kind | order_weight | description | optional | choices | default_value |
-| ---- | ---- | ------------ | ----------- | -------- | ------- | ------------- |
-| name | Text | 1000 |  |  | \`\` |  |
-| wdm\_type | Dropdown | 1110 | Type of WDM \(e\.g CWDM\. DWDM\) | False | \`cwdm, dwdm\` | dwdm |
-| description | Text | 2000 |  | True | \`\` |  |
+| name | kind | unique | order_weight | description | optional | choices | default_value |
+| ---- | ---- | ------ | ------------ | ----------- | -------- | ------- | ------------- |
+| name | Text | True | 1000 |  |  | \`\` |  |
+| wdm\_type | Dropdown |  | 1110 | Type of WDM \(e\.g CWDM\. DWDM\) | False | \`cwdm, dwdm\` | dwdm |
+| description | Text |  | 2000 |  | True | \`\` |  |
 
 #### Relationships
 

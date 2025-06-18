@@ -2,7 +2,7 @@
 
 This extension is using the Routing Policies extensions and the Routing BGP one together.
 
-Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_bgp`
+Dependencies: `base, extensions/routing, extensions/routing_policies, extensions/routing_bgp`
 
 ## routing_policies_bgp
 

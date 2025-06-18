@@ -5,6 +5,8 @@ This schema extension allows you to capture patch panel related information like
 > [!NOTE]
 > This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
 
+Dependencies: `base`
+
 ## patch_panel
 
 - **Version:** 1.0

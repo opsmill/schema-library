@@ -2,6 +2,8 @@
 
 This schema extension contains models for VMs. You might consider Cluster or/and Hypervisor extension to go with!
 
+Dependencies: `base`
+
 ## firewall_policer
 
 - **Version:** 1.0

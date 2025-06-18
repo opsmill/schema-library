@@ -2,7 +2,7 @@
 
 A rather generic cluster built with compute units (e.g. servers) and able to host VMs.
 
-Dependencies: `base, extensions.cluster, extensions.compute`
+Dependencies: `base, extensions/cluster, extensions/compute`
 
 ## hosting_cluster
 

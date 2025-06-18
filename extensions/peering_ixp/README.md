@@ -2,7 +2,7 @@
 
 This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)!
 
-Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.routing_bgp_community`
+Dependencies: `base, extensions/routing, extensions/routing_bgp, extensions/routing_bgp_community`
 
 ## peering_ixp
 

@@ -1,8 +1,8 @@
-# Routing Engine
+# Routing Engine Module
 
 This schema extension allows you to capture Routing Engine related information like the version. You can insert the Routing Engine into a Dcim Physical Device and leverage the Routing Engine type model.
 
-Dependencies: `base, extensions.modules`
+Dependencies: `base, extensions/modules`
 
 ## routing_engine
 
@@ -20,7 +20,7 @@ Dependencies: `base, extensions.modules`
 
 | name | peer | cardinality | kind | description |
 | ---- | ---- | ----------- | ---- | ----------- |
-| routing\_engines | InfraRoutingEngine | many | Generic | Routing engines of this type\. |
+| routing\_engines | DeviceRoutingEngine | many | Generic | Routing engines of this type\. |
 
 ### RoutingEngine
 
@@ -45,4 +45,4 @@ Dependencies: `base, extensions.modules`
 
 | name | label | peer | optional | cardinality | kind | order_weight |
 | ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
-| routing\_engine\_type | RE Type | InfraRoutingEngineType | False | one | Attribute | 1150 |
+| routing\_engine\_type | RE Type | DeviceRoutingEngineType | False | one | Attribute | 1150 |

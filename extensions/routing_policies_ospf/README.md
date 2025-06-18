@@ -2,7 +2,7 @@
 
 This extension is using the Routing Policies extensions and the Routing OSPF one together.
 
-Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_ospf`
+Dependencies: `base, extensions/routing, extensions/routing_policies, extensions/routing_ospf`
 
 ## routing_policies_ospf
 

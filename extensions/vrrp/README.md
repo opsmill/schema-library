@@ -2,7 +2,7 @@
 
 This schema extension contains models for VRRP.
 
-Dependencies: `base, base.dcim, base.ipam`
+Dependencies: `base`
 
 ## vrrp
 
@@ -61,11 +61,11 @@ Dependencies: `base, base.dcim, base.ipam`
 | name | description | label | peer | optional | cardinality | kind | order_weight |
 | ---- | ----------- | ----- | ---- | -------- | ----------- | ---- | ------------ |
 | vrrp\_group | VRRP Group | VRRP Group | NetworkVRRPGroup | False | one | Attribute | 1200 |
-| interface | Interface L3 | Interface | DcimInterfaceL3 | False | one | Attribute | 1300 |
+| interface | Interface L3 | Interface | InterfaceLayer3 | False | one | Attribute | 1300 |
 
 ## Extensions
 
-### DcimInterfaceL3
+### InterfaceLayer3
 
 #### Relationships
 

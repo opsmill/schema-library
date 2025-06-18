@@ -6,7 +6,7 @@ For example you have a MPLS network supported by a provider connecting multiple 
 - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...)
 - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side
 
-Dependencies: `extensions.circuit`
+Dependencies: `extensions/circuit`
 
 ## circuit_service
 

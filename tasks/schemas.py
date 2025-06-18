@@ -301,6 +301,25 @@ def build(context: Context) -> None:
     content = generate_readme(schema[str(base_path)], base_path)
     all_content.extend(content)
 
+    # --- Table of Contents Generation ---
+    toc = ["# Table of Contents\n"]
+    toc.append("## Base\n")
+    for yml_file in sorted(base_path.glob("*.yml")):
+        name = yml_file.stem
+        toc.append(f"- [{name}](#base-schemas)")
+    toc.append("\n## Extensions\n")
+    for entry in sorted(os.listdir("./extensions")):
+        ext_path = Path("./extensions") / entry
+        if ext_path.is_dir():
+            toc.append(f"- [{entry}](#extension-{entry})")
+    toc.append("\n## Experimental\n")
+    for entry in sorted(os.listdir("./experimental")):
+        exp_path = Path("./experimental") / entry
+        if exp_path.is_dir():
+            toc.append(f"- [{entry}](#experimental-{entry})")
+    all_content.insert(1, "\n".join(toc) + "\n")
+    # --- End Table of Contents ---
+
     for directory in directories_to_parse:
         for entry in os.listdir(directory):
             if os.path.isdir(directory / entry):
