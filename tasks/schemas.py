@@ -233,8 +233,6 @@ def generate_readme(schema, extension_dir: Path) -> list:
         return node_markdown
 
     for _, file_values in schema_definition_files.items():
-        # content.append(f"## {_}\n")
-        # content.append(f"## {_}\n")
         content.append(f"- **Version:** {file_values['version']}\n")
 
         if generics := file_values.get("generics", []):
