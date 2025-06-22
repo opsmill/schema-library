@@ -195,8 +195,8 @@ extensions/modules:
   description: |
     This schema extension allows you to capture Device Modules related information like the serial number or the status. You can insert the Module into a Dcim Physical Device.
 
-    > [!NOTE]
-    > This extension doesn't contain any Node, you can use the extension module_linecards or modules_routing_engine to use it
+    [!NOTE]
+    This extension doesn't contain any Node, you can use the extension module_linecards or modules_routing_engine to use it
   name: Modules
 extensions/patch_panel:
   dependencies:
@@ -204,8 +204,8 @@ extensions/patch_panel:
   description: |
     This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture information about potential modules you would insert into your patch panel.
 
-    > [!NOTE]
-    > This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
+    [!NOTE]
+    This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
   name: Patch Panel
 extensions/peering_ixp:
   dependencies:
@@ -223,8 +223,8 @@ extensions/physical_disk:
   description: |
     Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management.
 
-    > [!NOTE]
-    > This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares.
+    [!NOTE]
+    This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares.
   name: Physical Disks
 extensions/qinq:
   dependencies:

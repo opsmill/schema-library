@@ -282,6 +282,12 @@ def generate_readme(schema, extension_dir: Path) -> list:
     return content
 
 
+def sanitize_description(desc):
+    if not isinstance(desc, str):
+        return desc
+    return desc.replace('\n', ' ').replace('  ', ' ').strip()
+
+
 def generate_toc(schema, extensions_path, experimental_path):
     toc = ["# Schema Library Documentation\n"]
     toc.append("## Base\n")
@@ -290,7 +296,7 @@ def generate_toc(schema, extensions_path, experimental_path):
     for key in sorted(schema.keys()):
         if key.startswith("base/"):
             name = key.split("/", 1)[1]
-            desc = schema[key].get("description", "")
+            desc = sanitize_description(schema[key].get("description", ""))
             toc.append(f"| [{name}](#{name}) | {desc} |")
     toc.append("\n## Extensions\n")
     toc.append("| name | description |")
@@ -300,7 +306,7 @@ def generate_toc(schema, extensions_path, experimental_path):
         if ext_path.is_dir():
             desc = ""
             if str(ext_path) in schema and "description" in schema[str(ext_path)]:
-                desc = schema[str(ext_path)]["description"]
+                desc = sanitize_description(schema[str(ext_path)]["description"])
             toc.append(f"| [{entry}](#{entry}) | {desc} |")
     toc.append("\n## Experimental\n")
     toc.append("| name | description |")
@@ -310,7 +316,7 @@ def generate_toc(schema, extensions_path, experimental_path):
         if exp_path.is_dir():
             desc = ""
             if str(exp_path) in schema and "description" in schema[str(exp_path)]:
-                desc = schema[str(exp_path)]["description"]
+                desc = sanitize_description(schema[str(exp_path)]["description"])
             toc.append(f"| [{entry}](#{entry}) | {desc} |")
     return "\n".join(toc) + "\n"
 
