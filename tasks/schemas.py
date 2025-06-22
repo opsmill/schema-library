@@ -2,6 +2,7 @@ import os
 from collections import defaultdict, deque
 from pathlib import Path
 import copy
+import re
 
 import yaml  # type: ignore
 from invoke import Context, task  # type: ignore
@@ -290,7 +291,6 @@ def sanitize_description(desc):
 
 def normalize_anchor(name: str) -> str:
     """Normalize a string to match Docusaurus/GitHub anchor links."""
-    import re
 
     anchor = name.strip().lower()
     anchor = anchor.replace("_", "-").replace(" ", "-")
