@@ -1,6 +1,6 @@
-## Interface Breakdown
+## Interface Breakout
 
-This schema extension introduces relationships to support breakout interfaces, enabling you to document the breakdown of a physical interface into smaller physical interfaces.
+This schema extension introduces relationships to support breakout interfaces, enabling you to document the breakout of a physical interface into smaller physical interfaces.
 
 - **Dependencies:** `base`
 - **Version:** 1.0

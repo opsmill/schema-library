@@ -1,4 +1,4 @@
-## BGP Communities
+## Routing BGP Community
 
 This schema extension adds the BGP Communities models.
 

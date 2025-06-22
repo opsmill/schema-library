@@ -1,8 +1,6 @@
 ## Routing Policies
 
-This schema extension contains a generic to create Routing Policies.
-
-This Generic can be extend for each Routing Protocols you may want to use.
+This schema extension contains a generic to create Routing Policies. This Generic can be extend for each Routing Protocols you may want to use.
 
 - **Dependencies:** `base`
 - **Version:** 1.0

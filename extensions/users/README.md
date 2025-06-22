@@ -1,6 +1,6 @@
-## Accounts Management
+## Users
 
-This schema extension contains models for Accounts management.
+This schema extension contains models for account management.
 
 - **Dependencies:** `base`
 - **Version:** 1.0

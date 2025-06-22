@@ -1,4 +1,4 @@
-## Linecard Module
+## Modules Linecards
 
 This schema extension allows you to capture Linecard related information like the version. You can insert the Linecard into a Dcim Physical Device and leverage the Linecard type model. The Linecard can accept PIC to help configure PORT information like breakout-capabilities and configurations.
 

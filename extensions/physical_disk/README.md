@@ -1,4 +1,4 @@
-## Physical Disks
+## Physical Disk
 
 Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management.
 

@@ -288,6 +288,16 @@ def sanitize_description(desc):
     return desc.replace("\n", " ").replace("  ", " ").strip()
 
 
+def normalize_anchor(name: str) -> str:
+    """Normalize a string to match Docusaurus/GitHub anchor links."""
+    import re
+
+    anchor = name.strip().lower()
+    anchor = anchor.replace("_", "-").replace(" ", "-")
+    anchor = re.sub(r"[^a-z0-9\-]", "", anchor)
+    return anchor
+
+
 def generate_toc(schema, extensions_path, experimental_path):
     toc = ["# Schema Library Documentation\n"]
     toc.append("## Base\n")
@@ -297,7 +307,8 @@ def generate_toc(schema, extensions_path, experimental_path):
         if key.startswith("base/"):
             name = key.split("/", 1)[1]
             desc = sanitize_description(schema[key].get("description", ""))
-            toc.append(f"| [{name}](#{name}) | {desc} |")
+            anchor = normalize_anchor(name)
+            toc.append(f"| [{name}](#{anchor}) | {desc} |")
     toc.append("\n## Extensions\n")
     toc.append("| name | description |")
     toc.append("| ---- | ----------- |")
@@ -307,7 +318,8 @@ def generate_toc(schema, extensions_path, experimental_path):
             desc = ""
             if str(ext_path) in schema and "description" in schema[str(ext_path)]:
                 desc = sanitize_description(schema[str(ext_path)]["description"])
-            toc.append(f"| [{entry}](#{entry}) | {desc} |")
+            anchor = normalize_anchor(entry)
+            toc.append(f"| [{entry}](#{anchor}) | {desc} |")
     toc.append("\n## Experimental\n")
     toc.append("| name | description |")
     toc.append("| ---- | ----------- |")
@@ -317,7 +329,8 @@ def generate_toc(schema, extensions_path, experimental_path):
             desc = ""
             if str(exp_path) in schema and "description" in schema[str(exp_path)]:
                 desc = sanitize_description(schema[str(exp_path)]["description"])
-            toc.append(f"| [{entry}](#{entry}) | {desc} |")
+            anchor = normalize_anchor(entry)
+            toc.append(f"| [{entry}](#{anchor}) | {desc} |")
     return "\n".join(toc) + "\n"
 
 

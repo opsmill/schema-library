@@ -1,4 +1,4 @@
-## Base Organizations
+## Organization
 
 Basic Organization schema to capture organizations, vendors, and related information.
 

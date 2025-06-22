@@ -22,34 +22,34 @@ title: Schema Library Documentation
 | [circuit](#circuit) | This schema extension contains Circuits and ways to connect them with your infrastructure! The circuit could be a fiber connecting two sites, you would then have two endpoints, one on each site. |
 | [cluster](#cluster) | This schema extension contains the foundations to capture clusters. With this one in place you can unlock various clusters flavors (hosting cluster able to host VMs, firewall clusters built with specific appliances ...) |
 | [compute](#compute) | With this schema extension in place you will be able to capture all your physical servers. It also gives you the baseline to build virtualization. You might consider HostingCluster extension to go with! |
-| [cross_connect](#cross_connect) | This extension contains schema to capture Cross Connect. You can see it as "a cable operated by a provider". You will be able to attach it to a location and then connect endpoints to it (e.g. rear interface of a patch panel, circuit endpoint ...) |
+| [cross_connect](#cross-connect) | This extension contains schema to capture Cross Connect. You can see it as "a cable operated by a provider". You will be able to attach it to a location and then connect endpoints to it (e.g. rear interface of a patch panel, circuit endpoint ...) |
 | [dwdm](#dwdm) | This schema extension contains models for OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies such as DWDM (Dense Wavelength Division Multiplexing) or CWDM (Coarse Wavelength Division Multiplexing). With some vendors, the tunable optics are not configured via the channel number but via the wavelength and/or the frequency. This model provides a unique entry in Infrahub for those. |
-| [firewall_policer](#firewall_policer) | This schema extension contains models for VMs. You might consider Cluster or/and Hypervisor extension to go with! |
-| [hosting_cluster](#hosting_cluster) | A rather generic cluster built with compute units (e.g. servers) and able to host VMs. |
-| [interface_breakout](#interface_breakout) | This schema extension introduces relationships to support breakout interfaces, enabling you to document the breakdown of a physical interface into smaller physical interfaces. |
+| [firewall_policer](#firewall-policer) | This schema extension contains models for VMs. You might consider Cluster or/and Hypervisor extension to go with! |
+| [hosting_cluster](#hosting-cluster) | A rather generic cluster built with compute units (e.g. servers) and able to host VMs. |
+| [interface_breakout](#interface-breakout) | This schema extension introduces relationships to support breakout interfaces, enabling you to document the breakout of a physical interface into smaller physical interfaces. |
 | [lag](#lag) | This schema extension includes models for Link Aggregation Groups (LAGs), enabling you to link physical interfaces as building blocs of your LAG interface. It can be used in standard networking environments as well as in compute scenarios, such as capturing bond interfaces. |
-| [location_minimal](#location_minimal) | This schema extension is minimal but will provide you with basic items to store location related data. |
+| [location_minimal](#location-minimal) | This schema extension is minimal but will provide you with basic items to store location related data. |
 | [modules](#modules) | This schema extension allows you to capture Device Modules related information like the serial number or the status. You can insert the Module into a Dcim Physical Device. [!NOTE] This extension doesn't contain any Node, you can use the extension module_linecards or modules_routing_engine to use it |
-| [patch_panel](#patch_panel) | This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture information about potential modules you would insert into your patch panel. [!NOTE] This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces! |
-| [peering_ixp](#peering_ixp) | This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)! |
-| [physical_disk](#physical_disk) | Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management. [!NOTE] This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares. |
+| [patch_panel](#patch-panel) | This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture information about potential modules you would insert into your patch panel. [!NOTE] This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces! |
+| [peering_ixp](#peering-ixp) | This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)! |
+| [physical_disk](#physical-disk) | Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management. [!NOTE] This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares. |
 | [qinq](#qinq) | This schema extension brings extensions to VLAN model in order to support QinQ. |
 | [routing](#routing) | This schema extension contains generics to create Routing Protocol "Instance". The idea is to create one Routing Protocol instance per IpamVRF + DcimDevice pair. |
-| [routing_aggregate](#routing_aggregate) | This schema extension contains all you need to model the Aggregate Routing Protocol. |
-| [routing_bgp](#routing_bgp) | This schema extension contains all you need to model your BGP platform. |
-| [routing_bgp_community](#routing_bgp_community) | This schema extension adds the BGP Communities models. |
-| [routing_bgp_rr](#routing_bgp_rr) | This schema extension extend the BGP extension to add BGP Route Reflector Clustering. |
-| [routing_ospf](#routing_ospf) | This schema extension contains all you need to model the OSPF Routing Protocol. |
-| [routing_pim](#routing_pim) | This schema extension contains all you need to model the PIM Protocol. |
-| [routing_policies](#routing_policies) | This schema extension contains a generic to create Routing Policies. This Generic can be extend for each Routing Protocols you may want to use. |
-| [routing_policies_aggregate](#routing_policies_aggregate) | This extension is using the Routing Policies extensions and the Routing Aggregate one together. |
-| [routing_policies_bgp](#routing_policies_bgp) | This extension is using the Routing Policies extensions and the Routing BGP one together. |
-| [routing_policies_ospf](#routing_policies_ospf) | This extension is using the Routing Policies extensions and the Routing OSPF one together. |
-| [routing_policies_pim](#routing_policies_pim) | This schema inherits the `RoutingPolicy` schema and removes `import_policies` and `export_policies` attributes. However it adds a number of relationships to `RoutingPIM`. |
+| [routing_aggregate](#routing-aggregate) | This schema extension contains all you need to model the Aggregate Routing Protocol. |
+| [routing_bgp](#routing-bgp) | This schema extension contains all you need to model your BGP platform. |
+| [routing_bgp_community](#routing-bgp-community) | This schema extension adds the BGP Communities models. |
+| [routing_bgp_rr](#routing-bgp-rr) | This schema extension extend the BGP extension to add BGP Route Reflector Clustering. |
+| [routing_ospf](#routing-ospf) | This schema extension contains all you need to model the OSPF Routing Protocol. |
+| [routing_pim](#routing-pim) | This schema extension contains all you need to model the PIM Protocol. |
+| [routing_policies](#routing-policies) | This schema extension contains a generic to create Routing Policies. This Generic can be extend for each Routing Protocols you may want to use. |
+| [routing_policies_aggregate](#routing-policies-aggregate) | This extension is using the Routing Policies extensions and the Routing Aggregate one together. |
+| [routing_policies_bgp](#routing-policies-bgp) | This extension is using the Routing Policies extensions and the Routing BGP one together. |
+| [routing_policies_ospf](#routing-policies-ospf) | This extension is using the Routing Policies extensions and the Routing OSPF one together. |
+| [routing_policies_pim](#routing-policies-pim) | This schema inherits the `RoutingPolicy` schema and removes `import_policies` and `export_policies` attributes. However it adds a number of relationships to `RoutingPIM`. |
 | [sfp](#sfp) | This schema extension gives you all the models you need to document Small Form-factor Pluggable (SFP). You can either plug it into an interface or attach it to a location (e.g. it's a spare SFP stored in a rack). Improvements: - As of now there is no verification with type / form factor / protocol / distance ... - You could plug any SFP into any equipment interface (e.g. a virtual interface ...) - You could link a SFP to an interface AND a location ... |
 | [snmp](#snmp) | This schema extension contains models for SNMP Communities and SNMP Clients. As you can see this extension is not linked to Tenancy or Device, as you could decide to link the Community to different models based on your use case. |
 | [topology](#topology) | This schema extension introduces abstract network pods and services running in the pods, such as MPLS and EVPN. |
-| [users](#users) | This schema extension contains models for Accounts management. |
+| [users](#users) | This schema extension contains models for account management. |
 | [vlan](#vlan) | This schema extension contains models to support VLANs in you network. |
 | [vrf](#vrf) | This schema extension contains models to support VRF in your network. |
 | [vrrp](#vrrp) | This schema extension contains models for VRRP. |
@@ -59,18 +59,18 @@ title: Schema Library Documentation
 | name | description |
 | ---- | ----------- |
 | [azure](#azure) | This schema extension introduces cloud support for Microsoft Azure. |
-| [circuit_service](#circuit_service) | This schema extension contains model coming on top of circuit to capture a single service shared across multiple circuits. For example you have a MPLS network supported by a provider connecting multiple locations: - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...) - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side |
+| [circuit_service](#circuit-service) | This schema extension contains model coming on top of circuit to capture a single service shared across multiple circuits. For example you have a MPLS network supported by a provider connecting multiple locations: - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...) - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side |
 | [infiniband](#infiniband) | This schema extension adds support for InfiniBand switches. |
-| [location_extended](#location_extended) | This schema extension is the most detailed when it comes to location, you'll find all the layers you can think of. |
-| [modules_linecards](#modules_linecards) | This schema extension allows you to capture Linecard related information like the version. You can insert the Linecard into a Dcim Physical Device and leverage the Linecard type model. The Linecard can accept PIC to help configure PORT information like breakout-capabilities and configurations. |
-| [modules_routing_engine](#modules_routing_engine) | This schema extension allows you to capture Routing Engine related information like the version. You can insert the Routing Engine into a Dcim Physical Device and leverage the Routing Engine type model. |
+| [location_extended](#location-extended) | This schema extension is the most detailed when it comes to location, you'll find all the layers you can think of. |
+| [modules_linecards](#modules-linecards) | This schema extension allows you to capture Linecard related information like the version. You can insert the Linecard into a Dcim Physical Device and leverage the Linecard type model. The Linecard can accept PIC to help configure PORT information like breakout-capabilities and configurations. |
+| [modules_routing_engine](#modules-routing-engine) | This schema extension allows you to capture Routing Engine related information like the version. You can insert the Routing Engine into a Dcim Physical Device and leverage the Routing Engine type model. |
 | [qos](#qos) | This schema extension contains models for Quality of Service (QoS) |
 | [security](#security) | This schema extension contains models for implementing detailed security. |
 | [tenancy](#tenancy) | This schema extension introduces tenancy for some of the schema nodes (circuits...) |
 | [topology](#topology) | A schema for defining and managing network topology, strategies, and services. |
 | [vlan-translation](#vlan-translation) | This schema extension is based on Juniper VLAN MAP, and not yet test out for other vendors. |
 
-## Base DCIM
+## DCIM
 
 Basic DCIM schema to capture devices, racks, interfaces, and related information.
 
@@ -464,7 +464,7 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 | location | LocationHosting | True | one | Attribute | 1300 |  |  |
 | gateway | IpamIPAddress | True | one | Attribute | 1500 | L3 Gateway | prefix\_\_gateway |
 
-## Base IPAM
+## IPAM
 
 Basic IPAM schema to capture IP addresses, subnets, and related information.
 
@@ -858,7 +858,7 @@ Basic IPAM schema to capture IP addresses, subnets, and related information.
 | location | LocationHosting | True | one | Attribute | 1300 |  |  |
 | gateway | IpamIPAddress | True | one | Attribute | 1500 | L3 Gateway | prefix\_\_gateway |
 
-## Base Locations
+## Locations
 
 Basic Location schema to capture locations, sites, and related information.
 
@@ -1252,7 +1252,7 @@ Basic Location schema to capture locations, sites, and related information.
 | location | LocationHosting | True | one | Attribute | 1300 |  |  |
 | gateway | IpamIPAddress | True | one | Attribute | 1500 | L3 Gateway | prefix\_\_gateway |
 
-## Base Organizations
+## Organization
 
 Basic Organization schema to capture organizations, vendors, and related information.
 
@@ -1878,9 +1878,9 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 | ---- | ---- | ----------- | ------------ |
 | community | SnmpCommunity | many | 1200 |
 
-## Interface Breakdown
+## Interface Breakout
 
-This schema extension introduces relationships to support breakout interfaces, enabling you to document the breakdown of a physical interface into smaller physical interfaces.
+This schema extension introduces relationships to support breakout interfaces, enabling you to document the breakout of a physical interface into smaller physical interfaces.
 
 - **Dependencies:** `base`
 - **Version:** 1.0
@@ -1952,7 +1952,7 @@ This extension is using the Routing Policies extensions and the Routing BGP one 
 | import\_routing\_policies | Import Routing Policies | RoutingPolicy | bgp\_\_import\_policies | The routing\-policies used by this instance for import\. | Generic | many |
 | export\_routing\_policies | Export Routing Policies | RoutingPolicy | bgp\_\_export\_policies | The routing\-policies used by this instance for export\. | Generic | many |
 
-## BGP Route Reflector
+## Routing BGP RR
 
 This schema extension extend the BGP extension to add BGP Route Reflector Clustering.
 
@@ -2173,7 +2173,7 @@ This schema extension contains Circuits and ways to connect them with your infra
 | ---- | ---- | ----------- | -------- |
 | circuits | DcimCircuit | many | True |
 
-## BGP Communities
+## Routing BGP Community
 
 This schema extension adds the BGP Communities models.
 
@@ -2420,7 +2420,7 @@ This schema extension contains models for VRRP.
 | ---- | ---- | ---- | ----------- | ----------- | ----- | ------------ |
 | vrrp | Component | NetworkVRRPGroup | Part of VRRP Group | one | VRRP Group | 1600 |
 
-## Exchange Points (IXP)
+## Peering IXP
 
 This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)!
 
@@ -2614,7 +2614,7 @@ This extension is using the Routing Policies extensions and the Routing OSPF one
 | import\_routing\_policies | Import Routing Policies | RoutingPolicyOSPF | ospf\_\_import\_policies | The routing\-policies used by this instance for import\. | Generic | many |
 | export\_routing\_policies | Export Routing Policies | RoutingPolicyOSPF | ospf\_\_export\_policies | The routing\-policies used by this instance for export\. | Generic | many |
 
-## Physical Disks
+## Physical Disk
 
 Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management.
 
@@ -2730,7 +2730,7 @@ With this schema extension in place you will be able to capture all your physica
 | ---- | ---- | -------- | ----------- | ---- | ------------ |
 | host | VirtualizationHostVirtualMachine | False | one | Attribute | 1500 |
 
-## PIM
+## Routing PIM
 
 This schema extension contains all you need to model the PIM Protocol.
 
@@ -2941,7 +2941,7 @@ This extension is compatible with all sort of connectors, meaning you can plug c
 | ---- | ---- | -------- | ------------ | ----------- | ---- |
 | patch\_panel | DcimPatchPanel | False | 900 | one | Parent |
 
-## Aggregate
+## Routing Aggregate
 
 This schema extension contains all you need to model the Aggregate Routing Protocol.
 
@@ -3100,9 +3100,9 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 | ---- | ----- | ---- | ---- | ----------- | -------- | ------------ |
 | wdm\_channel | WDM Channel | DcimWdmChannel | Attribute | one | False | 1150 |
 
-## Accounts Management
+## Users
 
-This schema extension contains models for Accounts management.
+This schema extension contains models for account management.
 
 - **Dependencies:** `base`
 - **Version:** 1.0
@@ -3357,7 +3357,7 @@ This schema extension contains generics to create Routing Protocol "Instance". T
 | device | DcimDevice | False | one | Parent | 1050 |  |
 | vrf | IpamVRF | False | one | Attribute | 1075 | VRF |
 
-## BGP
+## Routing BGP
 
 This schema extension contains all you need to model your BGP platform.
 
@@ -3550,9 +3550,7 @@ This extension doesn't contain any Node, you can use the extension module_lineca
 
 ## Routing Policies
 
-This schema extension contains a generic to create Routing Policies.
-
-This Generic can be extend for each Routing Protocols you may want to use.
+This schema extension contains a generic to create Routing Policies. This Generic can be extend for each Routing Protocols you may want to use.
 
 - **Dependencies:** `base`
 - **Version:** 1.0
@@ -3604,7 +3602,7 @@ A rather generic cluster built with compute units (e.g. servers) and able to hos
 | cluster\_type | Dropdown | 1200 | Type of the cluster\. | \`aws, kvm, gcp, vmware\` |  |
 | status | Dropdown | 1300 |  | \`active, provisioning, maintenance, drained\` | False |
 
-## OSPF
+## Routing OSPF
 
 This schema extension contains all you need to model the OSPF Routing Protocol.
 
@@ -4298,7 +4296,7 @@ A schema for defining and managing network topology, strategies, and services.
 | ---- | ----- | ---- | -------- | ----------- | ------------ |
 | network\_service | Network Service | TopologyNetworkService | True | one | 1400 |
 
-## Routing Engine Module
+## Modules Routing Engine
 
 This schema extension allows you to capture Routing Engine related information like the version. You can insert the Routing Engine into a Dcim Physical Device and leverage the Routing Engine type model.
 
@@ -4344,7 +4342,7 @@ This schema extension allows you to capture Routing Engine related information l
 | ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
 | routing\_engine\_type | RE Type | DeviceRoutingEngineType | False | one | Attribute | 1150 |
 
-## Linecard Module
+## Modules Linecards
 
 This schema extension allows you to capture Linecard related information like the version. You can insert the Linecard into a Dcim Physical Device and leverage the Linecard type model. The Linecard can accept PIC to help configure PORT information like breakout-capabilities and configurations.
 
@@ -5051,7 +5049,7 @@ This schema extension introduces tenancy for some of the schema nodes (circuits.
 | location | LocationBuilding | many |  | True |  |
 | circuit | DcimCircuit | many |  | True |  |
 
-## Quality of Service (QoS)
+## QoS
 
 This schema extension contains models for Quality of Service (QoS)
 

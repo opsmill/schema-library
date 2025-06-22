@@ -1,4 +1,4 @@
-## BGP Route Reflector
+## Routing BGP RR
 
 This schema extension extend the BGP extension to add BGP Route Reflector Clustering.
 
