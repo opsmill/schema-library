@@ -198,25 +198,6 @@ extensions/modules:
     > [!NOTE]
     > This extension doesn't contain any Node, you can use the extension module_linecards or modules_routing_engine to use it
   name: Modules
-extensions/modules_linecards:
-  dependencies:
-    - base
-    - extensions/modules
-  description:
-    This schema extension allows you to capture Linecard related information
-    like the version. You can insert the Linecard into a Dcim Physical Device and
-    leverage the Linecard type model. The Linecard can accept PIC to help configure
-    PORT information like breakout-capabilities and configurations.
-  name: Linecards
-extensions/modules_routing_engine:
-  dependencies:
-    - base
-    - extensions/modules
-  description:
-    This schema extension allows you to capture Routing Engine related
-    information like the version. You can insert the Routing Engine into a Dcim Physical
-    Device and leverage the Routing Engine type model.
-  name: Routing Engine
 extensions/patch_panel:
   dependencies:
     - base
@@ -256,7 +237,7 @@ extensions/qinq:
 extensions/routing:
   dependencies:
     - base
-    - extensions/vlan
+    # - extensions/vlan
   description:
     This schema extension contains generics to create Routing Protocol
     "Instance". The idea is to create one Routing Protocol instance per IpamVRF +

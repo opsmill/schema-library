@@ -1,6 +1,7 @@
 import os
 from collections import defaultdict, deque
 from pathlib import Path
+import copy
 
 import yaml  # type: ignore
 from invoke import Context, task  # type: ignore
@@ -47,19 +48,43 @@ def _build_dependency_graph(metadata):
     # Parse the metadata list
     for key, value in metadata.items():
         dependencies = value.get("dependencies", [])
-        for dep in dependencies:
-            graph[dep].append(key)
-        all_extensions[key] = dependencies
-
+        graph[key] = list(dependencies)  # key: [dependencies]
+        all_extensions[key] = list(dependencies)
+    # Ensure 'base' is present as a dummy node
+    if "base" not in graph:
+        graph["base"] = []
+        all_extensions["base"] = []
     return graph, all_extensions
 
 
 # Topological sort to determine a safe load order
 def _resolve_load_order(graph, all_extensions):
+    all_exts = copy.deepcopy(all_extensions)
     load_order = []  # List to store the final load order
+    queue = deque([node for node, deps in all_exts.items() if not deps])
 
-    # Queue here is used to keep track of extension to proceed
-    queue = deque(["base"])  # Start with base anyway
+    # For cycle detection
+    def find_cycle():
+        # Improved DFS to print all cycles
+        visited_nodes = set()
+        cycles = []
+
+        def dfs(node, stack):
+            if node in stack:
+                cycle_start = stack.index(node)
+                cycles.append(stack[cycle_start:] + [node])
+                return
+            if node in visited_nodes:
+                return
+            visited_nodes.add(node)
+            stack.append(node)
+            for dep in graph[node]:
+                dfs(dep, stack)
+            stack.pop()
+
+        for n in all_extensions:
+            dfs(n, [])
+        return cycles
 
     # While we have something to proceed
     while queue:
@@ -67,18 +92,20 @@ def _resolve_load_order(graph, all_extensions):
         current = queue.popleft()
         load_order.append(current)
 
-        # We will update dependencies that we cleared an extension
-        for dependency in graph[current]:
-            # As we loaded current, remove it from the dependency list
-            all_extensions[dependency].remove(current)
+        # Remove 'current' from the dependencies of all other nodes
+        for node in all_exts:
+            if current in all_exts[node]:
+                all_exts[node].remove(current)
+                # If it happens the current was the last needed for a given
+                if not all_exts[node]:
+                    # We add it to the queue to be proceed!
+                    queue.append(node)
 
-            # If it happens the current was the last needed for a given
-            if len(all_extensions[dependency]) == 0:
-                # We add it to the queue to be proceed!
-                queue.append(dependency)
-
-    if len(load_order) != len(all_extensions):
-        # If not all nodes are processed, there's a cycle
+    if len(load_order) != len(all_exts):
+        print("\n[Dependency Graph Debug] Unresolved nodes and their dependencies:")
+        for node, deps in all_exts.items():
+            if deps:
+                print(f"  {node}: {deps}")
         raise ValueError("Cycle detected in dependency graph!")
 
     return load_order
