@@ -288,38 +288,7 @@ def generate_readme(schema, extension_dir: Path) -> list:
     return content
 
 
-@task
-def build(context: Context) -> None:
-    """Generate README.md files for all schema extensions"""
-    print("Building schema README.md files...")
-    directories_to_parse = [
-        Path("./extensions"),
-        Path("./experimental"),
-    ]
-
-    # Create docs directory if it doesn't exist
-    schema_docs_dir = DOCUMENTATION_DIRECTORY / "docs"
-    consolidated_doc = schema_docs_dir / "schema-library.mdx"
-
-    all_content = []
-    all_content.append(
-        "---\ntitle: Schema Library Documentation\n---\n<!-- markdownlint-disable-file MD025 -->\n"
-    )
-
-    with open(METADATA_FILE, "r", encoding="utf-8") as f:
-        schema = yaml.safe_load(f)
-
-    # Build Readme for base schemas
-    base_path = Path("./base")
-    for key in sorted(schema.keys()):
-        if key.startswith("base/"):
-            name = key.split("/", 1)[1]
-            yml_path = base_path / f"{name}.yml"
-            if yml_path.exists():
-                content = generate_readme(schema[key], base_path)
-                all_content.extend(content)
-
-    # --- Table of Contents Generation ---
+def generate_toc(schema, base_path, extensions_path, experimental_path):
     toc = ["# Schema Library Documentation\n"]
     toc.append("## Base\n")
     toc.append("| name | description |")
@@ -332,8 +301,8 @@ def build(context: Context) -> None:
     toc.append("\n## Extensions\n")
     toc.append("| name | description |")
     toc.append("| ---- | ----------- |")
-    for entry in sorted(os.listdir("./extensions")):
-        ext_path = Path("./extensions") / entry
+    for entry in sorted(os.listdir(extensions_path)):
+        ext_path = Path(extensions_path) / entry
         if ext_path.is_dir():
             desc = ""
             if str(ext_path) in schema and "description" in schema[str(ext_path)]:
@@ -342,16 +311,18 @@ def build(context: Context) -> None:
     toc.append("\n## Experimental\n")
     toc.append("| name | description |")
     toc.append("| ---- | ----------- |")
-    for entry in sorted(os.listdir("./experimental")):
-        exp_path = Path("./experimental") / entry
+    for entry in sorted(os.listdir(experimental_path)):
+        exp_path = Path(experimental_path) / entry
         if exp_path.is_dir():
             desc = ""
             if str(exp_path) in schema and "description" in schema[str(exp_path)]:
                 desc = schema[str(exp_path)]["description"]
             toc.append(f"| [{entry}](#{entry}) | {desc} |")
-    all_content.insert(1, "\n".join(toc) + "\n")
-    # --- End Table of Contents ---
+    return "\n".join(toc) + "\n"
 
+
+def process_schema_directories(schema, directories_to_parse):
+    all_content = []
     for directory in directories_to_parse:
         for entry in os.listdir(directory):
             if os.path.isdir(directory / entry):
@@ -360,8 +331,36 @@ def build(context: Context) -> None:
                     content = generate_readme(schema[str(path)], path)
                     all_content.extend(content)
                 except KeyError:
-                    print(f"Schema `{path}` is not added to the {METADATA_FILE} file")
+                    print(f"Schema `{path}` is not added to the .metadata.yml file")
+    return all_content
 
-    # Write consolidated documentation
+
+@task
+def build(context: Context) -> None:
+    """Generate README.md files for all schema extensions"""
+    print("Building schema README.md files...")
+    directories_to_parse = [
+        Path("./extensions"),
+        Path("./experimental"),
+    ]
+    schema_docs_dir = DOCUMENTATION_DIRECTORY / "docs"
+    consolidated_doc = schema_docs_dir / "schema-library.mdx"
+    all_content = []
+    all_content.append(
+        "---\ntitle: Schema Library Documentation\n---\n<!-- markdownlint-disable-file MD025 -->\n"
+    )
+    with open(METADATA_FILE, "r", encoding="utf-8") as f:
+        schema = yaml.safe_load(f)
+    base_path = Path("./base")
+    for key in sorted(schema.keys()):
+        if key.startswith("base/"):
+            name = key.split("/", 1)[1]
+            yml_path = base_path / f"{name}.yml"
+            if yml_path.exists():
+                content = generate_readme(schema[key], base_path)
+                all_content.extend(content)
+    toc = generate_toc(schema, base_path, "./extensions", "./experimental")
+    all_content.insert(1, toc)
+    all_content.extend(process_schema_directories(schema, directories_to_parse))
     with open(consolidated_doc, "w", encoding="utf-8") as f:
         f.write("\n".join(all_content))
