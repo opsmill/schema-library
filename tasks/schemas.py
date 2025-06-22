@@ -285,7 +285,7 @@ def generate_readme(schema, extension_dir: Path) -> list:
 def sanitize_description(desc):
     if not isinstance(desc, str):
         return desc
-    return desc.replace('\n', ' ').replace('  ', ' ').strip()
+    return desc.replace("\n", " ").replace("  ", " ").strip()
 
 
 def generate_toc(schema, extensions_path, experimental_path):
