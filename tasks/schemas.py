@@ -60,29 +60,6 @@ def _resolve_load_order(graph, all_extensions):
     load_order = []  # List to store the final load order
     queue = deque([node for node, deps in all_exts.items() if not deps])
 
-    # For cycle detection
-    def find_cycle():
-        # Improved DFS to print all cycles
-        visited_nodes = set()
-        cycles = []
-
-        def dfs(node, stack):
-            if node in stack:
-                cycle_start = stack.index(node)
-                cycles.append(stack[cycle_start:] + [node])
-                return
-            if node in visited_nodes:
-                return
-            visited_nodes.add(node)
-            stack.append(node)
-            for dep in graph[node]:
-                dfs(dep, stack)
-            stack.pop()
-
-        for n in all_extensions:
-            dfs(n, [])
-        return cycles
-
     # While we have something to proceed
     while queue:
         # Pick first element in the queue and add it to the result
