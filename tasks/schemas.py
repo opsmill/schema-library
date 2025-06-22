@@ -282,7 +282,7 @@ def generate_readme(schema, extension_dir: Path) -> list:
     return content
 
 
-def generate_toc(schema, base_path, extensions_path, experimental_path):
+def generate_toc(schema, extensions_path, experimental_path):
     toc = ["# Schema Library Documentation\n"]
     toc.append("## Base\n")
     toc.append("| name | description |")
@@ -353,7 +353,7 @@ def build(context: Context) -> None:
             if yml_path.exists():
                 content = generate_readme(schema[key], base_path)
                 all_content.extend(content)
-    toc = generate_toc(schema, base_path, "./extensions", "./experimental")
+    toc = generate_toc(schema, "./extensions", "./experimental")
     all_content.insert(1, toc)
     all_content.extend(process_schema_directories(schema, directories_to_parse))
     with open(consolidated_doc, "w", encoding="utf-8") as f:
