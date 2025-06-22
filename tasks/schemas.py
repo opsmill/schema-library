@@ -41,11 +41,8 @@ def _load_yaml_metadata():
 # Build `all_extensions` list
 # i.e. `extension_abc` => list of all dependencies
 def _build_dependency_graph(metadata):
-    print("🌱 Building dependency graph...")
     graph = defaultdict(list)  # Graph of dependencies
     all_extensions = defaultdict(dict)  # Dict of all extension with dependencies
-
-    # Parse the metadata list
     for key, value in metadata.items():
         dependencies = value.get("dependencies", [])
         graph[key] = list(dependencies)  # key: [dependencies]
@@ -102,10 +99,7 @@ def _resolve_load_order(graph, all_extensions):
                     queue.append(node)
 
     if len(load_order) != len(all_exts):
-        print("\n[Dependency Graph Debug] Unresolved nodes and their dependencies:")
-        for node, deps in all_exts.items():
-            if deps:
-                print(f"  {node}: {deps}")
+        # Remove debugging output, just raise error
         raise ValueError("Cycle detected in dependency graph!")
 
     return load_order
