@@ -2,8 +2,7 @@
 
 This schema extension allows you to capture Device Modules related information like the serial number or the status. You can insert the Module into a Dcim Physical Device.
 
-[!NOTE]
-This extension doesn't contain any Node, you can use the extension module_linecards or modules_routing_engine to use it
+NOTE: This extension doesn't contain any Nodes, you can use the extension module_linecards or modules_routing_engine to use it
 
 - **Dependencies:** `base`
 - **Version:** 1.0

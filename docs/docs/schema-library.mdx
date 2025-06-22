@@ -29,10 +29,10 @@ title: Schema Library Documentation
 | [interface_breakout](#interface-breakout) | This schema extension introduces relationships to support breakout interfaces, enabling you to document the breakout of a physical interface into smaller physical interfaces. |
 | [lag](#lag) | This schema extension includes models for Link Aggregation Groups (LAGs), enabling you to link physical interfaces as building blocs of your LAG interface. It can be used in standard networking environments as well as in compute scenarios, such as capturing bond interfaces. |
 | [location_minimal](#location-minimal) | This schema extension is minimal but will provide you with basic items to store location related data. |
-| [modules](#modules) | This schema extension allows you to capture Device Modules related information like the serial number or the status. You can insert the Module into a Dcim Physical Device. [!NOTE] This extension doesn't contain any Node, you can use the extension module_linecards or modules_routing_engine to use it |
-| [patch_panel](#patch-panel) | This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture information about potential modules you would insert into your patch panel. [!NOTE] This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces! |
+| [modules](#modules) | This schema extension allows you to capture Device Modules related information like the serial number or the status. You can insert the Module into a Dcim Physical Device. NOTE: This extension doesn't contain any Nodes, you can use the extension module_linecards or modules_routing_engine to use it |
+| [patch_panel](#patch-panel) | This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture information about potential modules you would insert into your patch panel. NOTE: This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces! |
 | [peering_ixp](#peering-ixp) | This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)! |
-| [physical_disk](#physical-disk) | Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management. [!NOTE] This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares. |
+| [physical_disk](#physical-disk) | Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management. NOTE: This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares. |
 | [qinq](#qinq) | This schema extension brings extensions to VLAN model in order to support QinQ. |
 | [routing](#routing) | This schema extension contains generics to create Routing Protocol "Instance". The idea is to create one Routing Protocol instance per IpamVRF + DcimDevice pair. |
 | [routing_aggregate](#routing-aggregate) | This schema extension contains all you need to model the Aggregate Routing Protocol. |
@@ -2618,8 +2618,7 @@ This extension is using the Routing Policies extensions and the Routing OSPF one
 
 Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management.
 
-[!NOTE]
-This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares.
+NOTE: This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares.
 
 - **Dependencies:** `base`
 - **Version:** 1.0
@@ -2824,8 +2823,7 @@ This schema extension contains a basic Cable model allowing you to connect two e
 
 This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture information about potential modules you would insert into your patch panel.
 
-[!NOTE]
-This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
+NOTE: This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
 
 - **Dependencies:** `base`
 - **Version:** 1.0
@@ -3483,8 +3481,7 @@ This schema extension contains all you need to model your BGP platform.
 
 This schema extension allows you to capture Device Modules related information like the serial number or the status. You can insert the Module into a Dcim Physical Device.
 
-[!NOTE]
-This extension doesn't contain any Node, you can use the extension module_linecards or modules_routing_engine to use it
+NOTE: This extension doesn't contain any Nodes, you can use the extension module_linecards or modules_routing_engine to use it
 
 - **Dependencies:** `base`
 - **Version:** 1.0
