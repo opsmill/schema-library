@@ -191,17 +191,13 @@ def generate_node_data(node: dict):
     if node.get("icon"):
         node_markdown.append(f"- **Icon:** {node.get('icon', '')}")
     if node.get("menu_placement"):
-        node_markdown.append(
-            f"- **Menu Placement:** {node.get('menu_placement', '')}"
-        )
+        node_markdown.append(f"- **Menu Placement:** {node.get('menu_placement', '')}")
     node_markdown.append(
         f"- **Include in Menu:** {'✅' if node.get('include_in_menu') else '❌'}\n"
     )
     if node.get("order_by") or node.get("uniqueness_constraints"):
         node_markdown.append("#### Ordering and Constraints\n")
-        node_markdown.append(
-            f"- **Order By:**{', '.join(node.get('order_by', []))}"
-        )
+        node_markdown.append(f"- **Order By:**{', '.join(node.get('order_by', []))}")
         node_markdown.append(
             f"- **Uniqueness Constraints:**{', '.join([' + '.join(c) for c in node.get('uniqueness_constraints', [])])}\n"
         )
