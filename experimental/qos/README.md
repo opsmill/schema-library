@@ -1,14 +1,13 @@
-# Quality of Service (QoS)
+## QoS
 
 This schema extension contains models for Quality of Service (QoS)
 
-## qos
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### ForwardingClass
+#### ForwardingClass
 
 - **Description:** Represents a forwarding class in QoS with distinct loss priorities.
 - **Label:** Forwarding Class
@@ -20,7 +19,7 @@ This schema extension contains models for Quality of Service (QoS)
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | order_weight | optional |
 | ---- | ---- | ----------- | ------ | ------------ | -------- |
@@ -28,7 +27,7 @@ This schema extension contains models for Quality of Service (QoS)
 | high\_loss\_priority\_code | List | List of code points for high loss priority\. |  | 1200 | True |
 | low\_loss\_priority\_code | List | List of code points for low loss priority\. |  | 1300 | True |
 
-### ClassOfService
+#### ClassOfService
 
 - **Description:** Defines a Class of Service configuration.
 - **Label:** Class of Service
@@ -39,7 +38,7 @@ This schema extension contains models for Quality of Service (QoS)
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | order_weight |
 | ---- | ---- | ----------- | ------ | ------------ |
@@ -51,7 +50,7 @@ This schema extension contains models for Quality of Service (QoS)
 | ---- | ---- | ----------- | ----------- | -------- | ------------ |
 | traffic\_control\_profiles | QosTrafficControlProfile | List of traffic control profiles\. | many | True | 1200 |
 
-### TrafficControlProfile
+#### TrafficControlProfile
 
 - **Description:** Defines a traffic control profile with an active/inactive state.
 - **Label:** Traffic Control Profile
@@ -63,14 +62,14 @@ This schema extension contains models for Quality of Service (QoS)
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | order_weight | choices | default_value |
 | ---- | ---- | ----------- | ------ | ------------ | ------- | ------------- |
 | name | Text | Name of the traffic control profile\. | True | 1000 | \`\` |  |
 | status | Dropdown | Status of the traffic control profile \(active/inactive\)\. |  | 1200 | \`active, inactive\` | inactive |
 
-### Classifier
+#### Classifier
 
 - **Description:** Represents a classifier mapping DSCP or EXP values to forwarding classes.
 - **Label:** Classifier
@@ -82,7 +81,7 @@ This schema extension contains models for Quality of Service (QoS)
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | order_weight | choices |
 | ---- | ---- | ----------- | ------ | ------------ | ------- |
@@ -95,7 +94,7 @@ This schema extension contains models for Quality of Service (QoS)
 | ---- | ---- | ----------- | ----------- | -------- | ------------ |
 | forwarding\_classes | QosForwardingClass | List of forwarding classes defined in the classifier\. | many | True | 1300 |
 
-### Scheduler
+#### Scheduler
 
 - **Description:** Represents a scheduler configuration.
 - **Label:** Scheduler
@@ -107,7 +106,7 @@ This schema extension contains models for Quality of Service (QoS)
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | order_weight | label | choices | optional |
 | ---- | ---- | ----------- | ------ | ------------ | ----- | ------- | -------- |
@@ -117,7 +116,7 @@ This schema extension contains models for Quality of Service (QoS)
 | priority | Dropdown | Priority of the scheduler\. |  | 1400 |  | \`low, high, strict\-high\` | True |
 | excess\_priority | Dropdown | Excess priority when applicable\. |  | 1500 |  | \`low, high\` | True |
 
-### SchedulerMap
+#### SchedulerMap
 
 - **Description:** Defines mappings of schedulers to forwarding classes.
 - **Label:** Scheduler Map
@@ -129,7 +128,7 @@ This schema extension contains models for Quality of Service (QoS)
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | order_weight |
 | ---- | ---- | ----------- | ------ | ------------ |

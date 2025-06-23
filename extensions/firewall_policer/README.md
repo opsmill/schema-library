@@ -1,14 +1,13 @@
-# Firewall Policer
+## Firewall Policer
 
 This schema extension contains models for VMs. You might consider Cluster or/and Hypervisor extension to go with!
 
-## firewall_policer
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### Policer
+#### Policer
 
 - **Description:** A generic policer configuration.
 - **Label:** Network Policer
@@ -20,7 +19,7 @@ This schema extension contains models for VMs. You might consider Cluster or/and
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | description | order_weight | unique | optional | choices |
 | ---- | ---- | ----- | ----------- | ------------ | ------ | -------- | ------- |

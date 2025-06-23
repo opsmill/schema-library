@@ -1,16 +1,13 @@
-# Infiniband
+## Infiniband
 
 This schema extension adds support for InfiniBand switches.
 
-Dependencies: `base, extensions.compute`
-
-## infiniband
-
+- **Dependencies:** `base, extensions/compute`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### Switch
+#### Switch
 
 - **Description:** InfiniBand Switch
 - **Label:** InfiniBand Switch
@@ -22,7 +19,7 @@ Dependencies: `base, extensions.compute`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | optional | label | description | default_value | choices |
 | ---- | ---- | ------ | ------------ | -------- | ----- | ----------- | ------------- | ------- |
@@ -49,7 +46,7 @@ Dependencies: `base, extensions.compute`
 | mgmt\_interface | Component | one | InfinibandSwitchMgmtInterface | True |
 | rsu | Attribute | one | InfinibandRSU | True |
 
-### SwitchInterface
+#### SwitchInterface
 
 - **Description:** InfiniBand Switch Interface
 - **Label:** InfiniBand Switch Interface
@@ -61,7 +58,7 @@ Dependencies: `base, extensions.compute`
 - **Order By:**name__value
 - **Uniqueness Constraints:**switch + name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional | default_value | label | description | enum | choices |
 | ---- | ---- | ------------ | -------- | ------------- | ----- | ----------- | ---- | ------- |
@@ -85,7 +82,7 @@ Dependencies: `base, extensions.compute`
 | speed\_option | InfinibandSwitchIntfSpeedOptions | True | many | Attribute | 6 |
 | switch | InfinibandSwitch | False | one | Parent |  |
 
-### SwitchMgmtInterface
+#### SwitchMgmtInterface
 
 - **Description:** InfiniBand Switch Management Interface
 - **Label:** InfiniBand Mgmt Interface
@@ -97,7 +94,7 @@ Dependencies: `base, extensions.compute`
 - **Order By:**name__value
 - **Uniqueness Constraints:**switch + name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional | label | default_value | description |
 | ---- | ---- | ------------ | -------- | ----- | ------------- | ----------- |
@@ -115,7 +112,7 @@ Dependencies: `base, extensions.compute`
 | switch | InfinibandSwitch | False | one | Parent |
 | ipv4\_address | IpamIPAddress | True | one |  |
 
-### SwitchIntfSpeedOptions
+#### SwitchIntfSpeedOptions
 
 - **Description:** InfiniBand Interface Speed Options
 - **Label:** InfiniBand Interface Speed Options
@@ -127,7 +124,7 @@ Dependencies: `base, extensions.compute`
 - **Order By:**speed__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | description | choices | unique |
 | ---- | ---- | ----- | ----------- | ------- | ------ |
@@ -140,7 +137,7 @@ Dependencies: `base, extensions.compute`
 | ---- | ---- | -------- | ----------- | ---- |
 | switch | InfinibandSwitchInterface | False | one | Parent |
 
-### RSU
+#### RSU
 
 - **Description:** InfiniBand Rail-Optimized Scalable Unit
 - **Label:** InfiniBand RSU
@@ -152,7 +149,7 @@ Dependencies: `base, extensions.compute`
 - **Order By:**identifier__value
 - **Uniqueness Constraints:**identifier__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | description | regex | optional |
 | ---- | ---- | ----- | ----------- | ----- | -------- |
@@ -166,7 +163,7 @@ Dependencies: `base, extensions.compute`
 | switches | InfinibandSwitch | True | many | Attribute |
 | interfaces | InfinibandSwitchInterface | True | many | Attribute |
 
-### Fabric
+#### Fabric
 
 - **Description:** InfiniBand Network Fabric
 - **Label:** InfiniBand Network Fabric
@@ -178,7 +175,7 @@ Dependencies: `base, extensions.compute`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | description | unique |
 | ---- | ---- | ----- | ----------- | ------ |

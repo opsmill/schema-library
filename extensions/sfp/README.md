@@ -1,4 +1,4 @@
-# SFP
+## SFP
 
 This schema extension gives you all the models you need to document Small Form-factor Pluggable (SFP).
 
@@ -10,22 +10,19 @@ Improvements:
 - You could plug any SFP into any equipment interface (e.g. a virtual interface ...)
 - You could link a SFP to an interface AND a location ...
 
-Dependencies: `base`
-
-## sfp
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### GenericSFP
+#### GenericSFP
 
 - **Description:** Generic base for all Small Form-factor Pluggable (SFP) transceivers.
 - **Label:** SFP
 - **Icon:** mdi:gpu
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | order_weight | description | choices | default_value |
 | ---- | ---- | -------- | ------------ | ----------- | ------- | ------------- |
@@ -42,9 +39,9 @@ Dependencies: `base`
 | spare\_location | LocationHosting | Attribute | True | one | 1500 |
 | manufacturer | OrganizationManufacturer | Attribute | True | one | 1350 |
 
-## Nodes
+### Nodes
 
-### StandardSFP
+#### StandardSFP
 
 - **Description:** Standard SFP module for various types (e.g., LR, SR, T).
 - **Label:** Standard SFP
@@ -52,7 +49,7 @@ Dependencies: `base`
 - **Menu Placement:** DcimGenericSFP
 - **Include in Menu:** ❌
 
-### BidiSFP
+#### BidiSFP
 
 - **Description:** Bidirectional SFP supporting two wavelengths for single-fiber operation.
 - **Label:** Bidirectional SFP
@@ -60,16 +57,16 @@ Dependencies: `base`
 - **Menu Placement:** DcimGenericSFP
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | description | order_weight |
 | ---- | ----- | ---- | -------- | ----------- | ------------ |
 | wavelength\_tx | Transmit Wavelength \(nm\) | Number | False | Transmit wavelength in nm\. | 1175 |
 | wavelength\_rx | Receive Wavelength \(nm\) | Number | False | Receive wavelength in nm\. | 1150 |
 
-## Extensions
+### Extensions
 
-### DcimInterface
+#### DcimInterface
 
 #### Relationships
 
@@ -77,7 +74,7 @@ Dependencies: `base`
 | ---- | ---- | ----------- | -------- |
 | plugged\_sfp | DcimGenericSFP | one | True |
 
-### LocationHosting
+#### LocationHosting
 
 #### Relationships
 
@@ -85,7 +82,7 @@ Dependencies: `base`
 | ---- | ---- | ----------- | -------- |
 | spare\_sfps | DcimGenericSFP | many | True |
 
-### OrganizationManufacturer
+#### OrganizationManufacturer
 
 #### Relationships
 

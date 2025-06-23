@@ -1,16 +1,13 @@
-# VLAN
+## VLAN
 
 This schema extension contains models to support VLANs in you network.
 
-Dependencies: `base`
-
-## vlan
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### VLAN
+#### VLAN
 
 - **Description:** A VLAN is isolated layer two domain
 - **Label:** VLAN
@@ -23,7 +20,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**l2domain + vlan_id__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | choices |
 | ---- | ---- | -------- | ------- |
@@ -41,14 +38,14 @@ Dependencies: `base`
 | prefixes | IpamPrefix | True | many |  |  |
 | l2domain | IpamL2Domain | False | one | Attribute | 1200 |
 
-### L2Domain
+#### L2Domain
 
 - **Description:** Represents layer 2 domain.
 - **Label:** Layer 2 Domain
 - **Icon:** mdi:domain-switch
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight |
 | ---- | ---- | ------------ |
@@ -60,9 +57,9 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- |
 | vlans | IpamVLAN | True | many | Component |
 
-## Extensions
+### Extensions
 
-### IpamPrefix
+#### IpamPrefix
 
 #### Relationships
 
@@ -70,7 +67,7 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- | ------------ |
 | vlan | IpamVLAN | True | one | Attribute | 1400 |
 
-### InterfaceLayer2
+#### InterfaceLayer2
 
 #### Relationships
 
@@ -79,7 +76,7 @@ Dependencies: `base`
 | untagged\_vlan | Untagged VLAN | IpamVLAN | True | one | Generic | interface\_l2\_\_untagged\_vlan |
 | tagged\_vlan | Tagged VLANs | IpamVLAN | True | many | Generic | interface\_l2\_\_tagged\_vlan |
 
-### LocationHosting
+#### LocationHosting
 
 #### Relationships
 

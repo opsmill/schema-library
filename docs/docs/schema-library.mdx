@@ -3,17 +3,82 @@ title: Schema Library Documentation
 ---
 <!-- markdownlint-disable-file MD025 -->
 
-# Base Schemas
+# Schema Library Documentation
 
-The base schemas serve as the foundation for every single schema extension you might want to use afterward. This one is mandatory and will unlock access to the extensions section.
+## Base
 
-## dcim
+| name | description |
+| ---- | ----------- |
+| [dcim](#dcim) | Basic DCIM schema to capture devices, racks, interfaces, and related information. |
+| [ipam](#ipam) | Basic IPAM schema to capture IP addresses, subnets, and related information. |
+| [location](#location) | Basic Location schema to capture locations, sites, and related information. |
+| [organization](#organization) | Basic Organization schema to capture organizations, vendors, and related information. |
+
+## Extensions
+
+| name | description |
+| ---- | ----------- |
+| [cable](#cable) | This schema extension contains a basic Cable model allowing you to connect two endpoints. |
+| [circuit](#circuit) | This schema extension contains Circuits and ways to connect them with your infrastructure! The circuit could be a fiber connecting two sites, you would then have two endpoints, one on each site. |
+| [cluster](#cluster) | This schema extension contains the foundations to capture clusters. With this one in place you can unlock various clusters flavors (hosting cluster able to host VMs, firewall clusters built with specific appliances ...) |
+| [compute](#compute) | With this schema extension in place you will be able to capture all your physical servers. It also gives you the baseline to build virtualization. You might consider HostingCluster extension to go with! |
+| [cross_connect](#cross-connect) | This extension contains schema to capture Cross Connect. You can see it as "a cable operated by a provider". You will be able to attach it to a location and then connect endpoints to it (e.g. rear interface of a patch panel, circuit endpoint ...) |
+| [dwdm](#dwdm) | This schema extension contains models for OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies such as DWDM (Dense Wavelength Division Multiplexing) or CWDM (Coarse Wavelength Division Multiplexing). With some vendors, the tunable optics are not configured via the channel number but via the wavelength and/or the frequency. This model provides a unique entry in Infrahub for those. |
+| [firewall_policer](#firewall-policer) | This schema extension contains models for VMs. You might consider Cluster or/and Hypervisor extension to go with! |
+| [hosting_cluster](#hosting-cluster) | A rather generic cluster built with compute units (e.g. servers) and able to host VMs. |
+| [interface_breakout](#interface-breakout) | This schema extension introduces relationships to support breakout interfaces, enabling you to document the breakout of a physical interface into smaller physical interfaces. |
+| [lag](#lag) | This schema extension includes models for Link Aggregation Groups (LAGs), enabling you to link physical interfaces as building blocs of your LAG interface. It can be used in standard networking environments as well as in compute scenarios, such as capturing bond interfaces. |
+| [location_minimal](#location-minimal) | This schema extension is minimal but will provide you with basic items to store location related data. |
+| [modules](#modules) | This schema extension allows you to capture Device Modules related information like the serial number or the status. You can insert the Module into a Dcim Physical Device. NOTE: This extension doesn't contain any Nodes, you can use the extension module_linecards or modules_routing_engine to use it |
+| [patch_panel](#patch-panel) | This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture information about potential modules you would insert into your patch panel. NOTE: This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces! |
+| [peering_ixp](#peering-ixp) | This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)! |
+| [physical_disk](#physical-disk) | Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management. NOTE: This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares. |
+| [qinq](#qinq) | This schema extension brings extensions to VLAN model in order to support QinQ. |
+| [routing](#routing) | This schema extension contains generics to create Routing Protocol "Instance". The idea is to create one Routing Protocol instance per IpamVRF + DcimDevice pair. |
+| [routing_aggregate](#routing-aggregate) | This schema extension contains all you need to model the Aggregate Routing Protocol. |
+| [routing_bgp](#routing-bgp) | This schema extension contains all you need to model your BGP platform. |
+| [routing_bgp_community](#routing-bgp-community) | This schema extension adds the BGP Communities models. |
+| [routing_bgp_rr](#routing-bgp-rr) | This schema extension extend the BGP extension to add BGP Route Reflector Clustering. |
+| [routing_ospf](#routing-ospf) | This schema extension contains all you need to model the OSPF Routing Protocol. |
+| [routing_pim](#routing-pim) | This schema extension contains all you need to model the PIM Protocol. |
+| [routing_policies](#routing-policies) | This schema extension contains a generic to create Routing Policies. This Generic can be extend for each Routing Protocols you may want to use. |
+| [routing_policies_aggregate](#routing-policies-aggregate) | This extension is using the Routing Policies extensions and the Routing Aggregate one together. |
+| [routing_policies_bgp](#routing-policies-bgp) | This extension is using the Routing Policies extensions and the Routing BGP one together. |
+| [routing_policies_ospf](#routing-policies-ospf) | This extension is using the Routing Policies extensions and the Routing OSPF one together. |
+| [routing_policies_pim](#routing-policies-pim) | This schema inherits the `RoutingPolicy` schema and removes `import_policies` and `export_policies` attributes. However it adds a number of relationships to `RoutingPIM`. |
+| [sfp](#sfp) | This schema extension gives you all the models you need to document Small Form-factor Pluggable (SFP). You can either plug it into an interface or attach it to a location (e.g. it's a spare SFP stored in a rack). Improvements: - As of now there is no verification with type / form factor / protocol / distance ... - You could plug any SFP into any equipment interface (e.g. a virtual interface ...) - You could link a SFP to an interface AND a location ... |
+| [snmp](#snmp) | This schema extension contains models for SNMP Communities and SNMP Clients. As you can see this extension is not linked to Tenancy or Device, as you could decide to link the Community to different models based on your use case. |
+| [topology](#topology) | This schema extension introduces abstract network pods and services running in the pods, such as MPLS and EVPN. |
+| [users](#users) | This schema extension contains models for account management. |
+| [vlan](#vlan) | This schema extension contains models to support VLANs in you network. |
+| [vrf](#vrf) | This schema extension contains models to support VRF in your network. |
+| [vrrp](#vrrp) | This schema extension contains models for VRRP. |
+
+## Experimental
+
+| name | description |
+| ---- | ----------- |
+| [azure](#azure) | This schema extension introduces cloud support for Microsoft Azure. |
+| [circuit_service](#circuit-service) | This schema extension contains model coming on top of circuit to capture a single service shared across multiple circuits. For example you have a MPLS network supported by a provider connecting multiple locations: - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...) - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side |
+| [infiniband](#infiniband) | This schema extension adds support for InfiniBand switches. |
+| [location_extended](#location-extended) | This schema extension is the most detailed when it comes to location, you'll find all the layers you can think of. |
+| [modules_linecards](#modules-linecards) | This schema extension allows you to capture Linecard related information like the version. You can insert the Linecard into a Dcim Physical Device and leverage the Linecard type model. The Linecard can accept PIC to help configure PORT information like breakout-capabilities and configurations. |
+| [modules_routing_engine](#modules-routing-engine) | This schema extension allows you to capture Routing Engine related information like the version. You can insert the Routing Engine into a Dcim Physical Device and leverage the Routing Engine type model. |
+| [qos](#qos) | This schema extension contains models for Quality of Service (QoS) |
+| [security](#security) | This schema extension contains models for implementing detailed security. |
+| [tenancy](#tenancy) | This schema extension introduces tenancy for some of the schema nodes (circuits...) |
+| [topology](#topology) | A schema for defining and managing network topology, strategies, and services. |
+| [vlan-translation](#vlan-translation) | This schema extension is based on Juniper VLAN MAP, and not yet test out for other vendors. |
+
+## DCIM
+
+Basic DCIM schema to capture devices, racks, interfaces, and related information.
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### GenericDevice
+#### GenericDevice
 
 - **Description:** Generic Device object.
 - **Label:** Device
@@ -25,7 +90,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | optional |
 | ---- | ---- | ------ | ------------ | -------- |
@@ -42,12 +107,12 @@ The base schemas serve as the foundation for every single schema extension you m
 | primary\_address | IpamIPAddress | True | one |  | Attribute | 1700 | Primary IP Address |
 | platform | DcimPlatform | True | one |  | Attribute | 1250 |  |
 
-### PhysicalDevice
+#### PhysicalDevice
 
 - **Description:** Generic holding attributes and relationships relevant for physical device.
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | label | description | kind | optional | order_weight | default_value | choices |
 | ---- | ----- | ----------- | ---- | -------- | ------------ | ------------- | ------- |
@@ -62,7 +127,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | device\_type | DcimDeviceType | True | one | Attribute | 1200 |  |
 | location | LocationHosting | False | one | Attribute | 1500 | Location |
 
-### Endpoint
+#### Endpoint
 
 - **Description:** Generic Endpoint to receive a connector.
 - **Include in Menu:** ❌
@@ -73,7 +138,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ---- | -------- | ----------- | ------------ | ---- |
 | connector | DcimConnector | True | one | 1500 | Attribute |
 
-### Connector
+#### Connector
 
 - **Description:** Generic Connector to link two endpoints together.
 - **Include in Menu:** ❌
@@ -84,7 +149,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ---- | -------- | ----------- | ------------ | ---- |
 | connected\_endpoints | DcimEndpoint | True | many | 1500 | Generic |
 
-### Interface
+#### Interface
 
 - **Description:** Generic Network Interface
 - **Label:** Interface
@@ -95,7 +160,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**device__name__value, name__value
 - **Uniqueness Constraints:**device + name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | optional | label | default_value | choices |
 | ---- | ---- | ----------- | ------------ | -------- | ----- | ------------- | ------- |
@@ -112,25 +177,25 @@ The base schemas serve as the foundation for every single schema extension you m
 | device | DcimGenericDevice | device\_\_interface | False | one | Parent | 1025 |
 | tags | BuiltinTag |  | True | many | Attribute | 3000 |
 
-### Layer2
+#### Layer2
 
 - **Description:** Layer 2 specific attributes for network interfaces
 - **Label:** Layer 2 Interface
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | choices | description | order_weight |
 | ---- | ----- | ---- | -------- | ------- | ----------- | ------------ |
 | l2\_mode | Layer2 Mode | Dropdown | True | \`access, trunk, trunk\_all\` | Layer 2 mode of the interface | 1500 |
 
-### Layer3
+#### Layer3
 
 - **Description:** Layer 3 specific attributes for network interfaces
 - **Label:** Layer 3 Interface
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | description | order_weight | optional |
 | ---- | ----- | ---- | ----------- | ------------ | -------- |
@@ -143,7 +208,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ----- | ---- | ----------- | ---- | -------- | ----------- | ------------ |
 | ip\_addresses | IP Addresses | IpamIPAddress | many | Attribute | True | List of IP addresses associated with the interface | 1150 |
 
-### HasSubInterface
+#### HasSubInterface
 
 - **Description:** A generic interface that can have sub-interfaces
 - **Include in Menu:** ❌
@@ -154,9 +219,9 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ----------- | ------------ |
 | sub\_interfaces | Sub\-interface\(s\) | InterfaceVirtual | sub\_\_interface | True | many | Attribute | Sub\-interfaces of this interface | 1750 |
 
-## Nodes
+### Nodes
 
-### DeviceType
+#### DeviceType
 
 - **Description:** A model of device
 - **Label:** Device Type
@@ -168,7 +233,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**manufacturer__name__value, name__value
 - **Uniqueness Constraints:**manufacturer + name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | optional | label | default_value |
 | ---- | ---- | ------ | ------------ | -------- | ----- | ------------- |
@@ -187,7 +252,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | manufacturer | OrganizationManufacturer | one | Attribute | 1250 | False |
 | tags | BuiltinTag | many | Attribute | 2000 | True |
 
-### Platform
+#### Platform
 
 - **Description:** A Platform represent the type of software running on a device.
 - **Label:** Platform
@@ -199,7 +264,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**manufacturer__name__value, name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | optional |
 | ---- | ---- | ------ | ------------ | -------- |
@@ -218,27 +283,27 @@ The base schemas serve as the foundation for every single schema extension you m
 | devices | DcimGenericDevice | True | many | 1350 |  |
 | manufacturer | OrganizationManufacturer |  | one | 1300 | Attribute |
 
-### Device
+#### Device
 
 - **Description:** A configurable network device for managing and directing data traffic, including routers, switches...
 - **Label:** Network Device
 - **Icon:** clarity:network-switch-solid
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | order_weight | choices |
 | ---- | ---- | -------- | ------------ | ------- |
 | status | Dropdown | False | 1100 | \`active, provisioning, maintenance, drained\` |
 | role | Dropdown | True | 1400 | \`core, edge, cpe, spine, leaf, tor\` |
 
-### Physical
+#### Physical
 
 - **Description:** Physical network port on a device
 - **Label:** Physical Interface
 - **Include in Menu:** ❌
 
-### Virtual
+#### Virtual
 
 - **Description:** Virtual interface like VLAN or Loopback
 - **Label:** Virtual Interface
@@ -250,13 +315,11 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ---- | ----------- | ---- | ---------- | ----------- |
 | parent\_interface | InterfaceHasSubInterface | one | Attribute | sub\_\_interface | Parent interface to which this sub\-interface belongs |
 
-## organization
-
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### Generic
+#### Generic
 
 - **Description:** An organization represent a legal entity, a company.
 - **Label:** Organization
@@ -268,7 +331,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | optional |
 | ---- | ---- | ------ | ------------ | -------- |
@@ -281,9 +344,9 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ---- | ----------- | ---- | -------- | ------------ |
 | tags | BuiltinTag | many | Attribute | True | 3000 |
 
-## Nodes
+### Nodes
 
-### Manufacturer
+#### Manufacturer
 
 - **Description:** Device Manufacturer
 - **Icon:** mdi:domain
@@ -297,20 +360,18 @@ The base schemas serve as the foundation for every single schema extension you m
 | device\_type | DcimDeviceType | many | True |
 | platform | DcimPlatform | many | True |
 
-### Provider
+#### Provider
 
 - **Description:** Circuit or Location Provider
 - **Icon:** mdi:domain
 - **Menu Placement:** OrganizationGeneric
 - **Include in Menu:** ✅
 
-## location
-
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### Generic
+#### Generic
 
 - **Description:** Generic Location, could be a country, city ...
 - **Label:** Location
@@ -322,7 +383,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | unique | optional |
 | ---- | ---- | ------------ | ------ | -------- |
@@ -336,7 +397,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ---- | ---- | -------- | ----------- |
 | tags | BuiltinTag | Attribute | True | many |
 
-### Hosting
+#### Hosting
 
 - **Description:** Location directly hosting device and services.
 - **Include in Menu:** ❌
@@ -348,13 +409,11 @@ The base schemas serve as the foundation for every single schema extension you m
 | prefixes | Prefixes | IpamPrefix | many | True |
 | devices | Devices | DcimPhysicalDevice | many | True |
 
-## ipam
-
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### IPAddress
+#### IPAddress
 
 - **Description:** IP Address
 - **Label:** IP Address
@@ -366,7 +425,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**address__value
 - **Uniqueness Constraints:**ip_namespace + address__value
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | regex |
 | ---- | ----- | ---- | -------- | ----- |
@@ -378,7 +437,7 @@ The base schemas serve as the foundation for every single schema extension you m
 | ---- | ---- | -------- | ----------- |
 | interface | InterfaceLayer3 | True | one |
 
-### Prefix
+#### Prefix
 
 - **Description:** IPv4 or IPv6 network (with mask)
 - **Label:** Prefix
@@ -390,7 +449,7 @@ The base schemas serve as the foundation for every single schema extension you m
 - **Order By:**prefix__value
 - **Uniqueness Constraints:**ip_namespace + prefix__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | choices | optional |
 | ---- | ---- | ------- | -------- |
@@ -405,28 +464,1207 @@ The base schemas serve as the foundation for every single schema extension you m
 | location | LocationHosting | True | one | Attribute | 1300 |  |  |
 | gateway | IpamIPAddress | True | one | Attribute | 1500 | L3 Gateway | prefix\_\_gateway |
 
-# Routing Policies (PIM)
+## IPAM
 
-This schema inherits the `RoutingPolicy` schema and removes `import_policies` and `export_policies` attributes. However it adds a number of relationships to `RoutingPIM`.
-
-Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_pim`
-
-## routing_policies_pim
+Basic IPAM schema to capture IP addresses, subnets, and related information.
 
 - **Version:** 1.0
 
-## Nodes
+### Generics
 
-### PolicyPIM
+#### GenericDevice
+
+- **Description:** Generic Device object.
+- **Label:** Device
+- **Icon:** mdi:server
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
+##### Attributes
+
+| name | kind | unique | order_weight | optional |
+| ---- | ---- | ------ | ------------ | -------- |
+| name | Text | True | 1000 |  |
+| description | Text |  | 2000 | True |
+| os\_version | Text |  | 2200 | True |
+
+#### Relationships
+
+| name | peer | optional | cardinality | identifier | kind | order_weight | label |
+| ---- | ---- | -------- | ----------- | ---------- | ---- | ------------ | ----- |
+| interfaces | DcimInterface | True | many | device\_\_interface | Component |  |  |
+| tags | BuiltinTag | True | many |  | Attribute | 2000 |  |
+| primary\_address | IpamIPAddress | True | one |  | Attribute | 1700 | Primary IP Address |
+| platform | DcimPlatform | True | one |  | Attribute | 1250 |  |
+
+#### PhysicalDevice
+
+- **Description:** Generic holding attributes and relationships relevant for physical device.
+- **Include in Menu:** ❌
+
+##### Attributes
+
+| name | label | description | kind | optional | order_weight | default_value | choices |
+| ---- | ----- | ----------- | ---- | -------- | ------------ | ------------- | ------- |
+| position | Position \(U\) | Lowest unit\. | Number | True | 1500 |  | \`\` |
+| serial |  |  | Text | True | 1500 |  | \`\` |
+| rack\_face | Rack Face | On which face of the rack the device is mounted\. | Dropdown | False | 1515 | front | \`front, rear\` |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind | order_weight | label |
+| ---- | ---- | -------- | ----------- | ---- | ------------ | ----- |
+| device\_type | DcimDeviceType | True | one | Attribute | 1200 |  |
+| location | LocationHosting | False | one | Attribute | 1500 | Location |
+
+#### Endpoint
+
+- **Description:** Generic Endpoint to receive a connector.
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | peer | optional | cardinality | order_weight | kind |
+| ---- | ---- | -------- | ----------- | ------------ | ---- |
+| connector | DcimConnector | True | one | 1500 | Attribute |
+
+#### Connector
+
+- **Description:** Generic Connector to link two endpoints together.
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | peer | optional | cardinality | order_weight | kind |
+| ---- | ---- | -------- | ----------- | ------------ | ---- |
+| connected\_endpoints | DcimEndpoint | True | many | 1500 | Generic |
+
+#### Interface
+
+- **Description:** Generic Network Interface
+- **Label:** Interface
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**device__name__value, name__value
+- **Uniqueness Constraints:**device + name__value
+
+##### Attributes
+
+| name | kind | description | order_weight | optional | label | default_value | choices |
+| ---- | ---- | ----------- | ------------ | -------- | ----- | ------------- | ------- |
+| name | Text | Name of the interface | 1000 |  |  |  | \`\` |
+| description | Text | A brief description of the interface | 1100 | True |  |  | \`\` |
+| mtu | Number |  | 1300 |  | MTU | 1514 | \`\` |
+| status | Dropdown | The status of the interface | 1200 |  |  | active | \`provisioning, free, active, maintenance, disabled, deleted, outage\` |
+| role | Dropdown | The role of the interface in the network | 1250 | True |  |  | \`lag, core, cust, access, management, peering, upstream\` |
+
+#### Relationships
+
+| name | peer | identifier | optional | cardinality | kind | order_weight |
+| ---- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
+| device | DcimGenericDevice | device\_\_interface | False | one | Parent | 1025 |
+| tags | BuiltinTag |  | True | many | Attribute | 3000 |
+
+#### Layer2
+
+- **Description:** Layer 2 specific attributes for network interfaces
+- **Label:** Layer 2 Interface
+- **Include in Menu:** ❌
+
+##### Attributes
+
+| name | label | kind | optional | choices | description | order_weight |
+| ---- | ----- | ---- | -------- | ------- | ----------- | ------------ |
+| l2\_mode | Layer2 Mode | Dropdown | True | \`access, trunk, trunk\_all\` | Layer 2 mode of the interface | 1500 |
+
+#### Layer3
+
+- **Description:** Layer 3 specific attributes for network interfaces
+- **Label:** Layer 3 Interface
+- **Include in Menu:** ❌
+
+##### Attributes
+
+| name | label | kind | description | order_weight | optional |
+| ---- | ----- | ---- | ----------- | ------------ | -------- |
+| dot1q\_id | VLAN ID \(dot1q\) | Number | Dot1Q VLAN ID | 1600 | True |
+| mac\_address | Mac Address | Text |  | 1550 | True |
+
+#### Relationships
+
+| name | label | peer | cardinality | kind | optional | description | order_weight |
+| ---- | ----- | ---- | ----------- | ---- | -------- | ----------- | ------------ |
+| ip\_addresses | IP Addresses | IpamIPAddress | many | Attribute | True | List of IP addresses associated with the interface | 1150 |
+
+#### HasSubInterface
+
+- **Description:** A generic interface that can have sub-interfaces
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | label | peer | identifier | optional | cardinality | kind | description | order_weight |
+| ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ----------- | ------------ |
+| sub\_interfaces | Sub\-interface\(s\) | InterfaceVirtual | sub\_\_interface | True | many | Attribute | Sub\-interfaces of this interface | 1750 |
+
+### Nodes
+
+#### DeviceType
+
+- **Description:** A model of device
+- **Label:** Device Type
+- **Icon:** mdi:poll
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**manufacturer__name__value, name__value
+- **Uniqueness Constraints:**manufacturer + name__value
+
+##### Attributes
+
+| name | kind | unique | order_weight | optional | label | default_value |
+| ---- | ---- | ------ | ------------ | -------- | ----- | ------------- |
+| name | Text | True | 1000 |  |  |  |
+| description | Text |  | 1100 | True |  |  |
+| part\_number | Text |  | 1200 | True | Part Number |  |
+| height | Number |  | 1400 | False | Height \(U\) | 1 |
+| full\_depth | Boolean |  | 1500 |  | Full Depth | True |
+| weight | Number |  | 1600 | True | Weight \(kg\) |  |
+
+#### Relationships
+
+| name | peer | cardinality | kind | order_weight | optional |
+| ---- | ---- | ----------- | ---- | ------------ | -------- |
+| platform | DcimPlatform | one | Attribute | 1300 |  |
+| manufacturer | OrganizationManufacturer | one | Attribute | 1250 | False |
+| tags | BuiltinTag | many | Attribute | 2000 | True |
+
+#### Platform
+
+- **Description:** A Platform represent the type of software running on a device.
+- **Label:** Platform
+- **Icon:** mdi:application-cog-outline
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**manufacturer__name__value, name__value
+- **Uniqueness Constraints:**name__value
+
+##### Attributes
+
+| name | kind | unique | order_weight | optional |
+| ---- | ---- | ------ | ------------ | -------- |
+| name | Text | True | 1000 |  |
+| description | Text |  | 1200 | True |
+| nornir\_platform | Text |  | 1500 | True |
+| napalm\_driver | Text |  | 1600 | True |
+| netmiko\_device\_type | Text |  | 1700 | True |
+| ansible\_network\_os | Text |  | 1800 | True |
+| containerlab\_os | Text |  | 1900 | True |
+
+#### Relationships
+
+| name | peer | optional | cardinality | order_weight | kind |
+| ---- | ---- | -------- | ----------- | ------------ | ---- |
+| devices | DcimGenericDevice | True | many | 1350 |  |
+| manufacturer | OrganizationManufacturer |  | one | 1300 | Attribute |
+
+#### Device
+
+- **Description:** A configurable network device for managing and directing data traffic, including routers, switches...
+- **Label:** Network Device
+- **Icon:** clarity:network-switch-solid
+- **Include in Menu:** ❌
+
+##### Attributes
+
+| name | kind | optional | order_weight | choices |
+| ---- | ---- | -------- | ------------ | ------- |
+| status | Dropdown | False | 1100 | \`active, provisioning, maintenance, drained\` |
+| role | Dropdown | True | 1400 | \`core, edge, cpe, spine, leaf, tor\` |
+
+#### Physical
+
+- **Description:** Physical network port on a device
+- **Label:** Physical Interface
+- **Include in Menu:** ❌
+
+#### Virtual
+
+- **Description:** Virtual interface like VLAN or Loopback
+- **Label:** Virtual Interface
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | peer | cardinality | kind | identifier | description |
+| ---- | ---- | ----------- | ---- | ---------- | ----------- |
+| parent\_interface | InterfaceHasSubInterface | one | Attribute | sub\_\_interface | Parent interface to which this sub\-interface belongs |
+
+- **Version:** 1.0
+
+### Generics
+
+#### Generic
+
+- **Description:** An organization represent a legal entity, a company.
+- **Label:** Organization
+- **Icon:** mdi:domain
+- **Include in Menu:** ✅
+
+#### Ordering and Constraints
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
+##### Attributes
+
+| name | kind | unique | order_weight | optional |
+| ---- | ---- | ------ | ------------ | -------- |
+| name | Text | True | 1000 |  |
+| description | Text |  | 1200 | True |
+
+#### Relationships
+
+| name | peer | cardinality | kind | optional | order_weight |
+| ---- | ---- | ----------- | ---- | -------- | ------------ |
+| tags | BuiltinTag | many | Attribute | True | 3000 |
+
+### Nodes
+
+#### Manufacturer
+
+- **Description:** Device Manufacturer
+- **Icon:** mdi:domain
+- **Menu Placement:** OrganizationGeneric
+- **Include in Menu:** ✅
+
+#### Relationships
+
+| name | peer | cardinality | optional |
+| ---- | ---- | ----------- | -------- |
+| device\_type | DcimDeviceType | many | True |
+| platform | DcimPlatform | many | True |
+
+#### Provider
+
+- **Description:** Circuit or Location Provider
+- **Icon:** mdi:domain
+- **Menu Placement:** OrganizationGeneric
+- **Include in Menu:** ✅
+
+- **Version:** 1.0
+
+### Generics
+
+#### Generic
+
+- **Description:** Generic Location, could be a country, city ...
+- **Label:** Location
+- **Icon:** mingcute:location-line
+- **Include in Menu:** ✅
+
+#### Ordering and Constraints
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
+##### Attributes
+
+| name | kind | order_weight | unique | optional |
+| ---- | ---- | ------------ | ------ | -------- |
+| name | Text | 1000 |  |  |
+| shortname | Text | 1100 | True |  |
+| description | Text | 1200 |  | True |
+
+#### Relationships
+
+| name | peer | kind | optional | cardinality |
+| ---- | ---- | ---- | -------- | ----------- |
+| tags | BuiltinTag | Attribute | True | many |
+
+#### Hosting
+
+- **Description:** Location directly hosting device and services.
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | label | peer | cardinality | optional |
+| ---- | ----- | ---- | ----------- | -------- |
+| prefixes | Prefixes | IpamPrefix | many | True |
+| devices | Devices | DcimPhysicalDevice | many | True |
+
+- **Version:** 1.0
+
+### Nodes
+
+#### IPAddress
+
+- **Description:** IP Address
+- **Label:** IP Address
+- **Icon:** mdi:ip
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**address__value
+- **Uniqueness Constraints:**ip_namespace + address__value
+
+##### Attributes
+
+| name | label | kind | optional | regex |
+| ---- | ----- | ---- | -------- | ----- |
+| fqdn | FQDN | Text | True | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
+
+#### Relationships
+
+| name | peer | optional | cardinality |
+| ---- | ---- | -------- | ----------- |
+| interface | InterfaceLayer3 | True | one |
+
+#### Prefix
+
+- **Description:** IPv4 or IPv6 network (with mask)
+- **Label:** Prefix
+- **Icon:** mdi:ip-network
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**prefix__value
+- **Uniqueness Constraints:**ip_namespace + prefix__value
+
+##### Attributes
+
+| name | kind | choices | optional |
+| ---- | ---- | ------- | -------- |
+| status | Dropdown | \`active, deprecated, reserved\` |  |
+| role | Dropdown | \`loopback, management, public, server, supernet, technical, loopback\-vtep\` | True |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind | order_weight | label | identifier |
+| ---- | ---- | -------- | ----------- | ---- | ------------ | ----- | ---------- |
+| organization | OrganizationGeneric | True | one | Attribute | 1200 |  |  |
+| location | LocationHosting | True | one | Attribute | 1300 |  |  |
+| gateway | IpamIPAddress | True | one | Attribute | 1500 | L3 Gateway | prefix\_\_gateway |
+
+## Locations
+
+Basic Location schema to capture locations, sites, and related information.
+
+- **Version:** 1.0
+
+### Generics
+
+#### GenericDevice
+
+- **Description:** Generic Device object.
+- **Label:** Device
+- **Icon:** mdi:server
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
+##### Attributes
+
+| name | kind | unique | order_weight | optional |
+| ---- | ---- | ------ | ------------ | -------- |
+| name | Text | True | 1000 |  |
+| description | Text |  | 2000 | True |
+| os\_version | Text |  | 2200 | True |
+
+#### Relationships
+
+| name | peer | optional | cardinality | identifier | kind | order_weight | label |
+| ---- | ---- | -------- | ----------- | ---------- | ---- | ------------ | ----- |
+| interfaces | DcimInterface | True | many | device\_\_interface | Component |  |  |
+| tags | BuiltinTag | True | many |  | Attribute | 2000 |  |
+| primary\_address | IpamIPAddress | True | one |  | Attribute | 1700 | Primary IP Address |
+| platform | DcimPlatform | True | one |  | Attribute | 1250 |  |
+
+#### PhysicalDevice
+
+- **Description:** Generic holding attributes and relationships relevant for physical device.
+- **Include in Menu:** ❌
+
+##### Attributes
+
+| name | label | description | kind | optional | order_weight | default_value | choices |
+| ---- | ----- | ----------- | ---- | -------- | ------------ | ------------- | ------- |
+| position | Position \(U\) | Lowest unit\. | Number | True | 1500 |  | \`\` |
+| serial |  |  | Text | True | 1500 |  | \`\` |
+| rack\_face | Rack Face | On which face of the rack the device is mounted\. | Dropdown | False | 1515 | front | \`front, rear\` |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind | order_weight | label |
+| ---- | ---- | -------- | ----------- | ---- | ------------ | ----- |
+| device\_type | DcimDeviceType | True | one | Attribute | 1200 |  |
+| location | LocationHosting | False | one | Attribute | 1500 | Location |
+
+#### Endpoint
+
+- **Description:** Generic Endpoint to receive a connector.
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | peer | optional | cardinality | order_weight | kind |
+| ---- | ---- | -------- | ----------- | ------------ | ---- |
+| connector | DcimConnector | True | one | 1500 | Attribute |
+
+#### Connector
+
+- **Description:** Generic Connector to link two endpoints together.
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | peer | optional | cardinality | order_weight | kind |
+| ---- | ---- | -------- | ----------- | ------------ | ---- |
+| connected\_endpoints | DcimEndpoint | True | many | 1500 | Generic |
+
+#### Interface
+
+- **Description:** Generic Network Interface
+- **Label:** Interface
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**device__name__value, name__value
+- **Uniqueness Constraints:**device + name__value
+
+##### Attributes
+
+| name | kind | description | order_weight | optional | label | default_value | choices |
+| ---- | ---- | ----------- | ------------ | -------- | ----- | ------------- | ------- |
+| name | Text | Name of the interface | 1000 |  |  |  | \`\` |
+| description | Text | A brief description of the interface | 1100 | True |  |  | \`\` |
+| mtu | Number |  | 1300 |  | MTU | 1514 | \`\` |
+| status | Dropdown | The status of the interface | 1200 |  |  | active | \`provisioning, free, active, maintenance, disabled, deleted, outage\` |
+| role | Dropdown | The role of the interface in the network | 1250 | True |  |  | \`lag, core, cust, access, management, peering, upstream\` |
+
+#### Relationships
+
+| name | peer | identifier | optional | cardinality | kind | order_weight |
+| ---- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
+| device | DcimGenericDevice | device\_\_interface | False | one | Parent | 1025 |
+| tags | BuiltinTag |  | True | many | Attribute | 3000 |
+
+#### Layer2
+
+- **Description:** Layer 2 specific attributes for network interfaces
+- **Label:** Layer 2 Interface
+- **Include in Menu:** ❌
+
+##### Attributes
+
+| name | label | kind | optional | choices | description | order_weight |
+| ---- | ----- | ---- | -------- | ------- | ----------- | ------------ |
+| l2\_mode | Layer2 Mode | Dropdown | True | \`access, trunk, trunk\_all\` | Layer 2 mode of the interface | 1500 |
+
+#### Layer3
+
+- **Description:** Layer 3 specific attributes for network interfaces
+- **Label:** Layer 3 Interface
+- **Include in Menu:** ❌
+
+##### Attributes
+
+| name | label | kind | description | order_weight | optional |
+| ---- | ----- | ---- | ----------- | ------------ | -------- |
+| dot1q\_id | VLAN ID \(dot1q\) | Number | Dot1Q VLAN ID | 1600 | True |
+| mac\_address | Mac Address | Text |  | 1550 | True |
+
+#### Relationships
+
+| name | label | peer | cardinality | kind | optional | description | order_weight |
+| ---- | ----- | ---- | ----------- | ---- | -------- | ----------- | ------------ |
+| ip\_addresses | IP Addresses | IpamIPAddress | many | Attribute | True | List of IP addresses associated with the interface | 1150 |
+
+#### HasSubInterface
+
+- **Description:** A generic interface that can have sub-interfaces
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | label | peer | identifier | optional | cardinality | kind | description | order_weight |
+| ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ----------- | ------------ |
+| sub\_interfaces | Sub\-interface\(s\) | InterfaceVirtual | sub\_\_interface | True | many | Attribute | Sub\-interfaces of this interface | 1750 |
+
+### Nodes
+
+#### DeviceType
+
+- **Description:** A model of device
+- **Label:** Device Type
+- **Icon:** mdi:poll
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**manufacturer__name__value, name__value
+- **Uniqueness Constraints:**manufacturer + name__value
+
+##### Attributes
+
+| name | kind | unique | order_weight | optional | label | default_value |
+| ---- | ---- | ------ | ------------ | -------- | ----- | ------------- |
+| name | Text | True | 1000 |  |  |  |
+| description | Text |  | 1100 | True |  |  |
+| part\_number | Text |  | 1200 | True | Part Number |  |
+| height | Number |  | 1400 | False | Height \(U\) | 1 |
+| full\_depth | Boolean |  | 1500 |  | Full Depth | True |
+| weight | Number |  | 1600 | True | Weight \(kg\) |  |
+
+#### Relationships
+
+| name | peer | cardinality | kind | order_weight | optional |
+| ---- | ---- | ----------- | ---- | ------------ | -------- |
+| platform | DcimPlatform | one | Attribute | 1300 |  |
+| manufacturer | OrganizationManufacturer | one | Attribute | 1250 | False |
+| tags | BuiltinTag | many | Attribute | 2000 | True |
+
+#### Platform
+
+- **Description:** A Platform represent the type of software running on a device.
+- **Label:** Platform
+- **Icon:** mdi:application-cog-outline
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**manufacturer__name__value, name__value
+- **Uniqueness Constraints:**name__value
+
+##### Attributes
+
+| name | kind | unique | order_weight | optional |
+| ---- | ---- | ------ | ------------ | -------- |
+| name | Text | True | 1000 |  |
+| description | Text |  | 1200 | True |
+| nornir\_platform | Text |  | 1500 | True |
+| napalm\_driver | Text |  | 1600 | True |
+| netmiko\_device\_type | Text |  | 1700 | True |
+| ansible\_network\_os | Text |  | 1800 | True |
+| containerlab\_os | Text |  | 1900 | True |
+
+#### Relationships
+
+| name | peer | optional | cardinality | order_weight | kind |
+| ---- | ---- | -------- | ----------- | ------------ | ---- |
+| devices | DcimGenericDevice | True | many | 1350 |  |
+| manufacturer | OrganizationManufacturer |  | one | 1300 | Attribute |
+
+#### Device
+
+- **Description:** A configurable network device for managing and directing data traffic, including routers, switches...
+- **Label:** Network Device
+- **Icon:** clarity:network-switch-solid
+- **Include in Menu:** ❌
+
+##### Attributes
+
+| name | kind | optional | order_weight | choices |
+| ---- | ---- | -------- | ------------ | ------- |
+| status | Dropdown | False | 1100 | \`active, provisioning, maintenance, drained\` |
+| role | Dropdown | True | 1400 | \`core, edge, cpe, spine, leaf, tor\` |
+
+#### Physical
+
+- **Description:** Physical network port on a device
+- **Label:** Physical Interface
+- **Include in Menu:** ❌
+
+#### Virtual
+
+- **Description:** Virtual interface like VLAN or Loopback
+- **Label:** Virtual Interface
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | peer | cardinality | kind | identifier | description |
+| ---- | ---- | ----------- | ---- | ---------- | ----------- |
+| parent\_interface | InterfaceHasSubInterface | one | Attribute | sub\_\_interface | Parent interface to which this sub\-interface belongs |
+
+- **Version:** 1.0
+
+### Generics
+
+#### Generic
+
+- **Description:** An organization represent a legal entity, a company.
+- **Label:** Organization
+- **Icon:** mdi:domain
+- **Include in Menu:** ✅
+
+#### Ordering and Constraints
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
+##### Attributes
+
+| name | kind | unique | order_weight | optional |
+| ---- | ---- | ------ | ------------ | -------- |
+| name | Text | True | 1000 |  |
+| description | Text |  | 1200 | True |
+
+#### Relationships
+
+| name | peer | cardinality | kind | optional | order_weight |
+| ---- | ---- | ----------- | ---- | -------- | ------------ |
+| tags | BuiltinTag | many | Attribute | True | 3000 |
+
+### Nodes
+
+#### Manufacturer
+
+- **Description:** Device Manufacturer
+- **Icon:** mdi:domain
+- **Menu Placement:** OrganizationGeneric
+- **Include in Menu:** ✅
+
+#### Relationships
+
+| name | peer | cardinality | optional |
+| ---- | ---- | ----------- | -------- |
+| device\_type | DcimDeviceType | many | True |
+| platform | DcimPlatform | many | True |
+
+#### Provider
+
+- **Description:** Circuit or Location Provider
+- **Icon:** mdi:domain
+- **Menu Placement:** OrganizationGeneric
+- **Include in Menu:** ✅
+
+- **Version:** 1.0
+
+### Generics
+
+#### Generic
+
+- **Description:** Generic Location, could be a country, city ...
+- **Label:** Location
+- **Icon:** mingcute:location-line
+- **Include in Menu:** ✅
+
+#### Ordering and Constraints
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
+##### Attributes
+
+| name | kind | order_weight | unique | optional |
+| ---- | ---- | ------------ | ------ | -------- |
+| name | Text | 1000 |  |  |
+| shortname | Text | 1100 | True |  |
+| description | Text | 1200 |  | True |
+
+#### Relationships
+
+| name | peer | kind | optional | cardinality |
+| ---- | ---- | ---- | -------- | ----------- |
+| tags | BuiltinTag | Attribute | True | many |
+
+#### Hosting
+
+- **Description:** Location directly hosting device and services.
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | label | peer | cardinality | optional |
+| ---- | ----- | ---- | ----------- | -------- |
+| prefixes | Prefixes | IpamPrefix | many | True |
+| devices | Devices | DcimPhysicalDevice | many | True |
+
+- **Version:** 1.0
+
+### Nodes
+
+#### IPAddress
+
+- **Description:** IP Address
+- **Label:** IP Address
+- **Icon:** mdi:ip
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**address__value
+- **Uniqueness Constraints:**ip_namespace + address__value
+
+##### Attributes
+
+| name | label | kind | optional | regex |
+| ---- | ----- | ---- | -------- | ----- |
+| fqdn | FQDN | Text | True | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
+
+#### Relationships
+
+| name | peer | optional | cardinality |
+| ---- | ---- | -------- | ----------- |
+| interface | InterfaceLayer3 | True | one |
+
+#### Prefix
+
+- **Description:** IPv4 or IPv6 network (with mask)
+- **Label:** Prefix
+- **Icon:** mdi:ip-network
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**prefix__value
+- **Uniqueness Constraints:**ip_namespace + prefix__value
+
+##### Attributes
+
+| name | kind | choices | optional |
+| ---- | ---- | ------- | -------- |
+| status | Dropdown | \`active, deprecated, reserved\` |  |
+| role | Dropdown | \`loopback, management, public, server, supernet, technical, loopback\-vtep\` | True |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind | order_weight | label | identifier |
+| ---- | ---- | -------- | ----------- | ---- | ------------ | ----- | ---------- |
+| organization | OrganizationGeneric | True | one | Attribute | 1200 |  |  |
+| location | LocationHosting | True | one | Attribute | 1300 |  |  |
+| gateway | IpamIPAddress | True | one | Attribute | 1500 | L3 Gateway | prefix\_\_gateway |
+
+## Organization
+
+Basic Organization schema to capture organizations, vendors, and related information.
+
+- **Version:** 1.0
+
+### Generics
+
+#### GenericDevice
+
+- **Description:** Generic Device object.
+- **Label:** Device
+- **Icon:** mdi:server
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
+##### Attributes
+
+| name | kind | unique | order_weight | optional |
+| ---- | ---- | ------ | ------------ | -------- |
+| name | Text | True | 1000 |  |
+| description | Text |  | 2000 | True |
+| os\_version | Text |  | 2200 | True |
+
+#### Relationships
+
+| name | peer | optional | cardinality | identifier | kind | order_weight | label |
+| ---- | ---- | -------- | ----------- | ---------- | ---- | ------------ | ----- |
+| interfaces | DcimInterface | True | many | device\_\_interface | Component |  |  |
+| tags | BuiltinTag | True | many |  | Attribute | 2000 |  |
+| primary\_address | IpamIPAddress | True | one |  | Attribute | 1700 | Primary IP Address |
+| platform | DcimPlatform | True | one |  | Attribute | 1250 |  |
+
+#### PhysicalDevice
+
+- **Description:** Generic holding attributes and relationships relevant for physical device.
+- **Include in Menu:** ❌
+
+##### Attributes
+
+| name | label | description | kind | optional | order_weight | default_value | choices |
+| ---- | ----- | ----------- | ---- | -------- | ------------ | ------------- | ------- |
+| position | Position \(U\) | Lowest unit\. | Number | True | 1500 |  | \`\` |
+| serial |  |  | Text | True | 1500 |  | \`\` |
+| rack\_face | Rack Face | On which face of the rack the device is mounted\. | Dropdown | False | 1515 | front | \`front, rear\` |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind | order_weight | label |
+| ---- | ---- | -------- | ----------- | ---- | ------------ | ----- |
+| device\_type | DcimDeviceType | True | one | Attribute | 1200 |  |
+| location | LocationHosting | False | one | Attribute | 1500 | Location |
+
+#### Endpoint
+
+- **Description:** Generic Endpoint to receive a connector.
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | peer | optional | cardinality | order_weight | kind |
+| ---- | ---- | -------- | ----------- | ------------ | ---- |
+| connector | DcimConnector | True | one | 1500 | Attribute |
+
+#### Connector
+
+- **Description:** Generic Connector to link two endpoints together.
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | peer | optional | cardinality | order_weight | kind |
+| ---- | ---- | -------- | ----------- | ------------ | ---- |
+| connected\_endpoints | DcimEndpoint | True | many | 1500 | Generic |
+
+#### Interface
+
+- **Description:** Generic Network Interface
+- **Label:** Interface
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**device__name__value, name__value
+- **Uniqueness Constraints:**device + name__value
+
+##### Attributes
+
+| name | kind | description | order_weight | optional | label | default_value | choices |
+| ---- | ---- | ----------- | ------------ | -------- | ----- | ------------- | ------- |
+| name | Text | Name of the interface | 1000 |  |  |  | \`\` |
+| description | Text | A brief description of the interface | 1100 | True |  |  | \`\` |
+| mtu | Number |  | 1300 |  | MTU | 1514 | \`\` |
+| status | Dropdown | The status of the interface | 1200 |  |  | active | \`provisioning, free, active, maintenance, disabled, deleted, outage\` |
+| role | Dropdown | The role of the interface in the network | 1250 | True |  |  | \`lag, core, cust, access, management, peering, upstream\` |
+
+#### Relationships
+
+| name | peer | identifier | optional | cardinality | kind | order_weight |
+| ---- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
+| device | DcimGenericDevice | device\_\_interface | False | one | Parent | 1025 |
+| tags | BuiltinTag |  | True | many | Attribute | 3000 |
+
+#### Layer2
+
+- **Description:** Layer 2 specific attributes for network interfaces
+- **Label:** Layer 2 Interface
+- **Include in Menu:** ❌
+
+##### Attributes
+
+| name | label | kind | optional | choices | description | order_weight |
+| ---- | ----- | ---- | -------- | ------- | ----------- | ------------ |
+| l2\_mode | Layer2 Mode | Dropdown | True | \`access, trunk, trunk\_all\` | Layer 2 mode of the interface | 1500 |
+
+#### Layer3
+
+- **Description:** Layer 3 specific attributes for network interfaces
+- **Label:** Layer 3 Interface
+- **Include in Menu:** ❌
+
+##### Attributes
+
+| name | label | kind | description | order_weight | optional |
+| ---- | ----- | ---- | ----------- | ------------ | -------- |
+| dot1q\_id | VLAN ID \(dot1q\) | Number | Dot1Q VLAN ID | 1600 | True |
+| mac\_address | Mac Address | Text |  | 1550 | True |
+
+#### Relationships
+
+| name | label | peer | cardinality | kind | optional | description | order_weight |
+| ---- | ----- | ---- | ----------- | ---- | -------- | ----------- | ------------ |
+| ip\_addresses | IP Addresses | IpamIPAddress | many | Attribute | True | List of IP addresses associated with the interface | 1150 |
+
+#### HasSubInterface
+
+- **Description:** A generic interface that can have sub-interfaces
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | label | peer | identifier | optional | cardinality | kind | description | order_weight |
+| ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ----------- | ------------ |
+| sub\_interfaces | Sub\-interface\(s\) | InterfaceVirtual | sub\_\_interface | True | many | Attribute | Sub\-interfaces of this interface | 1750 |
+
+### Nodes
+
+#### DeviceType
+
+- **Description:** A model of device
+- **Label:** Device Type
+- **Icon:** mdi:poll
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**manufacturer__name__value, name__value
+- **Uniqueness Constraints:**manufacturer + name__value
+
+##### Attributes
+
+| name | kind | unique | order_weight | optional | label | default_value |
+| ---- | ---- | ------ | ------------ | -------- | ----- | ------------- |
+| name | Text | True | 1000 |  |  |  |
+| description | Text |  | 1100 | True |  |  |
+| part\_number | Text |  | 1200 | True | Part Number |  |
+| height | Number |  | 1400 | False | Height \(U\) | 1 |
+| full\_depth | Boolean |  | 1500 |  | Full Depth | True |
+| weight | Number |  | 1600 | True | Weight \(kg\) |  |
+
+#### Relationships
+
+| name | peer | cardinality | kind | order_weight | optional |
+| ---- | ---- | ----------- | ---- | ------------ | -------- |
+| platform | DcimPlatform | one | Attribute | 1300 |  |
+| manufacturer | OrganizationManufacturer | one | Attribute | 1250 | False |
+| tags | BuiltinTag | many | Attribute | 2000 | True |
+
+#### Platform
+
+- **Description:** A Platform represent the type of software running on a device.
+- **Label:** Platform
+- **Icon:** mdi:application-cog-outline
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**manufacturer__name__value, name__value
+- **Uniqueness Constraints:**name__value
+
+##### Attributes
+
+| name | kind | unique | order_weight | optional |
+| ---- | ---- | ------ | ------------ | -------- |
+| name | Text | True | 1000 |  |
+| description | Text |  | 1200 | True |
+| nornir\_platform | Text |  | 1500 | True |
+| napalm\_driver | Text |  | 1600 | True |
+| netmiko\_device\_type | Text |  | 1700 | True |
+| ansible\_network\_os | Text |  | 1800 | True |
+| containerlab\_os | Text |  | 1900 | True |
+
+#### Relationships
+
+| name | peer | optional | cardinality | order_weight | kind |
+| ---- | ---- | -------- | ----------- | ------------ | ---- |
+| devices | DcimGenericDevice | True | many | 1350 |  |
+| manufacturer | OrganizationManufacturer |  | one | 1300 | Attribute |
+
+#### Device
+
+- **Description:** A configurable network device for managing and directing data traffic, including routers, switches...
+- **Label:** Network Device
+- **Icon:** clarity:network-switch-solid
+- **Include in Menu:** ❌
+
+##### Attributes
+
+| name | kind | optional | order_weight | choices |
+| ---- | ---- | -------- | ------------ | ------- |
+| status | Dropdown | False | 1100 | \`active, provisioning, maintenance, drained\` |
+| role | Dropdown | True | 1400 | \`core, edge, cpe, spine, leaf, tor\` |
+
+#### Physical
+
+- **Description:** Physical network port on a device
+- **Label:** Physical Interface
+- **Include in Menu:** ❌
+
+#### Virtual
+
+- **Description:** Virtual interface like VLAN or Loopback
+- **Label:** Virtual Interface
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | peer | cardinality | kind | identifier | description |
+| ---- | ---- | ----------- | ---- | ---------- | ----------- |
+| parent\_interface | InterfaceHasSubInterface | one | Attribute | sub\_\_interface | Parent interface to which this sub\-interface belongs |
+
+- **Version:** 1.0
+
+### Generics
+
+#### Generic
+
+- **Description:** An organization represent a legal entity, a company.
+- **Label:** Organization
+- **Icon:** mdi:domain
+- **Include in Menu:** ✅
+
+#### Ordering and Constraints
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
+##### Attributes
+
+| name | kind | unique | order_weight | optional |
+| ---- | ---- | ------ | ------------ | -------- |
+| name | Text | True | 1000 |  |
+| description | Text |  | 1200 | True |
+
+#### Relationships
+
+| name | peer | cardinality | kind | optional | order_weight |
+| ---- | ---- | ----------- | ---- | -------- | ------------ |
+| tags | BuiltinTag | many | Attribute | True | 3000 |
+
+### Nodes
+
+#### Manufacturer
+
+- **Description:** Device Manufacturer
+- **Icon:** mdi:domain
+- **Menu Placement:** OrganizationGeneric
+- **Include in Menu:** ✅
+
+#### Relationships
+
+| name | peer | cardinality | optional |
+| ---- | ---- | ----------- | -------- |
+| device\_type | DcimDeviceType | many | True |
+| platform | DcimPlatform | many | True |
+
+#### Provider
+
+- **Description:** Circuit or Location Provider
+- **Icon:** mdi:domain
+- **Menu Placement:** OrganizationGeneric
+- **Include in Menu:** ✅
+
+- **Version:** 1.0
+
+### Generics
+
+#### Generic
+
+- **Description:** Generic Location, could be a country, city ...
+- **Label:** Location
+- **Icon:** mingcute:location-line
+- **Include in Menu:** ✅
+
+#### Ordering and Constraints
+
+- **Order By:**name__value
+- **Uniqueness Constraints:**
+
+##### Attributes
+
+| name | kind | order_weight | unique | optional |
+| ---- | ---- | ------------ | ------ | -------- |
+| name | Text | 1000 |  |  |
+| shortname | Text | 1100 | True |  |
+| description | Text | 1200 |  | True |
+
+#### Relationships
+
+| name | peer | kind | optional | cardinality |
+| ---- | ---- | ---- | -------- | ----------- |
+| tags | BuiltinTag | Attribute | True | many |
+
+#### Hosting
+
+- **Description:** Location directly hosting device and services.
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | label | peer | cardinality | optional |
+| ---- | ----- | ---- | ----------- | -------- |
+| prefixes | Prefixes | IpamPrefix | many | True |
+| devices | Devices | DcimPhysicalDevice | many | True |
+
+- **Version:** 1.0
+
+### Nodes
+
+#### IPAddress
+
+- **Description:** IP Address
+- **Label:** IP Address
+- **Icon:** mdi:ip
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**address__value
+- **Uniqueness Constraints:**ip_namespace + address__value
+
+##### Attributes
+
+| name | label | kind | optional | regex |
+| ---- | ----- | ---- | -------- | ----- |
+| fqdn | FQDN | Text | True | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
+
+#### Relationships
+
+| name | peer | optional | cardinality |
+| ---- | ---- | -------- | ----------- |
+| interface | InterfaceLayer3 | True | one |
+
+#### Prefix
+
+- **Description:** IPv4 or IPv6 network (with mask)
+- **Label:** Prefix
+- **Icon:** mdi:ip-network
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**prefix__value
+- **Uniqueness Constraints:**ip_namespace + prefix__value
+
+##### Attributes
+
+| name | kind | choices | optional |
+| ---- | ---- | ------- | -------- |
+| status | Dropdown | \`active, deprecated, reserved\` |  |
+| role | Dropdown | \`loopback, management, public, server, supernet, technical, loopback\-vtep\` | True |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind | order_weight | label | identifier |
+| ---- | ---- | -------- | ----------- | ---- | ------------ | ----- | ---------- |
+| organization | OrganizationGeneric | True | one | Attribute | 1200 |  |  |
+| location | LocationHosting | True | one | Attribute | 1300 |  |  |
+| gateway | IpamIPAddress | True | one | Attribute | 1500 | L3 Gateway | prefix\_\_gateway |
+
+## Routing Policies (PIM)
+
+This schema inherits the `RoutingPolicy` schema and removes `import_policies` and `export_policies` attributes. However it adds a number of relationships to `RoutingPIM`.
+
+- **Dependencies:** `base, extensions/routing, extensions/routing_policies, extensions/routing_pim`
+- **Version:** 1.0
+
+### Nodes
+
+#### PolicyPIM
 
 - **Description:** A routing policiers for PIM
 - **Label:** PIM Routing Policies
 - **Icon:** carbon:deployment-policy
 - **Include in Menu:** ❌
 
-## Extensions
+### Extensions
 
-### RoutingPIM
+#### RoutingPIM
 
 #### Attributes
 
@@ -442,26 +1680,23 @@ Dependencies: `base, extensions.routing, extensions.routing_policies, extensions
 | import\_routing\_policies | Import Routing Policies | RoutingPolicyPIM | pim\_\_import\_policies | The routing\-policies used by this instance for import\. | Generic | many |
 | export\_routing\_policies | Export Routing Policies | RoutingPolicyPIM | pim\_\_export\_policies | The routing\-policies used by this instance for export\. | Generic | many |
 
-# Topology
+## Topology
 
 This schema extension introduces abstract network pods and services running in the pods, such as MPLS and EVPN.
 
-Dependencies: `base`
-
-## topology
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### Generic
+#### Generic
 
 - **Description:** Generic model for topology.
 - **Label:** Topology
 - **Icon:** carbon:network-3
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional |
 | ---- | ---- | ------------ | -------- |
@@ -473,19 +1708,16 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- |
 | location | LocationGeneric | True | one | Attribute |
 
-# Cluster
+## Cluster
 
 This schema extension contains the foundations to capture clusters. With this one in place you can unlock various clusters flavors (hosting cluster able to host VMs, firewall clusters built with specific appliances ...)
 
-Dependencies: `base, extensions.compute`
-
-## cluster
-
+- **Dependencies:** `base, extensions/compute`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### Generic
+#### Generic
 
 - **Description:** A cluster of machines hosting services or other machines.
 - **Label:** Clusters
@@ -497,7 +1729,7 @@ Dependencies: `base, extensions.compute`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | order_weight | optional |
 | ---- | ---- | ----------- | ------ | ------------ | -------- |
@@ -511,7 +1743,7 @@ Dependencies: `base, extensions.compute`
 | location | Location | LocationGeneric | False | many | Attribute | 1400 |
 | tags |  | BuiltinTag | True | many | Attribute | 2000 |
 
-### GenericComputeUnitNodes
+#### GenericComputeUnitNodes
 
 - **Description:** A generic to apply on clusters that can be built out of generic compute units.
 - **Include in Menu:** ❌
@@ -522,9 +1754,9 @@ Dependencies: `base, extensions.compute`
 | ---- | ----- | ---------- | ----------- | ---- | ---- |
 | nodes | Nodes | worker\_in\_cluster | many | ComputeGenericUnit | Component |
 
-## Extensions
+### Extensions
 
-### ComputeGenericUnit
+#### ComputeGenericUnit
 
 #### Relationships
 
@@ -532,7 +1764,7 @@ Dependencies: `base, extensions.compute`
 | ---- | ---------- | ----- | ---- | ----------- | ----------- | -------- |
 | worker\_in\_cluster | worker\_in\_cluster | Worker in cluster | ClusterGenericComputeUnitNodes | one | This device is a worker node of the specified cluster\. | True |
 
-### LocationGeneric
+#### LocationGeneric
 
 #### Relationships
 
@@ -540,66 +1772,16 @@ Dependencies: `base, extensions.compute`
 | ---- | ----- | ---- | ----------- | ---- | ----------- | -------- |
 | clusters | Clusters | ClusterGeneric | many | Component | All clusters available on that location\. | True |
 
-# Routing Engine
-
-This schema extension allows you to capture Routing Engine related information like the version. You can insert the Routing Engine into a Dcim Physical Device and leverage the Routing Engine type model.
-
-Dependencies: `base, extensions.modules`
-
-## routing_engine
-
-- **Version:** 1.0
-
-## Nodes
-
-### RoutingEngineType
-
-- **Description:** Routing Engine Type information, detailing specifications such as part number and manufacturer.
-- **Label:** Routing Engine Type
-- **Include in Menu:** ❌
-
-#### Relationships
-
-| name | peer | cardinality | kind | description |
-| ---- | ---- | ----------- | ---- | ----------- |
-| routing\_engines | InfraRoutingEngine | many | Generic | Routing engines of this type\. |
-
-### RoutingEngine
-
-- **Description:** A Routing Engine (RE) installed in a device, responsible for routing functionalities.
-- **Label:** Routing Engine
-- **Icon:** mdi:cpu-64-bit
-- **Include in Menu:** ❌
-
-#### Ordering and Constraints
-
-- **Order By:**device__name__value, slot__value
-- **Uniqueness Constraints:**serial_number__value
-
-#### Attributes
-
-| name | kind | description | order_weight | label | optional |
-| ---- | ---- | ----------- | ------------ | ----- | -------- |
-| slot | Number | The slot number where the Routing Engine is installed within the device | 1100 |  |  |
-| version | Text | Firmware version of the Routing Engine\. | 1200 | Version | True |
-
-#### Relationships
-
-| name | label | peer | optional | cardinality | kind | order_weight |
-| ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
-| routing\_engine\_type | RE Type | InfraRoutingEngineType | False | one | Attribute | 1150 |
-
-# SNMP
+## SNMP
 
 This schema extension contains models for SNMP Communities and SNMP Clients. As you can see this extension is not linked to Tenancy or Device, as you could decide to link the Community to different models based on your use case.
 
-## snmp
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### Community
+#### Community
 
 - **Description:** Generic model for SNMP community configurations.
 - **Label:** SNMP Community
@@ -611,7 +1793,7 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional |
 | ---- | ---- | ------------ | -------- |
@@ -624,9 +1806,9 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 | ---- | ---- | ----------- | ---- |
 | clients | SnmpClient | many | Component |
 
-## Nodes
+### Nodes
 
-### CommunityV2
+#### CommunityV2
 
 - **Description:** SNMP v1/v2c community configuration.
 - **Label:** SNMP v1/v2c
@@ -639,14 +1821,14 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | enum |
 | ---- | ---- | ------------ | ---- |
 | community\_string | Password | 1300 |  |
 | access | Text | 1200 | \['Read\-Only', 'Read\-Write'\] |
 
-### CommunityV3
+#### CommunityV3
 
 - **Description:** SNMP version 3 configuration with enhanced security.
 - **Label:** SNMP v3
@@ -659,7 +1841,7 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | label | enum | optional | choices |
 | ---- | ---- | ------------ | ----- | ---- | -------- | ------- |
@@ -670,7 +1852,7 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 | privacy\_password | Password | 1700 | Privacy Password |  | True | \`\` |
 | security\_level | Dropdown | 1200 | Security Level |  |  | \`noAuthNoPriv, authNoPriv, authPriv\` |
 
-### Client
+#### Client
 
 - **Description:** Represents an SNMP client that interacts with SNMP Community.
 - **Label:** SNMP Client
@@ -683,7 +1865,7 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | label | optional |
 | ---- | ---- | ------------ | ----- | -------- |
@@ -696,117 +1878,16 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 | ---- | ---- | ----------- | ------------ |
 | community | SnmpCommunity | many | 1200 |
 
-# Linecards
+## Interface Breakout
 
-This schema extension allows you to capture Linecard related information like the version. You can insert the Linecard into a Dcim Physical Device and leverage the Linecard type model. The Linecard can accept PIC to help configure PORT information like breakout-capabilities and configurations.
+This schema extension introduces relationships to support breakout interfaces, enabling you to document the breakout of a physical interface into smaller physical interfaces.
 
-Dependencies: `base, extensions.modules`
-
-## linecard
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Extensions
 
-### LinecardType
-
-- **Description:** Linecard Type information, detailing specifications such as part number and manufacturer.
-- **Label:** Linecard Type
-- **Include in Menu:** ❌
-
-#### Relationships
-
-| name | peer | cardinality | kind | description |
-| ---- | ---- | ----------- | ---- | ----------- |
-| linecards | InfraLinecard | many | Generic | Linecards of this type\. |
-
-### Linecard
-
-- **Description:** A Linecard installed in a device, specifying slot, power status, and functionalities.
-- **Label:** Linecard
-- **Icon:** bi:pci-card
-- **Include in Menu:** ❌
-
-#### Ordering and Constraints
-
-- **Order By:**device__name__value, slot__value
-- **Uniqueness Constraints:**serial_number__value
-
-#### Attributes
-
-| name | kind | description | order_weight | label | optional | default_value |
-| ---- | ---- | ----------- | ------------ | ----- | -------- | ------------- |
-| slot | Number | The slot number where the Linecard is installed within the device | 1050 |  |  |  |
-| bng\_enabled | Boolean | BNG activated or deactivated on the Linecard | 1400 | BNG Enabled | True | False |
-
-#### Relationships
-
-| name | label | peer | optional | cardinality | kind | order_weight |
-| ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
-| linecard\_type | Linecard Type | DeviceLinecardType | False | one | Attribute | 1150 |
-| pics | PICs | DevicePic | True | many | Attribute | 1500 |
-
-### Pic
-
-- **Description:** Physical Interface Card (PIC) installed in the Linecard, containing multiple ports.
-- **Label:** PIC
-- **Include in Menu:** ❌
-
-#### Ordering and Constraints
-
-- **Order By:**linecard__serial_number__value, slot__value
-- **Uniqueness Constraints:**linecard + slot__value
-
-#### Attributes
-
-| name | kind | description | order_weight |
-| ---- | ---- | ----------- | ------------ |
-| slot | Number | Slot number of the PIC within the Linecard | 1200 |
-
-#### Relationships
-
-| name | label | peer | identifier | optional | cardinality | kind | order_weight |
-| ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
-| linecard | Linecard | DeviceLinecard | linecard\_\_pics | False | one | Parent | 1000 |
-| ports | Ports | InfraPort |  | True | many | Component | 1100 |
-
-### Port
-
-- **Description:** A network port on a PIC, specifying speed and port number.
-- **Label:** Port
-- **Include in Menu:** ❌
-
-#### Ordering and Constraints
-
-- **Order By:**pic__slot__value, port_number__value
-- **Uniqueness Constraints:**pic + port_number__value
-
-#### Attributes
-
-| name | kind | description | order_weight | choices |
-| ---- | ---- | ----------- | ------------ | ------- |
-| port\_number | Number | Port number on the PIC | 1100 | \`\` |
-| speed | Dropdown | Speed of the port | 1200 | \`10g, 100g\` |
-
-#### Relationships
-
-| name | label | peer | optional | cardinality | kind | order_weight |
-| ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
-| pic | PIC | DevicePic | False | one | Parent | 1000 |
-
-# Interface Breakdown
-
-This schema extension introduces relationships to support breakout interfaces, enabling you to document the breakdown of a physical interface into smaller physical interfaces.
-
-Dependencies: `base`
-
-## interface_breakout
-
-- **Version:** 1.0
-
-## Extensions
-
-### InterfacePhysical
+#### InterfacePhysical
 
 #### Attributes
 
@@ -821,28 +1902,25 @@ Dependencies: `base`
 | breakout\_child\_interfaces | InterfacePhysical | Breakout child interface\(s\) | True | many | Attribute | physical\_\_breakout | outbound | Interfaces resulting from the breakout | 1650 |
 | breakout\_parent\_interface | InterfacePhysical | Breakout parent interface | True | one | Attribute | physical\_\_breakout | inbound | Interface from which breakout is created | 1700 |
 
-# Routing Policies BGP
+## Routing Policies BGP
 
 This extension is using the Routing Policies extensions and the Routing BGP one together.
 
-Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_bgp`
-
-## routing_policies_bgp
-
+- **Dependencies:** `base, extensions/routing, extensions/routing_policies, extensions/routing_bgp`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### PolicyBGP
+#### PolicyBGP
 
 - **Description:** A routing policiers for BGP
 - **Label:** BGP Routing Policies
 - **Icon:** carbon:deployment-policy
 - **Include in Menu:** ❌
 
-## Extensions
+### Extensions
 
-### RoutingBGPPeerGroup
+#### RoutingBGPPeerGroup
 
 #### Attributes
 
@@ -858,7 +1936,7 @@ Dependencies: `base, extensions.routing, extensions.routing_policies, extensions
 | import\_routing\_policies | Import Routing Policies | RoutingPolicyBGP | bgp\_\_import\_policies | The routing\-policies used by this instance for import\. | Generic | many |
 | export\_routing\_policies | Export Routing Policies | RoutingPolicyBGP | bgp\_\_export\_policies | The routing\-policies used by this instance for export\. | Generic | many |
 
-### RoutingBGPSession
+#### RoutingBGPSession
 
 #### Attributes
 
@@ -874,19 +1952,16 @@ Dependencies: `base, extensions.routing, extensions.routing_policies, extensions
 | import\_routing\_policies | Import Routing Policies | RoutingPolicy | bgp\_\_import\_policies | The routing\-policies used by this instance for import\. | Generic | many |
 | export\_routing\_policies | Export Routing Policies | RoutingPolicy | bgp\_\_export\_policies | The routing\-policies used by this instance for export\. | Generic | many |
 
-# BGP Route Reflector
+## Routing BGP RR
 
 This schema extension extend the BGP extension to add BGP Route Reflector Clustering.
 
-Dependencies: `base, extensions.routing, extensions.routing_bgp`
-
-## bgp_rr
-
+- **Dependencies:** `base, extensions/routing, extensions/routing_bgp`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### BGPRRCluster
+#### BGPRRCluster
 
 - **Description:** A Route Reflector (RR) Cluster used for grouping internal peers
 - **Label:** Route Reflector Cluster
@@ -898,7 +1973,7 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp`
 - **Order By:**
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | optional |
 | ---- | ---- | ----------- | ------------ | -------- |
@@ -912,9 +1987,9 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp`
 | cluster\_id | Cluster ID | IpamIPAddress | Cluster ID represented as a reference to an IP Address | one | Attribute | False | 1200 |
 | peer\_groups | BGP Peer Groups | RoutingBGPPeerGroup |  | many | Generic | True |  |
 
-## Extensions
+### Extensions
 
-### RoutingBGPPeerGroup
+#### RoutingBGPPeerGroup
 
 #### Relationships
 
@@ -922,7 +1997,7 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp`
 | ---- | ----- | ---- | ----------- | ---- | ------------ |
 | rr\_cluster | RR Cluster | RoutingBGPRRCluster | one | Attribute | 1600 |
 
-# SFP
+## SFP
 
 This schema extension gives you all the models you need to document Small Form-factor Pluggable (SFP).
 
@@ -934,22 +2009,19 @@ Improvements:
 - You could plug any SFP into any equipment interface (e.g. a virtual interface ...)
 - You could link a SFP to an interface AND a location ...
 
-Dependencies: `base`
-
-## sfp
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### GenericSFP
+#### GenericSFP
 
 - **Description:** Generic base for all Small Form-factor Pluggable (SFP) transceivers.
 - **Label:** SFP
 - **Icon:** mdi:gpu
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | order_weight | description | choices | default_value |
 | ---- | ---- | -------- | ------------ | ----------- | ------- | ------------- |
@@ -966,9 +2038,9 @@ Dependencies: `base`
 | spare\_location | LocationHosting | Attribute | True | one | 1500 |
 | manufacturer | OrganizationManufacturer | Attribute | True | one | 1350 |
 
-## Nodes
+### Nodes
 
-### StandardSFP
+#### StandardSFP
 
 - **Description:** Standard SFP module for various types (e.g., LR, SR, T).
 - **Label:** Standard SFP
@@ -976,7 +2048,7 @@ Dependencies: `base`
 - **Menu Placement:** DcimGenericSFP
 - **Include in Menu:** ❌
 
-### BidiSFP
+#### BidiSFP
 
 - **Description:** Bidirectional SFP supporting two wavelengths for single-fiber operation.
 - **Label:** Bidirectional SFP
@@ -984,16 +2056,16 @@ Dependencies: `base`
 - **Menu Placement:** DcimGenericSFP
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | description | order_weight |
 | ---- | ----- | ---- | -------- | ----------- | ------------ |
 | wavelength\_tx | Transmit Wavelength \(nm\) | Number | False | Transmit wavelength in nm\. | 1175 |
 | wavelength\_rx | Receive Wavelength \(nm\) | Number | False | Receive wavelength in nm\. | 1150 |
 
-## Extensions
+### Extensions
 
-### DcimInterface
+#### DcimInterface
 
 #### Relationships
 
@@ -1001,7 +2073,7 @@ Dependencies: `base`
 | ---- | ---- | ----------- | -------- |
 | plugged\_sfp | DcimGenericSFP | one | True |
 
-### LocationHosting
+#### LocationHosting
 
 #### Relationships
 
@@ -1009,7 +2081,7 @@ Dependencies: `base`
 | ---- | ---- | ----------- | -------- |
 | spare\_sfps | DcimGenericSFP | many | True |
 
-### OrganizationManufacturer
+#### OrganizationManufacturer
 
 #### Relationships
 
@@ -1017,19 +2089,16 @@ Dependencies: `base`
 | ---- | ----- | ---- | ----------- | -------- |
 | sfps | SFPs | DcimGenericSFP | many | True |
 
-# Circuit
+## Circuit
 
 This schema extension contains Circuits and ways to connect them with your infrastructure! The circuit could be a fiber connecting two sites, you would then have two endpoints, one on each site.
 
-Dependencies: `base, extensions.location_minimal`
-
-## circuit
-
+- **Dependencies:** `base, extensions/location_minimal`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### Circuit
+#### Circuit
 
 - **Description:** A Circuit represent service operated by a provider.
 - **Label:** Circuit
@@ -1041,7 +2110,7 @@ Dependencies: `base, extensions.location_minimal`
 - **Order By:**circuit_id__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional | description | choices |
 | ---- | ---- | ------ | -------- | ----------- | ------- |
@@ -1058,7 +2127,7 @@ Dependencies: `base, extensions.location_minimal`
 | location | LocationHosting | True | one | Attribute | Location | 1500 |
 | enpoints | DcimCircuitEndpoint | True | many | Component |  |  |
 
-### CircuitEndpoint
+#### CircuitEndpoint
 
 - **Description:** A circuit endpoint, could be a position in a MMR...
 - **Label:** Circuit Endpoint
@@ -1071,7 +2140,7 @@ Dependencies: `base, extensions.location_minimal`
 - **Order By:**name__value
 - **Uniqueness Constraints:**circuit + name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | optional | choices |
 | ---- | ---- | ----------- | ------------ | -------- | ------- |
@@ -1086,17 +2155,9 @@ Dependencies: `base, extensions.location_minimal`
 | circuit | DcimCircuit | 900 | False | one | Parent |  |
 | location | LocationHosting | 1500 | False | one | Attribute | Location |
 
-## Extensions
+### Extensions
 
-### OrganizationProvider
-
-#### Relationships
-
-| name | peer | cardinality | optional |
-| ---- | ---- | ----------- | -------- |
-| circuits | DcimCircuit | many | True |
-
-### LocationHosting
+#### OrganizationProvider
 
 #### Relationships
 
@@ -1104,19 +2165,24 @@ Dependencies: `base, extensions.location_minimal`
 | ---- | ---- | ----------- | -------- |
 | circuits | DcimCircuit | many | True |
 
-# BGP Communities
+#### LocationHosting
+
+#### Relationships
+
+| name | peer | cardinality | optional |
+| ---- | ---- | ----------- | -------- |
+| circuits | DcimCircuit | many | True |
+
+## Routing BGP Community
 
 This schema extension adds the BGP Communities models.
 
-Dependencies: `base, extensions.routing`
-
-## bgp_community
-
+- **Dependencies:** `base, extensions/routing`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### BGPCommunity
+#### BGPCommunity
 
 - **Description:** Defines a BGP community.
 - **Label:** BGP Community
@@ -1128,7 +2194,7 @@ Dependencies: `base, extensions.routing`
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value, community__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | optional |
 | ---- | ---- | ----------- | ------------ | -------- |
@@ -1143,19 +2209,16 @@ Dependencies: `base, extensions.routing`
 | routing\_policy | Routing Policies | RoutingPolicy | The BGP Policies using this BGP Community\. | Generic | many |  |  |
 | tags |  | BuiltinTag |  | Attribute | many | True | 3000 |
 
-# Cross Connect
+## Cross Connect
 
 This extension contains schema to capture Cross Connect. You can see it as "a cable operated by a provider". You will be able to attach it to a location and then connect endpoints to it (e.g. rear interface of a patch panel, circuit endpoint ...)
 
-Dependencies: `base`
-
-## cross_connect
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### CrossConnect
+#### CrossConnect
 
 - **Description:** Cross-connect between different endpoints within a datacenter.
 - **Label:** Cross-Connect
@@ -1167,7 +2230,7 @@ Dependencies: `base`
 - **Order By:**provider__name__value
 - **Uniqueness Constraints:**provider + identifier__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional | choices |
 | ---- | ---- | ------------ | -------- | ------- |
@@ -1182,83 +2245,59 @@ Dependencies: `base`
 | location | Location | LocationHosting | False | one | Attribute | 1100 |
 | provider |  | OrganizationProvider | False | one | Attribute | 1000 |
 
-# Routing Policies Aggregate
+## Routing Policies Aggregate
 
 This extension is using the Routing Policies extensions and the Routing Aggregate one together.
 
-Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_aggregate`
-
-## routing_policies_aggregate
-
+- **Dependencies:** `base, extensions/routing, extensions/routing_policies, extensions/routing_aggregate`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### PolicyAggregate
+#### PolicyAggregate
 
 - **Description:** A routing policiers for Aggregate
 - **Label:** Aggregate Routing Policies
 - **Icon:** carbon:deployment-policy
 - **Include in Menu:** ❌
 
-## Extensions
-
-### RoutingAggregate
-
-#### Attributes
-
-| name | kind | state |
-| ---- | ---- | ----- |
-| import\_policies | Text | absent |
-| export\_policies | Text | absent |
-
-#### Relationships
-
-| name | label | peer | identifier | description | kind | cardinality |
-| ---- | ----- | ---- | ---------- | ----------- | ---- | ----------- |
-| import\_routing\_policies | Import Routing Policies | RoutingPolicyAggregate | aggregate\_\_import\_policies | The routing\-policies used by this instance for import\. | Generic | many |
-| export\_routing\_policies | Export Routing Policies | RoutingPolicyAggregate | aggregate\_\_export\_policies | The routing\-policies used by this instance for export\. | Generic | many |
-
-# Location Minimal
+## Location Minimal
 
 This schema extension is minimal but will provide you with basic items to store location related data.
 
-Dependencies: `base`
-
-## location_minimal
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### Country
+#### Country
 
 - **Label:** Country
 - **Icon:** gis:search-country
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | order_weight |
 | ---- | ---- | -------- | ------------ |
 | timezone | Text | True | 1300 |
 
-### Metro
+#### Metro
 
 - **Label:** Metro
 - **Icon:** healthicons:city
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ❌
 
-### Site
+#### Site
 
 - **Label:** Site
 - **Icon:** ri:building-line
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional | order_weight |
 | ---- | ---- | ------ | -------- | ------------ |
@@ -1271,14 +2310,14 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | owner | OrganizationGeneric | True | one |
 
-### Rack
+#### Rack
 
 - **Label:** Rack
 - **Icon:** clarity:rack-server-line
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional | order_weight | label | default_value |
 | ---- | ---- | ------ | -------- | ------------ | ----- | ------------- |
@@ -1291,9 +2330,9 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | owner | OrganizationGeneric | True | one |
 
-## Extensions
+### Extensions
 
-### OrganizationProvider
+#### OrganizationProvider
 
 #### Relationships
 
@@ -1301,19 +2340,16 @@ Dependencies: `base`
 | ---- | ---- | ----------- | -------- |
 | sites | LocationSite | many | True |
 
-# VRRP
+## VRRP
 
 This schema extension contains models for VRRP.
 
-Dependencies: `base, base.dcim, base.ipam`
-
-## vrrp
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### VRRPGroup
+#### VRRPGroup
 
 - **Description:** VRRP Group configuration
 - **Label:** VRRP Group
@@ -1325,7 +2361,7 @@ Dependencies: `base, base.dcim, base.ipam`
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | unique | description | order_weight | optional |
 | ---- | ---- | ----- | ------ | ----------- | ------------ | -------- |
@@ -1340,7 +2376,7 @@ Dependencies: `base, base.dcim, base.ipam`
 | ip\_address | cascade | VRRP IP \(v4 or v6\) | IP Address | IpamIPAddress | True | many | Attribute | 1200 |
 | vrrp\_interfaces | cascade |  | VRRP Interfaces | NetworkVRRPInterface |  | many | Component | 1300 |
 
-### VRRPInterface
+#### VRRPInterface
 
 - **Description:** VRRP Interface configuration
 - **Label:** VRRP Interface
@@ -1353,7 +2389,7 @@ Dependencies: `base, base.dcim, base.ipam`
 - **Order By:**priority__value
 - **Uniqueness Constraints:**vrrp_group + interface
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | description | regex | default_value | order_weight |
 | ---- | ---- | ----- | ----------- | ----- | ------------- | ------------ |
@@ -1364,11 +2400,11 @@ Dependencies: `base, base.dcim, base.ipam`
 | name | description | label | peer | optional | cardinality | kind | order_weight |
 | ---- | ----------- | ----- | ---- | -------- | ----------- | ---- | ------------ |
 | vrrp\_group | VRRP Group | VRRP Group | NetworkVRRPGroup | False | one | Attribute | 1200 |
-| interface | Interface L3 | Interface | DcimInterfaceL3 | False | one | Attribute | 1300 |
+| interface | Interface L3 | Interface | InterfaceLayer3 | False | one | Attribute | 1300 |
 
-## Extensions
+### Extensions
 
-### DcimInterfaceL3
+#### InterfaceLayer3
 
 #### Relationships
 
@@ -1376,7 +2412,7 @@ Dependencies: `base, base.dcim, base.ipam`
 | ---- | ---- | ---- | ----------- | ----------- | ----- | ------------ |
 | vrrp | Component | NetworkVRRPInterface | VRRP Interface Configuration | one | VRRP | 1500 |
 
-### IpamIPAddress
+#### IpamIPAddress
 
 #### Relationships
 
@@ -1384,19 +2420,16 @@ Dependencies: `base, base.dcim, base.ipam`
 | ---- | ---- | ---- | ----------- | ----------- | ----- | ------------ |
 | vrrp | Component | NetworkVRRPGroup | Part of VRRP Group | one | VRRP Group | 1600 |
 
-# Exchange Points (IXP)
+## Peering IXP
 
 This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)!
 
-Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.routing_bgp_community`
-
-## peering_ixp
-
+- **Dependencies:** `base, extensions/routing, extensions/routing_bgp, extensions/routing_bgp_community`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### IXP
+#### IXP
 
 - **Description:** An Internet Exchange Point (IXP) for peering
 - **Label:** Internet Exchange
@@ -1408,7 +2441,7 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.rout
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | description | order_weight | optional | choices | default_value |
 | ---- | ---- | ------ | ----------- | ------------ | -------- | ------- | ------------- |
@@ -1427,7 +2460,7 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.rout
 | bgp\_communities | RoutingBGPCommunity | True | many | Generic | BGP communities associated with the session |  | BGP Communities |  |
 | tags | BuiltinTag | True | many | Attribute |  | 3000 |  |  |
 
-### IXPConnection
+#### IXPConnection
 
 - **Description:** A connection to an Internet Exchange Point (IXP)
 - **Label:** IXP Connection
@@ -1440,7 +2473,7 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.rout
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | description | order_weight | optional | label | choices | default_value |
 | ---- | ---- | ------ | ----------- | ------------ | -------- | ----- | ------- | ------------- |
@@ -1461,19 +2494,16 @@ Dependencies: `base, extensions.routing, extensions.routing_bgp, extensions.rout
 | router |  | The router this IXP connection is connected to | DcimDevice |  | one | Attribute | 1400 |  |
 | tags |  |  | BuiltinTag |  | many | Attribute | 3000 |  |
 
-# VLAN
+## VLAN
 
 This schema extension contains models to support VLANs in you network.
 
-Dependencies: `base`
-
-## vlan
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### VLAN
+#### VLAN
 
 - **Description:** A VLAN is isolated layer two domain
 - **Label:** VLAN
@@ -1486,7 +2516,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**l2domain + vlan_id__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | choices |
 | ---- | ---- | -------- | ------- |
@@ -1504,14 +2534,14 @@ Dependencies: `base`
 | prefixes | IpamPrefix | True | many |  |  |
 | l2domain | IpamL2Domain | False | one | Attribute | 1200 |
 
-### L2Domain
+#### L2Domain
 
 - **Description:** Represents layer 2 domain.
 - **Label:** Layer 2 Domain
 - **Icon:** mdi:domain-switch
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight |
 | ---- | ---- | ------------ |
@@ -1523,9 +2553,9 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- |
 | vlans | IpamVLAN | True | many | Component |
 
-## Extensions
+### Extensions
 
-### IpamPrefix
+#### IpamPrefix
 
 #### Relationships
 
@@ -1533,7 +2563,7 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- | ------------ |
 | vlan | IpamVLAN | True | one | Attribute | 1400 |
 
-### InterfaceLayer2
+#### InterfaceLayer2
 
 #### Relationships
 
@@ -1542,7 +2572,7 @@ Dependencies: `base`
 | untagged\_vlan | Untagged VLAN | IpamVLAN | True | one | Generic | interface\_l2\_\_untagged\_vlan |
 | tagged\_vlan | Tagged VLANs | IpamVLAN | True | many | Generic | interface\_l2\_\_tagged\_vlan |
 
-### LocationHosting
+#### LocationHosting
 
 #### Relationships
 
@@ -1550,28 +2580,25 @@ Dependencies: `base`
 | ---- | ----- | ---- | ----------- | -------- |
 | vlans | VLANs | IpamVLAN | many | True |
 
-# Routing Policies OSPF
+## Routing Policies OSPF
 
 This extension is using the Routing Policies extensions and the Routing OSPF one together.
 
-Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_ospf`
-
-## routing_policies_ospf
-
+- **Dependencies:** `base, extensions/routing, extensions/routing_policies, extensions/routing_ospf`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### PolicyOSPF
+#### PolicyOSPF
 
 - **Description:** A routing policiers for OSPF
 - **Label:** OSPF Routing Policies
 - **Icon:** carbon:deployment-policy
 - **Include in Menu:** ❌
 
-## Extensions
+### Extensions
 
-### RoutingOSPF
+#### RoutingOSPF
 
 #### Attributes
 
@@ -1587,22 +2614,18 @@ Dependencies: `base, extensions.routing, extensions.routing_policies, extensions
 | import\_routing\_policies | Import Routing Policies | RoutingPolicyOSPF | ospf\_\_import\_policies | The routing\-policies used by this instance for import\. | Generic | many |
 | export\_routing\_policies | Export Routing Policies | RoutingPolicyOSPF | ospf\_\_export\_policies | The routing\-policies used by this instance for export\. | Generic | many |
 
-# Physical Disks
+## Physical Disk
 
 Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management.
 
-> [!NOTE]
-> This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares.
+NOTE: This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares.
 
-Dependencies: `base`
-
-## physical_disk
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### DeviceWithPhysicalDisks
+#### DeviceWithPhysicalDisks
 
 - **Description:** Generic that hold relationship toward physical disks. To apply on device that can have physical disks.
 - **Include in Menu:** ❌
@@ -1613,9 +2636,9 @@ Dependencies: `base`
 | ---- | ----------- | ---- | -------- | ---- |
 | physical\_disks | many | DcimPhysicalDisk | True | Component |
 
-## Nodes
+### Nodes
 
-### PhysicalDisk
+#### PhysicalDisk
 
 - **Description:** Physical Disk
 - **Label:** Physical Disk
@@ -1627,7 +2650,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value + device
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional | order_weight | description | choices | label |
 | ---- | ---- | ------ | -------- | ------------ | ----------- | ------- | ----- |
@@ -1644,24 +2667,21 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- | ------------ |
 | device | DcimDeviceWithPhysicalDisks | False | one | Parent | 800 |
 
-# Compute
+## Compute
 
 With this schema extension in place you will be able to capture all your physical servers. It also gives you the baseline to build virtualization. You might consider HostingCluster extension to go with!
 
-Dependencies: `base`
-
-## compute
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### GenericUnit
+#### GenericUnit
 
 - **Description:** A generic unit that can compute (e.g. server, vm ...).
 - **Include in Menu:** ❌
 
-### HostVirtualMachine
+#### HostVirtualMachine
 
 - **Description:** A generic unit that can host VM
 - **Include in Menu:** ❌
@@ -1672,29 +2692,29 @@ Dependencies: `base`
 | ---- | ----------- | ---- | ---- | -------- |
 | virtual\_machines | many | VirtualizationVirtualMachine | Component | True |
 
-## Nodes
+### Nodes
 
-### PhysicalServer
+#### PhysicalServer
 
 - **Description:** A physical server with fixed resources and specific hardware characteristics.
 - **Label:** Physical Server
 - **Icon:** mdi:server
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | order_weight | choices |
 | ---- | ---- | -------- | ------------ | ------- |
 | status | Dropdown | False | 1100 | \`active, provisioning, maintenance, drained\` |
 
-### VirtualMachine
+#### VirtualMachine
 
 - **Description:** A virtual machine hosted on a server or a cluster.
 - **Label:** Virtual Machine
 - **Icon:** carbon:virtual-machine
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | description | order_weight | choices |
 | ---- | ---- | -------- | ----------- | ------------ | ------- |
@@ -1709,19 +2729,16 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- | ------------ |
 | host | VirtualizationHostVirtualMachine | False | one | Attribute | 1500 |
 
-# PIM
+## Routing PIM
 
 This schema extension contains all you need to model the PIM Protocol.
 
-Dependencies: `base, extensions.routing`
-
-## pim
-
+- **Dependencies:** `base, extensions/routing`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### PIM
+#### PIM
 
 - **Description:** Protocol Independent Multicast (PIM) instance on a Virtual Router.
 - **Label:** PIM
@@ -1733,7 +2750,7 @@ Dependencies: `base, extensions.routing`
 - **Order By:**vrf__name__value, device__name__value
 - **Uniqueness Constraints:**device + vrf
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | default_value | description | order_weight |
 | ---- | ---- | -------- | ------------- | ----------- | ------------ |
@@ -1748,7 +2765,7 @@ Dependencies: `base, extensions.routing`
 | rp\_address | IpamIPAddress | True | Rendezvous Point \(RP\) address for PIM\. | one | Attribute |  |  |
 | pim\_interfaces | RoutingPIMInterface | True |  | many | Component | PIM Interfaces | pim\_\_piminterfaces |
 
-### PIMInterface
+#### PIMInterface
 
 - **Description:** Interface configuration for PIM.
 - **Label:** PIM Interface
@@ -1760,42 +2777,39 @@ Dependencies: `base, extensions.routing`
 - **Order By:**description__value
 - **Uniqueness Constraints:**pim + interface
 
-#### Attributes
+##### Attributes
 
-| name | kind | optional | description | order_weight | choices | default_value |
-| ---- | ---- | -------- | ----------- | ------------ | ------- | ------------- |
-| description | Text | False | Description of the OSPF interface\. | 1100 | \`\` |  |
-| pim\_mode | Dropdown |  | PIM mode used for multicast routing on this interface\. | 1150 | \`sparse, dense, bidirectional\` |  |
-| hello\_interval | Number | True | Interval for PIM hello messages \(in seconds\)\. | 1300 | \`\` | 30 |
-| dr\_priority | Number | True | Designated Router priority on the interface\. | 1250 | \`\` | 1 |
+| name | kind | optional | unique | description | order_weight | choices | default_value |
+| ---- | ---- | -------- | ------ | ----------- | ------------ | ------- | ------------- |
+| description | Text | False | True | Description of the OSPF interface\. | 1100 | \`\` |  |
+| pim\_mode | Dropdown |  |  | PIM mode used for multicast routing on this interface\. | 1150 | \`sparse, dense, bidirectional\` |  |
+| hello\_interval | Number | True |  | Interval for PIM hello messages \(in seconds\)\. | 1300 | \`\` | 30 |
+| dr\_priority | Number | True |  | Designated Router priority on the interface\. | 1250 | \`\` | 1 |
 
 #### Relationships
 
 | name | label | peer | identifier | optional | cardinality | kind | order_weight |
 | ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
 | pim | PIM | RoutingPIM | pim\_\_piminterfaces | False | one | Parent |  |
-| interface |  | DcimInterfaceL3 |  | False | one | Attribute | 1200 |
+| interface |  | InterfaceLayer3 |  | False | one | Attribute | 1200 |
 
-# Cable
+## Cable
 
 This schema extension contains a basic Cable model allowing you to connect two endpoints.
 
-Dependencies: `base`
-
-## cable
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### Cable
+#### Cable
 
 - **Description:** Physical cable connecting two endpoints
 - **Label:** Cable
 - **Icon:** mdi:cable-data
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | order_weight | choices | label |
 | ---- | ---- | -------- | ------------ | ------- | ----- |
@@ -1805,27 +2819,25 @@ Dependencies: `base`
 | label | Text | True | 1200 | \`\` |  |
 | length | Number | True | 1350 | \`\` | Length \(in cm\) |
 
-# Patch Panel
+## Patch Panel
 
 This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture information about potential modules you would insert into your patch panel.
 
-> [!NOTE]
-> This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
+NOTE: This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
 
-## patch_panel
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### GenericPatchPanelInterface
+#### GenericPatchPanelInterface
 
 - **Label:** Patch Panel Interfaces
 - **Icon:** mdi:ethernet
 - **Menu Placement:** DcimPatchPanel
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional | choices |
 | ---- | ---- | ------------ | -------- | ------- |
@@ -1833,9 +2845,9 @@ This schema extension allows you to capture patch panel related information like
 | description | Text | 2000 | True | \`\` |
 | connector\_type | Dropdown | 1100 |  | \`FC, LC, LC\_PC, LC\_UPC, LC\_APC, LSH, LSH\_PC, LSH\_UPC, LSH\_APC, LX\_5, LX\_5\_PC, LX\_5\_UPC, LX\_5\_APC, MPO, MTRJ, SC, SC\_PC, SC\_UPC, SC\_APC, ST, CS, SN, SMA\_905, SMA\_906, URM\_P2\` |
 
-## Nodes
+### Nodes
 
-### PatchPanel
+#### PatchPanel
 
 - **Description:** A Patch Panel used for managing network cable connections in a data center or telecom setup.
 - **Label:** Patch Panel
@@ -1847,7 +2859,7 @@ This schema extension allows you to capture patch panel related information like
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | label | optional | description |
 | ---- | ---- | ------ | ------------ | ----- | -------- | ----------- |
@@ -1863,7 +2875,7 @@ This schema extension allows you to capture patch panel related information like
 | rear\_interfaces | DcimRearPatchPanelInterface | rear\_interfaces | True | many | Component |
 | modules | DcimPatchPanelModule |  | True | many | Component |
 
-### FrontPatchPanelInterface
+#### FrontPatchPanelInterface
 
 - **Label:** Patch Panel Front Interfaces
 - **Menu Placement:** DcimGenericPatchPanelInterface
@@ -1881,7 +2893,7 @@ This schema extension allows you to capture patch panel related information like
 | corresponding\_front\_rear | Corresponding rear interface | DcimRearPatchPanelInterface | 1200 | True | one | Attribute |  |
 | patch\_panel |  | DcimPatchPanel | 900 | False | one | Parent | front\_interfaces |
 
-### RearPatchPanelInterface
+#### RearPatchPanelInterface
 
 - **Label:** Patch Panel Rear Interfaces
 - **Menu Placement:** DcimGenericPatchPanelInterface
@@ -1899,7 +2911,7 @@ This schema extension allows you to capture patch panel related information like
 | corresponding\_front\_rear | Corresponding front interfaces | DcimFrontPatchPanelInterface | 1200 | True | many | Attribute |  |
 | patch\_panel |  | DcimPatchPanel | 900 | False | one | Parent | rear\_interfaces |
 
-### PatchPanelModule
+#### PatchPanelModule
 
 - **Label:** Patch Panel Module
 - **Icon:** mdi:expansion-card
@@ -1911,7 +2923,7 @@ This schema extension allows you to capture patch panel related information like
 - **Order By:**patch_panel__name__value, position__value
 - **Uniqueness Constraints:**patch_panel + position__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | description | label | optional | choices |
 | ---- | ---- | ------------ | ----------- | ----- | -------- | ------- |
@@ -1927,26 +2939,23 @@ This schema extension allows you to capture patch panel related information like
 | ---- | ---- | -------- | ------------ | ----------- | ---- |
 | patch\_panel | DcimPatchPanel | False | 900 | one | Parent |
 
-# Aggregate
+## Routing Aggregate
 
 This schema extension contains all you need to model the Aggregate Routing Protocol.
 
-Dependencies: `base, extensions.routing`
-
-## aggregate
-
+- **Dependencies:** `base, extensions/routing`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### AggregateRoute
+#### AggregateRoute
 
 - **Description:** Aggregate Protocol with action and BGP communities
 - **Label:** Aggregate Routes
 - **Icon:** grommet-icons:aggregate
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | default_value | order_weight |
 | ---- | ----- | ---- | -------- | ------------- | ------------ |
@@ -1960,26 +2969,23 @@ Dependencies: `base, extensions.routing`
 | ---- | ---- | ---- | ----------- | ------------ |
 | destination | Attribute | IpamPrefix | Destination network for the static route\. | 1200 |
 
-# DWDM
+## DWDM
 
 This schema extension contains models for OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies such as DWDM (Dense Wavelength Division Multiplexing) or CWDM (Coarse Wavelength Division Multiplexing). With some vendors, the tunable optics are not configured via the channel number but via the wavelength and/or the frequency. This model provides a unique entry in Infrahub for those.
 
-Dependencies: `base, extensions.sfp`
-
-## dwdm
-
+- **Dependencies:** `base, extensions/sfp`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### GenericOadmInterface
+#### GenericOadmInterface
 
 - **Label:** Optical Multiplexer Interfaces
 - **Icon:** mdi:ethernet
 - **Menu Placement:** DcimOpticalMultiplexer
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional | choices |
 | ---- | ---- | ------------ | -------- | ------- |
@@ -1987,9 +2993,9 @@ Dependencies: `base, extensions.sfp`
 | description | Text | 2000 | True | \`\` |
 | connector\_type | Dropdown | 1100 |  | \`FC, LC, LC\_PC, LC\_UPC, LC\_APC, LSH, LSH\_PC, LSH\_UPC, LSH\_APC, LX\_5, LX\_5\_PC, LX\_5\_UPC, LX\_5\_APC, MPO, MTRJ, SC, SC\_PC, SC\_UPC, SC\_APC, ST, CS, SN, SMA\_905, SMA\_906, URM\_P2\` |
 
-## Nodes
+### Nodes
 
-### OpticalMultiplexer
+#### OpticalMultiplexer
 
 - **Description:** An OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies.
 - **Label:** Optical Multiplexer
@@ -2001,13 +3007,13 @@ Dependencies: `base, extensions.sfp`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
-| name | kind | order_weight | description | optional | choices | default_value |
-| ---- | ---- | ------------ | ----------- | -------- | ------- | ------------- |
-| name | Text | 1000 |  |  | \`\` |  |
-| wdm\_type | Dropdown | 1110 | Type of WDM \(e\.g CWDM\. DWDM\) | False | \`cwdm, dwdm\` | dwdm |
-| description | Text | 2000 |  | True | \`\` |  |
+| name | kind | unique | order_weight | description | optional | choices | default_value |
+| ---- | ---- | ------ | ------------ | ----------- | -------- | ------- | ------------- |
+| name | Text | True | 1000 |  |  | \`\` |  |
+| wdm\_type | Dropdown |  | 1110 | Type of WDM \(e\.g CWDM\. DWDM\) | False | \`cwdm, dwdm\` | dwdm |
+| description | Text |  | 2000 |  | True | \`\` |  |
 
 #### Relationships
 
@@ -2016,7 +3022,7 @@ Dependencies: `base, extensions.sfp`
 | front\_interfaces | DcimOadmFrontInterface | front\_interfaces | True | many | Component |
 | rear\_interface | DcimOadmRearInterface | rear\_interfaces | True | one | Component |
 
-### OadmFrontInterface
+#### OadmFrontInterface
 
 - **Label:** Optical Multiplexer Front Interfaces
 - **Menu Placement:** DcimGenericOadmInterface
@@ -2034,7 +3040,7 @@ Dependencies: `base, extensions.sfp`
 | optical\_multiplexer | DcimOpticalMultiplexer | 900 | front\_interfaces | False | one | Parent |
 | channels | DcimWdmChannel | 1200 |  | True | many | Attribute |
 
-### OadmRearInterface
+#### OadmRearInterface
 
 - **Label:** Optical Multiplexer Rear Interfaces
 - **Menu Placement:** DcimGenericOadmInterface
@@ -2051,7 +3057,7 @@ Dependencies: `base, extensions.sfp`
 | ---- | ---- | ------------ | ---------- | -------- | ----------- | ---- |
 | optical\_multiplexer | DcimOpticalMultiplexer | 900 | rear\_interface | False | one | Parent |
 
-### WdmChannel
+#### WdmChannel
 
 - **Description:** A WDM channel with its wavelength and frequency.
 - **Label:** WDM Channel
@@ -2063,7 +3069,7 @@ Dependencies: `base, extensions.sfp`
 - **Order By:**wdm_type__value, channel__value
 - **Uniqueness Constraints:**wdm_type__value + channel__value + wavelength__value + frequency__value, wdm_type__value + channel__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | optional | choices | default_value | label |
 | ---- | ---- | ----------- | ------------ | -------- | ------- | ------------- | ----- |
@@ -2072,7 +3078,7 @@ Dependencies: `base, extensions.sfp`
 | wavelength | Text | Wavelength of the channel in nm\. |  |  | \`\` |  | Wavelength \(nm\) |
 | frequency | Text | Frequency of the channel in GHz\. |  |  | \`\` |  | Frequency \(GHz\) |
 
-### WdmSFP
+#### WdmSFP
 
 - **Description:** SFP with configuration for Wavelength Division Multiplexing.
 - **Label:** WDM SFP
@@ -2080,7 +3086,7 @@ Dependencies: `base, extensions.sfp`
 - **Menu Placement:** DcimGenericSFP
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | optional | choices | default_value |
 | ---- | ---- | ----------- | ------------ | -------- | ------- | ------------- |
@@ -2092,19 +3098,16 @@ Dependencies: `base, extensions.sfp`
 | ---- | ----- | ---- | ---- | ----------- | -------- | ------------ |
 | wdm\_channel | WDM Channel | DcimWdmChannel | Attribute | one | False | 1150 |
 
-# Accounts Management
+## Users
 
-This schema extension contains models for Accounts management.
+This schema extension contains models for account management.
 
-Dependencies: `base`
-
-## users
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### Group
+#### Group
 
 - **Description:** User Group
 - **Label:** User Groups
@@ -2116,7 +3119,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional | label | choices |
 | ---- | ---- | ------------ | -------- | ----- | ------- |
@@ -2125,7 +3128,7 @@ Dependencies: `base`
 | idle\_timeout | Number | 1300 |  | Idle Timeout \(s\) | \`\` |
 | permissions | Dropdown | 1200 | False |  | \`admin, operator, read\-only\` |
 
-### Account
+#### Account
 
 - **Description:** User login and authentication
 - **Label:** User Account
@@ -2137,7 +3140,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | description | order_weight | default_value |
 | ---- | ----- | ---- | -------- | ----------- | ------------ | ------------- |
@@ -2154,9 +3157,9 @@ Dependencies: `base`
 | user\_group | UserGroup | one | False | Attribute | 1200 |
 | organization | OrganizationGeneric | one | False | Parent |  |
 
-## Extensions
+### Extensions
 
-### OrganizationGeneric
+#### OrganizationGeneric
 
 #### Relationships
 
@@ -2164,23 +3167,21 @@ Dependencies: `base`
 | ---- | ---- | ---- | ----------- | ----------- |
 | accounts | Component | UserAccount | List of Accounts under this organization | many |
 
-# QinQ
+## QinQ
 
 This schema extension brings extensions to VLAN model in order to support QinQ.
 
-Dependencies: `base, extensions.vlan`
-
-# Firewall Policer
+- **Dependencies:** `base, extensions/vlan`
+## Firewall Policer
 
 This schema extension contains models for VMs. You might consider Cluster or/and Hypervisor extension to go with!
 
-## firewall_policer
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### Policer
+#### Policer
 
 - **Description:** A generic policer configuration.
 - **Label:** Network Policer
@@ -2192,7 +3193,7 @@ This schema extension contains models for VMs. You might consider Cluster or/and
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | description | order_weight | unique | optional | choices |
 | ---- | ---- | ----- | ----------- | ------------ | ------ | -------- | ------- |
@@ -2205,19 +3206,16 @@ This schema extension contains models for VMs. You might consider Cluster or/and
 | packet\_burst | Dropdown | Packet Burst | Packet burst size for the policer\. | 1350 |  | True | \`1k, 5k, 10k\` |
 | action | Dropdown | Action | Action to take when limits are exceeded\. | 1400 |  |  | \`discard, drop, accept\` |
 
-# VRF
+## VRF
 
 This schema extension contains models to support VRF in your network.
 
-Dependencies: `base`
-
-## vrf
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### VRF
+#### VRF
 
 - **Description:** A VRF is isolated layer three domain
 - **Label:** VRF
@@ -2229,7 +3227,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | unique | label | order_weight |
 | ---- | ---- | -------- | ------ | ----- | ------------ |
@@ -2245,7 +3243,7 @@ Dependencies: `base`
 | import\_rt | IpamRouteTarget | True | one | Attribute | vrf\_\_import | Import Targets |
 | export\_rt | IpamRouteTarget | True | one | Attribute | vrf\_\_export | Export Targets |
 
-### RouteTarget
+#### RouteTarget
 
 - **Description:** Route Target (RFC 4360)
 - **Label:** Route Target
@@ -2258,7 +3256,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional |
 | ---- | ---- | ------ | -------- |
@@ -2271,17 +3269,9 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | vrf | IpamVRF | True | many |
 
-## Extensions
+### Extensions
 
-### IpamPrefix
-
-#### Relationships
-
-| name | label | peer | optional | cardinality | kind | order_weight |
-| ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
-| vrf | VRF | IpamVRF | True | one | Attribute | 1150 |
-
-### IpamIPAddress
+#### IpamPrefix
 
 #### Relationships
 
@@ -2289,25 +3279,30 @@ Dependencies: `base`
 | ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
 | vrf | VRF | IpamVRF | True | one | Attribute | 1150 |
 
-# Lag
+#### IpamIPAddress
+
+#### Relationships
+
+| name | label | peer | optional | cardinality | kind | order_weight |
+| ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
+| vrf | VRF | IpamVRF | True | one | Attribute | 1150 |
+
+## Lag
 
 This schema extension includes models for Link Aggregation Groups (LAGs), enabling you to link physical interfaces as building blocs of your LAG interface. It can be used in standard networking environments as well as in compute scenarios, such as capturing bond interfaces.
 
-Dependencies: `base`
-
-## lag
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### Lag
+#### Lag
 
 - **Description:** LAG interface
 - **Label:** LAG Interface
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | choices | default_value | description | order_weight |
 | ---- | ----- | ---- | ------- | ------------- | ----------- | ------------ |
@@ -2320,9 +3315,9 @@ Dependencies: `base`
 | ---- | ----- | ---- | ----------- | ---- | ----------- | ------------ |
 | lag\_members | Member\(s\) | InterfacePhysical | many | Attribute | Physical Interfaces that are members of this aggregate | 1800 |
 
-## Extensions
+### Extensions
 
-### InterfacePhysical
+#### InterfacePhysical
 
 #### Relationships
 
@@ -2330,31 +3325,28 @@ Dependencies: `base`
 | ---- | ----- | ---- | -------- | ----------- | ---- | ----------- | ------------ |
 | lag\_parent | LAG | InterfaceLag | True | one | Attribute | LAG Interface using this Physical Interface | 1800 |
 
-# Routing
+## Routing
 
 This schema extension contains generics to create Routing Protocol "Instance". The idea is to create one Routing Protocol instance per IpamVRF + DcimDevice pair.
 
-Dependencies: `base, extensions.vlan`
-
-## routing
-
+- **Dependencies:** `base, extensions/vlan`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### Protocol
+#### Protocol
 
 - **Description:** Generic protocol model for routing protocols
 - **Label:** Protocol
 - **Icon:** carbon:router
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
-| name | kind | optional | description | order_weight | choices |
-| ---- | ---- | -------- | ----------- | ------------ | ------- |
-| description | Text | False | Description of the protocol | 1100 | \`\` |
-| status | Dropdown |  | Status of the Protocol Configuration\. | 1150 | \`active, disabled, deleted\` |
+| name | kind | optional | unique | description | order_weight | choices |
+| ---- | ---- | -------- | ------ | ----------- | ------------ | ------- |
+| description | Text | False | True | Description of the protocol | 1100 | \`\` |
+| status | Dropdown |  |  | Status of the Protocol Configuration\. | 1150 | \`active, disabled, deleted\` |
 
 #### Relationships
 
@@ -2363,19 +3355,16 @@ Dependencies: `base, extensions.vlan`
 | device | DcimDevice | False | one | Parent | 1050 |  |
 | vrf | IpamVRF | False | one | Attribute | 1075 | VRF |
 
-# BGP
+## Routing BGP
 
 This schema extension contains all you need to model your BGP platform.
 
-Dependencies: `base, extensions.routing`
-
-## bgp
-
+- **Dependencies:** `base, extensions/routing`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### AutonomousSystem
+#### AutonomousSystem
 
 - **Description:** An Autonomous System (AS) is a set of Internet routable IP prefixes belonging to a network
 - **Label:** Autonomous System
@@ -2388,7 +3377,7 @@ Dependencies: `base, extensions.routing`
 - **Order By:**asn__value, name__value
 - **Uniqueness Constraints:**asn__value, name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | optional |
 | ---- | ---- | ----------- | ------------ | -------- |
@@ -2404,7 +3393,7 @@ Dependencies: `base, extensions.routing`
 | location | LocationGeneric | True | one | Attribute |
 | devices | DcimDevice | True | many | Attribute |
 
-### BGPPeerGroup
+#### BGPPeerGroup
 
 - **Description:** A BGP Peer Group is used to regroup parameters that are shared across multiple peers
 - **Label:** BGP Peer Group
@@ -2417,7 +3406,7 @@ Dependencies: `base, extensions.routing`
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | description | order_weight | regex | choices | default_value |
 | ---- | ---- | -------- | ----------- | ------------ | ----- | ------- | ------------- |
@@ -2436,7 +3425,7 @@ Dependencies: `base, extensions.routing`
 | local\_as | bgppeergroup\_\_local\_as | RoutingAutonomousSystem | True | one | Attribute |
 | remote\_as | bgppeergroup\_\_remote\_as | RoutingAutonomousSystem | True | one | Attribute |
 
-### BGPSession
+#### BGPSession
 
 - **Description:** A BGP Session represent a point to point connection between two routers
 - **Label:** BGP Session
@@ -2448,7 +3437,7 @@ Dependencies: `base, extensions.routing`
 - **Order By:**remote_as__asn__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | enum | description | order_weight | choices | regex |
 | ---- | ---- | -------- | ---- | ----------- | ------------ | ------- | ----- |
@@ -2470,9 +3459,9 @@ Dependencies: `base, extensions.routing`
 | peer\_group |  | RoutingBGPPeerGroup | True | one | Attribute |
 | peer\_session |  | RoutingBGPSession | True | one | Attribute |
 
-## Extensions
+### Extensions
 
-### DcimGenericDevice
+#### DcimGenericDevice
 
 #### Relationships
 
@@ -2480,7 +3469,7 @@ Dependencies: `base, extensions.routing`
 | ---- | ---- | -------- | ----------- | ---- | ------------ |
 | asn | RoutingAutonomousSystem | True | one | Attribute | 1600 |
 
-### OrganizationGeneric
+#### OrganizationGeneric
 
 #### Relationships
 
@@ -2488,28 +3477,24 @@ Dependencies: `base, extensions.routing`
 | ---- | ----- | ----------- | -------- | ---- | ------------ |
 | asn | Autonomous System | many | True | RoutingAutonomousSystem | 2000 |
 
-# Modules
+## Modules
 
 This schema extension allows you to capture Device Modules related information like the serial number or the status. You can insert the Module into a Dcim Physical Device.
 
-> [!NOTE]
-> This extension doesn't contain any Node, you can use the extension module_linecards or modules_routing_engine to use it
+NOTE: This extension doesn't contain any Nodes, you can use the extension module_linecards or modules_routing_engine to use it
 
-Dependencies: `base`
-
-## modules
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### GenericModule
+#### GenericModule
 
 - **Description:** A generic module, such as a Linecard or Routing Engine, installed in a device.
 - **Label:** Module
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | description | order_weight | optional | choices | default_value |
 | ---- | ---- | ------ | ----------- | ------------ | -------- | ------- | ------------- |
@@ -2524,7 +3509,7 @@ Dependencies: `base`
 | module\_type | DeviceGenericModuleType | False | one | Attribute | 1150 |  |  |
 | device | DcimPhysicalDevice | True | one | Attribute | 1000 | Device | device\_\_modules |
 
-### GenericModuleType
+#### GenericModuleType
 
 - **Description:** A generic module type, with common specifications like part number and manufacturer.
 - **Label:** Module Type
@@ -2535,7 +3520,7 @@ Dependencies: `base`
 - **Order By:**manufacturer__name__value, name__value
 - **Uniqueness Constraints:**part_number__value, name__value + manufacturer
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | description | order_weight | optional | label |
 | ---- | ---- | ------ | ----------- | ------------ | -------- | ----- |
@@ -2550,9 +3535,9 @@ Dependencies: `base`
 | manufacturer | OrganizationManufacturer | manufacturer\_\_moduletype | one | False | Attribute | Manufacturer of the module type\. | 1250 |
 | tags | BuiltinTag |  | many | True | Attribute | Tags associated with the module type\. | 3000 |
 
-## Extensions
+### Extensions
 
-### DcimPhysicalDevice
+#### DcimPhysicalDevice
 
 #### Relationships
 
@@ -2560,21 +3545,16 @@ Dependencies: `base`
 | ---- | ---- | ---------- | ----------- | ---- |
 | modules | DeviceGenericModule | device\_\_modules | many | Component |
 
-# Routing Policies
+## Routing Policies
 
-This schema extension contains a generic to create Routing Policies.
+This schema extension contains a generic to create Routing Policies. This Generic can be extend for each Routing Protocols you may want to use.
 
-This Generic can be extend for each Routing Protocols you may want to use.
-
-Dependencies: `base`
-
-## routing_policies
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### Policy
+#### Policy
 
 - **Description:** Policy defining the rules for routing traffic in a network.
 - **Icon:** carbon:deployment-policy
@@ -2585,7 +3565,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | optional | order_weight | label | choices | default_value |
 | ---- | ---- | ----------- | ------ | -------- | ------------ | ----- | ------- | ------------- |
@@ -2595,19 +3575,16 @@ Dependencies: `base`
 | weight | Number | Priority of the routing policy\. The higher the number, the higher the priority\. |  | True | 1400 |  | \`\` | 1000 |
 | address\_family | Dropdown | The address family for the routing policy indicating the type of IP address\. |  |  | 1150 |  | \`ipv4, ipv6, all\` | all |
 
-# Hosting Cluster
+## Hosting Cluster
 
 A rather generic cluster built with compute units (e.g. servers) and able to host VMs.
 
-Dependencies: `base, extensions.cluster, extensions.compute`
-
-## hosting_cluster
-
+- **Dependencies:** `base, extensions/cluster, extensions/compute`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### Hosting
+#### Hosting
 
 - **Description:** A cluster hosting virtual machines.
 - **Label:** Hosting Cluster
@@ -2615,26 +3592,23 @@ Dependencies: `base, extensions.cluster, extensions.compute`
 - **Menu Placement:** ClusterGeneric
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | description | choices | optional |
 | ---- | ---- | ------------ | ----------- | ------- | -------- |
 | cluster\_type | Dropdown | 1200 | Type of the cluster\. | \`aws, kvm, gcp, vmware\` |  |
 | status | Dropdown | 1300 |  | \`active, provisioning, maintenance, drained\` | False |
 
-# OSPF
+## Routing OSPF
 
 This schema extension contains all you need to model the OSPF Routing Protocol.
 
-Dependencies: `base, extensions.routing`
-
-## ospf
-
+- **Dependencies:** `base, extensions/routing`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### OSPF
+#### OSPF
 
 - **Description:** OSPF (Open Shortest Path First) instance on a Virtual Router.
 - **Label:** OSPF
@@ -2646,7 +3620,7 @@ Dependencies: `base, extensions.routing`
 - **Order By:**router_id__address__value, vrf__name__value, device__name__value
 - **Uniqueness Constraints:**device + vrf + version__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | default_value | description | order_weight | choices |
 | ---- | ---- | -------- | ------------- | ----------- | ------------ | ------- |
@@ -2662,7 +3636,7 @@ Dependencies: `base, extensions.routing`
 | router\_id | IpamIPAddress | True | one | Attribute |  |  |
 | ospf\_interfaces | RoutingOSPFInterface | True | many | Component | OSPF Interfaces | ospf\_\_ospfinterfaces |
 
-### OSPFInterface
+#### OSPFInterface
 
 - **Description:** Pivot table linking OSPF configuration to an interface.
 - **Label:** OSPF Interface
@@ -2674,37 +3648,34 @@ Dependencies: `base, extensions.routing`
 - **Order By:**description__value
 - **Uniqueness Constraints:**ospf + interface
 
-#### Attributes
+##### Attributes
 
-| name | kind | optional | description | order_weight | choices | default_value |
-| ---- | ---- | -------- | ----------- | ------------ | ------- | ------------- |
-| description | Text | False | Description of the OSPF interface\. | 1500 | \`\` |  |
-| metric | Number | True | OSPF metric for the interface\. | 1400 | \`\` |  |
-| mode | Dropdown |  | Mode of the OSPF interface\. | 1300 | \`normal, passive, peer\_to\_peer\` | normal |
-| authentication\_key | Password | True | Shared secret used to authenticate and secure routing messages between neighboring routers\. | 1250 | \`\` |  |
-| authentication\_mode | Dropdown | True |  | 1225 | \`md5, sha1\` |  |
-| area | Text |  | OSPF area associated with the interface\. | 1200 | \`\` |  |
+| name | kind | optional | unique | description | order_weight | choices | default_value |
+| ---- | ---- | -------- | ------ | ----------- | ------------ | ------- | ------------- |
+| description | Text | False | True | Description of the OSPF interface\. | 1500 | \`\` |  |
+| metric | Number | True |  | OSPF metric for the interface\. | 1400 | \`\` |  |
+| mode | Dropdown |  |  | Mode of the OSPF interface\. | 1300 | \`normal, passive, peer\_to\_peer\` | normal |
+| authentication\_key | Password | True |  | Shared secret used to authenticate and secure routing messages between neighboring routers\. | 1250 | \`\` |  |
+| authentication\_mode | Dropdown | True |  |  | 1225 | \`md5, sha1\` |  |
+| area | Text |  |  | OSPF area associated with the interface\. | 1200 | \`\` |  |
 
 #### Relationships
 
 | name | label | peer | identifier | optional | cardinality | kind | order_weight |
 | ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
 | ospf | OSPF | RoutingOSPF | ospf\_\_ospfinterfaces | False | one | Parent | 1100 |
-| interface |  | DcimInterfaceL3 |  | False | one | Attribute | 1200 |
+| interface |  | InterfaceLayer3 |  | False | one | Attribute | 1200 |
 
-# Infiniband
+## Infiniband
 
 This schema extension adds support for InfiniBand switches.
 
-Dependencies: `base, extensions.compute`
-
-## infiniband
-
+- **Dependencies:** `base, extensions/compute`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### Switch
+#### Switch
 
 - **Description:** InfiniBand Switch
 - **Label:** InfiniBand Switch
@@ -2716,7 +3687,7 @@ Dependencies: `base, extensions.compute`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | optional | label | description | default_value | choices |
 | ---- | ---- | ------ | ------------ | -------- | ----- | ----------- | ------------- | ------- |
@@ -2743,7 +3714,7 @@ Dependencies: `base, extensions.compute`
 | mgmt\_interface | Component | one | InfinibandSwitchMgmtInterface | True |
 | rsu | Attribute | one | InfinibandRSU | True |
 
-### SwitchInterface
+#### SwitchInterface
 
 - **Description:** InfiniBand Switch Interface
 - **Label:** InfiniBand Switch Interface
@@ -2755,7 +3726,7 @@ Dependencies: `base, extensions.compute`
 - **Order By:**name__value
 - **Uniqueness Constraints:**switch + name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional | default_value | label | description | enum | choices |
 | ---- | ---- | ------------ | -------- | ------------- | ----- | ----------- | ---- | ------- |
@@ -2779,7 +3750,7 @@ Dependencies: `base, extensions.compute`
 | speed\_option | InfinibandSwitchIntfSpeedOptions | True | many | Attribute | 6 |
 | switch | InfinibandSwitch | False | one | Parent |  |
 
-### SwitchMgmtInterface
+#### SwitchMgmtInterface
 
 - **Description:** InfiniBand Switch Management Interface
 - **Label:** InfiniBand Mgmt Interface
@@ -2791,7 +3762,7 @@ Dependencies: `base, extensions.compute`
 - **Order By:**name__value
 - **Uniqueness Constraints:**switch + name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional | label | default_value | description |
 | ---- | ---- | ------------ | -------- | ----- | ------------- | ----------- |
@@ -2809,7 +3780,7 @@ Dependencies: `base, extensions.compute`
 | switch | InfinibandSwitch | False | one | Parent |
 | ipv4\_address | IpamIPAddress | True | one |  |
 
-### SwitchIntfSpeedOptions
+#### SwitchIntfSpeedOptions
 
 - **Description:** InfiniBand Interface Speed Options
 - **Label:** InfiniBand Interface Speed Options
@@ -2821,7 +3792,7 @@ Dependencies: `base, extensions.compute`
 - **Order By:**speed__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | description | choices | unique |
 | ---- | ---- | ----- | ----------- | ------- | ------ |
@@ -2834,7 +3805,7 @@ Dependencies: `base, extensions.compute`
 | ---- | ---- | -------- | ----------- | ---- |
 | switch | InfinibandSwitchInterface | False | one | Parent |
 
-### RSU
+#### RSU
 
 - **Description:** InfiniBand Rail-Optimized Scalable Unit
 - **Label:** InfiniBand RSU
@@ -2846,7 +3817,7 @@ Dependencies: `base, extensions.compute`
 - **Order By:**identifier__value
 - **Uniqueness Constraints:**identifier__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | description | regex | optional |
 | ---- | ---- | ----- | ----------- | ----- | -------- |
@@ -2860,7 +3831,7 @@ Dependencies: `base, extensions.compute`
 | switches | InfinibandSwitch | True | many | Attribute |
 | interfaces | InfinibandSwitchInterface | True | many | Attribute |
 
-### Fabric
+#### Fabric
 
 - **Description:** InfiniBand Network Fabric
 - **Label:** InfiniBand Network Fabric
@@ -2872,60 +3843,57 @@ Dependencies: `base, extensions.compute`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | description | unique |
 | ---- | ---- | ----- | ----------- | ------ |
 | name | Text | Name | InfiniBand Network Fabric Name | True |
 
-# Location Extended
+## Location Extended
 
 This schema extension is the most detailed when it comes to location, you'll find all the layers you can think of.
 
-Dependencies: `base`
-
-## location_extended
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### Continent
+#### Continent
 
 - **Label:** Continent
 - **Icon:** jam:world
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-### Country
+#### Country
 
 - **Label:** Country
 - **Icon:** gis:search-country
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-### Region
+#### Region
 
 - **Label:** Region
 - **Icon:** carbon:cics-region-target
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-### Metro
+#### Metro
 
 - **Label:** Metro
 - **Icon:** healthicons:city
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-### Building
+#### Building
 
 - **Label:** Building
 - **Icon:** ri:building-line
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional | order_weight |
 | ---- | ---- | ------ | -------- | ------------ |
@@ -2938,21 +3906,21 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | owner | OrganizationGeneric | True | one |
 
-### Floor
+#### Floor
 
 - **Label:** Floor
 - **Icon:** mdi:home-floor-0
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-### Suite
+#### Suite
 
 - **Label:** Suite
 - **Icon:** game-icons:cage
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional | order_weight |
 | ---- | ---- | ------ | -------- | ------------ |
@@ -2964,14 +3932,14 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | owner | OrganizationGeneric | True | one |
 
-### Rack
+#### Rack
 
 - **Label:** Rack
 - **Icon:** clarity:rack-server-line
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional | order_weight |
 | ---- | ---- | ------ | -------- | ------------ |
@@ -2983,9 +3951,9 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | owner | OrganizationGeneric | True | one |
 
-## Extensions
+### Extensions
 
-### OrganizationProvider
+#### OrganizationProvider
 
 #### Relationships
 
@@ -2993,19 +3961,16 @@ Dependencies: `base`
 | ---- | ---- | ----------- | -------- |
 | location | LocationBuilding | many | True |
 
-# Topology
+## Topology
 
 A schema for defining and managing network topology, strategies, and services.
 
-Dependencies: `base`
-
-## topology
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### ManagementServer
+#### ManagementServer
 
 - **Description:** Generic model for network management server (dns, ntp, and dhcp).
 - **Label:** Network Management Servers
@@ -3016,7 +3981,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional | choices |
 | ---- | ---- | ------------ | -------- | ------- |
@@ -3031,7 +3996,7 @@ Dependencies: `base`
 | location | LocationGeneric | True | many |  |
 | ip\_addresses | InfraIPAddress | True | many | Component |
 
-### GenericElement
+#### GenericElement
 
 - **Description:** Base model for elements
 - **Label:** Generic Topology Element
@@ -3044,7 +4009,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional |
 | ---- | ---- | ------------ | -------- |
@@ -3058,7 +4023,7 @@ Dependencies: `base`
 | ---- | ---- | ----------- | ---- | -------- |
 | topology | TopologyTopology | one | Parent | False |
 
-### NetworkStrategy
+#### NetworkStrategy
 
 - **Description:** Generic model for network strategies (underlays and overlays).
 - **Label:** Network Strategy
@@ -3071,7 +4036,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional |
 | ---- | ---- | ------------ | -------- |
@@ -3084,9 +4049,9 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | topology | TopologyTopology | True | many |
 
-## Nodes
+### Nodes
 
-### Topology
+#### Topology
 
 - **Description:** A Topology represents the entire network pod.
 - **Label:** Topology
@@ -3098,7 +4063,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | optional |
 | ---- | ---- | ------ | ------------ | -------- |
@@ -3115,7 +4080,7 @@ Dependencies: `base`
 | devices | DcimGenericDevice | True | many | Component |
 | network\_services | TopologyNetworkService | True | many | Component |
 
-### MPLSStrategy
+#### MPLSStrategy
 
 - **Description:** Specific strategy attributes for MPLS.
 - **Label:** MPLS Strategy
@@ -3128,14 +4093,14 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | choices |
 | ---- | ---- | ------- |
 | underlay | Dropdown | \`ospf, isis, bgp\` |
 | overlay | Dropdown | \`ldp, rsvp, segment\_routing\` |
 
-### EVPNStrategy
+#### EVPNStrategy
 
 - **Description:** Specific strategy attributes for EVPN.
 - **Label:** EVPN Strategy
@@ -3148,14 +4113,14 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | choices |
 | ---- | ---- | ------- |
 | underlay | Dropdown | \`ebgp, ospf, isis\` |
 | overlay | Dropdown | \`ebgp, ibgp\` |
 
-### PhysicalElement
+#### PhysicalElement
 
 - **Description:** Physical aspect of topology elements.
 - **Label:** Physical Topology Element
@@ -3168,7 +4133,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | default_value | order_weight | label | choices |
 | ---- | ---- | ------------- | ------------ | ----- | ------- |
@@ -3183,7 +4148,7 @@ Dependencies: `base`
 | ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
 | device\_type | Type | DcimDeviceType | True | one | Attribute | 1400 |
 
-### DhcpOption
+#### DhcpOption
 
 - **Description:** Represents a configurable option within a Dhcp server.
 - **Label:** Dhcp Option
@@ -3196,7 +4161,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional |
 | ---- | ---- | ------------ | -------- |
@@ -3205,7 +4170,7 @@ Dependencies: `base`
 | option\_code | Number | 2000 |  |
 | content | Text | 2100 |  |
 
-### DhcpServer
+#### DhcpServer
 
 - **Description:** Represents a Dhcp server in the network.
 - **Label:** Dhcp Server
@@ -3218,7 +4183,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight |
 | ---- | ---- | ------------ |
@@ -3230,7 +4195,7 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- |
 | dhcp\_options | NetworkDhcpOption | True | many | Component |
 
-### NameServer
+#### NameServer
 
 - **Description:** Represents a DNS server in the network.
 - **Label:** DNS Server
@@ -3243,7 +4208,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-### NTPServer
+#### NTPServer
 
 - **Description:** Represents a NTP server in the network.
 - **Label:** NTP Server
@@ -3256,7 +4221,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-### NetworkServiceIdentifier
+#### NetworkServiceIdentifier
 
 - **Description:** Generic model for different types of identifiers used in network services.
 - **Label:** Network Service Identifier
@@ -3269,7 +4234,7 @@ Dependencies: `base`
 - **Order By:**identifier__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
@@ -3281,7 +4246,7 @@ Dependencies: `base`
 | ---- | ----- | ---- | ----------- | -------- |
 | service | Network Service | TopologyNetworkService | one | True |
 
-### NetworkService
+#### NetworkService
 
 - **Description:** Network services attached to a Topology.
 - **Label:** Network Service
@@ -3293,7 +4258,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | order_weight | enum |
 | ---- | ----- | ---- | ------------ | ---- |
@@ -3310,9 +4275,9 @@ Dependencies: `base`
 | vlan | InfraVLAN | one | Component | True | 1500 |
 | prefix | InfraPrefix | one | Component | True | 1400 |
 
-## Extensions
+### Extensions
 
-### DcimGenericDevice
+#### DcimGenericDevice
 
 #### Relationships
 
@@ -3320,7 +4285,7 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | topology | TopologyTopology | True | one |
 
-### IpamPrefix
+#### IpamPrefix
 
 #### Relationships
 
@@ -3328,19 +4293,157 @@ Dependencies: `base`
 | ---- | ----- | ---- | -------- | ----------- | ------------ |
 | network\_service | Network Service | TopologyNetworkService | True | one | 1400 |
 
-# Security
+## Modules Routing Engine
+
+This schema extension allows you to capture Routing Engine related information like the version. You can insert the Routing Engine into a Dcim Physical Device and leverage the Routing Engine type model.
+
+- **Dependencies:** `base, extensions/modules`
+- **Version:** 1.0
+
+### Nodes
+
+#### RoutingEngineType
+
+- **Description:** Routing Engine Type information, detailing specifications such as part number and manufacturer.
+- **Label:** Routing Engine Type
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | peer | cardinality | kind | description |
+| ---- | ---- | ----------- | ---- | ----------- |
+| routing\_engines | DeviceRoutingEngine | many | Generic | Routing engines of this type\. |
+
+#### RoutingEngine
+
+- **Description:** A Routing Engine (RE) installed in a device, responsible for routing functionalities.
+- **Label:** Routing Engine
+- **Icon:** mdi:cpu-64-bit
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**device__name__value, slot__value
+- **Uniqueness Constraints:**serial_number__value
+
+##### Attributes
+
+| name | kind | description | order_weight | label | optional |
+| ---- | ---- | ----------- | ------------ | ----- | -------- |
+| slot | Number | The slot number where the Routing Engine is installed within the device | 1100 |  |  |
+| version | Text | Firmware version of the Routing Engine\. | 1200 | Version | True |
+
+#### Relationships
+
+| name | label | peer | optional | cardinality | kind | order_weight |
+| ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
+| routing\_engine\_type | RE Type | DeviceRoutingEngineType | False | one | Attribute | 1150 |
+
+## Modules Linecards
+
+This schema extension allows you to capture Linecard related information like the version. You can insert the Linecard into a Dcim Physical Device and leverage the Linecard type model. The Linecard can accept PIC to help configure PORT information like breakout-capabilities and configurations.
+
+- **Dependencies:** `base, extensions/modules`
+- **Version:** 1.0
+
+### Nodes
+
+#### LinecardType
+
+- **Description:** Linecard Type information, detailing specifications such as part number and manufacturer.
+- **Label:** Linecard Type
+- **Include in Menu:** ❌
+
+#### Relationships
+
+| name | peer | cardinality | kind | description |
+| ---- | ---- | ----------- | ---- | ----------- |
+| linecards | DeviceLinecard | many | Generic | Linecards of this type\. |
+
+#### Linecard
+
+- **Description:** A Linecard installed in a device, specifying slot, power status, and functionalities.
+- **Label:** Linecard
+- **Icon:** bi:pci-card
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**device__name__value, slot__value
+- **Uniqueness Constraints:**serial_number__value
+
+##### Attributes
+
+| name | kind | description | order_weight | label | optional | default_value |
+| ---- | ---- | ----------- | ------------ | ----- | -------- | ------------- |
+| slot | Number | The slot number where the Linecard is installed within the device | 1050 |  |  |  |
+| bng\_enabled | Boolean | BNG activated or deactivated on the Linecard | 1400 | BNG Enabled | True | False |
+
+#### Relationships
+
+| name | label | peer | optional | cardinality | kind | order_weight |
+| ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
+| linecard\_type | Linecard Type | DeviceLinecardType | False | one | Attribute | 1150 |
+| pics | PICs | DevicePic | True | many | Attribute | 1500 |
+
+#### Pic
+
+- **Description:** Physical Interface Card (PIC) installed in the Linecard, containing multiple ports.
+- **Label:** PIC
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**linecard__serial_number__value, slot__value
+- **Uniqueness Constraints:**linecard + slot__value
+
+##### Attributes
+
+| name | kind | description | order_weight |
+| ---- | ---- | ----------- | ------------ |
+| slot | Number | Slot number of the PIC within the Linecard | 1200 |
+
+#### Relationships
+
+| name | label | peer | identifier | optional | cardinality | kind | order_weight |
+| ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
+| linecard | Linecard | DeviceLinecard | linecard\_\_pics | False | one | Parent | 1000 |
+| ports | Ports | InfraPort |  | True | many | Component | 1100 |
+
+#### Port
+
+- **Description:** A network port on a PIC, specifying speed and port number.
+- **Label:** Port
+- **Include in Menu:** ❌
+
+#### Ordering and Constraints
+
+- **Order By:**pic__slot__value, port_number__value
+- **Uniqueness Constraints:**pic + port_number__value
+
+##### Attributes
+
+| name | kind | description | order_weight | choices |
+| ---- | ---- | ----------- | ------------ | ------- |
+| port\_number | Number | Port number on the PIC | 1100 | \`\` |
+| speed | Dropdown | Speed of the port | 1200 | \`10g, 100g\` |
+
+#### Relationships
+
+| name | label | peer | optional | cardinality | kind | order_weight |
+| ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
+| pic | PIC | DevicePic | False | one | Parent | 1000 |
+
+## Security
 
 This schema extension contains models for implementing detailed security.
 
-Dependencies: `base`
-
-## security
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### PolicyAssignment
+#### PolicyAssignment
 
 - **Label:** Security Policy
 - **Include in Menu:** ❌
@@ -3351,11 +4454,11 @@ Dependencies: `base`
 | ---- | ----- | ---- | ---- | ----------- | -------- |
 | rules | Policy | SecurityRenderedPolicyRule | Component | many | True |
 
-### GenericAddressGroup
+#### GenericAddressGroup
 
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | optional | unique |
 | ---- | ---- | ----- | -------- | ------ |
@@ -3368,11 +4471,11 @@ Dependencies: `base`
 | ---- | ---- | ----------- | ---- | -------- |
 | addresses | SecurityGenericAddress | many | Component | True |
 
-### GenericAddress
+#### GenericAddress
 
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | unique |
 | ---- | ---- | -------- | ------ |
@@ -3384,11 +4487,11 @@ Dependencies: `base`
 | ---- | ----- | ---- | ----------- | -------- |
 | address\_groups | Address Groups | SecurityGenericAddressGroup | many | True |
 
-### GenericServiceGroup
+#### GenericServiceGroup
 
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional |
 | ---- | ----- | ---- | -------- |
@@ -3401,11 +4504,11 @@ Dependencies: `base`
 | ---- | ---- | ----- | ----------- | ---- | -------- |
 | services | SecurityGenericService | Services | many | Component | True |
 
-### GenericService
+#### GenericService
 
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional |
 | ---- | ----- | ---- | -------- |
@@ -3418,9 +4521,9 @@ Dependencies: `base`
 | ---- | ----- | ---- | ----------- | -------- |
 | service\_groups | Service Groups | SecurityGenericServiceGroup | many | True |
 
-## Nodes
+### Nodes
 
-### Zone
+#### Zone
 
 - **Description:** Security zones
 - **Label:** Security zone
@@ -3428,7 +4531,7 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional |
 | ---- | ---- | ------ | -------- |
@@ -3440,7 +4543,7 @@ Dependencies: `base`
 | ---- | ----- | ---- | -------- | ---- |
 | interfaces | Interfaces | Attribute | True | SecurityFirewallInterface |
 
-### IPAMIPAddress
+#### IPAMIPAddress
 
 - **Description:** Infrahub IPv4/6 address
 - **Label:** IPAM IP Address
@@ -3448,7 +4551,7 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional |
 | ---- | ---- | -------- |
@@ -3460,7 +4563,7 @@ Dependencies: `base`
 | ---- | ---- | ----------- | ---- | -------- |
 | ip\_address | InfraIPAddress | one | Attribute | False |
 
-### IPAMIPPrefix
+#### IPAMIPPrefix
 
 - **Description:** Infrahub IPv4/6 prefix
 - **Label:** IPAM IP Prefix
@@ -3468,7 +4571,7 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional |
 | ---- | ---- | -------- |
@@ -3480,7 +4583,7 @@ Dependencies: `base`
 | ---- | ---- | ----------- | ---- | -------- |
 | ip\_prefix | InfraPrefix | one | Attribute | False |
 
-### IPAddress
+#### IPAddress
 
 - **Description:** IPv4/6 address
 - **Label:** IP Address
@@ -3493,14 +4596,14 @@ Dependencies: `base`
 - **Order By:**address__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional |
 | ---- | ---- | -------- |
 | address | IPHost |  |
 | description | Text | True |
 
-### Prefix
+#### Prefix
 
 - **Description:** IPv4/6 prefix
 - **Label:** Prefix
@@ -3513,14 +4616,14 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | unique |
 | ---- | ---- | -------- | ------ |
 | prefix | IPNetwork | False | True |
 | description | Text | True |  |
 
-### IPRange
+#### IPRange
 
 - **Description:** IPv4/6 Range
 - **Label:** IP Range
@@ -3533,14 +4636,14 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional |
 | ---- | ----- | ---- | -------- |
 | start | Start IP Address | IPHost | False |
 | end | End IP Address | IPHost | False |
 
-### FQDN
+#### FQDN
 
 - **Description:** Full Qualified Domain Name
 - **Label:** FQDN
@@ -3553,13 +4656,13 @@ Dependencies: `base`
 - **Order By:**name__value, fqdn__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | regex |
 | ---- | ----- | ---- | -------- | ----- |
 | fqdn | FQDN | Text | False | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
 
-### AddressGroup
+#### AddressGroup
 
 - **Description:** Group of addresses
 - **Label:** Address Group
@@ -3567,7 +4670,7 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-### IPProtocol
+#### IPProtocol
 
 - **Description:** IP protocol
 - **Label:** IP Protocols
@@ -3580,13 +4683,13 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional |
 | ---- | ---- | -------- |
 | protocol | Number | True |
 
-### Service
+#### Service
 
 - **Description:** Service
 - **Label:** Service
@@ -3599,7 +4702,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
@@ -3611,7 +4714,7 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- |
 | ip\_protocol | SecurityIPProtocol | True | one | Attribute |
 
-### ServiceRange
+#### ServiceRange
 
 - **Description:** Service range
 - **Label:** Service range
@@ -3624,7 +4727,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional |
 | ---- | ---- | -------- |
@@ -3637,7 +4740,7 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- |
 | ip\_protocol | SecurityIPProtocol | False | one | Attribute |
 
-### ServiceGroup
+#### ServiceGroup
 
 - **Description:** Group of services
 - **Label:** Service group
@@ -3650,7 +4753,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-### Policy
+#### Policy
 
 - **Label:** Security Policy
 - **Include in Menu:** ❌
@@ -3660,7 +4763,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional |
 | ---- | ----- | ---- | -------- |
@@ -3675,7 +4778,7 @@ Dependencies: `base`
 | location\_target | LocationGeneric | one | Attribute | True |
 | device\_target | SecurityFirewall | one | Attribute | True |
 
-### PolicyRule
+#### PolicyRule
 
 - **Description:** Policy rule
 - **Label:** Policy rule
@@ -3688,7 +4791,7 @@ Dependencies: `base`
 - **Order By:**source_zone__name__value, destination_zone__name__value, index__value
 - **Uniqueness Constraints:**index__value + source_zone + destination_zone + policy
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | order_weight | enum | default_value |
 | ---- | ----- | ---- | -------- | ------------ | ---- | ------------- |
@@ -3713,13 +4816,13 @@ Dependencies: `base`
 | destination\_services | SecurityGenericService | Attribute | many | True |  | policy\_rule\_\_destination\_service |
 | destination\_service\_groups | SecurityGenericServiceGroup | Attribute | many | True |  | policy\_rule\_\_destination\_service\_group |
 
-### Firewall
+#### Firewall
 
 - **Icon:** mdi:firewall
 - **Menu Placement:** InfraGenericDevice
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | choices |
 | ---- | ---- | -------- | ------- |
@@ -3731,7 +4834,7 @@ Dependencies: `base`
 | ---- | ---- | ----- | ----------- | ---- |
 | policy | SecurityPolicy | Security Policy | one | Attribute |
 
-### RenderedPolicyRule
+#### RenderedPolicyRule
 
 - **Description:** Policy rule
 - **Label:** Policy rule
@@ -3742,7 +4845,7 @@ Dependencies: `base`
 - **Order By:**source_zone__name__value, destination_zone__name__value, index__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | order_weight | enum | default_value |
 | ---- | ----- | ---- | -------- | ------------ | ---- | ------------- |
@@ -3767,7 +4870,7 @@ Dependencies: `base`
 | destination\_services | SecurityGenericService | Attribute | many | True | rendered\_policy\_rule\_\_destination\_service |  |
 | destination\_service\_groups | SecurityGenericServiceGroup | Attribute | many | True | rendered\_policy\_rule\_\_destination\_service\_group |  |
 
-### FirewallInterface
+#### FirewallInterface
 
 - **Label:** Firewall Interface
 - **Icon:** mdi:ethernet
@@ -3781,9 +4884,9 @@ Dependencies: `base`
 | ip\_addresses | InfraIPAddress | True | many | Component |
 | security\_zone | SecurityZone | False | one | Attribute |
 
-## Extensions
+### Extensions
 
-### LocationGeneric
+#### LocationGeneric
 
 #### Relationships
 
@@ -3791,26 +4894,23 @@ Dependencies: `base`
 | ---- | ---- | ----------- | ---- |
 | policy | SecurityPolicy | one | Attribute |
 
-# Azure
+## Azure
 
 This schema extension introduces cloud support for Microsoft Azure.
 
-Dependencies: `base`
-
-Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)
-
-## azure
+- **Dependencies:** `base`
+- **Attribution**: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)
 
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### Resource
+#### Resource
 
 - **Label:** Azure
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
@@ -3823,25 +4923,25 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 | location | one | Attribute | AzureLocation |  |
 | resourcegroup | one | Parent | AzureResourceGroup | False |
 
-## Nodes
+### Nodes
 
-### Location
+#### Location
 
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
 | name | Text |
 
-### Tenant
+#### Tenant
 
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
@@ -3854,12 +4954,12 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 | ---- | ----------- | ---- | ---- |
 | subscriptions | many | AzureSubscription | Component |
 
-### Subscription
+#### Subscription
 
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
@@ -3873,12 +4973,12 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 | tenant | one | AzureTenant | Parent | False |
 | resourcegroups | many | AzureResourceGroup | Component |  |
 
-### ResourceGroup
+#### ResourceGroup
 
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
@@ -3891,7 +4991,7 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 | location | one | Attribute | AzureLocation |  |
 | subscription | one | Parent | AzureSubscription | False |
 
-### VirtualNetwork
+#### VirtualNetwork
 
 - **Label:** Virtual Networks
 - **Menu Placement:** AzureResource
@@ -3904,13 +5004,13 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 | address\_space | many | Attribute | BuiltinIPPrefix |
 | subnets | many | Component | AzureVirtualNetworkSubnet |
 
-### VirtualNetworkSubnet
+#### VirtualNetworkSubnet
 
 - **Label:** Subnets
 - **Menu Placement:** AzureResource
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
@@ -3923,19 +5023,16 @@ Attribution: [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/
 | virtualnetwork | one | AzureVirtualNetwork | Parent | False |
 | address\_prefixes | many | BuiltinIPPrefix | Attribute |  |
 
-# Tenancy
+## Tenancy
 
 This schema extension introduces tenancy for some of the schema nodes (circuits...)
 
-Dependencies: `base, extensions.circuit, experimental.location_extended`
-
-## tenancy
-
+- **Dependencies:** `base, extensions/circuit`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### Tenant
+#### Tenant
 
 - **Description:** A tenant is owning the corresponding entity
 - **Icon:** mdi:domain
@@ -3949,17 +5046,16 @@ Dependencies: `base, extensions.circuit, experimental.location_extended`
 | location | LocationBuilding | many |  | True |  |
 | circuit | DcimCircuit | many |  | True |  |
 
-# Quality of Service (QoS)
+## QoS
 
 This schema extension contains models for Quality of Service (QoS)
 
-## qos
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### ForwardingClass
+#### ForwardingClass
 
 - **Description:** Represents a forwarding class in QoS with distinct loss priorities.
 - **Label:** Forwarding Class
@@ -3971,7 +5067,7 @@ This schema extension contains models for Quality of Service (QoS)
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | order_weight | optional |
 | ---- | ---- | ----------- | ------ | ------------ | -------- |
@@ -3979,7 +5075,7 @@ This schema extension contains models for Quality of Service (QoS)
 | high\_loss\_priority\_code | List | List of code points for high loss priority\. |  | 1200 | True |
 | low\_loss\_priority\_code | List | List of code points for low loss priority\. |  | 1300 | True |
 
-### ClassOfService
+#### ClassOfService
 
 - **Description:** Defines a Class of Service configuration.
 - **Label:** Class of Service
@@ -3990,7 +5086,7 @@ This schema extension contains models for Quality of Service (QoS)
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | order_weight |
 | ---- | ---- | ----------- | ------ | ------------ |
@@ -4002,7 +5098,7 @@ This schema extension contains models for Quality of Service (QoS)
 | ---- | ---- | ----------- | ----------- | -------- | ------------ |
 | traffic\_control\_profiles | QosTrafficControlProfile | List of traffic control profiles\. | many | True | 1200 |
 
-### TrafficControlProfile
+#### TrafficControlProfile
 
 - **Description:** Defines a traffic control profile with an active/inactive state.
 - **Label:** Traffic Control Profile
@@ -4014,14 +5110,14 @@ This schema extension contains models for Quality of Service (QoS)
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | order_weight | choices | default_value |
 | ---- | ---- | ----------- | ------ | ------------ | ------- | ------------- |
 | name | Text | Name of the traffic control profile\. | True | 1000 | \`\` |  |
 | status | Dropdown | Status of the traffic control profile \(active/inactive\)\. |  | 1200 | \`active, inactive\` | inactive |
 
-### Classifier
+#### Classifier
 
 - **Description:** Represents a classifier mapping DSCP or EXP values to forwarding classes.
 - **Label:** Classifier
@@ -4033,7 +5129,7 @@ This schema extension contains models for Quality of Service (QoS)
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | order_weight | choices |
 | ---- | ---- | ----------- | ------ | ------------ | ------- |
@@ -4046,7 +5142,7 @@ This schema extension contains models for Quality of Service (QoS)
 | ---- | ---- | ----------- | ----------- | -------- | ------------ |
 | forwarding\_classes | QosForwardingClass | List of forwarding classes defined in the classifier\. | many | True | 1300 |
 
-### Scheduler
+#### Scheduler
 
 - **Description:** Represents a scheduler configuration.
 - **Label:** Scheduler
@@ -4058,7 +5154,7 @@ This schema extension contains models for Quality of Service (QoS)
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | order_weight | label | choices | optional |
 | ---- | ---- | ----------- | ------ | ------------ | ----- | ------- | -------- |
@@ -4068,7 +5164,7 @@ This schema extension contains models for Quality of Service (QoS)
 | priority | Dropdown | Priority of the scheduler\. |  | 1400 |  | \`low, high, strict\-high\` | True |
 | excess\_priority | Dropdown | Excess priority when applicable\. |  | 1500 |  | \`low, high\` | True |
 
-### SchedulerMap
+#### SchedulerMap
 
 - **Description:** Defines mappings of schedulers to forwarding classes.
 - **Label:** Scheduler Map
@@ -4080,7 +5176,7 @@ This schema extension contains models for Quality of Service (QoS)
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | order_weight |
 | ---- | ---- | ----------- | ------ | ------------ |
@@ -4093,7 +5189,7 @@ This schema extension contains models for Quality of Service (QoS)
 | schedulers | QosScheduler | List of schedulers defined in the map\. | many | True | 1200 |
 | forwarding\_classes | QosForwardingClass | List of forwarding classes associated with schedulers\. | many | True | 1300 |
 
-# Circuit Service
+## Circuit Service
 
 This schema extension contains model coming on top of circuit to capture a single service shared across multiple circuits.
 For example you have a MPLS network supported by a provider connecting multiple locations:
@@ -4101,15 +5197,12 @@ For example you have a MPLS network supported by a provider connecting multiple 
 - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...)
 - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side
 
-Dependencies: `extensions.circuit`
-
-## circuit_service
-
+- **Dependencies:** `extensions/circuit`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### Service
+#### Service
 
 - **Description:** Represent the boundary of a provider network, the details of which are unknown or unimportant
 - **Label:** Circuit Service
@@ -4122,7 +5215,7 @@ Dependencies: `extensions.circuit`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional |
 | ---- | ---- | ------ | -------- |
@@ -4137,9 +5230,9 @@ Dependencies: `extensions.circuit`
 | provider | OrganizationProvider | False | one | Attribute |
 | circuit\_endpoints | CircuitEndpoint | True | many | Component |
 
-## Extensions
+### Extensions
 
-### OrganizationProvider
+#### OrganizationProvider
 
 #### Relationships
 
@@ -4147,7 +5240,7 @@ Dependencies: `extensions.circuit`
 | ---- | ---- | ----------- | -------- |
 | circuit\_services | CircuitService | many | True |
 
-### CircuitEndpoint
+#### CircuitEndpoint
 
 #### Relationships
 
@@ -4155,19 +5248,16 @@ Dependencies: `extensions.circuit`
 | ---- | ---- | ----------- | -------- |
 | circuit\_service | CircuitService | one | True |
 
-# VLAN Translation
+## VLAN Translation
 
 This schema extension is based on Juniper VLAN MAP, and not yet test out for other vendors.
 
-Dependencies: `base.dcim`
-
-## vlan-translation
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### MapInOut
+#### MapInOut
 
 - **Description:** VLAN Mapping for In/Out operations
 - **Label:** VLAN Map In/Out
@@ -4180,7 +5270,7 @@ Dependencies: `base.dcim`
 - **Order By:**interface__name__value, direction__value, operation__value
 - **Uniqueness Constraints:**interface + direction__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | label | order_weight | choices | optional |
 | ---- | ---- | ----------- | ----- | ------------ | ------- | -------- |
@@ -4197,9 +5287,9 @@ Dependencies: `base.dcim`
 | ---- | ---- | ---- | ----------- | ----------- | -------- | ----- | ------------ |
 | interface | Parent | DcimInterface | Interface to which the Input/Output VLAN mapping is applied | one | False | Interface | 1000 |
 
-## Extensions
+### Extensions
 
-### DcimInterface
+#### DcimInterface
 
 #### Relationships
 

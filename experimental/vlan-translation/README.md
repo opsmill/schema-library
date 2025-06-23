@@ -1,16 +1,13 @@
-# VLAN Translation
+## VLAN Translation
 
 This schema extension is based on Juniper VLAN MAP, and not yet test out for other vendors.
 
-Dependencies: `base.dcim`
-
-## vlan-translation
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### MapInOut
+#### MapInOut
 
 - **Description:** VLAN Mapping for In/Out operations
 - **Label:** VLAN Map In/Out
@@ -23,7 +20,7 @@ Dependencies: `base.dcim`
 - **Order By:**interface__name__value, direction__value, operation__value
 - **Uniqueness Constraints:**interface + direction__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | label | order_weight | choices | optional |
 | ---- | ---- | ----------- | ----- | ------------ | ------- | -------- |
@@ -40,9 +37,9 @@ Dependencies: `base.dcim`
 | ---- | ---- | ---- | ----------- | ----------- | -------- | ----- | ------------ |
 | interface | Parent | DcimInterface | Interface to which the Input/Output VLAN mapping is applied | one | False | Interface | 1000 |
 
-## Extensions
+### Extensions
 
-### DcimInterface
+#### DcimInterface
 
 #### Relationships
 

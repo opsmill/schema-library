@@ -1,25 +1,22 @@
-# Routing Policies BGP
+## Routing Policies BGP
 
 This extension is using the Routing Policies extensions and the Routing BGP one together.
 
-Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_bgp`
-
-## routing_policies_bgp
-
+- **Dependencies:** `base, extensions/routing, extensions/routing_policies, extensions/routing_bgp`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### PolicyBGP
+#### PolicyBGP
 
 - **Description:** A routing policiers for BGP
 - **Label:** BGP Routing Policies
 - **Icon:** carbon:deployment-policy
 - **Include in Menu:** ❌
 
-## Extensions
+### Extensions
 
-### RoutingBGPPeerGroup
+#### RoutingBGPPeerGroup
 
 #### Attributes
 
@@ -35,7 +32,7 @@ Dependencies: `base, extensions.routing, extensions.routing_policies, extensions
 | import\_routing\_policies | Import Routing Policies | RoutingPolicyBGP | bgp\_\_import\_policies | The routing\-policies used by this instance for import\. | Generic | many |
 | export\_routing\_policies | Export Routing Policies | RoutingPolicyBGP | bgp\_\_export\_policies | The routing\-policies used by this instance for export\. | Generic | many |
 
-### RoutingBGPSession
+#### RoutingBGPSession
 
 #### Attributes
 

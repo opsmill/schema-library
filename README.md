@@ -7,4 +7,4 @@ Welcome to the Schema Library for Infrahub! This repository offers a collection 
 
 ## Using the schema library
 
-Documentation for using the Schema Library is available [here](https://docs.infrahub.app/schema-library/schema-library/)
+Documentation for using the Schema Library is available in the [Schema Library docs](https://docs.infrahub.app/schema-library) site.

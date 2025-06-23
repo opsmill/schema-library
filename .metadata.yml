@@ -1,11 +1,21 @@
 ---
 # yamllint disable rule:line-length
-base:
+base/dcim:
   description:
-    The base schemas serve as the foundation for every single schema extension
-    you might want to use afterward. This one is mandatory and will unlock access
-    to the extensions section.
-  name: Base Schemas
+    Basic DCIM schema to capture devices, racks, interfaces, and related information.
+  name: DCIM
+base/ipam:
+  description:
+    Basic IPAM schema to capture IP addresses, subnets, and related information.
+  name: IPAM
+base/location:
+  description:
+    Basic Location schema to capture locations, sites, and related information.
+  name: Locations
+base/organization:
+  description:
+    Basic Organization schema to capture organizations, vendors, and related information.
+  name: Organization
 experimental/azure:
   attribution: "[Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)"
   dependencies:
@@ -35,11 +45,30 @@ experimental/location_extended:
     This schema extension is the most detailed when it comes to location,
     you'll find all the layers you can think of.
   name: Location Extended
+experimental/modules_linecards:
+  dependencies:
+    - base
+    - extensions/modules
+  description:
+    This schema extension allows you to capture Linecard related information
+    like the version. You can insert the Linecard into a Dcim Physical Device
+    and leverage the Linecard type model. The Linecard can accept PIC to help
+    configure PORT information like breakout-capabilities and configurations.
+  name: Modules Linecards
+experimental/modules_routing_engine:
+  dependencies:
+    - base
+    - extensions/modules
+  description:
+    This schema extension allows you to capture Routing Engine related information
+    like the version. You can insert the Routing Engine into a Dcim Physical Device
+    and leverage the Routing Engine type model.
+  name: Modules Routing Engine
 experimental/qos:
   dependencies:
     - base
   description: This schema extension contains models for Quality of Service (QoS)
-  name: Quality of Service (QoS)
+  name: QoS
 experimental/security:
   dependencies:
     - base
@@ -106,8 +135,8 @@ extensions/interface_breakout:
     - base
   description:
     This schema extension introduces relationships to support breakout interfaces,
-    enabling you to document the breakdown of a physical interface into smaller physical interfaces.
-  name: Interface Breakdown
+    enabling you to document the breakout of a physical interface into smaller physical interfaces.
+  name: Interface Breakout
 extensions/compute:
   dependencies:
     - base
@@ -166,36 +195,15 @@ extensions/modules:
   description: |
     This schema extension allows you to capture Device Modules related information like the serial number or the status. You can insert the Module into a Dcim Physical Device.
 
-    > [!NOTE]
-    > This extension doesn't contain any Node, you can use the extension module_linecards or modules_routing_engine to use it
+    NOTE: This extension doesn't contain any Nodes, you can use the extension module_linecards or modules_routing_engine to use it
   name: Modules
-extensions/modules_linecards:
-  dependencies:
-    - base
-    - extensions/modules
-  description:
-    This schema extension allows you to capture Linecard related information
-    like the version. You can insert the Linecard into a Dcim Physical Device and
-    leverage the Linecard type model. The Linecard can accept PIC to help configure
-    PORT information like breakout-capabilities and configurations.
-  name: Linecards
-extensions/modules_routing_engine:
-  dependencies:
-    - base
-    - extensions/modules
-  description:
-    This schema extension allows you to capture Routing Engine related
-    information like the version. You can insert the Routing Engine into a Dcim Physical
-    Device and leverage the Routing Engine type model.
-  name: Routing Engine
 extensions/patch_panel:
   dependencies:
     - base
   description: |
     This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture information about potential modules you would insert into your patch panel.
 
-    > [!NOTE]
-    > This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
+    NOTE: This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
   name: Patch Panel
 extensions/peering_ixp:
   dependencies:
@@ -204,25 +212,22 @@ extensions/peering_ixp:
     - extensions/routing_bgp
     - extensions/routing_bgp_community
   description:
-    This schema extension contains all you need to model anything revolving
-    around internet peering (Exchange points ...)!
-  name: Exchange Points (IXP)
+    This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)!
+  name: Peering IXP
 extensions/physical_disk:
   dependencies:
     - base
   description: |
     Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management.
 
-    > [!NOTE]
-    > This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares.
-  name: Physical Disks
+    NOTE: This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares.
+  name: Physical Disk
 extensions/qinq:
   dependencies:
     - base
     - extensions/vlan
   description:
-    This schema extension brings extensions to VLAN model in order to support
-    QinQ.
+    This schema extension brings extensions to VLAN model in order to support QinQ.
   name: QinQ
 extensions/routing:
   dependencies:
@@ -240,19 +245,19 @@ extensions/routing_aggregate:
   description:
     This schema extension contains all you need to model the Aggregate
     Routing Protocol.
-  name: Aggregate
+  name: Routing Aggregate
 extensions/routing_bgp:
   dependencies:
     - base
     - extensions/routing
   description: This schema extension contains all you need to model your BGP platform.
-  name: BGP
+  name: Routing BGP
 extensions/routing_bgp_community:
   dependencies:
     - base
     - extensions/routing
   description: This schema extension adds the BGP Communities models.
-  name: BGP Communities
+  name: Routing BGP Community
 extensions/routing_bgp_rr:
   dependencies:
     - base
@@ -261,7 +266,7 @@ extensions/routing_bgp_rr:
   description:
     This schema extension extend the BGP extension to add BGP Route Reflector
     Clustering.
-  name: BGP Route Reflector
+  name: Routing BGP RR
 extensions/routing_ospf:
   dependencies:
     - base
@@ -269,20 +274,17 @@ extensions/routing_ospf:
   description:
     This schema extension contains all you need to model the OSPF Routing
     Protocol.
-  name: OSPF
+  name: Routing OSPF
 extensions/routing_pim:
   dependencies:
     - base
     - extensions/routing
   description: This schema extension contains all you need to model the PIM Protocol.
-  name: PIM
+  name: Routing PIM
 extensions/routing_policies:
   dependencies:
     - base
-  description: |
-    This schema extension contains a generic to create Routing Policies.
-
-    This Generic can be extend for each Routing Protocols you may want to use.
+  description: This schema extension contains a generic to create Routing Policies. This Generic can be extend for each Routing Protocols you may want to use.
   name: Routing Policies
 extensions/routing_policies_aggregate:
   dependencies:
@@ -357,8 +359,8 @@ extensions/topology:
 extensions/users:
   dependencies:
     - base
-  description: This schema extension contains models for Accounts management.
-  name: Accounts Management
+  description: This schema extension contains models for account management.
+  name: Users
 extensions/vlan:
   dependencies:
     - base

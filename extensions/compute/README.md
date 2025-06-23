@@ -1,21 +1,18 @@
-# Compute
+## Compute
 
 With this schema extension in place you will be able to capture all your physical servers. It also gives you the baseline to build virtualization. You might consider HostingCluster extension to go with!
 
-Dependencies: `base`
-
-## compute
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### GenericUnit
+#### GenericUnit
 
 - **Description:** A generic unit that can compute (e.g. server, vm ...).
 - **Include in Menu:** ❌
 
-### HostVirtualMachine
+#### HostVirtualMachine
 
 - **Description:** A generic unit that can host VM
 - **Include in Menu:** ❌
@@ -26,29 +23,29 @@ Dependencies: `base`
 | ---- | ----------- | ---- | ---- | -------- |
 | virtual\_machines | many | VirtualizationVirtualMachine | Component | True |
 
-## Nodes
+### Nodes
 
-### PhysicalServer
+#### PhysicalServer
 
 - **Description:** A physical server with fixed resources and specific hardware characteristics.
 - **Label:** Physical Server
 - **Icon:** mdi:server
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | order_weight | choices |
 | ---- | ---- | -------- | ------------ | ------- |
 | status | Dropdown | False | 1100 | \`active, provisioning, maintenance, drained\` |
 
-### VirtualMachine
+#### VirtualMachine
 
 - **Description:** A virtual machine hosted on a server or a cluster.
 - **Label:** Virtual Machine
 - **Icon:** carbon:virtual-machine
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | description | order_weight | choices |
 | ---- | ---- | -------- | ----------- | ------------ | ------- |

@@ -1,16 +1,13 @@
-# Cluster
+## Cluster
 
 This schema extension contains the foundations to capture clusters. With this one in place you can unlock various clusters flavors (hosting cluster able to host VMs, firewall clusters built with specific appliances ...)
 
-Dependencies: `base, extensions.compute`
-
-## cluster
-
+- **Dependencies:** `base, extensions/compute`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### Generic
+#### Generic
 
 - **Description:** A cluster of machines hosting services or other machines.
 - **Label:** Clusters
@@ -22,7 +19,7 @@ Dependencies: `base, extensions.compute`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | unique | order_weight | optional |
 | ---- | ---- | ----------- | ------ | ------------ | -------- |
@@ -36,7 +33,7 @@ Dependencies: `base, extensions.compute`
 | location | Location | LocationGeneric | False | many | Attribute | 1400 |
 | tags |  | BuiltinTag | True | many | Attribute | 2000 |
 
-### GenericComputeUnitNodes
+#### GenericComputeUnitNodes
 
 - **Description:** A generic to apply on clusters that can be built out of generic compute units.
 - **Include in Menu:** ❌
@@ -47,9 +44,9 @@ Dependencies: `base, extensions.compute`
 | ---- | ----- | ---------- | ----------- | ---- | ---- |
 | nodes | Nodes | worker\_in\_cluster | many | ComputeGenericUnit | Component |
 
-## Extensions
+### Extensions
 
-### ComputeGenericUnit
+#### ComputeGenericUnit
 
 #### Relationships
 
@@ -57,7 +54,7 @@ Dependencies: `base, extensions.compute`
 | ---- | ---------- | ----- | ---- | ----------- | ----------- | -------- |
 | worker\_in\_cluster | worker\_in\_cluster | Worker in cluster | ClusterGenericComputeUnitNodes | one | This device is a worker node of the specified cluster\. | True |
 
-### LocationGeneric
+#### LocationGeneric
 
 #### Relationships
 

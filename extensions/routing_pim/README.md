@@ -1,16 +1,13 @@
-# PIM
+## Routing PIM
 
 This schema extension contains all you need to model the PIM Protocol.
 
-Dependencies: `base, extensions.routing`
-
-## pim
-
+- **Dependencies:** `base, extensions/routing`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### PIM
+#### PIM
 
 - **Description:** Protocol Independent Multicast (PIM) instance on a Virtual Router.
 - **Label:** PIM
@@ -22,7 +19,7 @@ Dependencies: `base, extensions.routing`
 - **Order By:**vrf__name__value, device__name__value
 - **Uniqueness Constraints:**device + vrf
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | default_value | description | order_weight |
 | ---- | ---- | -------- | ------------- | ----------- | ------------ |
@@ -37,7 +34,7 @@ Dependencies: `base, extensions.routing`
 | rp\_address | IpamIPAddress | True | Rendezvous Point \(RP\) address for PIM\. | one | Attribute |  |  |
 | pim\_interfaces | RoutingPIMInterface | True |  | many | Component | PIM Interfaces | pim\_\_piminterfaces |
 
-### PIMInterface
+#### PIMInterface
 
 - **Description:** Interface configuration for PIM.
 - **Label:** PIM Interface
@@ -49,18 +46,18 @@ Dependencies: `base, extensions.routing`
 - **Order By:**description__value
 - **Uniqueness Constraints:**pim + interface
 
-#### Attributes
+##### Attributes
 
-| name | kind | optional | description | order_weight | choices | default_value |
-| ---- | ---- | -------- | ----------- | ------------ | ------- | ------------- |
-| description | Text | False | Description of the OSPF interface\. | 1100 | \`\` |  |
-| pim\_mode | Dropdown |  | PIM mode used for multicast routing on this interface\. | 1150 | \`sparse, dense, bidirectional\` |  |
-| hello\_interval | Number | True | Interval for PIM hello messages \(in seconds\)\. | 1300 | \`\` | 30 |
-| dr\_priority | Number | True | Designated Router priority on the interface\. | 1250 | \`\` | 1 |
+| name | kind | optional | unique | description | order_weight | choices | default_value |
+| ---- | ---- | -------- | ------ | ----------- | ------------ | ------- | ------------- |
+| description | Text | False | True | Description of the OSPF interface\. | 1100 | \`\` |  |
+| pim\_mode | Dropdown |  |  | PIM mode used for multicast routing on this interface\. | 1150 | \`sparse, dense, bidirectional\` |  |
+| hello\_interval | Number | True |  | Interval for PIM hello messages \(in seconds\)\. | 1300 | \`\` | 30 |
+| dr\_priority | Number | True |  | Designated Router priority on the interface\. | 1250 | \`\` | 1 |
 
 #### Relationships
 
 | name | label | peer | identifier | optional | cardinality | kind | order_weight |
 | ---- | ----- | ---- | ---------- | -------- | ----------- | ---- | ------------ |
 | pim | PIM | RoutingPIM | pim\_\_piminterfaces | False | one | Parent |  |
-| interface |  | DcimInterfaceL3 |  | False | one | Attribute | 1200 |
+| interface |  | InterfaceLayer3 |  | False | one | Attribute | 1200 |

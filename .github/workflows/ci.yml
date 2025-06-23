@@ -171,6 +171,9 @@ jobs:
         run: npm install
       - name: "Setup Python environment"
         run: "pip install invoke toml"
+      - name: "Create schema docs"
+        run: "invoke schemas.build"
+        working-directory: ./
       - name: "Build docs website"
         run: "invoke docusaurus.docs"
 

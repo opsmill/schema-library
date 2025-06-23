@@ -1,51 +1,48 @@
-# Location Extended
+## Location Extended
 
 This schema extension is the most detailed when it comes to location, you'll find all the layers you can think of.
 
-Dependencies: `base`
-
-## location_extended
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### Continent
+#### Continent
 
 - **Label:** Continent
 - **Icon:** jam:world
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-### Country
+#### Country
 
 - **Label:** Country
 - **Icon:** gis:search-country
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-### Region
+#### Region
 
 - **Label:** Region
 - **Icon:** carbon:cics-region-target
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-### Metro
+#### Metro
 
 - **Label:** Metro
 - **Icon:** healthicons:city
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-### Building
+#### Building
 
 - **Label:** Building
 - **Icon:** ri:building-line
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional | order_weight |
 | ---- | ---- | ------ | -------- | ------------ |
@@ -58,21 +55,21 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | owner | OrganizationGeneric | True | one |
 
-### Floor
+#### Floor
 
 - **Label:** Floor
 - **Icon:** mdi:home-floor-0
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-### Suite
+#### Suite
 
 - **Label:** Suite
 - **Icon:** game-icons:cage
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional | order_weight |
 | ---- | ---- | ------ | -------- | ------------ |
@@ -84,14 +81,14 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | owner | OrganizationGeneric | True | one |
 
-### Rack
+#### Rack
 
 - **Label:** Rack
 - **Icon:** clarity:rack-server-line
 - **Menu Placement:** LocationGeneric
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional | order_weight |
 | ---- | ---- | ------ | -------- | ------------ |
@@ -103,9 +100,9 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | owner | OrganizationGeneric | True | one |
 
-## Extensions
+### Extensions
 
-### OrganizationProvider
+#### OrganizationProvider
 
 #### Relationships
 

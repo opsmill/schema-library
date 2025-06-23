@@ -1,16 +1,13 @@
-# VRRP
+## VRRP
 
 This schema extension contains models for VRRP.
 
-Dependencies: `base, base.dcim, base.ipam`
-
-## vrrp
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### VRRPGroup
+#### VRRPGroup
 
 - **Description:** VRRP Group configuration
 - **Label:** VRRP Group
@@ -22,7 +19,7 @@ Dependencies: `base, base.dcim, base.ipam`
 - **Order By:**name__value
 - **Uniqueness Constraints:**name__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | unique | description | order_weight | optional |
 | ---- | ---- | ----- | ------ | ----------- | ------------ | -------- |
@@ -37,7 +34,7 @@ Dependencies: `base, base.dcim, base.ipam`
 | ip\_address | cascade | VRRP IP \(v4 or v6\) | IP Address | IpamIPAddress | True | many | Attribute | 1200 |
 | vrrp\_interfaces | cascade |  | VRRP Interfaces | NetworkVRRPInterface |  | many | Component | 1300 |
 
-### VRRPInterface
+#### VRRPInterface
 
 - **Description:** VRRP Interface configuration
 - **Label:** VRRP Interface
@@ -50,7 +47,7 @@ Dependencies: `base, base.dcim, base.ipam`
 - **Order By:**priority__value
 - **Uniqueness Constraints:**vrrp_group + interface
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | description | regex | default_value | order_weight |
 | ---- | ---- | ----- | ----------- | ----- | ------------- | ------------ |
@@ -61,11 +58,11 @@ Dependencies: `base, base.dcim, base.ipam`
 | name | description | label | peer | optional | cardinality | kind | order_weight |
 | ---- | ----------- | ----- | ---- | -------- | ----------- | ---- | ------------ |
 | vrrp\_group | VRRP Group | VRRP Group | NetworkVRRPGroup | False | one | Attribute | 1200 |
-| interface | Interface L3 | Interface | DcimInterfaceL3 | False | one | Attribute | 1300 |
+| interface | Interface L3 | Interface | InterfaceLayer3 | False | one | Attribute | 1300 |
 
-## Extensions
+### Extensions
 
-### DcimInterfaceL3
+#### InterfaceLayer3
 
 #### Relationships
 
@@ -73,7 +70,7 @@ Dependencies: `base, base.dcim, base.ipam`
 | ---- | ---- | ---- | ----------- | ----------- | ----- | ------------ |
 | vrrp | Component | NetworkVRRPInterface | VRRP Interface Configuration | one | VRRP | 1500 |
 
-### IpamIPAddress
+#### IpamIPAddress
 
 #### Relationships
 

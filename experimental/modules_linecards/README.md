@@ -1,16 +1,13 @@
-# Linecards
+## Modules Linecards
 
 This schema extension allows you to capture Linecard related information like the version. You can insert the Linecard into a Dcim Physical Device and leverage the Linecard type model. The Linecard can accept PIC to help configure PORT information like breakout-capabilities and configurations.
 
-Dependencies: `base, extensions.modules`
-
-## linecard
-
+- **Dependencies:** `base, extensions/modules`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### LinecardType
+#### LinecardType
 
 - **Description:** Linecard Type information, detailing specifications such as part number and manufacturer.
 - **Label:** Linecard Type
@@ -20,9 +17,9 @@ Dependencies: `base, extensions.modules`
 
 | name | peer | cardinality | kind | description |
 | ---- | ---- | ----------- | ---- | ----------- |
-| linecards | InfraLinecard | many | Generic | Linecards of this type\. |
+| linecards | DeviceLinecard | many | Generic | Linecards of this type\. |
 
-### Linecard
+#### Linecard
 
 - **Description:** A Linecard installed in a device, specifying slot, power status, and functionalities.
 - **Label:** Linecard
@@ -34,7 +31,7 @@ Dependencies: `base, extensions.modules`
 - **Order By:**device__name__value, slot__value
 - **Uniqueness Constraints:**serial_number__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | label | optional | default_value |
 | ---- | ---- | ----------- | ------------ | ----- | -------- | ------------- |
@@ -48,7 +45,7 @@ Dependencies: `base, extensions.modules`
 | linecard\_type | Linecard Type | DeviceLinecardType | False | one | Attribute | 1150 |
 | pics | PICs | DevicePic | True | many | Attribute | 1500 |
 
-### Pic
+#### Pic
 
 - **Description:** Physical Interface Card (PIC) installed in the Linecard, containing multiple ports.
 - **Label:** PIC
@@ -59,7 +56,7 @@ Dependencies: `base, extensions.modules`
 - **Order By:**linecard__serial_number__value, slot__value
 - **Uniqueness Constraints:**linecard + slot__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight |
 | ---- | ---- | ----------- | ------------ |
@@ -72,7 +69,7 @@ Dependencies: `base, extensions.modules`
 | linecard | Linecard | DeviceLinecard | linecard\_\_pics | False | one | Parent | 1000 |
 | ports | Ports | InfraPort |  | True | many | Component | 1100 |
 
-### Port
+#### Port
 
 - **Description:** A network port on a PIC, specifying speed and port number.
 - **Label:** Port
@@ -83,7 +80,7 @@ Dependencies: `base, extensions.modules`
 - **Order By:**pic__slot__value, port_number__value
 - **Uniqueness Constraints:**pic + port_number__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | choices |
 | ---- | ---- | ----------- | ------------ | ------- |

@@ -1,25 +1,22 @@
-# Routing Policies OSPF
+## Routing Policies OSPF
 
 This extension is using the Routing Policies extensions and the Routing OSPF one together.
 
-Dependencies: `base, extensions.routing, extensions.routing_policies, extensions.routing_ospf`
-
-## routing_policies_ospf
-
+- **Dependencies:** `base, extensions/routing, extensions/routing_policies, extensions/routing_ospf`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### PolicyOSPF
+#### PolicyOSPF
 
 - **Description:** A routing policiers for OSPF
 - **Label:** OSPF Routing Policies
 - **Icon:** carbon:deployment-policy
 - **Include in Menu:** ❌
 
-## Extensions
+### Extensions
 
-### RoutingOSPF
+#### RoutingOSPF
 
 #### Attributes
 

@@ -1,16 +1,13 @@
-# VRF
+## VRF
 
 This schema extension contains models to support VRF in your network.
 
-Dependencies: `base`
-
-## vrf
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Nodes
+### Nodes
 
-### VRF
+#### VRF
 
 - **Description:** A VRF is isolated layer three domain
 - **Label:** VRF
@@ -22,7 +19,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | unique | label | order_weight |
 | ---- | ---- | -------- | ------ | ----- | ------------ |
@@ -38,7 +35,7 @@ Dependencies: `base`
 | import\_rt | IpamRouteTarget | True | one | Attribute | vrf\_\_import | Import Targets |
 | export\_rt | IpamRouteTarget | True | one | Attribute | vrf\_\_export | Export Targets |
 
-### RouteTarget
+#### RouteTarget
 
 - **Description:** Route Target (RFC 4360)
 - **Label:** Route Target
@@ -51,7 +48,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional |
 | ---- | ---- | ------ | -------- |
@@ -64,9 +61,9 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- |
 | vrf | IpamVRF | True | many |
 
-## Extensions
+### Extensions
 
-### IpamPrefix
+#### IpamPrefix
 
 #### Relationships
 
@@ -74,7 +71,7 @@ Dependencies: `base`
 | ---- | ----- | ---- | -------- | ----------- | ---- | ------------ |
 | vrf | VRF | IpamVRF | True | one | Attribute | 1150 |
 
-### IpamIPAddress
+#### IpamIPAddress
 
 #### Relationships
 

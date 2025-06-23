@@ -1,16 +1,13 @@
-# Security
+## Security
 
 This schema extension contains models for implementing detailed security.
 
-Dependencies: `base`
-
-## security
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### PolicyAssignment
+#### PolicyAssignment
 
 - **Label:** Security Policy
 - **Include in Menu:** ❌
@@ -21,11 +18,11 @@ Dependencies: `base`
 | ---- | ----- | ---- | ---- | ----------- | -------- |
 | rules | Policy | SecurityRenderedPolicyRule | Component | many | True |
 
-### GenericAddressGroup
+#### GenericAddressGroup
 
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | label | optional | unique |
 | ---- | ---- | ----- | -------- | ------ |
@@ -38,11 +35,11 @@ Dependencies: `base`
 | ---- | ---- | ----------- | ---- | -------- |
 | addresses | SecurityGenericAddress | many | Component | True |
 
-### GenericAddress
+#### GenericAddress
 
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | unique |
 | ---- | ---- | -------- | ------ |
@@ -54,11 +51,11 @@ Dependencies: `base`
 | ---- | ----- | ---- | ----------- | -------- |
 | address\_groups | Address Groups | SecurityGenericAddressGroup | many | True |
 
-### GenericServiceGroup
+#### GenericServiceGroup
 
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional |
 | ---- | ----- | ---- | -------- |
@@ -71,11 +68,11 @@ Dependencies: `base`
 | ---- | ---- | ----- | ----------- | ---- | -------- |
 | services | SecurityGenericService | Services | many | Component | True |
 
-### GenericService
+#### GenericService
 
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional |
 | ---- | ----- | ---- | -------- |
@@ -88,9 +85,9 @@ Dependencies: `base`
 | ---- | ----- | ---- | ----------- | -------- |
 | service\_groups | Service Groups | SecurityGenericServiceGroup | many | True |
 
-## Nodes
+### Nodes
 
-### Zone
+#### Zone
 
 - **Description:** Security zones
 - **Label:** Security zone
@@ -98,7 +95,7 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | optional |
 | ---- | ---- | ------ | -------- |
@@ -110,7 +107,7 @@ Dependencies: `base`
 | ---- | ----- | ---- | -------- | ---- |
 | interfaces | Interfaces | Attribute | True | SecurityFirewallInterface |
 
-### IPAMIPAddress
+#### IPAMIPAddress
 
 - **Description:** Infrahub IPv4/6 address
 - **Label:** IPAM IP Address
@@ -118,7 +115,7 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional |
 | ---- | ---- | -------- |
@@ -130,7 +127,7 @@ Dependencies: `base`
 | ---- | ---- | ----------- | ---- | -------- |
 | ip\_address | InfraIPAddress | one | Attribute | False |
 
-### IPAMIPPrefix
+#### IPAMIPPrefix
 
 - **Description:** Infrahub IPv4/6 prefix
 - **Label:** IPAM IP Prefix
@@ -138,7 +135,7 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional |
 | ---- | ---- | -------- |
@@ -150,7 +147,7 @@ Dependencies: `base`
 | ---- | ---- | ----------- | ---- | -------- |
 | ip\_prefix | InfraPrefix | one | Attribute | False |
 
-### IPAddress
+#### IPAddress
 
 - **Description:** IPv4/6 address
 - **Label:** IP Address
@@ -163,14 +160,14 @@ Dependencies: `base`
 - **Order By:**address__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional |
 | ---- | ---- | -------- |
 | address | IPHost |  |
 | description | Text | True |
 
-### Prefix
+#### Prefix
 
 - **Description:** IPv4/6 prefix
 - **Label:** Prefix
@@ -183,14 +180,14 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | unique |
 | ---- | ---- | -------- | ------ |
 | prefix | IPNetwork | False | True |
 | description | Text | True |  |
 
-### IPRange
+#### IPRange
 
 - **Description:** IPv4/6 Range
 - **Label:** IP Range
@@ -203,14 +200,14 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional |
 | ---- | ----- | ---- | -------- |
 | start | Start IP Address | IPHost | False |
 | end | End IP Address | IPHost | False |
 
-### FQDN
+#### FQDN
 
 - **Description:** Full Qualified Domain Name
 - **Label:** FQDN
@@ -223,13 +220,13 @@ Dependencies: `base`
 - **Order By:**name__value, fqdn__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | regex |
 | ---- | ----- | ---- | -------- | ----- |
 | fqdn | FQDN | Text | False | \(?=^\.{1,253}\$\)\(^\(\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\)\|\(\(?\!\-\)\[a\-zA\-Z0\-9\-\]{1,63}\(?\<\!\-\)\\.\)\+\[a\-zA\-Z\]{2,63}\)\$\) |
 
-### AddressGroup
+#### AddressGroup
 
 - **Description:** Group of addresses
 - **Label:** Address Group
@@ -237,7 +234,7 @@ Dependencies: `base`
 - **Menu Placement:** SecurityPolicy
 - **Include in Menu:** ✅
 
-### IPProtocol
+#### IPProtocol
 
 - **Description:** IP protocol
 - **Label:** IP Protocols
@@ -250,13 +247,13 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional |
 | ---- | ---- | -------- |
 | protocol | Number | True |
 
-### Service
+#### Service
 
 - **Description:** Service
 - **Label:** Service
@@ -269,7 +266,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind |
 | ---- | ---- |
@@ -281,7 +278,7 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- |
 | ip\_protocol | SecurityIPProtocol | True | one | Attribute |
 
-### ServiceRange
+#### ServiceRange
 
 - **Description:** Service range
 - **Label:** Service range
@@ -294,7 +291,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional |
 | ---- | ---- | -------- |
@@ -307,7 +304,7 @@ Dependencies: `base`
 | ---- | ---- | -------- | ----------- | ---- |
 | ip\_protocol | SecurityIPProtocol | False | one | Attribute |
 
-### ServiceGroup
+#### ServiceGroup
 
 - **Description:** Group of services
 - **Label:** Service group
@@ -320,7 +317,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-### Policy
+#### Policy
 
 - **Label:** Security Policy
 - **Include in Menu:** ❌
@@ -330,7 +327,7 @@ Dependencies: `base`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional |
 | ---- | ----- | ---- | -------- |
@@ -345,7 +342,7 @@ Dependencies: `base`
 | location\_target | LocationGeneric | one | Attribute | True |
 | device\_target | SecurityFirewall | one | Attribute | True |
 
-### PolicyRule
+#### PolicyRule
 
 - **Description:** Policy rule
 - **Label:** Policy rule
@@ -358,7 +355,7 @@ Dependencies: `base`
 - **Order By:**source_zone__name__value, destination_zone__name__value, index__value
 - **Uniqueness Constraints:**index__value + source_zone + destination_zone + policy
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | order_weight | enum | default_value |
 | ---- | ----- | ---- | -------- | ------------ | ---- | ------------- |
@@ -383,13 +380,13 @@ Dependencies: `base`
 | destination\_services | SecurityGenericService | Attribute | many | True |  | policy\_rule\_\_destination\_service |
 | destination\_service\_groups | SecurityGenericServiceGroup | Attribute | many | True |  | policy\_rule\_\_destination\_service\_group |
 
-### Firewall
+#### Firewall
 
 - **Icon:** mdi:firewall
 - **Menu Placement:** InfraGenericDevice
 - **Include in Menu:** ✅
 
-#### Attributes
+##### Attributes
 
 | name | kind | optional | choices |
 | ---- | ---- | -------- | ------- |
@@ -401,7 +398,7 @@ Dependencies: `base`
 | ---- | ---- | ----- | ----------- | ---- |
 | policy | SecurityPolicy | Security Policy | one | Attribute |
 
-### RenderedPolicyRule
+#### RenderedPolicyRule
 
 - **Description:** Policy rule
 - **Label:** Policy rule
@@ -412,7 +409,7 @@ Dependencies: `base`
 - **Order By:**source_zone__name__value, destination_zone__name__value, index__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | label | kind | optional | order_weight | enum | default_value |
 | ---- | ----- | ---- | -------- | ------------ | ---- | ------------- |
@@ -437,7 +434,7 @@ Dependencies: `base`
 | destination\_services | SecurityGenericService | Attribute | many | True | rendered\_policy\_rule\_\_destination\_service |  |
 | destination\_service\_groups | SecurityGenericServiceGroup | Attribute | many | True | rendered\_policy\_rule\_\_destination\_service\_group |  |
 
-### FirewallInterface
+#### FirewallInterface
 
 - **Label:** Firewall Interface
 - **Icon:** mdi:ethernet
@@ -451,9 +448,9 @@ Dependencies: `base`
 | ip\_addresses | InfraIPAddress | True | many | Component |
 | security\_zone | SecurityZone | False | one | Attribute |
 
-## Extensions
+### Extensions
 
-### LocationGeneric
+#### LocationGeneric
 
 #### Relationships
 

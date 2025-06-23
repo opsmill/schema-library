@@ -1,24 +1,22 @@
-# Patch Panel
+## Patch Panel
 
 This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture information about potential modules you would insert into your patch panel.
 
-> [!NOTE]
-> This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
+NOTE: This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
 
-## patch_panel
-
+- **Dependencies:** `base`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### GenericPatchPanelInterface
+#### GenericPatchPanelInterface
 
 - **Label:** Patch Panel Interfaces
 - **Icon:** mdi:ethernet
 - **Menu Placement:** DcimPatchPanel
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional | choices |
 | ---- | ---- | ------------ | -------- | ------- |
@@ -26,9 +24,9 @@ This schema extension allows you to capture patch panel related information like
 | description | Text | 2000 | True | \`\` |
 | connector\_type | Dropdown | 1100 |  | \`FC, LC, LC\_PC, LC\_UPC, LC\_APC, LSH, LSH\_PC, LSH\_UPC, LSH\_APC, LX\_5, LX\_5\_PC, LX\_5\_UPC, LX\_5\_APC, MPO, MTRJ, SC, SC\_PC, SC\_UPC, SC\_APC, ST, CS, SN, SMA\_905, SMA\_906, URM\_P2\` |
 
-## Nodes
+### Nodes
 
-### PatchPanel
+#### PatchPanel
 
 - **Description:** A Patch Panel used for managing network cable connections in a data center or telecom setup.
 - **Label:** Patch Panel
@@ -40,7 +38,7 @@ This schema extension allows you to capture patch panel related information like
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
 | name | kind | unique | order_weight | label | optional | description |
 | ---- | ---- | ------ | ------------ | ----- | -------- | ----------- |
@@ -56,7 +54,7 @@ This schema extension allows you to capture patch panel related information like
 | rear\_interfaces | DcimRearPatchPanelInterface | rear\_interfaces | True | many | Component |
 | modules | DcimPatchPanelModule |  | True | many | Component |
 
-### FrontPatchPanelInterface
+#### FrontPatchPanelInterface
 
 - **Label:** Patch Panel Front Interfaces
 - **Menu Placement:** DcimGenericPatchPanelInterface
@@ -74,7 +72,7 @@ This schema extension allows you to capture patch panel related information like
 | corresponding\_front\_rear | Corresponding rear interface | DcimRearPatchPanelInterface | 1200 | True | one | Attribute |  |
 | patch\_panel |  | DcimPatchPanel | 900 | False | one | Parent | front\_interfaces |
 
-### RearPatchPanelInterface
+#### RearPatchPanelInterface
 
 - **Label:** Patch Panel Rear Interfaces
 - **Menu Placement:** DcimGenericPatchPanelInterface
@@ -92,7 +90,7 @@ This schema extension allows you to capture patch panel related information like
 | corresponding\_front\_rear | Corresponding front interfaces | DcimFrontPatchPanelInterface | 1200 | True | many | Attribute |  |
 | patch\_panel |  | DcimPatchPanel | 900 | False | one | Parent | rear\_interfaces |
 
-### PatchPanelModule
+#### PatchPanelModule
 
 - **Label:** Patch Panel Module
 - **Icon:** mdi:expansion-card
@@ -104,7 +102,7 @@ This schema extension allows you to capture patch panel related information like
 - **Order By:**patch_panel__name__value, position__value
 - **Uniqueness Constraints:**patch_panel + position__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | description | label | optional | choices |
 | ---- | ---- | ------------ | ----------- | ----- | -------- | ------- |

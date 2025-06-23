@@ -1,28 +1,25 @@
-# Routing
+## Routing
 
 This schema extension contains generics to create Routing Protocol "Instance". The idea is to create one Routing Protocol instance per IpamVRF + DcimDevice pair.
 
-Dependencies: `base, extensions.vlan`
-
-## routing
-
+- **Dependencies:** `base, extensions/vlan`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### Protocol
+#### Protocol
 
 - **Description:** Generic protocol model for routing protocols
 - **Label:** Protocol
 - **Icon:** carbon:router
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
-| name | kind | optional | description | order_weight | choices |
-| ---- | ---- | -------- | ----------- | ------------ | ------- |
-| description | Text | False | Description of the protocol | 1100 | \`\` |
-| status | Dropdown |  | Status of the Protocol Configuration\. | 1150 | \`active, disabled, deleted\` |
+| name | kind | optional | unique | description | order_weight | choices |
+| ---- | ---- | -------- | ------ | ----------- | ------------ | ------- |
+| description | Text | False | True | Description of the protocol | 1100 | \`\` |
+| status | Dropdown |  |  | Status of the Protocol Configuration\. | 1150 | \`active, disabled, deleted\` |
 
 #### Relationships
 

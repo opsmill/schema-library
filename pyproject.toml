@@ -16,6 +16,7 @@ yamllint = "^1.35.1"
 mypy = "^1.14.1"
 pylint = "^3.3.4"
 vale = "^3.9.4.0"
+types-pyyaml = "^6.0.12.20250516"
 
 [tool.pylint.messages_control]
 # Line length is enforced by Black, so pylint doesn't need to check it.

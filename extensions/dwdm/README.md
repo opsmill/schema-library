@@ -1,23 +1,20 @@
-# DWDM
+## DWDM
 
 This schema extension contains models for OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies such as DWDM (Dense Wavelength Division Multiplexing) or CWDM (Coarse Wavelength Division Multiplexing). With some vendors, the tunable optics are not configured via the channel number but via the wavelength and/or the frequency. This model provides a unique entry in Infrahub for those.
 
-Dependencies: `base, extensions.sfp`
-
-## dwdm
-
+- **Dependencies:** `base, extensions/sfp`
 - **Version:** 1.0
 
-## Generics
+### Generics
 
-### GenericOadmInterface
+#### GenericOadmInterface
 
 - **Label:** Optical Multiplexer Interfaces
 - **Icon:** mdi:ethernet
 - **Menu Placement:** DcimOpticalMultiplexer
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | order_weight | optional | choices |
 | ---- | ---- | ------------ | -------- | ------- |
@@ -25,9 +22,9 @@ Dependencies: `base, extensions.sfp`
 | description | Text | 2000 | True | \`\` |
 | connector\_type | Dropdown | 1100 |  | \`FC, LC, LC\_PC, LC\_UPC, LC\_APC, LSH, LSH\_PC, LSH\_UPC, LSH\_APC, LX\_5, LX\_5\_PC, LX\_5\_UPC, LX\_5\_APC, MPO, MTRJ, SC, SC\_PC, SC\_UPC, SC\_APC, ST, CS, SN, SMA\_905, SMA\_906, URM\_P2\` |
 
-## Nodes
+### Nodes
 
-### OpticalMultiplexer
+#### OpticalMultiplexer
 
 - **Description:** An OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies.
 - **Label:** Optical Multiplexer
@@ -39,13 +36,13 @@ Dependencies: `base, extensions.sfp`
 - **Order By:**name__value
 - **Uniqueness Constraints:**
 
-#### Attributes
+##### Attributes
 
-| name | kind | order_weight | description | optional | choices | default_value |
-| ---- | ---- | ------------ | ----------- | -------- | ------- | ------------- |
-| name | Text | 1000 |  |  | \`\` |  |
-| wdm\_type | Dropdown | 1110 | Type of WDM \(e\.g CWDM\. DWDM\) | False | \`cwdm, dwdm\` | dwdm |
-| description | Text | 2000 |  | True | \`\` |  |
+| name | kind | unique | order_weight | description | optional | choices | default_value |
+| ---- | ---- | ------ | ------------ | ----------- | -------- | ------- | ------------- |
+| name | Text | True | 1000 |  |  | \`\` |  |
+| wdm\_type | Dropdown |  | 1110 | Type of WDM \(e\.g CWDM\. DWDM\) | False | \`cwdm, dwdm\` | dwdm |
+| description | Text |  | 2000 |  | True | \`\` |  |
 
 #### Relationships
 
@@ -54,7 +51,7 @@ Dependencies: `base, extensions.sfp`
 | front\_interfaces | DcimOadmFrontInterface | front\_interfaces | True | many | Component |
 | rear\_interface | DcimOadmRearInterface | rear\_interfaces | True | one | Component |
 
-### OadmFrontInterface
+#### OadmFrontInterface
 
 - **Label:** Optical Multiplexer Front Interfaces
 - **Menu Placement:** DcimGenericOadmInterface
@@ -72,7 +69,7 @@ Dependencies: `base, extensions.sfp`
 | optical\_multiplexer | DcimOpticalMultiplexer | 900 | front\_interfaces | False | one | Parent |
 | channels | DcimWdmChannel | 1200 |  | True | many | Attribute |
 
-### OadmRearInterface
+#### OadmRearInterface
 
 - **Label:** Optical Multiplexer Rear Interfaces
 - **Menu Placement:** DcimGenericOadmInterface
@@ -89,7 +86,7 @@ Dependencies: `base, extensions.sfp`
 | ---- | ---- | ------------ | ---------- | -------- | ----------- | ---- |
 | optical\_multiplexer | DcimOpticalMultiplexer | 900 | rear\_interface | False | one | Parent |
 
-### WdmChannel
+#### WdmChannel
 
 - **Description:** A WDM channel with its wavelength and frequency.
 - **Label:** WDM Channel
@@ -101,7 +98,7 @@ Dependencies: `base, extensions.sfp`
 - **Order By:**wdm_type__value, channel__value
 - **Uniqueness Constraints:**wdm_type__value + channel__value + wavelength__value + frequency__value, wdm_type__value + channel__value
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | optional | choices | default_value | label |
 | ---- | ---- | ----------- | ------------ | -------- | ------- | ------------- | ----- |
@@ -110,7 +107,7 @@ Dependencies: `base, extensions.sfp`
 | wavelength | Text | Wavelength of the channel in nm\. |  |  | \`\` |  | Wavelength \(nm\) |
 | frequency | Text | Frequency of the channel in GHz\. |  |  | \`\` |  | Frequency \(GHz\) |
 
-### WdmSFP
+#### WdmSFP
 
 - **Description:** SFP with configuration for Wavelength Division Multiplexing.
 - **Label:** WDM SFP
@@ -118,7 +115,7 @@ Dependencies: `base, extensions.sfp`
 - **Menu Placement:** DcimGenericSFP
 - **Include in Menu:** ❌
 
-#### Attributes
+##### Attributes
 
 | name | kind | description | order_weight | optional | choices | default_value |
 | ---- | ---- | ----------- | ------------ | -------- | ------- | ------------- |
