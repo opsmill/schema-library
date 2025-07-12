@@ -1,6 +1,7 @@
-from pathlib import Path
-import yaml  # type: ignore
 from collections import OrderedDict
+from pathlib import Path
+
+import yaml  # type: ignore
 from invoke import Context, task  # type: ignore
 
 CURRENT_DIRECTORY = Path(__file__).resolve()
