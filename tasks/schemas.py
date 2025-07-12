@@ -7,9 +7,6 @@ import yaml  # type: ignore
 from invoke import Context, task  # type: ignore
 
 # If no version is indicated, we will take the latest
-VERSION = os.getenv("INFRAHUB_VERSION", None)
-DOCKER_PROJECT = os.getenv("INFRAHUB_BUILD_NAME", "schema-library-ci")
-COMPOSE_COMMAND = f"curl https://infrahub.opsmill.io/{VERSION if VERSION else ''} | sed 's/8000:8000/0:8000/' | docker compose -p {DOCKER_PROJECT} -f -"  # noqa: line-too-long
 CURRENT_DIRECTORY = Path(__file__).parent.resolve()
 MAIN_DIRECTORY_PATH = Path(__file__).parent
 DOCUMENTATION_DIRECTORY = CURRENT_DIRECTORY.parent.resolve() / "docs"

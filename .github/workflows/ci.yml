@@ -119,7 +119,7 @@ jobs:
       - name: "Set environment variable INFRAHUB_BUILD_NAME"
         run: echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
       - name: Initialize Infrahub
-        run: invoke schemas.start
+        run: invoke start
       - name: Set infrahub address
         run: |
           PORT=$(docker compose -p $INFRAHUB_BUILD_NAME port infrahub-server 8000 | cut -d: -f2)
