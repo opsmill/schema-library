@@ -1,21 +1,26 @@
 ---
 # yamllint disable rule:line-length
 base/dcim:
-  description:
-    Basic DCIM schema to capture devices, racks, interfaces, and related information.
+  description: Basic DCIM schema to capture devices, racks, interfaces, and related information.
   name: DCIM
 base/ipam:
-  description:
-    Basic IPAM schema to capture IP addresses, subnets, and related information.
+  description: Basic IPAM schema to capture IP addresses, subnets, and related information.
   name: IPAM
 base/location:
-  description:
-    Basic Location schema to capture locations, sites, and related information.
+  description: Basic Location schema to capture locations, sites, and related information.
   name: Locations
 base/organization:
-  description:
-    Basic Organization schema to capture organizations, vendors, and related information.
+  description: Basic Organization schema to capture organizations, vendors, and related information.
   name: Organization
+extensions/circuit:
+  dependencies:
+    - base
+    - extensions/location_minimal
+  description:
+    This schema extension contains Circuits and ways to connect them with
+    your infrastructure! The circuit could be a fiber connecting two sites, you would
+    then have two endpoints, one on each site.
+  name: Circuit
 experimental/azure:
   attribution: "[Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)"
   dependencies:
@@ -103,15 +108,6 @@ extensions/cable:
     This schema extension contains a basic Cable model allowing you to
     connect two endpoints.
   name: Cable
-extensions/circuit:
-  dependencies:
-    - base
-    - extensions/location_minimal
-  description:
-    This schema extension contains Circuits and ways to connect them with
-    your infrastructure! The circuit could be a fiber connecting two sites, you would
-    then have two endpoints, one on each site.
-  name: Circuit
 extensions/cluster:
   dependencies:
     - base
@@ -211,8 +207,7 @@ extensions/peering_ixp:
     - extensions/routing
     - extensions/routing_bgp
     - extensions/routing_bgp_community
-  description:
-    This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)!
+  description: This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)!
   name: Peering IXP
 extensions/physical_disk:
   dependencies:
@@ -226,8 +221,7 @@ extensions/qinq:
   dependencies:
     - base
     - extensions/vlan
-  description:
-    This schema extension brings extensions to VLAN model in order to support QinQ.
+  description: This schema extension brings extensions to VLAN model in order to support QinQ.
   name: QinQ
 extensions/routing:
   dependencies:
