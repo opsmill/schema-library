@@ -1,0 +1,238 @@
+---
+title: Schema Library
+---
+
+Welcome to the Schema Library for Infrahub! This repository offers a collection of schemas designed to streamline and standardize infrastructure-related data structures.
+
+:::warning
+
+This project is currently a collection of examples intended to serve as inspiration. Please note that it is in an experimental phase and may undergo significant changes.
+
+:::
+
+## Use case
+
+Infrahub comes without schemas out of the box. However, we don't want you to reinvent the wheel. You can use the schema library to scaffold your own schemas, allowing you to focus development on parts specific to your organization.
+
+You can also use the schemas in this repository as references or examples to craft your own.
+
+## Getting started
+
+#### Clone the repository
+
+```bash
+git clone https://github.com/opsmill/schema-library.git
+cd schema-library
+```
+
+:::note
+
+One of Infrahub's key strengths is its flexibility. We encourage you to copy any schemas you find useful into your own repository and tailor them to your specific needs, ensuring your schema aligns perfectly with your requirements.
+
+:::
+
+### How to load schemas
+
+There are two main ways to load schemas into Infrahub, depending on where you are in your Infrahub journey:
+- **Quick View**: To quickly view a schema, you can use `infrahubctl`. Please reference the [`infrahubctl` Guide](https://docs.infrahub.app/infrahubctl) for further instructions.
+- **Controlled Integration**: For a more organized and unified approach, you can connect a Git repository. Follow [this guide](https://docs.infrahub.app/guides/repository) to connect a Git repository.
+
+:::note
+
+For proof of concept or development purposes, using `infrahubctl` is the preferred approach. When running Infrahub in production, you might need the extra control provided by Git integration to load schemas.
+
+:::
+
+### Load schemas
+
+:::important
+
+You need to load the `base` schema before loading any extensions. Extensions may have dependencies on each other, so you'll need to load them in the correct order.
+
+:::
+
+```bash
+# Load the base
+infrahubctl schema load base
+
+# Load an extension
+infrahubctl schema load extensions/location_minimal
+
+# Load another extension
+infrahubctl schema load extensions/vlan
+```
+
+You can find the list of extensions and corresponding documentation in the [reference page](reference/extensions).
+
+## Project structure
+
+This project is divided into three main parts:
+
+- **Base**: The foundational layer required for most extensions. It must be loaded before adding extensions.
+- **Extensions**: Generic schema components for managing infrastructure. Extensions may have dependencies on each other.
+- **Experimental**: Schema components that are not yet fully supported.
+
+```bash
+.
+├── base
+│   ├── dcim.yml
+│   ├── ipam.yml
+│   ├── location.yml
+│   ├── organization.yml
+│   └── README.md
+├── experimental
+│   ├── azure
+│   │   ├── azure.yml
+│   │   └── README.md
+│   ├── circuit_service
+│   │   ├── circuit_service.yml
+│   │   └── README.md
+│   ├── infiniband
+│   │   ├── infiniband.yml
+│   │   └── README.md
+│   ├── location_extended
+│   │   ├── location_extended.yml
+│   │   └── README.md
+│   ├── modules_linecards
+│   │   ├── linecard.yml
+│   │   └── README.md
+│   ├── modules_routing_engine
+│   │   ├── README.md
+│   │   └── routing_engine.yml
+│   ├── qos
+│   │   ├── qos.yml
+│   │   └── README.md
+│   ├── README.md
+│   ├── security
+│   │   ├── README.md
+│   │   └── security.yml
+│   ├── tenancy
+│   │   ├── README.md
+│   │   └── tenancy.yml
+│   ├── topology
+│   │   ├── README.md
+│   │   └── topology.yml
+│   └── vlan-translation
+│       ├── README.md
+│       └── vlan-translation.yml
+├── extensions
+│   ├── cable
+│   │   ├── cable.yml
+│   │   └── README.md
+│   ├── circuit
+│   │   ├── circuit.yml
+│   │   └── README.md
+│   ├── cluster
+│   │   ├── cluster.yml
+│   │   └── README.md
+│   ├── compute
+│   │   ├── compute.yml
+│   │   └── README.md
+│   ├── cross_connect
+│   │   ├── cross_connect.yml
+│   │   └── README.md
+│   ├── dwdm
+│   │   ├── dwdm.yml
+│   │   └── README.md
+│   ├── firewall_policer
+│   │   ├── firewall_policer.yml
+│   │   └── README.md
+│   ├── hosting_cluster
+│   │   ├── hosting_cluster.yml
+│   │   └── README.md
+│   ├── interface_breakout
+│   │   ├── interface_breakout.yml
+│   │   └── README.md
+│   ├── lag
+│   │   ├── lag.yml
+│   │   └── README.md
+│   ├── location_minimal
+│   │   ├── location_minimal.yml
+│   │   └── README.md
+│   ├── modules
+│   │   ├── modules.yml
+│   │   └── README.md
+│   ├── patch_panel
+│   │   ├── patch_panel.yml
+│   │   └── README.md
+│   ├── peering_ixp
+│   │   ├── peering_ixp.yml
+│   │   └── README.md
+│   ├── physical_disk
+│   │   ├── physical_disk.yml
+│   │   └── README.md
+│   ├── qinq
+│   │   ├── qinq.yaml
+│   │   └── README.md
+│   ├── routing
+│   │   ├── README.md
+│   │   └── routing.yml
+│   ├── routing_aggregate
+│   │   ├── aggregate.yml
+│   │   └── README.md
+│   ├── routing_bgp
+│   │   ├── bgp.yml
+│   │   └── README.md
+│   ├── routing_bgp_community
+│   │   ├── bgp_community.yml
+│   │   └── README.md
+│   ├── routing_bgp_rr
+│   │   ├── bgp_rr.yml
+│   │   └── README.md
+│   ├── routing_ospf
+│   │   ├── ospf.yml
+│   │   └── README.md
+│   ├── routing_pim
+│   │   ├── pim.yml
+│   │   └── README.md
+│   ├── routing_policies
+│   │   ├── README.md
+│   │   └── routing_policies.yml
+│   ├── routing_policies_aggregate
+│   │   ├── README.md
+│   │   └── routing_policies_aggregate.yml
+│   ├── routing_policies_bgp
+│   │   ├── README.md
+│   │   └── routing_policies_bgp.yml
+│   ├── routing_policies_ospf
+│   │   ├── README.md
+│   │   └── routing_policies_ospf.yml
+│   ├── routing_policies_pim
+│   │   ├── README.md
+│   │   └── routing_policies_pim.yml
+│   ├── sfp
+│   │   ├── README.md
+│   │   └── sfp.yml
+│   ├── snmp
+│   │   ├── README.md
+│   │   └── snmp.yml
+│   ├── topology
+│   │   ├── README.md
+│   │   └── topology.yml
+│   ├── users
+│   │   ├── README.md
+│   │   └── users.yml
+│   ├── vlan
+│   │   ├── README.md
+│   │   └── vlan.yml
+│   ├── vrf
+│   │   ├── README.md
+│   │   └── vrf.yml
+│   └── vrrp
+│       ├── README.md
+│       └── vrrp.yml
+```
+
+You can find the list of extensions and corresponding documentation in the [reference page](reference/extensions).
+
+## Troubleshooting
+
+- **`Unable to load the schema: xxx unable to find the generic yyy` - Missing requirements**
+
+This error indicates that the schema you are trying to load has dependencies on other schemas that are not present in your Infrahub instance.
+
+:::success
+
+To resolve this, ensure that you have loaded all required schemas before attempting to load the one in question. You can find the list of dependencies in the schema's documentation or in the [reference page](reference/extensions).
+
+:::
