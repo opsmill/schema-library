@@ -1,9 +1,16 @@
-import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
+import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
 const sidebars: SidebarsConfig = {
   schemaSidebar: [
-    'readme',
-    'schema-library',
+    'home',
+    {
+      type: 'category',
+      label: 'Reference',
+      collapsed: false,
+      items: [
+        'reference/extensions',
+      ],
+    },
     'contributing',
   ]
 };
