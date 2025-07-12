@@ -1,21 +1,15 @@
-import os
 import re
 import sys
 from collections import defaultdict
 from pathlib import Path
 
+import jinja2
 import yaml  # type: ignore
 from invoke import Context, task  # type: ignore
 
-# If no version is indicated, we will take the latest
-VERSION = os.getenv("INFRAHUB_VERSION", None)
-DOCKER_PROJECT = os.getenv("INFRAHUB_BUILD_NAME", "schema-library-ci")
 CURRENT_DIRECTORY = Path(__file__).parent.resolve()
-MAIN_DIRECTORY_PATH = Path(__file__).parent
 DOCUMENTATION_DIRECTORY = CURRENT_DIRECTORY.parent.resolve() / "docs"
 METADATA_FILE = CURRENT_DIRECTORY.parent / ".metadata.yml"
-# Flag if we need to test experimental section or not
-TEST_EXPERIMENTAL = os.getenv("TEST_EXPERIMENTAL", None)
 
 
 def _sanitize_description(desc):
@@ -107,7 +101,6 @@ def _generate_schema_reference_content(metadata) -> list[dict]:
 
 def _generate_extensions_reference_documentation() -> None:
     """Generate reference page for all extensions."""
-    import jinja2
 
     template_file = DOCUMENTATION_DIRECTORY / "_templates" / "reference.j2"
     output_file = DOCUMENTATION_DIRECTORY / "docs" / "reference" / "extensions.mdx"

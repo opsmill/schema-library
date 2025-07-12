@@ -6,11 +6,7 @@ from pathlib import Path
 import yaml  # type: ignore
 from invoke import Context, task  # type: ignore
 
-# If no version is indicated, we will take the latest
-CURRENT_DIRECTORY = Path(__file__).parent.resolve()
-MAIN_DIRECTORY_PATH = Path(__file__).parent
-DOCUMENTATION_DIRECTORY = CURRENT_DIRECTORY.parent.resolve() / "docs"
-METADATA_FILE = CURRENT_DIRECTORY.parent / ".metadata.yml"
+METADATA_FILE = Path(__file__).parent.resolve() / ".metadata.yml"
 # Flag if we need to test experimental section or not
 TEST_EXPERIMENTAL = os.getenv("TEST_EXPERIMENTAL", None)
 
