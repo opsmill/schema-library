@@ -15,7 +15,7 @@ ns.add_collection(Collection.from_module(schemas))
 ns.add_collection(Collection.from_module(docs))
 
 
-@task
+@task(name="start")
 def start(context: Context) -> None:
     """Start local instance of Infrahub for test purposes."""
     context.run(f"{COMPOSE_COMMAND} up -d --wait")
