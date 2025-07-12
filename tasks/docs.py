@@ -33,7 +33,7 @@ def _normalize_anchor(name: str) -> str:
     return anchor
 
 
-def _generate_toc_content(metadata) -> dict[list]:
+def _generate_toc_content(metadata) -> defaultdict[str, list]:
     """Based on the metadata, generate the Table of Content for the reference page."""
 
     result = defaultdict(list)
@@ -91,7 +91,7 @@ def _generate_schema_reference_content(metadata) -> list[dict]:
                 raise FileNotFoundError(
                     f"Expected exactly one .yml file in {extension_dir}, found {len(yml_files)}"
                 )
-            yml_file = str(yml_files[0])
+            yml_file = yml_files[0]  # TODO: Could be improved
 
         # Now load the schema file
         with open(yml_file, "r", encoding="utf-8") as f:
@@ -155,7 +155,7 @@ def install(context: Context) -> None:
     with context.cd(DOCUMENTATION_DIRECTORY):
         output = context.run(exec_cmd)
 
-    if output.exited != 0:
+    if output is None or output.exited != 0:
         sys.exit(-1)
 
 
@@ -167,7 +167,7 @@ def build(context: Context) -> None:
     with context.cd(DOCUMENTATION_DIRECTORY):
         output = context.run(exec_cmd)
 
-    if output.exited != 0:
+    if output is None or output.exited != 0:
         sys.exit(-1)
 
 
