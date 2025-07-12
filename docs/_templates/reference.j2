@@ -1,0 +1,128 @@
+{# ===================== MACROS ===================== #}
+{% macro render_entity_overview(entity) %}
+##### {{ entity.name }}
+
+{% if entity.label %}
+- **Label:** {{ entity.label }}
+{% endif %}
+{% if entity.description %}
+- **Description:** {{ entity.description }}
+{% endif %}
+{% if entity.namespace %}
+- **Namespace:** {{ entity.namespace }}
+{% endif %}
+{% if entity.icon %}
+- **Icon:** {{ entity.icon }}
+{% endif %}
+{% if entity.display_labels %}
+- **Display Labels:** {{ entity.display_labels|join(', ') }}
+{% endif %}
+{% if entity.uniqueness_constraints %}
+- **Uniqueness Constraints:**
+{% for constraint in entity.uniqueness_constraints %}
+    - {{ constraint|join(', ') }}
+{% endfor %}
+{% endif %}
+{% if entity.human_friendly_id %}
+- **Human Friendly ID:** {{ entity.human_friendly_id|join(', ') }}
+{% endif %}
+{% if entity.inherit_from %}
+- **Inherit From:** {{ entity.inherit_from|join(', ') }}
+{% endif %}
+{% endmacro %}
+{% macro render_attributes(attributes) %}
+{% if attributes %}
+###### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+{% for attr in attributes %}
+| {{ attr.name }} | {{ attr.description or "" }} | {{ attr.kind }} | {{ attr.optional }} | {{ attr.default_value|default("") }} | {% if attr.choices %}{{ attr.choices|map(attribute='name')|join(', ') }}{% endif %} |
+{% endfor %}
+{% endif %}
+{% endmacro %}
+{% macro render_relationships(relationships) %}
+{% if relationships %}
+###### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+{% for rel in relationships %}
+| {{ rel.name }} | {{ rel.peer }} | {{ rel.optional }} | {{ rel.cardinality }} | {{ rel.kind }} |
+{% endfor %}
+{% endif %}
+{% endmacro %}
+{# ===================== MACROS ===================== #}
+---
+title: Schema Library Extensions
+---
+
+This page is auto-generated from the content of the schema library. It serves as a reference for the available schema extensions.
+
+## Table of content
+{% for folder, extensions in toc.items() %}
+
+### {{ folder }}
+
+| Name | Description |
+|------|-------------|
+{% for extension in extensions %}
+{{ "| **[{}](#{})** | {} |".format(extension.name, extension.anchor, extension.description) }}
+{% endfor %}
+{% endfor %}
+
+## Schemas
+
+{% for schema in schemas %}
+### {{ schema.name }}
+
+{{ schema.description }}
+
+#### Details
+
+{% if schema.dependencies %}
+- **Dependencies:**
+{% for dep in schema.dependencies %}
+  - `{{ dep }}`
+{% endfor %}
+{% else %}
+- **Dependencies:** No dependencies
+{% endif %}
+{% if schema.attribution %}
+- **Attribution:** {{ schema.attribution }}
+{% endif %}
+
+{% if schema.nodes %}
+#### Nodes
+
+{% for node in schema.nodes %}
+{{ render_entity_overview(node) }}
+{{ render_attributes(node.attributes) }}
+{{ render_relationships(node.relationships) }}
+{% endfor %}
+{% endif %}
+{% if schema.generics %}
+#### Generics
+
+{% for generic in schema.generics %}
+{{ render_entity_overview(generic) }}
+{{ render_attributes(generic.attributes) }}
+{{ render_relationships(generic.relationships) }}
+{% endfor %}
+{% endif %}
+{% if schema.extensions and schema.extensions.nodes %}
+#### Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+{% for ext in schema.extensions.nodes %}
+##### {{ ext.kind }}
+{{ render_attributes(ext.attributes) }}
+{{ render_relationships(ext.relationships) }}
+{% endfor %}
+{% endif %}
+{% endfor %}
