@@ -8,7 +8,7 @@ import yaml  # type: ignore
 from invoke import Context, task  # type: ignore
 
 CURRENT_DIRECTORY = Path(__file__).parent.resolve()
-DOCUMENTATION_DIRECTORY = CURRENT_DIRECTORY.parent.resolve() / "docs"
+DOCUMENTATION_DIRECTORY = CURRENT_DIRECTORY.parent / "docs"
 METADATA_FILE = CURRENT_DIRECTORY.parent / ".metadata.yml"
 
 
