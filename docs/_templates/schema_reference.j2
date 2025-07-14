@@ -1,6 +1,6 @@
 {# ===================== MACROS ===================== #}
 {% macro render_entity_overview(entity) %}
-##### {{ entity.name }}
+### {{ entity.name }}
 
 {% if entity.label %}
 - **Label:** {{ entity.label }}
@@ -32,7 +32,7 @@
 {% endmacro %}
 {% macro render_attributes(attributes) %}
 {% if attributes %}
-###### Attributes
+#### Attributes
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
@@ -43,7 +43,7 @@
 {% endmacro %}
 {% macro render_relationships(relationships) %}
 {% if relationships %}
-###### Relationships
+#### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
@@ -54,31 +54,12 @@
 {% endmacro %}
 {# ===================== MACROS ===================== #}
 ---
-title: Schema Library Extensions
+title: {{ schema.name }}
 ---
-
-This page is auto-generated from the content of the schema library. It serves as a reference for the available schema extensions.
-
-## Table of content
-{% for folder, extensions in toc.items() %}
-
-### {{ folder }}
-
-| Name | Description |
-|------|-------------|
-{% for extension in extensions %}
-{{ "| **[{}](#{})** | {} |".format(extension.name, extension.anchor, extension.description) }}
-{% endfor %}
-{% endfor %}
-
-## Schemas
-
-{% for schema in schemas %}
-### {{ schema.name }}
 
 {{ schema.description }}
 
-#### Details
+## Details
 
 {% if schema.dependencies %}
 - **Dependencies:**
@@ -93,7 +74,7 @@ This page is auto-generated from the content of the schema library. It serves as
 {% endif %}
 
 {% if schema.nodes %}
-#### Nodes
+## Nodes
 
 {% for node in schema.nodes %}
 {{ render_entity_overview(node) }}
@@ -102,7 +83,7 @@ This page is auto-generated from the content of the schema library. It serves as
 {% endfor %}
 {% endif %}
 {% if schema.generics %}
-#### Generics
+## Generics
 
 {% for generic in schema.generics %}
 {{ render_entity_overview(generic) }}
@@ -111,7 +92,7 @@ This page is auto-generated from the content of the schema library. It serves as
 {% endfor %}
 {% endif %}
 {% if schema.extensions and schema.extensions.nodes %}
-#### Extensions
+## Extensions
 
 :::note
 
@@ -120,9 +101,14 @@ In this context "extensions" refer to modifications or additions to the existing
 :::
 
 {% for ext in schema.extensions.nodes %}
-##### {{ ext.kind }}
+### {{ ext.kind }}
 {{ render_attributes(ext.attributes) }}
 {{ render_relationships(ext.relationships) }}
 {% endfor %}
 {% endif %}
-{% endfor %}
+
+## Code
+
+```yaml
+{{ schema.code }}
+```

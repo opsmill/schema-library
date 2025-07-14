@@ -1,6 +1,7 @@
 ---
 title: Home
 slug: /
+hide_title: true
 ---
 ## Schema library for Infrahub
 
@@ -14,13 +15,21 @@ This project is currently a collection of examples intended to serve as inspirat
 
 ## Use case
 
-Infrahub comes without schemas out of the box. However, we don't want you to reinvent the wheel. You can use the schema library to scaffold your own schemas, allowing you to focus development on parts specific to your organization.
+Infrahub comes without schemas out of the box. However, we don't want you to reinvent the wheel. You can **use the schema library to scaffold your own schemas**, allowing you to focus development on parts specific to your organization.
 
-You can also use the schemas in this repository as references or examples to craft your own.
+You can also use **the schemas in this repository as references** or examples to craft your own.
+
+## Project structure
+
+This project is divided into three main parts:
+
+- **Base**: The foundational layer required for most extensions. It must be loaded before adding extensions.
+- **Extensions**: Generic schema components for managing infrastructure. Extensions may have dependencies on each other.
+- **Experimental**: Schema components that are not yet fully supported.
 
 ## Getting started
 
-#### Clone the repository
+### Clone the repository
 
 ```bash
 git clone https://github.com/opsmill/schema-library.git
@@ -29,7 +38,7 @@ cd schema-library
 
 :::note
 
-One of Infrahub's key strengths is its flexibility. We encourage you to copy any schemas you find useful into your own repository and tailor them to your specific needs, ensuring your schema aligns perfectly with your requirements.
+One of Infrahub's key strengths is its flexibility. **We encourage you to copy any schemas you find useful into your own repository** and tailor them to your specific needs, ensuring your schema aligns perfectly with your requirements.
 
 :::
 
@@ -64,168 +73,74 @@ infrahubctl schema load extensions/location_minimal
 infrahubctl schema load extensions/vlan
 ```
 
-You can find the list of extensions and corresponding documentation in the [reference page](reference/extensions).
+## Available schemas
 
-## Project structure
+This list provides an overview of the schemas available in this repository. Each schema is designed to address specific infrastructure needs, and you can find detailed documentation for each one by clicking its name.
 
-This project is divided into three main parts:
+### base
 
-- **Base**: The foundational layer required for most extensions. It must be loaded before adding extensions.
-- **Extensions**: Generic schema components for managing infrastructure. Extensions may have dependencies on each other.
-- **Experimental**: Schema components that are not yet fully supported.
+| Name | Description |
+|------|-------------|
+| **[DCIM](reference/dcim)** | Basic DCIM schema to capture devices, racks, interfaces, and related information. |
+| **[IPAM](reference/ipam)** | Basic IPAM schema to capture IP addresses, subnets, and related information. |
+| **[Locations](reference/location)** | Basic Location schema to capture locations, sites, and related information. |
+| **[Organization](reference/organization)** | Basic Organization schema to capture organizations, vendors, and related information. |
 
-```bash
-.
-├── base
-│   ├── dcim.yml
-│   ├── ipam.yml
-│   ├── location.yml
-│   ├── organization.yml
-│   └── README.md
-├── experimental
-│   ├── azure
-│   │   ├── azure.yml
-│   │   └── README.md
-│   ├── circuit_service
-│   │   ├── circuit_service.yml
-│   │   └── README.md
-│   ├── infiniband
-│   │   ├── infiniband.yml
-│   │   └── README.md
-│   ├── location_extended
-│   │   ├── location_extended.yml
-│   │   └── README.md
-│   ├── modules_linecards
-│   │   ├── linecard.yml
-│   │   └── README.md
-│   ├── modules_routing_engine
-│   │   ├── README.md
-│   │   └── routing_engine.yml
-│   ├── qos
-│   │   ├── qos.yml
-│   │   └── README.md
-│   ├── README.md
-│   ├── security
-│   │   ├── README.md
-│   │   └── security.yml
-│   ├── tenancy
-│   │   ├── README.md
-│   │   └── tenancy.yml
-│   ├── topology
-│   │   ├── README.md
-│   │   └── topology.yml
-│   └── vlan-translation
-│       ├── README.md
-│       └── vlan-translation.yml
-├── extensions
-│   ├── cable
-│   │   ├── cable.yml
-│   │   └── README.md
-│   ├── circuit
-│   │   ├── circuit.yml
-│   │   └── README.md
-│   ├── cluster
-│   │   ├── cluster.yml
-│   │   └── README.md
-│   ├── compute
-│   │   ├── compute.yml
-│   │   └── README.md
-│   ├── cross_connect
-│   │   ├── cross_connect.yml
-│   │   └── README.md
-│   ├── dwdm
-│   │   ├── dwdm.yml
-│   │   └── README.md
-│   ├── firewall_policer
-│   │   ├── firewall_policer.yml
-│   │   └── README.md
-│   ├── hosting_cluster
-│   │   ├── hosting_cluster.yml
-│   │   └── README.md
-│   ├── interface_breakout
-│   │   ├── interface_breakout.yml
-│   │   └── README.md
-│   ├── lag
-│   │   ├── lag.yml
-│   │   └── README.md
-│   ├── location_minimal
-│   │   ├── location_minimal.yml
-│   │   └── README.md
-│   ├── modules
-│   │   ├── modules.yml
-│   │   └── README.md
-│   ├── patch_panel
-│   │   ├── patch_panel.yml
-│   │   └── README.md
-│   ├── peering_ixp
-│   │   ├── peering_ixp.yml
-│   │   └── README.md
-│   ├── physical_disk
-│   │   ├── physical_disk.yml
-│   │   └── README.md
-│   ├── qinq
-│   │   ├── qinq.yaml
-│   │   └── README.md
-│   ├── routing
-│   │   ├── README.md
-│   │   └── routing.yml
-│   ├── routing_aggregate
-│   │   ├── aggregate.yml
-│   │   └── README.md
-│   ├── routing_bgp
-│   │   ├── bgp.yml
-│   │   └── README.md
-│   ├── routing_bgp_community
-│   │   ├── bgp_community.yml
-│   │   └── README.md
-│   ├── routing_bgp_rr
-│   │   ├── bgp_rr.yml
-│   │   └── README.md
-│   ├── routing_ospf
-│   │   ├── ospf.yml
-│   │   └── README.md
-│   ├── routing_pim
-│   │   ├── pim.yml
-│   │   └── README.md
-│   ├── routing_policies
-│   │   ├── README.md
-│   │   └── routing_policies.yml
-│   ├── routing_policies_aggregate
-│   │   ├── README.md
-│   │   └── routing_policies_aggregate.yml
-│   ├── routing_policies_bgp
-│   │   ├── README.md
-│   │   └── routing_policies_bgp.yml
-│   ├── routing_policies_ospf
-│   │   ├── README.md
-│   │   └── routing_policies_ospf.yml
-│   ├── routing_policies_pim
-│   │   ├── README.md
-│   │   └── routing_policies_pim.yml
-│   ├── sfp
-│   │   ├── README.md
-│   │   └── sfp.yml
-│   ├── snmp
-│   │   ├── README.md
-│   │   └── snmp.yml
-│   ├── topology
-│   │   ├── README.md
-│   │   └── topology.yml
-│   ├── users
-│   │   ├── README.md
-│   │   └── users.yml
-│   ├── vlan
-│   │   ├── README.md
-│   │   └── vlan.yml
-│   ├── vrf
-│   │   ├── README.md
-│   │   └── vrf.yml
-│   └── vrrp
-│       ├── README.md
-│       └── vrrp.yml
-```
+### extensions
 
-You can find the list of extensions and corresponding documentation in the [reference page](reference/extensions).
+| Name | Description |
+|------|-------------|
+| **[Cable](reference/cable)** | This schema extension contains a basic Cable model allowing you to connect two endpoints. |
+| **[Circuit](reference/circuit)** | This schema extension contains Circuits and ways to connect them with your infrastructure! The circuit could be a fiber connecting two sites, you would then have two endpoints, one on each site. |
+| **[Cluster](reference/cluster)** | This schema extension contains the foundations to capture clusters. With this one in place you can unlock various clusters flavors (hosting cluster able to host VMs, firewall clusters built with specific appliances ...) |
+| **[Compute](reference/compute)** | With this schema extension in place you will be able to capture all your physical servers. It also gives you the baseline to build virtualization. You might consider HostingCluster extension to go with! |
+| **[Cross Connect](reference/cross_connect)** | This extension contains schema to capture Cross Connect. You can see it as "a cable operated by a provider". You will be able to attach it to a location and then connect endpoints to it (e.g. rear interface of a patch panel, circuit endpoint ...) |
+| **[DWDM](reference/dwdm)** | This schema extension contains models for OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies such as DWDM (Dense Wavelength Division Multiplexing) or CWDM (Coarse Wavelength Division Multiplexing). With some vendors, the tunable optics are not configured via the channel number but via the wavelength and/or the frequency. This model provides a unique entry in Infrahub for those. |
+| **[Firewall Policer](reference/firewall_policer)** | This schema extension contains models for VMs. You might consider Cluster or/and Hypervisor extension to go with! |
+| **[Hosting Cluster](reference/hosting_cluster)** | A rather generic cluster built with compute units (e.g. servers) and able to host VMs. |
+| **[Interface Breakout](reference/interface_breakout)** | This schema extension introduces relationships to support breakout interfaces, enabling you to document the breakout of a physical interface into smaller physical interfaces. |
+| **[Lag](reference/lag)** | This schema extension includes models for Link Aggregation Groups (LAGs), enabling you to link physical interfaces as building blocs of your LAG interface. It can be used in standard networking environments as well as in compute scenarios, such as capturing bond interfaces. |
+| **[Location Minimal](reference/location_minimal)** | This schema extension is minimal but will provide you with basic items to store location related data. |
+| **[Modules](reference/modules)** | This schema extension allows you to capture Device Modules related information like the serial number or the status. You can insert the Module into a Dcim Physical Device. NOTE: This extension doesn't contain any Nodes, you can use the extension module_linecards or modules_routing_engine to use it |
+| **[Patch Panel](reference/patch_panel)** | This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture information about potential modules you would insert into your patch panel. NOTE: This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces! |
+| **[Peering IXP](reference/peering_ixp)** | This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)! |
+| **[Physical Disk](reference/physical_disk)** | Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management. NOTE: This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares. |
+| **[QinQ](reference/qinq)** | This schema extension brings extensions to VLAN model in order to support QinQ. |
+| **[Routing](reference/routing)** | This schema extension contains generics to create Routing Protocol "Instance". The idea is to create one Routing Protocol instance per IpamVRF + DcimDevice pair. |
+| **[Routing Aggregate](reference/routing_aggregate)** | This schema extension contains all you need to model the Aggregate Routing Protocol. |
+| **[Routing BGP](reference/routing_bgp)** | This schema extension contains all you need to model your BGP platform. |
+| **[Routing BGP Community](reference/routing_bgp_community)** | This schema extension adds the BGP Communities models. |
+| **[Routing BGP RR](reference/routing_bgp_rr)** | This schema extension extend the BGP extension to add BGP Route Reflector Clustering. |
+| **[Routing OSPF](reference/routing_ospf)** | This schema extension contains all you need to model the OSPF Routing Protocol. |
+| **[Routing PIM](reference/routing_pim)** | This schema extension contains all you need to model the PIM Protocol. |
+| **[Routing Policies](reference/routing_policies)** | This schema extension contains a generic to create Routing Policies. This Generic can be extend for each Routing Protocols you may want to use. |
+| **[Routing Policies (PIM)](reference/routing_policies_pim)** | This schema inherits the `RoutingPolicy` schema and removes `import_policies` and `export_policies` attributes. However it adds a number of relationships to `RoutingPIM`. |
+| **[Routing Policies Aggregate](reference/routing_policies_aggregate)** | This extension is using the Routing Policies extensions and the Routing Aggregate one together. |
+| **[Routing Policies BGP](reference/routing_policies_bgp)** | This extension is using the Routing Policies extensions and the Routing BGP one together. |
+| **[Routing Policies OSPF](reference/routing_policies_ospf)** | This extension is using the Routing Policies extensions and the Routing OSPF one together. |
+| **[SFP](reference/sfp)** | This schema extension gives you all the models you need to document Small Form-factor Pluggable (SFP). You can either plug it into an interface or attach it to a location (e.g. it's a spare SFP stored in a rack). Improvements: - As of now there is no verification with type / form factor / protocol / distance ... - You could plug any SFP into any equipment interface (e.g. a virtual interface ...) - You could link a SFP to an interface AND a location ... |
+| **[SNMP](reference/snmp)** | This schema extension contains models for SNMP Communities and SNMP Clients. As you can see this extension is not linked to Tenancy or Device, as you could decide to link the Community to different models based on your use case. |
+| **[Topology](reference/topology)** | This schema extension introduces abstract network pods and services running in the pods, such as MPLS and EVPN. |
+| **[Users](reference/users)** | This schema extension contains models for account management. |
+| **[VLAN](reference/vlan)** | This schema extension contains models to support VLANs in you network. |
+| **[VRF](reference/vrf)** | This schema extension contains models to support VRF in your network. |
+| **[VRRP](reference/vrrp)** | This schema extension contains models for VRRP. |
+
+### experimental
+
+| Name | Description |
+|------|-------------|
+| **[Azure](reference/azure)** | This schema extension introduces cloud support for Microsoft Azure. |
+| **[Circuit Service](reference/circuit_service)** | This schema extension contains model coming on top of circuit to capture a single service shared across multiple circuits. For example you have a MPLS network supported by a provider connecting multiple locations: - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...) - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side |
+| **[Infiniband](reference/infiniband)** | This schema extension adds support for InfiniBand switches. |
+| **[Location Extended](reference/location_extended)** | This schema extension is the most detailed when it comes to location, you'll find all the layers you can think of. |
+| **[Modules Linecards](reference/modules_linecards)** | This schema extension allows you to capture Linecard related information like the version. You can insert the Linecard into a Dcim Physical Device and leverage the Linecard type model. The Linecard can accept PIC to help configure PORT information like breakout-capabilities and configurations. |
+| **[Modules Routing Engine](reference/modules_routing_engine)** | This schema extension allows you to capture Routing Engine related information like the version. You can insert the Routing Engine into a Dcim Physical Device and leverage the Routing Engine type model. |
+| **[QoS](reference/qos)** | This schema extension contains models for Quality of Service (QoS) |
+| **[Security](reference/security)** | This schema extension contains models for implementing detailed security. |
+| **[Tenancy](reference/tenancy)** | This schema extension introduces tenancy for some of the schema nodes (circuits...) |
+| **[Topology](reference/topology)** | A schema for defining and managing network topology, strategies, and services. |
+| **[VLAN Translation](reference/vlan-translation)** | This schema extension is based on Juniper VLAN MAP, and not yet test out for other vendors. |
 
 ## Troubleshooting
 
@@ -235,6 +150,6 @@ This error indicates that the schema you are trying to load has dependencies on 
 
 :::success
 
-To resolve this, ensure that you have loaded all required schemas before attempting to load the one in question. You can find the list of dependencies in the schema documentation or in the [reference page](reference/extensions).
+To resolve this, ensure that you have loaded all required schemas before attempting to load the one in question. You can find the list of dependencies in the schema documentation.
 
 :::

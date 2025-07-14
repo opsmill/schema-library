@@ -1,0 +1,100 @@
+---
+title: Home
+slug: /
+hide_title: true
+---
+## Schema library for Infrahub
+
+Welcome to the Schema Library for Infrahub! This repository offers a collection of schemas designed to streamline and standardize infrastructure-related data structures.
+
+:::warning
+
+This project is currently a collection of examples intended to serve as inspiration. Please note that it is in an experimental phase and may undergo significant changes.
+
+:::
+
+## Use case
+
+Infrahub comes without schemas out of the box. However, we don't want you to reinvent the wheel. You can **use the schema library to scaffold your own schemas**, allowing you to focus development on parts specific to your organization.
+
+You can also use **the schemas in this repository as references** or examples to craft your own.
+
+## Project structure
+
+This project is divided into three main parts:
+
+- **Base**: The foundational layer required for most extensions. It must be loaded before adding extensions.
+- **Extensions**: Generic schema components for managing infrastructure. Extensions may have dependencies on each other.
+- **Experimental**: Schema components that are not yet fully supported.
+
+## Getting started
+
+### Clone the repository
+
+```bash
+git clone https://github.com/opsmill/schema-library.git
+cd schema-library
+```
+
+:::note
+
+One of Infrahub's key strengths is its flexibility. **We encourage you to copy any schemas you find useful into your own repository** and tailor them to your specific needs, ensuring your schema aligns perfectly with your requirements.
+
+:::
+
+### How to load schemas
+
+There are two main ways to load schemas into Infrahub, depending on where you are in your Infrahub journey:
+- **Quick View**: To quickly view a schema, you can use `infrahubctl`. Please reference the [`infrahubctl` Guide](https://docs.infrahub.app/infrahubctl) for further instructions.
+- **Controlled Integration**: For a more organized and unified approach, you can connect a Git repository. Follow [this guide](https://docs.infrahub.app/guides/repository) to connect a Git repository.
+
+:::note
+
+For proof of concept or development purposes, using `infrahubctl` is the preferred approach. When running Infrahub in production, you might need the extra control provided by Git integration to load schemas.
+
+:::
+
+### Load schemas
+
+:::important
+
+You need to load the `base` schema before loading any extensions. Extensions may have dependencies on each other, so you'll need to load them in the correct order.
+
+:::
+
+```bash
+# Load the base
+infrahubctl schema load base
+
+# Load an extension
+infrahubctl schema load extensions/location_minimal
+
+# Load another extension
+infrahubctl schema load extensions/vlan
+```
+
+## Available schemas
+
+This list provides an overview of the schemas available in this repository. Each schema is designed to address specific infrastructure needs, and you can find detailed documentation for each one by clicking its name.
+{% for folder, extensions in toc.items() %}
+
+### {{ folder }}
+
+| Name | Description |
+|------|-------------|
+{% for extension in extensions %}
+{{ "| **[{}]({})** | {} |".format(extension.name, extension.link, extension.description) }}
+{% endfor %}
+{% endfor %}
+
+## Troubleshooting
+
+- **`Unable to load the schema: xxx unable to find the generic yyy` - Missing requirements**
+
+This error indicates that the schema you are trying to load has dependencies on other schemas that are not present in your Infrahub instance.
+
+:::success
+
+To resolve this, ensure that you have loaded all required schemas before attempting to load the one in question. You can find the list of dependencies in the schema documentation.
+
+:::

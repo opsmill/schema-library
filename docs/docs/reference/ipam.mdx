@@ -1,0 +1,182 @@
+---
+title: IPAM
+---
+
+Basic IPAM schema to capture IP addresses, subnets, and related information.
+
+## Details
+
+- **Dependencies:** No dependencies
+
+## Nodes
+
+### IPAddress
+
+- **Label:** IP Address
+- **Description:** IP Address
+- **Namespace:** Ipam
+- **Icon:** mdi:ip
+- **Display Labels:** address__value
+- **Uniqueness Constraints:**
+    - ip_namespace, address__value
+- **Human Friendly ID:** address__value, ip_namespace__name__value
+- **Inherit From:** BuiltinIPAddress
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| fqdn |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| interface | InterfaceLayer3 | True | one |  |
+
+### Prefix
+
+- **Label:** Prefix
+- **Description:** IPv4 or IPv6 network (with mask)
+- **Namespace:** Ipam
+- **Icon:** mdi:ip-network
+- **Display Labels:** prefix__value
+- **Uniqueness Constraints:**
+    - ip_namespace, prefix__value
+- **Human Friendly ID:** prefix__value, ip_namespace__name__value
+- **Inherit From:** BuiltinIPPrefix
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| status |  | Dropdown |  |  | active, deprecated, reserved |
+| role |  | Dropdown | True |  | loopback, management, public, server, supernet, technical, loopback-vtep |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| organization | OrganizationGeneric | True | one | Attribute |
+| location | LocationHosting | True | one | Attribute |
+| gateway | IpamIPAddress | True | one | Attribute |
+
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: IPAddress
+  namespace: Ipam
+  description: IP Address
+  label: IP Address
+  icon: mdi:ip
+  include_in_menu: false
+  order_by:
+  - address__value
+  display_labels:
+  - address__value
+  inherit_from:
+  - BuiltinIPAddress
+  uniqueness_constraints:
+  - - ip_namespace
+    - address__value
+  human_friendly_id:
+  - address__value
+  - ip_namespace__name__value
+  attributes:
+  - name: fqdn
+    label: FQDN
+    kind: Text
+    optional: true
+    regex: (?=^.{1,253}$)(^(((?!-)[a-zA-Z0-9-]{1,63}(?<!-))|((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63})$)
+  relationships:
+  - name: interface
+    peer: InterfaceLayer3
+    optional: true
+    cardinality: one
+- name: Prefix
+  namespace: Ipam
+  description: IPv4 or IPv6 network (with mask)
+  icon: mdi:ip-network
+  include_in_menu: false
+  label: Prefix
+  order_by:
+  - prefix__value
+  display_labels:
+  - prefix__value
+  inherit_from:
+  - BuiltinIPPrefix
+  uniqueness_constraints:
+  - - ip_namespace
+    - prefix__value
+  human_friendly_id:
+  - prefix__value
+  - ip_namespace__name__value
+  attributes:
+  - name: status
+    kind: Dropdown
+    choices:
+    - name: active
+      label: Active
+    - name: deprecated
+      label: Deprecated
+    - name: reserved
+      label: Reserved
+  - name: role
+    kind: Dropdown
+    optional: true
+    choices:
+    - name: loopback
+      label: Loopback
+      description: Represents internal communications.
+      color: '#B0A8B9'
+    - name: management
+      label: Management
+      description: Handles administrative operations.
+      color: '#AEC6CF'
+    - name: public
+      label: Public
+      description: Public facing network.
+      color: '#FDFD96'
+    - name: server
+      label: Server
+      description: Dedicated to server functions.
+      color: '#77DD77'
+    - name: supernet
+      label: Supernet
+      description: Covers multiple networks
+      color: '#FFB347'
+    - name: technical
+      label: Technical
+      description: Focused on technical aspects.
+      color: '#9678B6'
+    - name: loopback-vtep
+      label: Loopback VTEP
+      description: Facilitates virtualized network communications within loopback
+        configurations.
+      color: '#CDB4DB'
+  relationships:
+  - name: organization
+    peer: OrganizationGeneric
+    optional: true
+    cardinality: one
+    kind: Attribute
+    order_weight: 1200
+  - name: location
+    peer: LocationHosting
+    optional: true
+    cardinality: one
+    kind: Attribute
+    order_weight: 1300
+  - name: gateway
+    label: L3 Gateway
+    identifier: prefix__gateway
+    peer: IpamIPAddress
+    optional: true
+    cardinality: one
+    kind: Attribute
+    order_weight: 1500
+
+```
