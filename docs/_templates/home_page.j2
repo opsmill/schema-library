@@ -76,6 +76,7 @@ infrahubctl schema load extensions/vlan
 ## Available schemas
 
 This list provides an overview of the schemas available in this repository. Each schema is designed to address specific infrastructure needs, and you can find detailed documentation for each one by clicking its name.
+<!-- vale off -->
 {% for folder, extensions in toc.items() %}
 
 ### {{ folder }}
@@ -86,6 +87,7 @@ This list provides an overview of the schemas available in this repository. Each
 {{ "| **[{}]({})** | {} |".format(extension.name, extension.link, extension.description) }}
 {% endfor %}
 {% endfor %}
+<!-- vale on -->
 
 ## Troubleshooting
 
