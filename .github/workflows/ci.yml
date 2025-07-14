@@ -112,14 +112,13 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install Invoke
-        run: |
-          pip install toml invoke infrahub-sdk["all"]
+        run: poetry install --no-interaction --no-ansi --with dev
       - name: Set job name
         run: echo JOB_NAME="$GITHUB_JOB" >> $GITHUB_ENV
       - name: "Set environment variable INFRAHUB_BUILD_NAME"
         run: echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
       - name: Initialize Infrahub
-        run: invoke start
+        run: poetry run invoke start
       - name: Set infrahub address
         run: |
           PORT=$(docker compose -p $INFRAHUB_BUILD_NAME port infrahub-server 8000 | cut -d: -f2)
@@ -127,10 +126,10 @@ jobs:
       - name: "Store start time"
         run: echo TEST_START_TIME=$(date +%s)000 >> $GITHUB_ENV
       - name: Load all schemas files
-        run: invoke schemas.load-all-schemas
+        run: poetry run invoke schemas.load-all-schemas
       - name: "Clear docker environment and force vmagent to stop"
         if: always()
-        run: docker compose -p $INFRAHUB_BUILD_NAME down -v --remove-orphans --rmi local
+        run: poetry run invoke destroy
 
   documentation:
     defaults:

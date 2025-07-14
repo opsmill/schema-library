@@ -21,4 +21,11 @@ def start(context: Context) -> None:
     context.run(f"{COMPOSE_COMMAND} up -d --wait")
 
 
+@task(name="destroy")
+def destroy(context: Context) -> None:
+    """Destroy local instance of Infrahub for test purposes."""
+    context.run(f"{COMPOSE_COMMAND} down -v --remove-orphans --rmi local")
+
+
 ns.add_task(start)
+ns.add_task(destroy)
