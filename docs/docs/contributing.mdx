@@ -2,11 +2,31 @@
 title: Contributing
 ---
 
-We welcome contributions and feedback! Feel free to open an issue or submit a pull request to suggest additions, improvements or to report bugs.
+We welcome contributions and feedback! Please open an issue or submit a pull request to suggest additions, improvements, or to report bugs.
 
-To add a new example, follow these steps:
+## Adding a new schema
 
-- Create a directory in `experimental` with the name of the schema example
-- Create a `<example_name>.yml` file using the [Infrahub schema format](https://docs.infrahub.app/reference/schema)
-- Update `.metadata.yml` file to include the schema you have created with a `name`, `descriptions` and `dependencies`.
-- `invoke build` will then generate a `README.md` file for the schema.
+To add a new schema:
+
+- Create a directory in either `experimental` or `extension` with the schema name (ensure the name is unique).
+- Add a `<schema_name>.yml` file using the [Infrahub schema format](https://docs.infrahub.app/reference/schema).
+- Update the `.metadata.yml` file to include your schema, providing its `name`, `description`, and `dependencies`.
+- To verify integration, run `invoke schemas.load-all-schemas` to load the entire schema library in your local Infrahub instance.
+
+To add documentation for your schema:
+
+- Run `invoke docs.generate` to generate documentation files.
+- Then run `invoke docs.build` and `invoke docs.serve` to build and serve the documentation locally.
+
+## Documentation
+
+Most documentation is generated automatically:
+
+- The `docs.py` task generates documentation.
+- `home.mdx` is generated from the `_templates/home_page.j2` template.
+- Each file in the `reference` directory is generated from the `_templates/schema_reference.j2` template.
+
+:::important
+
+To modify the documentation, edit the templates in the `_templates` directory.
+After making changes, run `invoke docs.generate` to update the documentation.
