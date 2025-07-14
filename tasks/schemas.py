@@ -6,7 +6,7 @@ from pathlib import Path
 import yaml  # type: ignore
 from invoke import Context, task  # type: ignore
 
-METADATA_FILE = Path(__file__).parent.resolve() / ".metadata.yml"
+METADATA_FILE = Path(__file__).parent.parent.resolve() / ".metadata.yml"
 # Flag if we need to test experimental section or not
 TEST_EXPERIMENTAL = os.getenv("TEST_EXPERIMENTAL", None)
 
