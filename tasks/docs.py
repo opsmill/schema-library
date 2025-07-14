@@ -162,10 +162,10 @@ def _generate_per_extension_documentation() -> None:
             print(f"Docs saved to: {output_readme}")
 
     # Finnaly write the base readme
-    readme_content: str = "# Base\n\nPlease refer to the [reference page](https://docs.infrahub.app/schema-library/reference/dcim) for the corresponding documentation.\n"
-    output_readme: Path = CURRENT_DIRECTORY.parent / "base" / "README.md"
-    output_readme.write_text(readme_content, encoding="utf-8")
-    print(f"Docs saved to: {output_readme}")
+    base_readme_content: str = "# Base\n\nPlease refer to the [reference page](https://docs.infrahub.app/schema-library/reference/dcim) for the corresponding documentation.\n"
+    base_output_readme: Path = CURRENT_DIRECTORY.parent / "base" / "README.md"
+    base_output_readme.write_text(base_readme_content, encoding="utf-8")
+    print(f"Docs saved to: {base_output_readme}")
 
 
 @task
