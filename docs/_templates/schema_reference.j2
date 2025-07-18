@@ -64,7 +64,7 @@ title: {{ schema.name }}
 {% if schema.dependencies %}
 - **Dependencies:**
 {% for dep in schema.dependencies %}
-  - `{{ dep }}`
+  - [{{ dep.name }}]({{ dep.link }})
 {% endfor %}
 {% else %}
 - **Dependencies:** No dependencies

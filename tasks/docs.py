@@ -52,8 +52,17 @@ def _generate_schema_reference_content(schema_key: str, schema_metadata: dict) -
         "name": schema_metadata.get("name", ""),
         "description": schema_metadata.get("description", ""),
         "attribution": schema_metadata.get("attribution", ""),
-        "dependencies": schema_metadata.get("dependencies", []),
     }
+
+    # Compute link for dependencies
+    schema_data["dependencies"] = []
+    if "dependencies" in schema_metadata:
+        for dep in schema_metadata["dependencies"]:
+            if dep == "base":
+                link = "dcim"  # TODO: This is a hack, should be improved ... maybe merging all base references
+            else:
+                link = dep.split("/")[1]
+            schema_data["dependencies"].append({"name": dep, "link": link})
 
     extension_dir = Path(schema_key)
 
