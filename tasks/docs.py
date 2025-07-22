@@ -31,7 +31,7 @@ def _generate_toc_content(metadata) -> defaultdict[str, list]:
         # TODO: Handle the case where we can't split the key
         current_item = {
             "name": metadata[key].get("name"),
-            "link": "/reference/" + key.split("/")[1],
+            "link": "./reference/" + key.split("/")[1] + ".mdx",
             "description": _sanitize_description(metadata[key].get("description", "")),
         }
 
