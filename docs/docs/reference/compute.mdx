@@ -1,0 +1,168 @@
+---
+title: Compute
+---
+
+With this schema extension in place you will be able to capture all your physical servers. It also gives you the baseline to build virtualization. You might consider HostingCluster extension to go with!
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+
+## Nodes
+
+### PhysicalServer
+
+- **Label:** Physical Server
+- **Description:** A physical server with fixed resources and specific hardware characteristics.
+- **Namespace:** Compute
+- **Icon:** mdi:server
+- **Inherit From:** ComputeGenericUnit, DcimGenericDevice, DcimPhysicalDevice, VirtualizationHostVirtualMachine
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| status |  | Dropdown | False |  | active, provisioning, maintenance, drained |
+
+
+### VirtualMachine
+
+- **Label:** Virtual Machine
+- **Description:** A virtual machine hosted on a server or a cluster.
+- **Namespace:** Virtualization
+- **Icon:** carbon:virtual-machine
+- **Inherit From:** ComputeGenericUnit, DcimGenericDevice
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| role | Role of the virtual machine. | Dropdown | True |  | application, storage |
+| vcpu | Number of CPU cores assigned to the VM. | Number | True |  |  |
+| memory | Amount of memory (in GB) assigned to the VM. | Number | True |  |  |
+| disk | Disk space (in GB) assigned to the VM. | Number | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| host | VirtualizationHostVirtualMachine | False | one | Attribute |
+
+## Generics
+
+### GenericUnit
+
+- **Description:** A generic unit that can compute (e.g. server, vm ...).
+- **Namespace:** Compute
+
+
+
+### HostVirtualMachine
+
+- **Description:** A generic unit that can host VM
+- **Namespace:** Virtualization
+
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| virtual_machines | VirtualizationVirtualMachine | True | many | Component |
+
+
+## Code
+
+```yaml
+version: '1.0'
+generics:
+- name: GenericUnit
+  namespace: Compute
+  description: A generic unit that can compute (e.g. server, vm ...).
+  include_in_menu: false
+- name: HostVirtualMachine
+  namespace: Virtualization
+  description: A generic unit that can host VM
+  include_in_menu: false
+  relationships:
+  - name: virtual_machines
+    cardinality: many
+    peer: VirtualizationVirtualMachine
+    kind: Component
+    optional: true
+nodes:
+- name: PhysicalServer
+  namespace: Compute
+  description: A physical server with fixed resources and specific hardware characteristics.
+  label: Physical Server
+  icon: mdi:server
+  inherit_from:
+  - ComputeGenericUnit
+  - DcimGenericDevice
+  - DcimPhysicalDevice
+  - VirtualizationHostVirtualMachine
+  attributes:
+  - name: status
+    kind: Dropdown
+    optional: false
+    order_weight: 1100
+    choices:
+    - name: active
+      label: Active
+      description: Fully operational and currently in service.
+      color: '#7fbf7f'
+    - name: provisioning
+      label: Provisioning
+      description: In the process of being set up and configured.
+      color: '#ffff7f'
+    - name: maintenance
+      label: Maintenance
+      description: Undergoing routine maintenance or repairs.
+      color: '#ffd27f'
+    - name: drained
+      label: Drained
+      description: Temporarily taken out of service.
+      color: '#bfbfbf'
+- name: VirtualMachine
+  namespace: Virtualization
+  description: A virtual machine hosted on a server or a cluster.
+  label: Virtual Machine
+  icon: carbon:virtual-machine
+  inherit_from:
+  - ComputeGenericUnit
+  - DcimGenericDevice
+  attributes:
+  - name: role
+    kind: Dropdown
+    optional: true
+    description: Role of the virtual machine.
+    order_weight: 1400
+    choices:
+    - name: application
+      color: '#7f7fff'
+    - name: storage
+      color: '#bf7fbf'
+  - name: vcpu
+    kind: Number
+    optional: true
+    order_weight: 1900
+    description: Number of CPU cores assigned to the VM.
+  - name: memory
+    kind: Number
+    optional: true
+    order_weight: 1900
+    description: Amount of memory (in GB) assigned to the VM.
+  - name: disk
+    kind: Number
+    optional: true
+    order_weight: 1900
+    description: Disk space (in GB) assigned to the VM.
+  relationships:
+  - name: host
+    peer: VirtualizationHostVirtualMachine
+    optional: false
+    cardinality: one
+    kind: Attribute
+    order_weight: 1500
+
+```

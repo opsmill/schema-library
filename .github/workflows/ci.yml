@@ -48,7 +48,6 @@ jobs:
     steps:
       - name: "Check out repository code"
         uses: "actions/checkout@v4"
-
       - name: "Set up Python ${{ matrix.python-version }}"
         uses: "actions/setup-python@v5"
         with:
@@ -66,7 +65,6 @@ jobs:
           poetry env use ${{ matrix.python-version }}
       - name: "Install dependencies"
         run: "poetry install --no-interaction --no-ansi --with dev"
-
       - name: "Linting: ruff check"
         run: "poetry run ruff check ."
       - name: "Linting: ruff format"
@@ -100,7 +98,6 @@ jobs:
       !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled') &&
       needs.files-changed.outputs.yaml == 'true'
-
     runs-on:
       group: huge-runners
     env:
@@ -110,39 +107,29 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
       - name: Install Invoke
-        run: |
-          pip install toml invoke infrahub-sdk["all"]
-
+        run: poetry install --no-interaction --no-ansi --with dev
       - name: Set job name
         run: echo JOB_NAME="$GITHUB_JOB" >> $GITHUB_ENV
-
       - name: "Set environment variable INFRAHUB_BUILD_NAME"
         run: echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
-
       - name: Initialize Infrahub
-        run: invoke schemas.start
-
+        run: poetry run invoke start
       - name: Set infrahub address
         run: |
           PORT=$(docker compose -p $INFRAHUB_BUILD_NAME port infrahub-server 8000 | cut -d: -f2)
           echo "INFRAHUB_ADDRESS=http://localhost:${PORT}" >> $GITHUB_ENV
-
       - name: "Store start time"
         run: echo TEST_START_TIME=$(date +%s)000 >> $GITHUB_ENV
-
       - name: Load all schemas files
-        run: invoke schemas.load-all-schemas
-
+        run: poetry run invoke schemas.load-all-schemas
       - name: "Clear docker environment and force vmagent to stop"
         if: always()
-        run: docker compose -p $INFRAHUB_BUILD_NAME down -v --remove-orphans --rmi local
+        run: poetry run invoke destroy
 
   documentation:
     defaults:
@@ -167,15 +154,15 @@ jobs:
           node-version: 20
           cache: 'npm'
           cache-dependency-path: docs/package-lock.json
-      - name: "Install dependencies"
-        run: npm install
       - name: "Setup Python environment"
         run: "pip install invoke toml"
-      - name: "Create schema docs"
-        run: "invoke schemas.build"
+      - name: "Install dependencies"
+        run: "invoke docs.install"
+      - name: "Generate reference documentation"
+        run: "invoke docs.generate"
         working-directory: ./
       - name: "Build docs website"
-        run: "invoke docusaurus.docs"
+        run: "invoke docs.build"
 
   validate-documentation-style:
     if: |
@@ -201,4 +188,4 @@ jobs:
         env:
           VALE_VERSION: ${{ env.VALE_VERSION }}
       - name: "Validate documentation style"
-        run: ./vale --config=.vale.ini --glob='!{docs/docs/schema-library.*}' ./docs/docs $(find ./docs/docs -type f \( -name "*.mdx" -o -name "*.md" \) )
+        run: ./vale --config=.vale.ini $(find ./docs -type f \( -name "*.mdx" -o -name "*.md" \) -not -path "./docs/node_modules/*" -not -path "./docs/docs/reference/*")

@@ -1,0 +1,293 @@
+---
+title: Location Extended
+---
+
+This schema extension is the most detailed when it comes to location, you'll find all the layers you can think of.
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+
+## Nodes
+
+### Continent
+
+- **Label:** Continent
+- **Namespace:** Location
+- **Icon:** jam:world
+- **Display Labels:** name__value
+- **Inherit From:** LocationGeneric
+
+
+
+### Country
+
+- **Label:** Country
+- **Namespace:** Location
+- **Icon:** gis:search-country
+- **Display Labels:** name__value
+- **Inherit From:** LocationGeneric
+
+
+
+### Region
+
+- **Label:** Region
+- **Namespace:** Location
+- **Icon:** carbon:cics-region-target
+- **Display Labels:** name__value
+- **Inherit From:** LocationGeneric
+
+
+
+### Metro
+
+- **Label:** Metro
+- **Namespace:** Location
+- **Icon:** healthicons:city
+- **Display Labels:** name__value
+- **Inherit From:** LocationGeneric
+
+
+
+### Building
+
+- **Label:** Building
+- **Namespace:** Location
+- **Icon:** ri:building-line
+- **Display Labels:** name__value
+- **Inherit From:** LocationGeneric
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| facility_id |  | Text | True |  |  |
+| physical_address |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| owner | OrganizationGeneric | True | one |  |
+
+### Floor
+
+- **Label:** Floor
+- **Namespace:** Location
+- **Icon:** mdi:home-floor-0
+- **Display Labels:** name__value
+- **Inherit From:** LocationGeneric
+
+
+
+### Suite
+
+- **Label:** Suite
+- **Namespace:** Location
+- **Icon:** game-icons:cage
+- **Display Labels:** name__value
+- **Inherit From:** LocationGeneric
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| facility_id |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| owner | OrganizationGeneric | True | one |  |
+
+### Rack
+
+- **Label:** Rack
+- **Namespace:** Location
+- **Icon:** clarity:rack-server-line
+- **Display Labels:** name__value
+- **Human Friendly ID:** shortname__value
+- **Inherit From:** LocationGeneric
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| facility_id |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| owner | OrganizationGeneric | True | one |  |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### OrganizationProvider
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| location | LocationBuilding | True | many |  |
+
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: Continent
+  namespace: Location
+  inherit_from:
+  - LocationGeneric
+  include_in_menu: true
+  menu_placement: LocationGeneric
+  label: Continent
+  display_labels:
+  - name__value
+  parent: ''
+  children: LocationCountry
+  icon: jam:world
+- name: Country
+  namespace: Location
+  inherit_from:
+  - LocationGeneric
+  include_in_menu: true
+  menu_placement: LocationGeneric
+  label: Country
+  display_labels:
+  - name__value
+  parent: LocationContinent
+  children: LocationRegion
+  icon: gis:search-country
+- name: Region
+  namespace: Location
+  inherit_from:
+  - LocationGeneric
+  include_in_menu: true
+  menu_placement: LocationGeneric
+  label: Region
+  display_labels:
+  - name__value
+  parent: LocationCountry
+  children: LocationMetro
+  icon: carbon:cics-region-target
+- name: Metro
+  namespace: Location
+  inherit_from:
+  - LocationGeneric
+  include_in_menu: true
+  menu_placement: LocationGeneric
+  label: Metro
+  display_labels:
+  - name__value
+  parent: LocationRegion
+  children: LocationBuilding
+  icon: healthicons:city
+- name: Building
+  namespace: Location
+  inherit_from:
+  - LocationGeneric
+  include_in_menu: true
+  menu_placement: LocationGeneric
+  label: Building
+  display_labels:
+  - name__value
+  parent: LocationMetro
+  children: LocationFloor
+  icon: ri:building-line
+  attributes:
+  - name: facility_id
+    kind: Text
+    unique: false
+    optional: true
+    order_weight: 1100
+  - name: physical_address
+    kind: Text
+    unique: false
+    optional: true
+    order_weight: 1500
+  relationships:
+  - name: owner
+    peer: OrganizationGeneric
+    optional: true
+    cardinality: one
+- name: Floor
+  namespace: Location
+  inherit_from:
+  - LocationGeneric
+  include_in_menu: true
+  menu_placement: LocationGeneric
+  label: Floor
+  display_labels:
+  - name__value
+  parent: LocationBuilding
+  icon: mdi:home-floor-0
+  children: LocationSuite
+- name: Suite
+  namespace: Location
+  inherit_from:
+  - LocationGeneric
+  include_in_menu: true
+  menu_placement: LocationGeneric
+  label: Suite
+  display_labels:
+  - name__value
+  parent: LocationFloor
+  children: LocationRack
+  icon: game-icons:cage
+  attributes:
+  - name: facility_id
+    kind: Text
+    unique: false
+    optional: true
+    order_weight: 1100
+  relationships:
+  - name: owner
+    peer: OrganizationGeneric
+    optional: true
+    cardinality: one
+- name: Rack
+  namespace: Location
+  inherit_from:
+  - LocationGeneric
+  include_in_menu: true
+  menu_placement: LocationGeneric
+  label: Rack
+  display_labels:
+  - name__value
+  human_friendly_id:
+  - shortname__value
+  parent: LocationSuite
+  children: ''
+  icon: clarity:rack-server-line
+  attributes:
+  - name: facility_id
+    kind: Text
+    unique: false
+    optional: true
+    order_weight: 1100
+  relationships:
+  - name: owner
+    peer: OrganizationGeneric
+    optional: true
+    cardinality: one
+extensions:
+  nodes:
+  - kind: OrganizationProvider
+    relationships:
+    - name: location
+      peer: LocationBuilding
+      cardinality: many
+      optional: true
+
+```

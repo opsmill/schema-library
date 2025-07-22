@@ -1,0 +1,73 @@
+---
+title: Routing Aggregate
+---
+
+This schema extension contains all you need to model the Aggregate Routing Protocol.
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+  - [extensions/routing](routing)
+
+## Nodes
+
+### AggregateRoute
+
+- **Label:** Aggregate Routes
+- **Description:** Aggregate Protocol with action and BGP communities
+- **Namespace:** Routing
+- **Icon:** grommet-icons:aggregate
+- **Inherit From:** RoutingProtocol
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| discard |  | Boolean | True | False |  |
+| import_policies |  | Text | True |  |  |
+| export_policies |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| destination | IpamPrefix |  |  | Attribute |
+
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: AggregateRoute
+  namespace: Routing
+  description: Aggregate Protocol with action and BGP communities
+  label: Aggregate Routes
+  include_in_menu: false
+  icon: grommet-icons:aggregate
+  inherit_from:
+  - RoutingProtocol
+  attributes:
+  - name: discard
+    label: Discard
+    kind: Boolean
+    optional: true
+    default_value: false
+    order_weight: 1275
+  - name: import_policies
+    kind: Text
+    optional: true
+    order_weight: 1300
+  - name: export_policies
+    kind: Text
+    optional: true
+    order_weight: 1350
+  relationships:
+  - name: destination
+    kind: Attribute
+    peer: IpamPrefix
+    description: Destination network for the static route.
+    order_weight: 1200
+
+```

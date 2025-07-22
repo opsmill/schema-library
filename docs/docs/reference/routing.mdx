@@ -1,0 +1,87 @@
+---
+title: Routing
+---
+
+This schema extension contains generics to create Routing Protocol "Instance". The idea is to create one Routing Protocol instance per IpamVRF + DcimDevice pair.
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+  - [extensions/vlan](vlan)
+
+## Generics
+
+### Protocol
+
+- **Label:** Protocol
+- **Description:** Generic protocol model for routing protocols
+- **Namespace:** Routing
+- **Icon:** carbon:router
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| description | Description of the protocol | Text | False |  |  |
+| status | Status of the Protocol Configuration. | Dropdown |  |  | active, disabled, deleted |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| device | DcimDevice | False | one | Parent |
+| vrf | IpamVRF | False | one | Attribute |
+
+
+## Code
+
+```yaml
+version: '1.0'
+generics:
+- name: Protocol
+  namespace: Routing
+  description: Generic protocol model for routing protocols
+  label: Protocol
+  icon: carbon:router
+  include_in_menu: false
+  attributes:
+  - name: description
+    kind: Text
+    optional: false
+    unique: true
+    description: Description of the protocol
+    order_weight: 1100
+  - name: status
+    kind: Dropdown
+    choices:
+    - name: active
+      label: Active
+      description: Configuration is active and operational.
+      color: '#A9CCE3'
+    - name: disabled
+      label: Disabled
+      description: Configuration has been disabled.
+      color: '#D3D3D3'
+    - name: deleted
+      label: Deleted
+      description: Configuration has been deleted.
+      color: '#FAD7A0'
+    description: Status of the Protocol Configuration.
+    order_weight: 1150
+  relationships:
+  - name: device
+    peer: DcimDevice
+    optional: false
+    cardinality: one
+    kind: Parent
+    order_weight: 1050
+  - name: vrf
+    label: VRF
+    peer: IpamVRF
+    optional: false
+    cardinality: one
+    kind: Attribute
+    order_weight: 1075
+
+```

@@ -1,0 +1,246 @@
+---
+title: Cable
+---
+
+This schema extension contains a basic Cable model allowing you to connect two endpoints.
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+
+## Nodes
+
+### Cable
+
+- **Label:** Cable
+- **Description:** Physical cable connecting two endpoints
+- **Namespace:** Dcim
+- **Icon:** mdi:cable-data
+- **Inherit From:** DcimConnector
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| status |  | Dropdown | True |  | connected, planned |
+| cable_type |  | Dropdown | True |  | cat3, cat5, cat5e, cat6, cat6a, cat7, cat7a, cat8, mmf-om1, mmf-om2, mmf-om3, mmf-om4, mmf-om5, smf-os1, smf-os2, dac-passive, dac-active, aoc, coaxial, mrj21-trunk, power, usb |
+| color |  | Dropdown | True |  | dark-red, red, pink, rose, fuchsia, purple, dark-purple, indigo, blue, light-blue, cyan, teal, aqua, dark-green, green, light-green, lime, yellow, amber, orange, dark-orange, brown, light-grey, grey, dark-grey, black |
+| label |  | Text | True |  |  |
+| length |  | Number | True |  |  |
+
+
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: Cable
+  namespace: Dcim
+  description: Physical cable connecting two endpoints
+  label: Cable
+  icon: mdi:cable-data
+  inherit_from:
+  - DcimConnector
+  attributes:
+  - name: status
+    kind: Dropdown
+    optional: true
+    order_weight: 1000
+    choices:
+    - name: connected
+      label: Connected
+      description: Fully operational and currently in connected
+      color: '#7fbf7f'
+    - name: planned
+      label: Planned
+      description: In the process of being set up
+      color: '#ffff7f'
+  - name: cable_type
+    kind: Dropdown
+    optional: true
+    order_weight: 1100
+    choices:
+    - name: cat3
+      label: CAT3
+      description: Category 3 twisted pair cable.
+      color: '#99ccff'
+    - name: cat5
+      label: CAT5
+      description: Category 5 twisted pair cable.
+      color: '#99ccff'
+    - name: cat5e
+      label: CAT5e
+      description: Enhanced Category 5 cable.
+      color: '#99ccff'
+    - name: cat6
+      label: CAT6
+      description: Category 6 twisted pair cable.
+      color: '#99ccff'
+    - name: cat6a
+      label: CAT6A
+      description: Augmented Category 6 cable.
+      color: '#99ccff'
+    - name: cat7
+      label: CAT7
+      description: Category 7 twisted pair cable.
+      color: '#99ccff'
+    - name: cat7a
+      label: CAT7A
+      description: Augmented Category 7 cable.
+      color: '#99ccff'
+    - name: cat8
+      label: CAT8
+      description: Category 8 twisted pair cable.
+      color: '#99ccff'
+    - name: mmf-om1
+      label: Multimode Fiber OM1
+      description: "Multimode fiber (62.5/125 \xB5m)."
+      color: '#ff9933'
+    - name: mmf-om2
+      label: Multimode Fiber OM2
+      description: "Multimode fiber (50/125 \xB5m)."
+      color: '#ff9933'
+    - name: mmf-om3
+      label: Multimode Fiber OM3
+      description: "Optimized multimode fiber (50/125 \xB5m)."
+      color: '#ff9933'
+    - name: mmf-om4
+      label: Multimode Fiber OM4
+      description: "Enhanced multimode fiber (50/125 \xB5m)."
+      color: '#ff9933'
+    - name: mmf-om5
+      label: Multimode Fiber OM5
+      description: "Wideband multimode fiber (50/125 \xB5m)."
+      color: '#ff9933'
+    - name: smf-os1
+      label: Singlemode Fiber OS1
+      description: Standard singlemode fiber.
+      color: '#ffcc00'
+    - name: smf-os2
+      label: Singlemode Fiber OS2
+      description: Improved singlemode fiber.
+      color: '#ffcc00'
+    - name: dac-passive
+      label: Passive DAC
+      description: Direct Attach Copper (Passive).
+      color: '#a0a0a0'
+    - name: dac-active
+      label: Active DAC
+      description: Direct Attach Copper (Active).
+      color: '#a0a0a0'
+    - name: aoc
+      label: Active Optical Cable
+      description: Active Optical Cable.
+      color: '#a0a0a0'
+    - name: coaxial
+      label: Coaxial
+      description: Coaxial cable for broadband.
+      color: '#000000'
+    - name: mrj21-trunk
+      label: MRJ21 Trunk
+      description: High-density copper cable.
+      color: '#000000'
+    - name: power
+      label: Power
+      description: Power cables for electrical connections.
+      color: '#000000'
+    - name: usb
+      label: USB
+      description: Universal Serial Bus cable.
+      color: '#000000'
+  - name: color
+    kind: Dropdown
+    optional: true
+    order_weight: 1300
+    choices:
+    - name: dark-red
+      label: Dark Red
+      color: '#aa1409'
+    - name: red
+      label: Red
+      color: '#f44336'
+    - name: pink
+      label: Pink
+      color: '#e91e63'
+    - name: rose
+      label: Rose
+      color: '#ffe4e1'
+    - name: fuchsia
+      label: Fuchsia
+      color: '#ff66ff'
+    - name: purple
+      label: Purple
+      color: '#9c27b0'
+    - name: dark-purple
+      label: Dark Purple
+      color: '#673ab7'
+    - name: indigo
+      label: Indigo
+      color: '#3f51b5'
+    - name: blue
+      label: Blue
+      color: '#2196f3'
+    - name: light-blue
+      label: Light Blue
+      color: '#03a9f4'
+    - name: cyan
+      label: Cyan
+      color: '#00bcd4'
+    - name: teal
+      label: Teal
+      color: '#009688'
+    - name: aqua
+      label: Aqua
+      color: '#00ffff'
+    - name: dark-green
+      label: Dark Green
+      color: '#2f6a31'
+    - name: green
+      label: Green
+      color: '#4caf50'
+    - name: light-green
+      label: Light Green
+      color: '#8bc34a'
+    - name: lime
+      label: Lime
+      color: '#cddc39'
+    - name: yellow
+      label: Yellow
+      color: '#ffeb3b'
+    - name: amber
+      label: Amber
+      color: '#ffc107'
+    - name: orange
+      label: Orange
+      color: '#ff9800'
+    - name: dark-orange
+      label: Dark Orange
+      color: '#ff5722'
+    - name: brown
+      label: Brown
+      color: '#795548'
+    - name: light-grey
+      label: Light Grey
+      color: '#c0c0c0'
+    - name: grey
+      label: Grey
+      color: '#9e9e9e'
+    - name: dark-grey
+      label: Dark Grey
+      color: '#607d8b'
+    - name: black
+      label: Black
+      color: '#111111'
+  - name: label
+    kind: Text
+    optional: true
+    order_weight: 1200
+  - name: length
+    label: Length (in cm)
+    kind: Number
+    optional: true
+    order_weight: 1350
+
+```

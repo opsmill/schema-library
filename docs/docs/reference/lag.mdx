@@ -1,0 +1,117 @@
+---
+title: Lag
+---
+
+This schema extension includes models for Link Aggregation Groups (LAGs), enabling you to link physical interfaces as building blocs of your LAG interface. It can be used in standard networking environments as well as in compute scenarios, such as capturing bond interfaces.
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+
+## Nodes
+
+### Lag
+
+- **Label:** LAG Interface
+- **Description:** LAG interface
+- **Namespace:** Interface
+- **Inherit From:** DcimInterface, InterfaceLayer2, InterfaceLayer3, InterfaceHasSubInterface
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| lacp_rate | LACP rate for the aggregated interface | Dropdown |  | fast | slow, fast |
+| lacp_mode | LACP mode for the aggregated interface | Dropdown |  | active | active, passive, disabled |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| lag_members | InterfacePhysical |  | many | Attribute |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### InterfacePhysical
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| lag_parent | InterfaceLag | True | one | Attribute |
+
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: Lag
+  namespace: Interface
+  label: LAG Interface
+  description: LAG interface
+  inherit_from:
+  - DcimInterface
+  - InterfaceLayer2
+  - InterfaceLayer3
+  - InterfaceHasSubInterface
+  include_in_menu: false
+  attributes:
+  - name: lacp_rate
+    label: LACP Rate
+    kind: Dropdown
+    choices:
+    - name: slow
+      label: Slow
+      color: '#E6E6FA'
+    - name: fast
+      label: Fast
+      color: '#E6E6FA'
+    default_value: fast
+    description: LACP rate for the aggregated interface
+    order_weight: 1700
+  - name: lacp_mode
+    label: LACP Mode
+    kind: Dropdown
+    choices:
+    - name: active
+      label: Active
+      color: '#E6E6FA'
+    - name: passive
+      label: Passive
+      color: '#E6E6FA'
+    - name: disabled
+      label: Disabled
+      color: '#E6E6FA'
+    description: LACP mode for the aggregated interface
+    default_value: active
+    order_weight: 1750
+  relationships:
+  - name: lag_members
+    label: Member(s)
+    peer: InterfacePhysical
+    cardinality: many
+    kind: Attribute
+    description: Physical Interfaces that are members of this aggregate
+    order_weight: 1800
+extensions:
+  nodes:
+  - kind: InterfacePhysical
+    relationships:
+    - name: lag_parent
+      label: LAG
+      peer: InterfaceLag
+      optional: true
+      cardinality: one
+      kind: Attribute
+      description: LAG Interface using this Physical Interface
+      order_weight: 1800
+
+```

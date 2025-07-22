@@ -1,0 +1,309 @@
+---
+title: SFP
+---
+
+This schema extension gives you all the models you need to document Small Form-factor Pluggable (SFP).
+
+You can either plug it into an interface or attach it to a location (e.g. it's a spare SFP stored in a rack).
+
+Improvements:
+
+- As of now there is no verification with type / form factor / protocol / distance ...
+- You could plug any SFP into any equipment interface (e.g. a virtual interface ...)
+- You could link a SFP to an interface AND a location ...
+
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+
+## Nodes
+
+### StandardSFP
+
+- **Label:** Standard SFP
+- **Description:** Standard SFP module for various types (e.g., LR, SR, T).
+- **Namespace:** Dcim
+- **Icon:** mdi:gpu
+- **Inherit From:** DcimGenericSFP
+
+
+
+### BidiSFP
+
+- **Label:** Bidirectional SFP
+- **Description:** Bidirectional SFP supporting two wavelengths for single-fiber operation.
+- **Namespace:** Dcim
+- **Icon:** lineicons:arrow-both-direction-vertical-1
+- **Inherit From:** DcimGenericSFP
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| wavelength_tx | Transmit wavelength in nm. | Number | False |  |  |
+| wavelength_rx | Receive wavelength in nm. | Number | False |  |  |
+
+
+## Generics
+
+### GenericSFP
+
+- **Label:** SFP
+- **Description:** Generic base for all Small Form-factor Pluggable (SFP) transceivers.
+- **Namespace:** Dcim
+- **Icon:** mdi:gpu
+- **Display Labels:** form_factor__value, sfp_type__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| serial |  | Text | True |  |  |
+| sfp_type | Type of SFP, such as LR, SR, T. | Dropdown | False |  | lr, sr, lrm, t, sr4, lr4, zr, er, dac, aoc |
+| status |  | Dropdown | False | plugged | plugged, spare, decommissioned |
+| form_factor | The physical form factor of the SFP module. | Dropdown | False |  | sfp, sfp_plus, qsfp, qsfp_plus, qsfp28, qsfp_dd, cfp, cfp2, cfp4, xfp, sfp56, qsfp56, osfp |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| interface | DcimInterface | True | one | Attribute |
+| spare_location | LocationHosting | True | one | Attribute |
+| manufacturer | OrganizationManufacturer | True | one | Attribute |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### DcimInterface
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| plugged_sfp | DcimGenericSFP | True | one |  |
+
+### LocationHosting
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| spare_sfps | DcimGenericSFP | True | many |  |
+
+### OrganizationManufacturer
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| sfps | DcimGenericSFP | True | many |  |
+
+
+## Code
+
+```yaml
+version: '1.0'
+generics:
+- name: GenericSFP
+  namespace: Dcim
+  description: Generic base for all Small Form-factor Pluggable (SFP) transceivers.
+  label: SFP
+  icon: mdi:gpu
+  include_in_menu: true
+  display_labels:
+  - form_factor__value
+  - sfp_type__value
+  attributes:
+  - name: serial
+    kind: Text
+    optional: true
+    order_weight: 1400
+  - name: sfp_type
+    kind: Dropdown
+    description: Type of SFP, such as LR, SR, T.
+    order_weight: 1100
+    optional: false
+    choices:
+    - name: lr
+      label: LR (Long Reach)
+      description: Long Reach SFP, suitable for long-distance fiber connections.
+      color: '#009933'
+    - name: sr
+      label: SR (Short Reach)
+      description: Short Reach SFP, typically used for short-distance fiber.
+      color: '#cc66ff'
+    - name: lrm
+      label: LRM (Long Reach Multimode)
+      description: SFP for multimode fiber over longer distances.
+      color: '#3366ff'
+    - name: t
+      label: T (Twisted Pair)
+      description: Copper-based SFP, often used for twisted pair Ethernet.
+      color: '#ff9900'
+    - name: sr4
+      label: SR4 (Short Range 4-lane)
+      description: Short Range 4-lane SFP, used for parallel optics.
+      color: '#6666ff'
+    - name: lr4
+      label: LR4 (Long Range 4-lane)
+      description: Long Range 4-lane SFP, typically used for longer distances over
+        parallel optics.
+      color: '#336699'
+    - name: zr
+      label: ZR (Extended Reach)
+      description: Extended Reach SFP, suitable for distances up to 80km.
+      color: '#cc3300'
+    - name: er
+      label: ER (Extended Reach)
+      description: Extended Reach SFP, typically used for 40km distances.
+      color: '#ff6600'
+    - name: dac
+      label: DAC (Direct Attach Copper)
+      description: Direct Attach Copper, used for short connections over copper.
+      color: '#b35900'
+    - name: aoc
+      label: AOC (Active Optical Cable)
+      description: Active Optical Cable, used for short connections over fiber.
+      color: '#6699ff'
+  - name: status
+    kind: Dropdown
+    optional: false
+    order_weight: 1300
+    default_value: plugged
+    choices:
+    - name: plugged
+      label: Plugged
+      description: Plugged into a device's interface.
+      color: '#7fbf7f'
+    - name: spare
+      label: Spare
+      description: Stored somewhere as a spare.
+      color: '#ffff7f'
+    - name: decommissioned
+      label: Decommissioned
+      description: Decommissioned might be broken or not used anymore.
+      color: '#ffd27f'
+  - name: form_factor
+    kind: Dropdown
+    description: The physical form factor of the SFP module.
+    order_weight: 1000
+    optional: false
+    choices:
+    - name: sfp
+      label: SFP
+      color: '#009933'
+    - name: sfp_plus
+      label: SFP+
+      color: '#cc66ff'
+    - name: qsfp
+      label: QSFP
+      color: '#6666ff'
+    - name: qsfp_plus
+      label: QSFP+
+      color: '#3366ff'
+    - name: qsfp28
+      label: QSFP28
+      color: '#336699'
+    - name: qsfp_dd
+      label: QSFP-DD
+      color: '#ff9900'
+    - name: cfp
+      label: CFP
+      color: '#cc3300'
+    - name: cfp2
+      label: CFP2
+      color: '#ff6600'
+    - name: cfp4
+      label: CFP4
+      color: '#b35900'
+    - name: xfp
+      label: XFP
+      color: '#6699ff'
+    - name: sfp56
+      label: SFP56
+      color: '#9966ff'
+    - name: qsfp56
+      label: QSFP56
+      color: '#9933cc'
+    - name: osfp
+      label: OSFP
+      color: '#0099cc'
+  relationships:
+  - name: interface
+    peer: DcimInterface
+    kind: Attribute
+    optional: true
+    cardinality: one
+    order_weight: 1200
+  - name: spare_location
+    peer: LocationHosting
+    kind: Attribute
+    optional: true
+    cardinality: one
+    order_weight: 1500
+  - name: manufacturer
+    peer: OrganizationManufacturer
+    cardinality: one
+    kind: Attribute
+    optional: true
+    order_weight: 1350
+nodes:
+- name: StandardSFP
+  namespace: Dcim
+  inherit_from:
+  - DcimGenericSFP
+  description: Standard SFP module for various types (e.g., LR, SR, T).
+  label: Standard SFP
+  icon: mdi:gpu
+  menu_placement: DcimGenericSFP
+- name: BidiSFP
+  namespace: Dcim
+  inherit_from:
+  - DcimGenericSFP
+  description: Bidirectional SFP supporting two wavelengths for single-fiber operation.
+  label: Bidirectional SFP
+  icon: lineicons:arrow-both-direction-vertical-1
+  menu_placement: DcimGenericSFP
+  attributes:
+  - name: wavelength_tx
+    label: Transmit Wavelength (nm)
+    kind: Number
+    optional: false
+    description: Transmit wavelength in nm.
+    order_weight: 1175
+  - name: wavelength_rx
+    label: Receive Wavelength (nm)
+    kind: Number
+    optional: false
+    description: Receive wavelength in nm.
+    order_weight: 1150
+extensions:
+  nodes:
+  - kind: DcimInterface
+    relationships:
+    - name: plugged_sfp
+      peer: DcimGenericSFP
+      cardinality: one
+      optional: true
+  - kind: LocationHosting
+    relationships:
+    - name: spare_sfps
+      peer: DcimGenericSFP
+      cardinality: many
+      optional: true
+  - kind: OrganizationManufacturer
+    relationships:
+    - name: sfps
+      label: SFPs
+      peer: DcimGenericSFP
+      cardinality: many
+      optional: true
+
+```

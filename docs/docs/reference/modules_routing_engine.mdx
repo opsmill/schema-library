@@ -1,0 +1,112 @@
+---
+title: Modules Routing Engine
+---
+
+This schema extension allows you to capture Routing Engine related information like the version. You can insert the Routing Engine into a Dcim Physical Device and leverage the Routing Engine type model.
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+  - [extensions/modules](modules)
+
+## Nodes
+
+### RoutingEngineType
+
+- **Label:** Routing Engine Type
+- **Description:** Routing Engine Type information, detailing specifications such as part number and manufacturer.
+- **Namespace:** Device
+- **Inherit From:** DeviceGenericModuleType
+
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| routing_engines | DeviceRoutingEngine |  | many | Generic |
+
+### RoutingEngine
+
+- **Label:** Routing Engine
+- **Description:** A Routing Engine (RE) installed in a device, responsible for routing functionalities.
+- **Namespace:** Device
+- **Icon:** mdi:cpu-64-bit
+- **Display Labels:** serial_number__value
+- **Uniqueness Constraints:**
+    - serial_number__value
+- **Human Friendly ID:** device__name__value, slot__value
+- **Inherit From:** DeviceGenericModule
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| slot | The slot number where the Routing Engine is installed within the device | Number |  |  |  |
+| version | Firmware version of the Routing Engine. | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| routing_engine_type | DeviceRoutingEngineType | False | one | Attribute |
+
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: RoutingEngineType
+  namespace: Device
+  description: Routing Engine Type information, detailing specifications such as part
+    number and manufacturer.
+  label: Routing Engine Type
+  inherit_from:
+  - DeviceGenericModuleType
+  relationships:
+  - name: routing_engines
+    peer: DeviceRoutingEngine
+    cardinality: many
+    kind: Generic
+    description: Routing engines of this type.
+- name: RoutingEngine
+  namespace: Device
+  description: A Routing Engine (RE) installed in a device, responsible for routing
+    functionalities.
+  label: Routing Engine
+  icon: mdi:cpu-64-bit
+  inherit_from:
+  - DeviceGenericModule
+  uniqueness_constraints:
+  - - serial_number__value
+  human_friendly_id:
+  - device__name__value
+  - slot__value
+  order_by:
+  - device__name__value
+  - slot__value
+  display_labels:
+  - serial_number__value
+  attributes:
+  - name: slot
+    kind: Number
+    description: The slot number where the Routing Engine is installed within the
+      device
+    order_weight: 1100
+  - name: version
+    kind: Text
+    label: Version
+    description: Firmware version of the Routing Engine.
+    optional: true
+    order_weight: 1200
+  relationships:
+  - name: routing_engine_type
+    label: RE Type
+    peer: DeviceRoutingEngineType
+    optional: false
+    cardinality: one
+    kind: Attribute
+    order_weight: 1150
+
+```

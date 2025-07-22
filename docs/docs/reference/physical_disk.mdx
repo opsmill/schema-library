@@ -1,0 +1,165 @@
+---
+title: Physical Disk
+---
+
+Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management.
+
+NOTE: This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares.
+
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+
+## Nodes
+
+### PhysicalDisk
+
+- **Label:** Physical Disk
+- **Description:** Physical Disk
+- **Namespace:** Dcim
+- **Icon:** carbon:vmdk-disk
+- **Display Labels:** name__value
+- **Uniqueness Constraints:**
+    - name__value, device
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| disk_type | Specifies the type of disk | Dropdown | True |  | ssd, nvme, hdd, hybrid |
+| status | Lifecycle status of the hardware component. | Dropdown |  |  | in_inventory, active, decommissioned, disposed |
+| size | Disk capacity (in GB). | Number | False |  |  |
+| serial_number | Serial number of the disk | Text | True |  |  |
+| description |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| device | DcimDeviceWithPhysicalDisks | False | one | Parent |
+
+## Generics
+
+### DeviceWithPhysicalDisks
+
+- **Description:** Generic that hold relationship toward physical disks. To apply on device that can have physical disks.
+- **Namespace:** Dcim
+
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| physical_disks | DcimPhysicalDisk | True | many | Component |
+
+
+## Code
+
+```yaml
+version: '1.0'
+generics:
+- name: DeviceWithPhysicalDisks
+  namespace: Dcim
+  description: Generic that hold relationship toward physical disks. To apply on device
+    that can have physical disks.
+  include_in_menu: false
+  relationships:
+  - name: physical_disks
+    cardinality: many
+    peer: DcimPhysicalDisk
+    optional: true
+    kind: Component
+nodes:
+- name: PhysicalDisk
+  namespace: Dcim
+  description: Physical Disk
+  label: Physical Disk
+  icon: carbon:vmdk-disk
+  order_by:
+  - name__value
+  display_labels:
+  - name__value
+  human_friendly_id:
+  - name__value
+  uniqueness_constraints:
+  - - name__value
+    - device
+  attributes:
+  - name: name
+    kind: Text
+    unique: false
+    optional: false
+    order_weight: 900
+  - name: disk_type
+    kind: Dropdown
+    description: Specifies the type of disk
+    order_weight: 950
+    optional: true
+    choices:
+    - name: ssd
+      label: SSD
+      description: Solid State Drive
+      color: '#a6c1ff'
+    - name: nvme
+      label: NVMe
+      description: Non-Volatile Memory Express
+      color: '#ffbf80'
+    - name: hdd
+      label: HDD
+      description: Hard Disk Drive
+      color: '#80c7a6'
+    - name: hybrid
+      label: Hybrid
+      description: Hybrid Drive
+      color: '#ffcc80'
+  - name: status
+    kind: Dropdown
+    description: Lifecycle status of the hardware component.
+    choices:
+    - name: in_inventory
+      label: In Inventory
+      description: The disk is newly acquired and held in inventory.
+      color: '#6c757d'
+    - name: active
+      label: Active
+      description: The disk is currently in use within the infrastructure.
+      color: '#28a745'
+    - name: decommissioned
+      label: Decommissioned
+      description: The disk is retired from active use but still stored for potential
+        reuse or auditing.
+      color: '#17a2b8'
+    - name: disposed
+      label: Disposed
+      description: The disk has been securely erased and disposed of.
+      color: '#dc3545'
+  - name: size
+    label: Size (GB)
+    kind: Number
+    optional: false
+    order_weight: 1000
+    description: Disk capacity (in GB).
+  - name: serial_number
+    kind: Text
+    description: Serial number of the disk
+    unique: true
+    order_weight: 1100
+    optional: true
+  - name: description
+    kind: Text
+    unique: false
+    optional: true
+    order_weight: 1500
+  relationships:
+  - name: device
+    peer: DcimDeviceWithPhysicalDisks
+    optional: false
+    cardinality: one
+    kind: Parent
+    order_weight: 800
+
+```

@@ -1,0 +1,157 @@
+---
+title: Home
+slug: /
+hide_title: true
+---
+# Schema library for Infrahub
+
+Welcome to the Schema Library for Infrahub! This repository offers a collection of schemas designed to streamline and standardize infrastructure-related data structures.
+
+:::warning
+
+This project is currently a collection of examples intended to serve as inspiration. Please note that it is in an experimental phase and may undergo significant changes.
+
+:::
+
+## Use case
+
+Infrahub ships without built-in schemas, giving you complete freedom to define your own. However, starting from scratch can be overwhelming, especially when many infrastructures share common models. That's where the [Schema Library](https://github.com/opsmill/schema-library), maintained by OpsMill and the community, comes in.
+
+**The library provides a curated collection of practical, ready-to-use schemas designed to reflect real-world infrastructure needs. Use them out of the box, or treat them as a foundation: copy, adapt, and extend each schema to align precisely with your organization.**
+
+## Project structure
+
+This project is divided into three main parts:
+
+- **Base**: The foundational layer required for most extensions. It must be loaded before adding extensions.
+- **Extensions**: Generic schema components for managing infrastructure. Extensions may have dependencies on each other.
+- **Experimental**: Schema components that are not yet fully supported.
+
+## Getting started
+
+### Clone the repository
+
+```bash
+git clone https://github.com/opsmill/schema-library.git
+cd schema-library
+```
+
+:::note
+
+One of Infrahub's key strengths is its flexibility. **We encourage you to copy any schemas you find useful into your own repository** and tailor them to your specific needs, ensuring your schema aligns perfectly with your requirements.
+
+:::
+
+### How to load schemas
+
+There are two main ways to load schemas into Infrahub, depending on where you are in your Infrahub journey:
+- **Quick View**: To quickly view a schema, you can use `infrahubctl`. Please reference the [`infrahubctl` Guide](https://docs.infrahub.app/infrahubctl) for further instructions.
+- **Controlled Integration**: For a more organized and unified approach, you can connect a Git repository. Follow [this guide](https://docs.infrahub.app/guides/repository) to connect a Git repository.
+
+:::note
+
+For proof of concept or development purposes, using `infrahubctl` is the preferred approach. When running Infrahub in production, you might need the extra control provided by Git integration to load schemas.
+
+:::
+
+### Load schemas
+
+:::important
+
+You need to load the `base` schema before loading any extensions. Extensions may have dependencies on each other, so you'll need to load them in the correct order.
+
+:::
+
+```bash
+# Load the base
+infrahubctl schema load base
+
+# Load an extension
+infrahubctl schema load extensions/location_minimal
+
+# Load another extension
+infrahubctl schema load extensions/vlan
+```
+
+## Available schemas
+
+This list provides an overview of the schemas available in this repository. Each schema is designed to address specific infrastructure needs, and you can find detailed documentation for each one by clicking its name.
+<!-- vale off -->
+
+### base
+
+| Name | Description |
+|------|-------------|
+| **[DCIM](reference/dcim)** | Basic DCIM schema to capture devices, racks, interfaces, and related information. |
+| **[IPAM](reference/ipam)** | Basic IPAM schema to capture IP addresses, subnets, and related information. |
+| **[Locations](reference/location)** | Basic Location schema to capture locations, sites, and related information. |
+| **[Organization](reference/organization)** | Basic Organization schema to capture organizations, vendors, and related information. |
+
+### extensions
+
+| Name | Description |
+|------|-------------|
+| **[Cable](reference/cable)** | This schema extension contains a basic Cable model allowing you to connect two endpoints. |
+| **[Circuit](reference/circuit)** | This schema extension contains Circuits and ways to connect them with your infrastructure! The circuit could be a fiber connecting two sites, you would then have two endpoints, one on each site. |
+| **[Cluster](reference/cluster)** | This schema extension contains the foundations to capture clusters. With this one in place you can unlock various clusters flavors (hosting cluster able to host VMs, firewall clusters built with specific appliances ...) |
+| **[Compute](reference/compute)** | With this schema extension in place you will be able to capture all your physical servers. It also gives you the baseline to build virtualization. You might consider HostingCluster extension to go with! |
+| **[Cross Connect](reference/cross_connect)** | This extension contains schema to capture Cross Connect. You can see it as "a cable operated by a provider". You will be able to attach it to a location and then connect endpoints to it (e.g. rear interface of a patch panel, circuit endpoint ...) |
+| **[DWDM](reference/dwdm)** | This schema extension contains models for OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies such as DWDM (Dense Wavelength Division Multiplexing) or CWDM (Coarse Wavelength Division Multiplexing). With some vendors, the tunable optics are not configured via the channel number but via the wavelength and/or the frequency. This model provides a unique entry in Infrahub for those. |
+| **[Firewall Policer](reference/firewall_policer)** | This schema extension contains models for VMs. You might consider Cluster or/and Hypervisor extension to go with! |
+| **[Hosting Cluster](reference/hosting_cluster)** | A rather generic cluster built with compute units (e.g. servers) and able to host VMs. |
+| **[Interface Breakout](reference/interface_breakout)** | This schema extension introduces relationships to support breakout interfaces, enabling you to document the breakout of a physical interface into smaller physical interfaces. |
+| **[Lag](reference/lag)** | This schema extension includes models for Link Aggregation Groups (LAGs), enabling you to link physical interfaces as building blocs of your LAG interface. It can be used in standard networking environments as well as in compute scenarios, such as capturing bond interfaces. |
+| **[Location Minimal](reference/location_minimal)** | This schema extension is minimal but will provide you with basic items to store location related data. |
+| **[Modules](reference/modules)** | This schema extension allows you to capture Device Modules related information like the serial number or the status. You can insert the Module into a Dcim Physical Device. NOTE: This extension doesn't contain any Nodes, you can use the extension module_linecards or modules_routing_engine to use it |
+| **[Patch Panel](reference/patch_panel)** | This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture information about potential modules you would insert into your patch panel. NOTE: This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces! |
+| **[Peering IXP](reference/peering_ixp)** | This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)! |
+| **[Physical Disk](reference/physical_disk)** | Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management. NOTE: This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares. |
+| **[QinQ](reference/qinq)** | This schema extension brings extensions to VLAN model in order to support QinQ. |
+| **[Routing](reference/routing)** | This schema extension contains generics to create Routing Protocol "Instance". The idea is to create one Routing Protocol instance per IpamVRF + DcimDevice pair. |
+| **[Routing Aggregate](reference/routing_aggregate)** | This schema extension contains all you need to model the Aggregate Routing Protocol. |
+| **[Routing BGP](reference/routing_bgp)** | This schema extension contains all you need to model your BGP platform. |
+| **[Routing BGP Community](reference/routing_bgp_community)** | This schema extension adds the BGP Communities models. |
+| **[Routing BGP RR](reference/routing_bgp_rr)** | This schema extension extend the BGP extension to add BGP Route Reflector Clustering. |
+| **[Routing OSPF](reference/routing_ospf)** | This schema extension contains all you need to model the OSPF Routing Protocol. |
+| **[Routing PIM](reference/routing_pim)** | This schema extension contains all you need to model the PIM Protocol. |
+| **[Routing Policies](reference/routing_policies)** | This schema extension contains a generic to create Routing Policies. This Generic can be extend for each Routing Protocols you may want to use. |
+| **[Routing Policies (PIM)](reference/routing_policies_pim)** | This schema inherits the `RoutingPolicy` schema and removes `import_policies` and `export_policies` attributes. However it adds a number of relationships to `RoutingPIM`. |
+| **[Routing Policies Aggregate](reference/routing_policies_aggregate)** | This extension is using the Routing Policies extensions and the Routing Aggregate one together. |
+| **[Routing Policies BGP](reference/routing_policies_bgp)** | This extension is using the Routing Policies extensions and the Routing BGP one together. |
+| **[Routing Policies OSPF](reference/routing_policies_ospf)** | This extension is using the Routing Policies extensions and the Routing OSPF one together. |
+| **[SFP](reference/sfp)** | This schema extension gives you all the models you need to document Small Form-factor Pluggable (SFP). You can either plug it into an interface or attach it to a location (e.g. it's a spare SFP stored in a rack). Improvements: - As of now there is no verification with type / form factor / protocol / distance ... - You could plug any SFP into any equipment interface (e.g. a virtual interface ...) - You could link a SFP to an interface AND a location ... |
+| **[SNMP](reference/snmp)** | This schema extension contains models for SNMP Communities and SNMP Clients. As you can see this extension is not linked to Tenancy or Device, as you could decide to link the Community to different models based on your use case. |
+| **[Topology](reference/topology)** | This schema extension introduces abstract network pods and services running in the pods, such as MPLS and EVPN. |
+| **[Users](reference/users)** | This schema extension contains models for account management. |
+| **[VLAN](reference/vlan)** | This schema extension contains models to support VLANs in you network. |
+| **[VRF](reference/vrf)** | This schema extension contains models to support VRF in your network. |
+| **[VRRP](reference/vrrp)** | This schema extension contains models for VRRP. |
+
+### experimental
+
+| Name | Description |
+|------|-------------|
+| **[Azure](reference/azure)** | This schema extension introduces cloud support for Microsoft Azure. |
+| **[Circuit Service](reference/circuit_service)** | This schema extension contains model coming on top of circuit to capture a single service shared across multiple circuits. For example you have a MPLS network supported by a provider connecting multiple locations: - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...) - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side |
+| **[Infiniband](reference/infiniband)** | This schema extension adds support for InfiniBand switches. |
+| **[Location Extended](reference/location_extended)** | This schema extension is the most detailed when it comes to location, you'll find all the layers you can think of. |
+| **[Modules Linecards](reference/modules_linecards)** | This schema extension allows you to capture Linecard related information like the version. You can insert the Linecard into a Dcim Physical Device and leverage the Linecard type model. The Linecard can accept PIC to help configure PORT information like breakout-capabilities and configurations. |
+| **[Modules Routing Engine](reference/modules_routing_engine)** | This schema extension allows you to capture Routing Engine related information like the version. You can insert the Routing Engine into a Dcim Physical Device and leverage the Routing Engine type model. |
+| **[QoS](reference/qos)** | This schema extension contains models for Quality of Service (QoS) |
+| **[Security](reference/security)** | This schema extension contains models for implementing detailed security. |
+| **[Tenancy](reference/tenancy)** | This schema extension introduces tenancy for some of the schema nodes (circuits...) |
+| **[Topology](reference/topology)** | A schema for defining and managing network topology, strategies, and services. |
+| **[VLAN Translation](reference/vlan-translation)** | This schema extension is based on Juniper VLAN MAP, and not yet test out for other vendors. |
+<!-- vale on -->
+
+## Troubleshooting
+
+- **`Unable to load the schema: xxx unable to find the generic yyy` - Missing requirements**
+
+This error indicates that the schema you are trying to load has dependencies on other schemas that are not present in your Infrahub instance.
+
+:::success
+
+To resolve this, ensure that you have loaded all required schemas before attempting to load the one in question. You can find the list of dependencies in the schema documentation.
+
+:::

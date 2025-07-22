@@ -1,0 +1,196 @@
+---
+title: Location Minimal
+---
+
+This schema extension is minimal but will provide you with basic items to store location related data.
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+
+## Nodes
+
+### Country
+
+- **Label:** Country
+- **Namespace:** Location
+- **Icon:** gis:search-country
+- **Display Labels:** name__value
+- **Inherit From:** LocationGeneric
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| timezone |  | Text | True |  |  |
+
+
+### Metro
+
+- **Label:** Metro
+- **Namespace:** Location
+- **Icon:** healthicons:city
+- **Display Labels:** name__value
+- **Inherit From:** LocationGeneric
+
+
+
+### Site
+
+- **Label:** Site
+- **Namespace:** Location
+- **Icon:** ri:building-line
+- **Display Labels:** name__value
+- **Inherit From:** LocationGeneric, LocationHosting
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| facility_id |  | Text | True |  |  |
+| physical_address |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| owner | OrganizationGeneric | True | one |  |
+
+### Rack
+
+- **Label:** Rack
+- **Namespace:** Location
+- **Icon:** clarity:rack-server-line
+- **Display Labels:** name__value
+- **Inherit From:** LocationGeneric, LocationHosting
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| facility_id |  | Text | True |  |  |
+| height |  | Number | False | 42 |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| owner | OrganizationGeneric | True | one |  |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### OrganizationProvider
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| sites | LocationSite | True | many |  |
+
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: Country
+  namespace: Location
+  label: Country
+  inherit_from:
+  - LocationGeneric
+  menu_placement: LocationGeneric
+  display_labels:
+  - name__value
+  parent: ''
+  children: LocationMetro
+  icon: gis:search-country
+  attributes:
+  - name: timezone
+    kind: Text
+    optional: true
+    order_weight: 1300
+- name: Metro
+  namespace: Location
+  label: Metro
+  inherit_from:
+  - LocationGeneric
+  menu_placement: LocationGeneric
+  display_labels:
+  - name__value
+  parent: LocationCountry
+  children: LocationSite
+  icon: healthicons:city
+- name: Site
+  namespace: Location
+  label: Site
+  inherit_from:
+  - LocationGeneric
+  - LocationHosting
+  menu_placement: LocationGeneric
+  display_labels:
+  - name__value
+  parent: LocationMetro
+  children: LocationRack
+  icon: ri:building-line
+  attributes:
+  - name: facility_id
+    kind: Text
+    unique: false
+    optional: true
+    order_weight: 1100
+  - name: physical_address
+    kind: Text
+    unique: false
+    optional: true
+    order_weight: 1500
+  relationships:
+  - name: owner
+    peer: OrganizationGeneric
+    optional: true
+    cardinality: one
+- name: Rack
+  namespace: Location
+  label: Rack
+  inherit_from:
+  - LocationGeneric
+  - LocationHosting
+  include_in_menu: true
+  display_labels:
+  - name__value
+  menu_placement: LocationGeneric
+  parent: LocationSite
+  icon: clarity:rack-server-line
+  attributes:
+  - name: facility_id
+    kind: Text
+    unique: false
+    optional: true
+    order_weight: 1100
+  - name: height
+    label: Height (U)
+    optional: false
+    default_value: 42
+    kind: Number
+    order_weight: 1300
+  relationships:
+  - name: owner
+    peer: OrganizationGeneric
+    optional: true
+    cardinality: one
+extensions:
+  nodes:
+  - kind: OrganizationProvider
+    relationships:
+    - name: sites
+      peer: LocationSite
+      cardinality: many
+      optional: true
+
+```

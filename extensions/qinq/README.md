@@ -1,5 +1,3 @@
-## QinQ
+# qinq
 
-This schema extension brings extensions to VLAN model in order to support QinQ.
-
-- **Dependencies:** `base, extensions/vlan`
+Please refer to the [reference page](https://docs.infrahub.app/schema-library/reference/qinq) for the corresponding documentation.

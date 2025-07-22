@@ -1,0 +1,224 @@
+---
+title: Routing OSPF
+---
+
+This schema extension contains all you need to model the OSPF Routing Protocol.
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+  - [extensions/routing](routing)
+
+## Nodes
+
+### OSPF
+
+- **Label:** OSPF
+- **Description:** OSPF (Open Shortest Path First) instance on a Virtual Router.
+- **Namespace:** Routing
+- **Icon:** mdi:network-outline
+- **Display Labels:** description__value
+- **Uniqueness Constraints:**
+    - device, vrf, version__value
+- **Human Friendly ID:** device__name__value, vrf__name__value, version__value
+- **Inherit From:** RoutingProtocol
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| reference_bandwidth | Reference bandwidth for OSPF instance (in Mbps). | Number | True | 1000 |  |
+| version | Version of the OSPF protocol. | Dropdown |  | ospf | ospf, ospfv3 |
+| import_policies |  | Text | True |  |  |
+| export_policies |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| router_id | IpamIPAddress | True | one | Attribute |
+| ospf_interfaces | RoutingOSPFInterface | True | many | Component |
+
+### OSPFInterface
+
+- **Label:** OSPF Interface
+- **Description:** Pivot table linking OSPF configuration to an interface.
+- **Namespace:** Routing
+- **Icon:** mdi:ethernet
+- **Display Labels:** description__value
+- **Uniqueness Constraints:**
+    - ospf, interface
+- **Human Friendly ID:** description__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| description | Description of the OSPF interface. | Text | False |  |  |
+| metric | OSPF metric for the interface. | Number | True |  |  |
+| mode | Mode of the OSPF interface. | Dropdown |  | normal | normal, passive, peer_to_peer |
+| authentication_key | Shared secret used to authenticate and secure routing messages between neighboring routers. | Password | True |  |  |
+| authentication_mode |  | Dropdown | True |  | md5, sha1 |
+| area | OSPF area associated with the interface. | Text |  |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| ospf | RoutingOSPF | False | one | Parent |
+| interface | InterfaceLayer3 | False | one | Attribute |
+
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: OSPF
+  namespace: Routing
+  description: OSPF (Open Shortest Path First) instance on a Virtual Router.
+  label: OSPF
+  icon: mdi:network-outline
+  include_in_menu: false
+  order_by:
+  - router_id__address__value
+  - vrf__name__value
+  - device__name__value
+  uniqueness_constraints:
+  - - device
+    - vrf
+    - version__value
+  human_friendly_id:
+  - device__name__value
+  - vrf__name__value
+  - version__value
+  display_labels:
+  - description__value
+  inherit_from:
+  - RoutingProtocol
+  attributes:
+  - name: reference_bandwidth
+    kind: Number
+    optional: true
+    default_value: 1000
+    description: Reference bandwidth for OSPF instance (in Mbps).
+    order_weight: 1150
+  - name: version
+    kind: Dropdown
+    choices:
+    - name: ospf
+      label: OSPFv2
+      description: Open Shortest Path First version 2.
+      color: '#E6E6FA'
+    - name: ospfv3
+      label: OSPFv3
+      description: Open Shortest Path First version 3.
+      color: '#E6E6FA'
+    default_value: ospf
+    description: Version of the OSPF protocol.
+    order_weight: 1100
+  - name: import_policies
+    kind: Text
+    optional: true
+    order_weight: 1300
+  - name: export_policies
+    kind: Text
+    optional: true
+    order_weight: 1350
+  relationships:
+  - name: router_id
+    peer: IpamIPAddress
+    optional: true
+    cardinality: one
+    kind: Attribute
+  - name: ospf_interfaces
+    label: OSPF Interfaces
+    peer: RoutingOSPFInterface
+    identifier: ospf__ospfinterfaces
+    optional: true
+    cardinality: many
+    kind: Component
+- name: OSPFInterface
+  namespace: Routing
+  description: Pivot table linking OSPF configuration to an interface.
+  label: OSPF Interface
+  icon: mdi:ethernet
+  include_in_menu: false
+  order_by:
+  - description__value
+  display_labels:
+  - description__value
+  uniqueness_constraints:
+  - - ospf
+    - interface
+  human_friendly_id:
+  - description__value
+  attributes:
+  - name: description
+    kind: Text
+    optional: false
+    unique: true
+    description: Description of the OSPF interface.
+    order_weight: 1500
+  - name: metric
+    kind: Number
+    optional: true
+    description: OSPF metric for the interface.
+    order_weight: 1400
+  - name: mode
+    kind: Dropdown
+    choices:
+    - name: normal
+      label: Normal
+      description: Standard OSPF interface mode.
+      color: '#E6E6FA'
+    - name: passive
+      label: Passive
+      description: Interface will not send OSPF hello packets.
+      color: '#E6E6FA'
+    - name: peer_to_peer
+      label: Peer-to-Peer
+      description: OSPF peer-to-peer interface mode.
+      color: '#E6E6FA'
+    default_value: normal
+    description: Mode of the OSPF interface.
+    order_weight: 1300
+  - name: authentication_key
+    kind: Password
+    description: Shared secret used to authenticate and secure routing messages between
+      neighboring routers.
+    optional: true
+    order_weight: 1250
+  - name: authentication_mode
+    kind: Dropdown
+    choices:
+    - name: md5
+      label: MD5
+      color: '#E6E6FA'
+    - name: sha1
+      label: SHA1
+      color: '#E6E6FA'
+    optional: true
+    order_weight: 1225
+  - name: area
+    kind: Text
+    description: OSPF area associated with the interface.
+    order_weight: 1200
+  relationships:
+  - name: ospf
+    label: OSPF
+    peer: RoutingOSPF
+    identifier: ospf__ospfinterfaces
+    optional: false
+    cardinality: one
+    kind: Parent
+    order_weight: 1100
+  - name: interface
+    peer: InterfaceLayer3
+    optional: false
+    cardinality: one
+    kind: Attribute
+    order_weight: 1200
+
+```

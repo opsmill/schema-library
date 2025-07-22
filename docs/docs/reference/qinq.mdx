@@ -1,0 +1,72 @@
+---
+title: QinQ
+---
+
+This schema extension brings extensions to VLAN model in order to support QinQ.
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+  - [extensions/vlan](vlan)
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### IpamVLAN
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| qinq_role |  | Dropdown | True |  | suplier, customer |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| svlan | IpamVLAN | True | one | Attribute |
+| cvlan | IpamVLAN | True | many | Attribute |
+
+
+## Code
+
+```yaml
+version: '1.0'
+extensions:
+  nodes:
+  - kind: IpamVLAN
+    attributes:
+    - name: qinq_role
+      kind: Dropdown
+      optional: true
+      choices:
+      - name: suplier
+        label: Suplier
+        description: A VLAN used to encapsulate multiple CVLANs.
+      - name: customer
+        label: Customer
+        description: A VLAN assigned to customer traffic.
+    relationships:
+    - name: svlan
+      label: Supplier vlan
+      peer: IpamVLAN
+      optional: true
+      direction: inbound
+      identifier: vlan__qinq
+      cardinality: one
+      kind: Attribute
+    - name: cvlan
+      label: Customer vlan(s)
+      peer: IpamVLAN
+      optional: true
+      direction: outbound
+      identifier: vlan__qinq
+      cardinality: many
+      kind: Attribute
+
+```

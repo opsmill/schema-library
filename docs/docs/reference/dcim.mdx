@@ -1,0 +1,759 @@
+---
+title: DCIM
+---
+
+Basic DCIM schema to capture devices, racks, interfaces, and related information.
+
+## Details
+
+- **Dependencies:** No dependencies
+
+## Nodes
+
+### DeviceType
+
+- **Label:** Device Type
+- **Description:** A model of device
+- **Namespace:** Dcim
+- **Icon:** mdi:poll
+- **Display Labels:** name__value
+- **Uniqueness Constraints:**
+    - manufacturer, name__value
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text |  |  |  |
+| description |  | Text | True |  |  |
+| part_number |  | Text | True |  |  |
+| height |  | Number | False | 1 |  |
+| full_depth |  | Boolean |  | True |  |
+| weight |  | Number | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| platform | DcimPlatform |  | one | Attribute |
+| manufacturer | OrganizationManufacturer | False | one | Attribute |
+| tags | BuiltinTag | True | many | Attribute |
+
+### Platform
+
+- **Label:** Platform
+- **Description:** A Platform represent the type of software running on a device.
+- **Namespace:** Dcim
+- **Icon:** mdi:application-cog-outline
+- **Display Labels:** name__value
+- **Uniqueness Constraints:**
+    - name__value
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text |  |  |  |
+| description |  | Text | True |  |  |
+| nornir_platform |  | Text | True |  |  |
+| napalm_driver |  | Text | True |  |  |
+| netmiko_device_type |  | Text | True |  |  |
+| ansible_network_os |  | Text | True |  |  |
+| containerlab_os |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| devices | DcimGenericDevice | True | many |  |
+| manufacturer | OrganizationManufacturer |  | one | Attribute |
+
+### Device
+
+- **Label:** Network Device
+- **Description:** A configurable network device for managing and directing data traffic, including routers, switches...
+- **Namespace:** Dcim
+- **Icon:** clarity:network-switch-solid
+- **Inherit From:** CoreArtifactTarget, DcimGenericDevice, DcimPhysicalDevice
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| status |  | Dropdown | False |  | active, provisioning, maintenance, drained |
+| role |  | Dropdown | True |  | core, edge, cpe, spine, leaf, tor |
+
+
+### Physical
+
+- **Label:** Physical Interface
+- **Description:** Physical network port on a device
+- **Namespace:** Interface
+- **Inherit From:** DcimInterface, InterfaceLayer2, InterfaceLayer3, DcimEndpoint, InterfaceHasSubInterface
+
+
+
+### Virtual
+
+- **Label:** Virtual Interface
+- **Description:** Virtual interface like VLAN or Loopback
+- **Namespace:** Interface
+- **Inherit From:** DcimInterface, InterfaceLayer2, InterfaceLayer3
+
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| parent_interface | InterfaceHasSubInterface |  | one | Attribute |
+
+## Generics
+
+### GenericDevice
+
+- **Label:** Device
+- **Description:** Generic Device object.
+- **Namespace:** Dcim
+- **Icon:** mdi:server
+- **Display Labels:** name__value
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text |  |  |  |
+| description |  | Text | True |  |  |
+| os_version |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| interfaces | DcimInterface | True | many | Component |
+| tags | BuiltinTag | True | many | Attribute |
+| primary_address | IpamIPAddress | True | one | Attribute |
+| platform | DcimPlatform | True | one | Attribute |
+
+### PhysicalDevice
+
+- **Description:** Generic holding attributes and relationships relevant for physical device.
+- **Namespace:** Dcim
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| position | Lowest unit. | Number | True |  |  |
+| serial |  | Text | True |  |  |
+| rack_face | On which face of the rack the device is mounted. | Dropdown | False | front | front, rear |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| device_type | DcimDeviceType | True | one | Attribute |
+| location | LocationHosting | False | one | Attribute |
+
+### Endpoint
+
+- **Description:** Generic Endpoint to receive a connector.
+- **Namespace:** Dcim
+
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| connector | DcimConnector | True | one | Attribute |
+
+### Connector
+
+- **Description:** Generic Connector to link two endpoints together.
+- **Namespace:** Dcim
+
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| connected_endpoints | DcimEndpoint | True | many | Generic |
+
+### Interface
+
+- **Label:** Interface
+- **Description:** Generic Network Interface
+- **Namespace:** Dcim
+- **Display Labels:** name__value
+- **Uniqueness Constraints:**
+    - device, name__value
+- **Human Friendly ID:** device__name__value, name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name | Name of the interface | Text |  |  |  |
+| description | A brief description of the interface | Text | True |  |  |
+| mtu |  | Number |  | 1514 |  |
+| status | The status of the interface | Dropdown |  | active | provisioning, free, active, maintenance, disabled, deleted, outage |
+| role | The role of the interface in the network | Dropdown | True |  | lag, core, cust, access, management, peering, upstream |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| device | DcimGenericDevice | False | one | Parent |
+| tags | BuiltinTag | True | many | Attribute |
+
+### Layer2
+
+- **Label:** Layer 2 Interface
+- **Description:** Layer 2 specific attributes for network interfaces
+- **Namespace:** Interface
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| l2_mode | Layer 2 mode of the interface | Dropdown | True |  | access, trunk, trunk_all |
+
+
+### Layer3
+
+- **Label:** Layer 3 Interface
+- **Description:** Layer 3 specific attributes for network interfaces
+- **Namespace:** Interface
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| dot1q_id | Dot1Q VLAN ID | Number | True |  |  |
+| mac_address |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| ip_addresses | IpamIPAddress | True | many | Attribute |
+
+### HasSubInterface
+
+- **Description:** A generic interface that can have sub-interfaces
+- **Namespace:** Interface
+
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| sub_interfaces | InterfaceVirtual | True | many | Attribute |
+
+
+## Code
+
+```yaml
+version: '1.0'
+generics:
+- name: GenericDevice
+  namespace: Dcim
+  description: Generic Device object.
+  label: Device
+  icon: mdi:server
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_labels:
+  - name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    order_weight: 1000
+  - name: description
+    kind: Text
+    optional: true
+    order_weight: 2000
+  - name: os_version
+    kind: Text
+    optional: true
+    order_weight: 2200
+  relationships:
+  - name: interfaces
+    peer: DcimInterface
+    optional: true
+    cardinality: many
+    identifier: device__interface
+    kind: Component
+  - name: tags
+    peer: BuiltinTag
+    optional: true
+    cardinality: many
+    kind: Attribute
+    order_weight: 2000
+  - name: primary_address
+    peer: IpamIPAddress
+    label: Primary IP Address
+    optional: true
+    cardinality: one
+    kind: Attribute
+    order_weight: 1700
+  - name: platform
+    peer: DcimPlatform
+    optional: true
+    cardinality: one
+    kind: Attribute
+    order_weight: 1250
+- name: PhysicalDevice
+  namespace: Dcim
+  description: Generic holding attributes and relationships relevant for physical
+    device.
+  include_in_menu: false
+  attributes:
+  - name: position
+    label: Position (U)
+    description: Lowest unit.
+    kind: Number
+    optional: true
+    order_weight: 1500
+  - name: serial
+    kind: Text
+    optional: true
+    order_weight: 1500
+  - name: rack_face
+    label: Rack Face
+    description: On which face of the rack the device is mounted.
+    kind: Dropdown
+    optional: false
+    default_value: front
+    order_weight: 1515
+    choices:
+    - name: front
+      label: Front
+      description: Device mounted on the front face of the rack.
+    - name: rear
+      label: Rear
+      description: Device mounted on the rear face of the rack.
+  relationships:
+  - name: device_type
+    peer: DcimDeviceType
+    optional: true
+    cardinality: one
+    kind: Attribute
+    order_weight: 1200
+  - name: location
+    label: Location
+    peer: LocationHosting
+    optional: false
+    cardinality: one
+    kind: Attribute
+    order_weight: 1500
+- name: Endpoint
+  namespace: Dcim
+  description: Generic Endpoint to receive a connector.
+  include_in_menu: false
+  relationships:
+  - name: connector
+    peer: DcimConnector
+    optional: true
+    cardinality: one
+    order_weight: 1500
+    kind: Attribute
+- name: Connector
+  namespace: Dcim
+  description: Generic Connector to link two endpoints together.
+  include_in_menu: false
+  relationships:
+  - name: connected_endpoints
+    peer: DcimEndpoint
+    optional: true
+    cardinality: many
+    order_weight: 1500
+    kind: Generic
+- name: Interface
+  namespace: Dcim
+  description: Generic Network Interface
+  label: Interface
+  include_in_menu: false
+  display_labels:
+  - name__value
+  order_by:
+  - device__name__value
+  - name__value
+  uniqueness_constraints:
+  - - device
+    - name__value
+  human_friendly_id:
+  - device__name__value
+  - name__value
+  attributes:
+  - name: name
+    kind: Text
+    description: Name of the interface
+    order_weight: 1000
+  - name: description
+    kind: Text
+    optional: true
+    description: A brief description of the interface
+    order_weight: 1100
+  - name: mtu
+    label: MTU
+    kind: Number
+    default_value: 1514
+    order_weight: 1300
+  - name: status
+    kind: Dropdown
+    description: The status of the interface
+    choices:
+    - name: provisioning
+      label: Provisioning
+      description: Interface is being provisioned.
+      color: '#A9DFBF'
+    - name: free
+      label: Free
+      description: Interface is unused.
+      color: '#CDEACC'
+    - name: active
+      label: Active
+      description: Interface is active and operational.
+      color: '#A9CCE3'
+    - name: maintenance
+      label: Maintenance
+      description: Interface is under maintenance.
+      color: '#FFF2CC'
+    - name: disabled
+      label: Disabled
+      description: Interface has been disabled.
+      color: '#D3D3D3'
+    - name: deleted
+      label: Deleted
+      description: Interface has been deleted.
+      color: '#FAD7A0'
+    - name: outage
+      label: Outage
+      description: Interface is currently experiencing an outage.
+      color: '#F4CCCC'
+    default_value: active
+    order_weight: 1200
+  - name: role
+    kind: Dropdown
+    optional: true
+    description: The role of the interface in the network
+    choices:
+    - name: lag
+      label: Lag
+      description: Interface LAG.
+      color: '#A9DFBF'
+    - name: core
+      label: Core Interface
+      description: Central part of the network.
+      color: '#A9CCE3'
+    - name: cust
+      label: Customer Interface
+      description: Interface dedicated to customer connections.
+      color: '#D2B4DE'
+    - name: access
+      label: Access Interfaces
+      description: Interface connecting endpoint devices.
+      color: '#B4E0DC'
+    - name: management
+      label: Management Interface
+      description: Interface dedicated to device management.
+      color: '#E3DAC9'
+    - name: peering
+      label: Peering Interface
+      description: Interface dedicated to peering with other networks.
+      color: '#C4B7E6'
+    - name: upstream
+      label: Upstream Interface
+      description: Interface dedicated to upstream traffic between networks.
+      color: '#B2D4E6'
+    order_weight: 1250
+  relationships:
+  - name: device
+    peer: DcimGenericDevice
+    identifier: device__interface
+    optional: false
+    cardinality: one
+    kind: Parent
+    order_weight: 1025
+  - name: tags
+    peer: BuiltinTag
+    optional: true
+    cardinality: many
+    kind: Attribute
+    order_weight: 3000
+- name: Layer2
+  namespace: Interface
+  include_in_menu: false
+  description: Layer 2 specific attributes for network interfaces
+  label: Layer 2 Interface
+  attributes:
+  - name: l2_mode
+    label: Layer2 Mode
+    kind: Dropdown
+    optional: true
+    choices:
+    - name: access
+      label: Access
+      description: Access mode
+    - name: trunk
+      label: Trunk
+      description: Trunk mode
+    - name: trunk_all
+      label: Trunk (All)
+      description: Trunk all mode
+    description: Layer 2 mode of the interface
+    order_weight: 1500
+- name: Layer3
+  namespace: Interface
+  include_in_menu: false
+  description: Layer 3 specific attributes for network interfaces
+  label: Layer 3 Interface
+  attributes:
+  - name: dot1q_id
+    label: VLAN ID (dot1q)
+    kind: Number
+    description: Dot1Q VLAN ID
+    order_weight: 1600
+    optional: true
+  - name: mac_address
+    label: Mac Address
+    kind: Text
+    optional: true
+    order_weight: 1550
+  relationships:
+  - name: ip_addresses
+    label: IP Addresses
+    peer: IpamIPAddress
+    cardinality: many
+    kind: Attribute
+    optional: true
+    description: List of IP addresses associated with the interface
+    order_weight: 1150
+- name: HasSubInterface
+  namespace: Interface
+  description: A generic interface that can have sub-interfaces
+  include_in_menu: false
+  relationships:
+  - name: sub_interfaces
+    label: Sub-interface(s)
+    peer: InterfaceVirtual
+    identifier: sub__interface
+    optional: true
+    cardinality: many
+    kind: Attribute
+    description: Sub-interfaces of this interface
+    order_weight: 1750
+nodes:
+- name: DeviceType
+  namespace: Dcim
+  description: A model of device
+  label: Device Type
+  icon: mdi:poll
+  human_friendly_id:
+  - name__value
+  display_labels:
+  - name__value
+  order_by:
+  - manufacturer__name__value
+  - name__value
+  uniqueness_constraints:
+  - - manufacturer
+    - name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    order_weight: 1000
+  - name: description
+    kind: Text
+    optional: true
+    order_weight: 1100
+  - name: part_number
+    label: Part Number
+    optional: true
+    kind: Text
+    order_weight: 1200
+  - name: height
+    label: Height (U)
+    optional: false
+    default_value: 1
+    kind: Number
+    order_weight: 1400
+  - name: full_depth
+    label: Full Depth
+    default_value: true
+    kind: Boolean
+    order_weight: 1500
+  - name: weight
+    label: Weight (kg)
+    optional: true
+    kind: Number
+    order_weight: 1600
+  relationships:
+  - name: platform
+    peer: DcimPlatform
+    cardinality: one
+    kind: Attribute
+    order_weight: 1300
+  - name: manufacturer
+    peer: OrganizationManufacturer
+    cardinality: one
+    kind: Attribute
+    order_weight: 1250
+    optional: false
+  - name: tags
+    peer: BuiltinTag
+    optional: true
+    cardinality: many
+    kind: Attribute
+    order_weight: 2000
+- name: Platform
+  namespace: Dcim
+  description: A Platform represent the type of software running on a device.
+  label: Platform
+  icon: mdi:application-cog-outline
+  human_friendly_id:
+  - name__value
+  display_labels:
+  - name__value
+  order_by:
+  - manufacturer__name__value
+  - name__value
+  uniqueness_constraints:
+  - - name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    order_weight: 1000
+  - name: description
+    kind: Text
+    optional: true
+    order_weight: 1200
+  - name: nornir_platform
+    kind: Text
+    optional: true
+    order_weight: 1500
+  - name: napalm_driver
+    kind: Text
+    optional: true
+    order_weight: 1600
+  - name: netmiko_device_type
+    kind: Text
+    optional: true
+    order_weight: 1700
+  - name: ansible_network_os
+    kind: Text
+    optional: true
+    order_weight: 1800
+  - name: containerlab_os
+    kind: Text
+    optional: true
+    order_weight: 1900
+  relationships:
+  - name: devices
+    peer: DcimGenericDevice
+    optional: true
+    cardinality: many
+    order_weight: 1350
+  - name: manufacturer
+    peer: OrganizationManufacturer
+    cardinality: one
+    kind: Attribute
+    order_weight: 1300
+- name: Device
+  label: Network Device
+  description: A configurable network device for managing and directing data traffic,
+    including routers, switches...
+  icon: clarity:network-switch-solid
+  namespace: Dcim
+  inherit_from:
+  - CoreArtifactTarget
+  - DcimGenericDevice
+  - DcimPhysicalDevice
+  attributes:
+  - name: status
+    kind: Dropdown
+    optional: false
+    order_weight: 1100
+    choices:
+    - name: active
+      label: Active
+      description: Fully operational and currently in service.
+      color: '#7fbf7f'
+    - name: provisioning
+      label: Provisioning
+      description: In the process of being set up and configured.
+      color: '#ffff7f'
+    - name: maintenance
+      label: Maintenance
+      description: Undergoing routine maintenance or repairs.
+      color: '#ffd27f'
+    - name: drained
+      label: Drained
+      description: Temporarily taken out of service.
+      color: '#bfbfbf'
+  - name: role
+    kind: Dropdown
+    optional: true
+    order_weight: 1400
+    choices:
+    - name: core
+      label: Core Router
+      description: Central part of the network.
+      color: '#7f7fff'
+    - name: edge
+      label: Edge Router
+      description: Network boundary with external networks.
+      color: '#bf7fbf'
+    - name: cpe
+      label: Customer Premise Equipment
+      description: Devices located at the customer's premises.
+      color: '#bf7f7f'
+    - name: spine
+      label: Spine Router
+      description: Aggregation router part of a Fabric.
+      color: '#aeeeee'
+    - name: leaf
+      label: Leaf Switch
+      description: Top of Rack part of a Fabric.
+      color: '#e6e6fa'
+    - name: tor
+      label: Tor Switch
+      description: Tor switch part of a Fabric.
+      color: '#e8e7fd'
+- name: Physical
+  namespace: Interface
+  label: Physical Interface
+  description: Physical network port on a device
+  inherit_from:
+  - DcimInterface
+  - InterfaceLayer2
+  - InterfaceLayer3
+  - DcimEndpoint
+  - InterfaceHasSubInterface
+  include_in_menu: false
+- name: Virtual
+  namespace: Interface
+  label: Virtual Interface
+  description: Virtual interface like VLAN or Loopback
+  inherit_from:
+  - DcimInterface
+  - InterfaceLayer2
+  - InterfaceLayer3
+  include_in_menu: false
+  relationships:
+  - name: parent_interface
+    peer: InterfaceHasSubInterface
+    cardinality: one
+    kind: Attribute
+    identifier: sub__interface
+    description: Parent interface to which this sub-interface belongs
+
+```

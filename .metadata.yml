@@ -2,20 +2,27 @@
 # yamllint disable rule:line-length
 base/dcim:
   description:
-    Basic DCIM schema to capture devices, racks, interfaces, and related information.
+    Basic DCIM schema to capture devices, racks, interfaces, and related
+    information.
   name: DCIM
 base/ipam:
-  description:
-    Basic IPAM schema to capture IP addresses, subnets, and related information.
+  description: Basic IPAM schema to capture IP addresses, subnets, and related information.
   name: IPAM
 base/location:
-  description:
-    Basic Location schema to capture locations, sites, and related information.
+  description: Basic Location schema to capture locations, sites, and related information.
   name: Locations
 base/organization:
   description:
-    Basic Organization schema to capture organizations, vendors, and related information.
+    Basic Organization schema to capture organizations, vendors, and related
+    information.
   name: Organization
+extensions/cable:
+  dependencies:
+    - base
+  description:
+    This schema extension contains a basic Cable model allowing you to
+    connect two endpoints.
+  name: Cable
 experimental/azure:
   attribution: "[Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)"
   dependencies:
@@ -51,18 +58,18 @@ experimental/modules_linecards:
     - extensions/modules
   description:
     This schema extension allows you to capture Linecard related information
-    like the version. You can insert the Linecard into a Dcim Physical Device
-    and leverage the Linecard type model. The Linecard can accept PIC to help
-    configure PORT information like breakout-capabilities and configurations.
+    like the version. You can insert the Linecard into a Dcim Physical Device and
+    leverage the Linecard type model. The Linecard can accept PIC to help configure
+    PORT information like breakout-capabilities and configurations.
   name: Modules Linecards
 experimental/modules_routing_engine:
   dependencies:
     - base
     - extensions/modules
   description:
-    This schema extension allows you to capture Routing Engine related information
-    like the version. You can insert the Routing Engine into a Dcim Physical Device
-    and leverage the Routing Engine type model.
+    This schema extension allows you to capture Routing Engine related
+    information like the version. You can insert the Routing Engine into a Dcim Physical
+    Device and leverage the Routing Engine type model.
   name: Modules Routing Engine
 experimental/qos:
   dependencies:
@@ -96,13 +103,6 @@ experimental/vlan-translation:
     This schema extension is based on Juniper VLAN MAP, and not yet test
     out for other vendors.
   name: VLAN Translation
-extensions/cable:
-  dependencies:
-    - base
-  description:
-    This schema extension contains a basic Cable model allowing you to
-    connect two endpoints.
-  name: Cable
 extensions/circuit:
   dependencies:
     - base
@@ -121,22 +121,6 @@ extensions/cluster:
     With this one in place you can unlock various clusters flavors (hosting cluster
     able to host VMs, firewall clusters built with specific appliances ...)
   name: Cluster
-extensions/lag:
-  dependencies:
-    - base
-  description:
-    This schema extension includes models for Link Aggregation Groups (LAGs),
-    enabling you to link physical interfaces as building blocs of your LAG interface.
-    It can be used in standard networking environments as well as in compute scenarios,
-    such as capturing bond interfaces.
-  name: Lag
-extensions/interface_breakout:
-  dependencies:
-    - base
-  description:
-    This schema extension introduces relationships to support breakout interfaces,
-    enabling you to document the breakout of a physical interface into smaller physical interfaces.
-  name: Interface Breakout
 extensions/compute:
   dependencies:
     - base
@@ -182,6 +166,23 @@ extensions/hosting_cluster:
     A rather generic cluster built with compute units (e.g. servers) and
     able to host VMs.
   name: Hosting Cluster
+extensions/interface_breakout:
+  dependencies:
+    - base
+  description:
+    This schema extension introduces relationships to support breakout
+    interfaces, enabling you to document the breakout of a physical interface into
+    smaller physical interfaces.
+  name: Interface Breakout
+extensions/lag:
+  dependencies:
+    - base
+  description:
+    This schema extension includes models for Link Aggregation Groups (LAGs),
+    enabling you to link physical interfaces as building blocs of your LAG interface.
+    It can be used in standard networking environments as well as in compute scenarios,
+    such as capturing bond interfaces.
+  name: Lag
 extensions/location_minimal:
   dependencies:
     - base
@@ -212,7 +213,8 @@ extensions/peering_ixp:
     - extensions/routing_bgp
     - extensions/routing_bgp_community
   description:
-    This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)!
+    This schema extension contains all you need to model anything revolving
+    around internet peering (Exchange points ...)!
   name: Peering IXP
 extensions/physical_disk:
   dependencies:
@@ -227,7 +229,8 @@ extensions/qinq:
     - base
     - extensions/vlan
   description:
-    This schema extension brings extensions to VLAN model in order to support QinQ.
+    This schema extension brings extensions to VLAN model in order to support
+    QinQ.
   name: QinQ
 extensions/routing:
   dependencies:
@@ -284,7 +287,9 @@ extensions/routing_pim:
 extensions/routing_policies:
   dependencies:
     - base
-  description: This schema extension contains a generic to create Routing Policies. This Generic can be extend for each Routing Protocols you may want to use.
+  description:
+    This schema extension contains a generic to create Routing Policies.
+    This Generic can be extend for each Routing Protocols you may want to use.
   name: Routing Policies
 extensions/routing_policies_aggregate:
   dependencies:

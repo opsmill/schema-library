@@ -1,0 +1,91 @@
+---
+title: Routing BGP Community
+---
+
+This schema extension adds the BGP Communities models.
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+  - [extensions/routing](routing)
+
+## Nodes
+
+### BGPCommunity
+
+- **Label:** BGP Community
+- **Description:** Defines a BGP community.
+- **Namespace:** Routing
+- **Icon:** iconoir:community
+- **Display Labels:** name__value, community__value
+- **Uniqueness Constraints:**
+    - name__value
+    - community__value
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name | The name of the BGP community. | Text |  |  |  |
+| description | An optional description of the BGP community. | Text | True |  |  |
+| community | The value of the BGP community (RFC1997, RFC4360, RFC8092). | Text |  |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| routing_policy | RoutingPolicy |  | many | Generic |
+| tags | BuiltinTag | True | many | Attribute |
+
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: BGPCommunity
+  namespace: Routing
+  icon: iconoir:community
+  label: BGP Community
+  description: Defines a BGP community.
+  uniqueness_constraints:
+  - - name__value
+  - - community__value
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_labels:
+  - name__value
+  - community__value
+  attributes:
+  - name: name
+    kind: Text
+    description: The name of the BGP community.
+    order_weight: 1000
+  - name: description
+    kind: Text
+    description: An optional description of the BGP community.
+    optional: true
+    order_weight: 1100
+  - name: community
+    kind: Text
+    description: The value of the BGP community (RFC1997, RFC4360, RFC8092).
+    order_weight: 1200
+  relationships:
+  - name: routing_policy
+    label: Routing Policies
+    peer: RoutingPolicy
+    description: The BGP Policies using this BGP Community.
+    kind: Generic
+    cardinality: many
+  - name: tags
+    peer: BuiltinTag
+    kind: Attribute
+    optional: true
+    cardinality: many
+    order_weight: 3000
+
+```

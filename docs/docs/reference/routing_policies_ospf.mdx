@@ -1,0 +1,90 @@
+---
+title: Routing Policies OSPF
+---
+
+This extension is using the Routing Policies extensions and the Routing OSPF one together.
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+  - [extensions/routing](routing)
+  - [extensions/routing_policies](routing_policies)
+  - [extensions/routing_ospf](routing_ospf)
+
+## Nodes
+
+### PolicyOSPF
+
+- **Label:** OSPF Routing Policies
+- **Description:** A routing policiers for OSPF
+- **Namespace:** Routing
+- **Icon:** carbon:deployment-policy
+- **Inherit From:** RoutingPolicy
+
+
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### RoutingOSPF
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| import_policies |  | Text |  |  |  |
+| export_policies |  | Text |  |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| import_routing_policies | RoutingPolicyOSPF |  | many | Generic |
+| export_routing_policies | RoutingPolicyOSPF |  | many | Generic |
+
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: PolicyOSPF
+  namespace: Routing
+  description: A routing policiers for OSPF
+  label: OSPF Routing Policies
+  icon: carbon:deployment-policy
+  include_in_menu: false
+  inherit_from:
+  - RoutingPolicy
+extensions:
+  nodes:
+  - kind: RoutingOSPF
+    attributes:
+    - name: import_policies
+      kind: Text
+      state: absent
+    - name: export_policies
+      kind: Text
+      state: absent
+    relationships:
+    - name: import_routing_policies
+      label: Import Routing Policies
+      peer: RoutingPolicyOSPF
+      identifier: ospf__import_policies
+      description: The routing-policies used by this instance for import.
+      kind: Generic
+      cardinality: many
+    - name: export_routing_policies
+      label: Export Routing Policies
+      peer: RoutingPolicyOSPF
+      identifier: ospf__export_policies
+      description: The routing-policies used by this instance for export.
+      kind: Generic
+      cardinality: many
+
+```

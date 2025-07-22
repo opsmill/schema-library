@@ -1,0 +1,268 @@
+---
+title: Peering IXP
+---
+
+This schema extension contains all you need to model anything revolving around internet peering (Exchange points ...)!
+
+## Details
+
+- **Dependencies:**
+  - [base](dcim)
+  - [extensions/routing](routing)
+  - [extensions/routing_bgp](routing_bgp)
+  - [extensions/routing_bgp_community](routing_bgp_community)
+
+## Nodes
+
+### IXP
+
+- **Label:** Internet Exchange
+- **Description:** An Internet Exchange Point (IXP) for peering
+- **Namespace:** Peering
+- **Icon:** mdi:network
+- **Display Labels:** name__value
+- **Uniqueness Constraints:**
+    - name__value
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name | Name of the Internet Exchange | Text |  |  |  |
+| description | An optional description of the Internet Exchange | Text | True |  |  |
+| status |  | Dropdown |  | enabled | enabled, disabled |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| connections | PeeringIXPConnection | True | many | Component |
+| local_as | RoutingAutonomousSystem | True | one | Attribute |
+| import_policies | RoutingPolicyBGP | True | many | Generic |
+| export_policies | RoutingPolicyBGP | True | many | Generic |
+| bgp_communities | RoutingBGPCommunity | True | many | Generic |
+| tags | BuiltinTag | True | many | Attribute |
+
+### IXPConnection
+
+- **Label:** IXP Connection
+- **Description:** A connection to an Internet Exchange Point (IXP)
+- **Namespace:** Peering
+- **Icon:** mdi:lan-connect
+- **Display Labels:** name__value
+- **Uniqueness Constraints:**
+    - name__value
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name | Name of the IXP Connection | Text |  |  |  |
+| description | Description of the IXP Connection | Text | True |  |  |
+| peeringdb_netixlan | PeeringDB ID for the IXP connection | Number | True |  |  |
+| status |  | Dropdown | True | enabled | enabled, pre-maintenance, maintenance, post-maintenance, disabled |
+| vlan | VLAN ID for the connection | Number | True |  |  |
+| mac_address | MAC address associated with the connection | MacAddress | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| ipv6_address | IpamIPAddress |  | one | Attribute |
+| ipv4_address | IpamIPAddress |  | one | Attribute |
+| internet_exchange_point | PeeringIXP | False | one | Parent |
+| router | DcimDevice |  | one | Attribute |
+| tags | BuiltinTag |  | many | Attribute |
+
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: IXP
+  namespace: Peering
+  description: An Internet Exchange Point (IXP) for peering
+  label: Internet Exchange
+  icon: mdi:network
+  uniqueness_constraints:
+  - - name__value
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_labels:
+  - name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    description: Name of the Internet Exchange
+    order_weight: 1000
+  - name: description
+    kind: Text
+    description: An optional description of the Internet Exchange
+    optional: true
+    order_weight: 1100
+  - name: status
+    kind: Dropdown
+    choices:
+    - name: enabled
+      label: Enabled
+      description: Internet Exchange is active and operational
+      color: '#a8dadc'
+    - name: disabled
+      label: Disabled
+      description: Internet Exchange is not operational
+      color: '#b0bec5'
+    default_value: enabled
+    order_weight: 1200
+  relationships:
+  - name: connections
+    peer: PeeringIXPConnection
+    optional: true
+    cardinality: many
+    kind: Component
+    description: IXP connections associated with this Internet Exchange
+  - name: local_as
+    peer: RoutingAutonomousSystem
+    optional: true
+    cardinality: one
+    kind: Attribute
+    order_weight: 1300
+  - name: import_policies
+    label: Import Routing Policies
+    peer: RoutingPolicyBGP
+    identifier: ixp__import_bgppolicies
+    optional: true
+    cardinality: many
+    kind: Generic
+    description: Import routing policies applied to the session
+  - name: export_policies
+    label: Export Routing Policies
+    peer: RoutingPolicyBGP
+    identifier: ixp__export_bgppolicies
+    optional: true
+    cardinality: many
+    kind: Generic
+    description: Export routing policies applied to the session
+  - name: bgp_communities
+    label: BGP Communities
+    peer: RoutingBGPCommunity
+    optional: true
+    cardinality: many
+    kind: Generic
+    description: BGP communities associated with the session
+  - name: tags
+    peer: BuiltinTag
+    optional: true
+    cardinality: many
+    kind: Attribute
+    order_weight: 3000
+- name: IXPConnection
+  namespace: Peering
+  description: A connection to an Internet Exchange Point (IXP)
+  label: IXP Connection
+  icon: mdi:lan-connect
+  menu_placement: PeeringIXP
+  uniqueness_constraints:
+  - - name__value
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_labels:
+  - name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    description: Name of the IXP Connection
+    order_weight: 1000
+  - name: description
+    kind: Text
+    optional: true
+    description: Description of the IXP Connection
+    order_weight: 1100
+  - name: peeringdb_netixlan
+    label: PeeringDB Netixlan
+    kind: Number
+    optional: true
+    description: PeeringDB ID for the IXP connection
+    order_weight: 1150
+  - name: status
+    kind: Dropdown
+    optional: true
+    choices:
+    - name: enabled
+      label: Enabled
+      description: The system is fully operational and functioning as expected.
+      color: '#a8dadc'
+    - name: pre-maintenance
+      label: Pre-Maintenance
+      description: Preparation stage before performing maintenance tasks.
+      color: '#f4a261'
+    - name: maintenance
+      label: Maintenance
+      description: Currently undergoing maintenance tasks.
+      color: '#e9c46a'
+    - name: post-maintenance
+      label: Post-Maintenance
+      description: Final checks and verifications after maintenance tasks.
+      color: '#f0e5de'
+    - name: disabled
+      label: Disabled
+      description: The system is not operational and cannot be used.
+      color: '#b0bec5'
+    default_value: enabled
+    order_weight: 1200
+  - name: vlan
+    kind: Number
+    description: VLAN ID for the connection
+    optional: true
+    order_weight: 1300
+  - name: mac_address
+    kind: MacAddress
+    label: MAC Address
+    optional: true
+    description: MAC address associated with the connection
+    order_weight: 1350
+  relationships:
+  - name: ipv6_address
+    label: IPv6 Address
+    description: IPv6 address assigned to the connection
+    peer: IpamIPAddress
+    identifier: ixpconn__ipv6_address
+    cardinality: one
+    kind: Attribute
+    order_weight: 1400
+  - name: ipv4_address
+    label: IPv4 Address
+    description: IPv4 address assigned to the connection
+    peer: IpamIPAddress
+    identifier: ixpconn__ipv4_address
+    cardinality: one
+    kind: Attribute
+    order_weight: 1375
+  - name: internet_exchange_point
+    label: IXP
+    peer: PeeringIXP
+    optional: false
+    cardinality: one
+    kind: Parent
+    description: The Internet Exchange Point this connection is part of
+  - name: router
+    peer: DcimDevice
+    cardinality: one
+    kind: Attribute
+    description: The router this IXP connection is connected to
+    order_weight: 1400
+  - name: tags
+    peer: BuiltinTag
+    cardinality: many
+    kind: Attribute
+    order_weight: 3000
+
+```
