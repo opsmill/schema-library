@@ -12,8 +12,6 @@ nodes:
       - name__value
     order_by:
       - name__value
-    uniqueness_constraints:
-      - [name__value]
     human_friendly_id:
       - name__value
     attributes:

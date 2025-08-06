@@ -8,9 +8,6 @@ nodes:
     icon: iconoir:community
     label: "BGP Community"
     description: "Defines a BGP community."
-    uniqueness_constraints:
-      - ["name__value"]
-      - ["community__value"]
     human_friendly_id:
       - name__value
     order_by:
@@ -23,6 +20,7 @@ nodes:
         kind: Text
         description: "The name of the BGP community."
         order_weight: 1000
+        unique: true
       - name: description
         kind: Text
         description: "An optional description of the BGP community."
@@ -32,6 +30,7 @@ nodes:
         kind: Text
         description: "The value of the BGP community (RFC1997, RFC4360, RFC8092)."
         order_weight: 1200
+        unique: true
     relationships:
       - name: routing_policy
         label: Routing Policies

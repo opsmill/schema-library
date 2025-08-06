@@ -9,8 +9,6 @@ nodes:
     label: "Route Reflector Cluster"
     icon: "mdi:router-network"
     include_in_menu: false
-    uniqueness_constraints:
-      - [name__value]
     human_friendly_id:
       - name__value
     display_labels:
@@ -20,6 +18,7 @@ nodes:
         kind: Text
         description: "Name of the Route Reflector Cluster"
         order_weight: 1000
+        unique: true
       - name: description
         kind: Text
         description: "Optional description of the Route Reflector Cluster"

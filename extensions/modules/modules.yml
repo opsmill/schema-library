@@ -1,7 +1,7 @@
 ---
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 
-version: '1.0'
+version: "1.0"
 
 generics:
   - name: GenericModule
@@ -24,23 +24,23 @@ generics:
           - name: provisioning
             label: Provisioning
             description: "Linecard is being provisioned."
-            color: "#A9DFBF"  # light pastel green
+            color: "#A9DFBF" # light pastel green
           - name: active
             label: Active
             description: "Linecard is active and operational."
-            color: "#A9CCE3"  # pastel blue
+            color: "#A9CCE3" # pastel blue
           - name: maintenance
             label: Maintenance
             description: "Linecard is under maintenance."
-            color: "#FFF2CC"  # pastel yellow
+            color: "#FFF2CC" # pastel yellow
           - name: disabled
             label: Disabled
             description: "Linecard has been disabled."
-            color: "#D3D3D3"  # light grey
+            color: "#D3D3D3" # light grey
           - name: outage
             label: Outage
             description: "Linecard is currently experiencing an outage."
-            color: "#F4CCCC"  # pastel red
+            color: "#F4CCCC" # pastel red
         default_value: "active"
         order_weight: 1300
     relationships:

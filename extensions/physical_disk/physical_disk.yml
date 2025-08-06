@@ -29,11 +29,10 @@ nodes:
     human_friendly_id:
       - name__value
     uniqueness_constraints:
-      - [name__value, device]
+      - [device, name__value]
     attributes:
       - name: name
         kind: Text
-        unique: false
         optional: false
         order_weight: 900
       - name: disk_type

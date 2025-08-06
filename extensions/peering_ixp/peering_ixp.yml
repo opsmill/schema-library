@@ -7,8 +7,6 @@ nodes:
     description: "An Internet Exchange Point (IXP) for peering"
     label: "Internet Exchange"
     icon: "mdi:network"
-    uniqueness_constraints:
-      - ["name__value"]
     human_friendly_id:
       - "name__value"
     order_by:
