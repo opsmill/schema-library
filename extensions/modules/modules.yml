@@ -1,13 +1,20 @@
 ---
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 
-version: '1.0'
+version: "1.0"
 
 generics:
   - name: GenericModule
     namespace: Device
     description: "A generic module, such as a Linecard or Routing Engine, installed in a device."
     label: "Module"
+    icon: mdi:expansion-card
+    human_friendly_id:
+      - serial_number__value
+    display_labels:
+      - serial_number__value
+    order_by:
+      - serial_number__value
     attributes:
       - name: serial_number
         kind: Text
@@ -24,23 +31,23 @@ generics:
           - name: provisioning
             label: Provisioning
             description: "Linecard is being provisioned."
-            color: "#A9DFBF"  # light pastel green
+            color: "#A9DFBF" # light pastel green
           - name: active
             label: Active
             description: "Linecard is active and operational."
-            color: "#A9CCE3"  # pastel blue
+            color: "#A9CCE3" # pastel blue
           - name: maintenance
             label: Maintenance
             description: "Linecard is under maintenance."
-            color: "#FFF2CC"  # pastel yellow
+            color: "#FFF2CC" # pastel yellow
           - name: disabled
             label: Disabled
             description: "Linecard has been disabled."
-            color: "#D3D3D3"  # light grey
+            color: "#D3D3D3" # light grey
           - name: outage
             label: Outage
             description: "Linecard is currently experiencing an outage."
-            color: "#F4CCCC"  # pastel red
+            color: "#F4CCCC" # pastel red
         default_value: "active"
         order_weight: 1300
     relationships:
@@ -64,8 +71,11 @@ generics:
     namespace: Device
     description: "A generic module type, with common specifications like part number and manufacturer."
     label: "Module Type"
+    icon: mdi:database-cog
+    menu_placement: DeviceGenericModule
+    display_labels:
+      - name__value
     uniqueness_constraints:
-      - ["part_number__value"]
       - ["name__value", "manufacturer"]
     human_friendly_id:
       - name__value
@@ -87,6 +97,7 @@ generics:
         label: Part Number
         kind: Text
         optional: true
+        unique: true
         description: "Part number of the module."
         order_weight: 1200
     relationships:
