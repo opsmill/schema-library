@@ -232,9 +232,9 @@ nodes:
       - channel__value
     uniqueness_constraints:
       # Combination must be unique
-      - [wdm_type__value, channel__value, wavelength__value, frequency__value]
+      - [frequency__value, wavelength__value, channel__value, wdm_type__value]
       # For a given type channel number must be unique
-      - [wdm_type__value, channel__value]
+      - [channel__value, wdm_type__value]
       # TODO: Maybe add some further validations
     human_friendly_id:
       - wdm_type__value

@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
-version: '1.0'
+version: "1.0"
 
 nodes:
   - name: Group
@@ -12,14 +12,13 @@ nodes:
       - name__value
     order_by:
       - name__value
-    uniqueness_constraints:
-      - ["name__value"]
     human_friendly_id:
       - "name__value"
     attributes:
       - name: name
         kind: Text
         order_weight: 1000
+        unique: true
       - name: description
         kind: Text
         optional: true
@@ -34,13 +33,13 @@ nodes:
         choices:
           - name: admin
             description: "All rights on device."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
           - name: operator
             description: "Operator right on configuration."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
           - name: read-only
             description: "Read only right on configuration."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
         order_weight: 1200
 
   - name: Account
@@ -52,17 +51,15 @@ nodes:
       - name__value
     order_by:
       - name__value
-    uniqueness_constraints:
-      - ["name__value"]
     human_friendly_id:
       - "name__value"
     attributes:
       - name: name
         label: Username
         kind: Text
-        optional: false
         description: "The login username"
         order_weight: 1000
+        unique: true
       - name: full_name
         kind: Text
         optional: true

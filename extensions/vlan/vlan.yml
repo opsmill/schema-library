@@ -10,7 +10,7 @@ nodes:
     icon: mdi:lan-pending
     menu_placement: IpamL2Domain
     uniqueness_constraints:
-      - [l2domain, vlan_id__value]
+      - [vlan_id__value, l2domain]
     human_friendly_id:
       - name__value
     order_by:

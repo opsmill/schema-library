@@ -17,7 +17,7 @@ nodes:
     inherit_from:
       - BuiltinIPAddress
     uniqueness_constraints:
-      - [ip_namespace, address__value]
+      - [address__value, ip_namespace]
     human_friendly_id:
       - address__value
       - ip_namespace__name__value
@@ -47,7 +47,7 @@ nodes:
     inherit_from:
       - BuiltinIPPrefix
     uniqueness_constraints:
-      - [ip_namespace, prefix__value]
+      - [prefix__value, ip_namespace]
     human_friendly_id:
       - prefix__value
       - ip_namespace__name__value

@@ -8,8 +8,6 @@ generics:
     icon: carbon:deployment-policy
     include_in_menu: false
     description: "Policy defining the rules for routing traffic in a network."
-    uniqueness_constraints:
-      - ["name__value"]
     human_friendly_id:
       - "name__value"
     order_by:
@@ -36,15 +34,15 @@ generics:
           - name: import-policy
             label: Import
             description: "Policy for incoming routes."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
           - name: export-policy
             label: Export
             description: "Policy for outgoing routes."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
           - name: import-export-policy
             label: Import + Export
             description: "Policy for both incoming and outgoing routes."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
         order_weight: 1200
       - name: weight
         kind: Number
@@ -59,14 +57,14 @@ generics:
           - name: "ipv4"
             label: IPv4
             description: "Policy applies to IPv4 addresses."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
           - name: "ipv6"
             label: IPv6
             description: "Policy applies to IPv6 addresses."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
           - name: "all"
             label: All
             description: "Policy applies to both IPv4 and IPv6 addresses."
-            color: "#E6E6FA"  # lavender
+            color: "#E6E6FA" # lavender
         default_value: "all"
         order_weight: 1150
