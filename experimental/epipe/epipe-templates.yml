@@ -13,7 +13,6 @@ nodes:
         computed_attribute:
           kind: Jinja2
           jinja2_template: "{{ role__value }}"
-        #  jinja2_template: "{{ node_a__name__value }}-{{node_b__name__value}}-{{ role__value }}"
         read_only: true
         optional: false
       - name: role
@@ -44,80 +43,80 @@ nodes:
     include_in_menu: false
     namespace: Infra
     attributes:
-    - name: name
-      kind: Text
-      computed_attribute:
-        kind: TransformPython
-        transform: compute_epipe_name
-      read_only: true
-      optional: true
-    - name: mtu
-      kind: Number
-      optional: false
-      default_value: 9100
-      description: "Maximum Transmission Unit"
+      - name: name
+        kind: Text
+        computed_attribute:
+          kind: TransformPython
+          transform: compute_epipe_name
+        read_only: true
+        optional: true
+      - name: mtu
+        kind: Number
+        optional: false
+        default_value: 9100
+        description: "Maximum Transmission Unit"
     relationships:
-    - name: customer
-      label: Customer
-      peer: ServicesCustomer
-      kind: Attribute
-      cardinality: one
-      identifier: epipetemplate__customer
-    - name: sdp_a
-      label: SDP Node A
-      peer: InfraSDP
-      kind: Attribute
-      cardinality: one
-      identifier: epipetemplate__sdp_a
-    - name: sdp_b
-      label: SDP Node B
-      peer: InfraSDP
-      kind: Attribute
-      cardinality: one
-      identifier: epipetemplate__sdp_b
-    - name: port_a
-      label: Port Node A
-      peer: InfraPort
-      kind: Attribute
-      cardinality: one
-      identifier: epipetemplate__port_a
-    - name: port_b
-      label: Port Node B
-      peer: InfraPort
-      kind: Attribute
-      cardinality: one
-      identifier: epipetemplate__port_b
+      - name: customer
+        label: Customer
+        peer: ServicesCustomer
+        kind: Attribute
+        cardinality: one
+        identifier: epipetemplate__customer
+      - name: sdp_a
+        label: SDP Node A
+        peer: InfraSDP
+        kind: Attribute
+        cardinality: one
+        identifier: epipetemplate__sdp_a
+      - name: sdp_b
+        label: SDP Node B
+        peer: InfraSDP
+        kind: Attribute
+        cardinality: one
+        identifier: epipetemplate__sdp_b
+      - name: port_a
+        label: Port Node A
+        peer: InfraPort
+        kind: Attribute
+        cardinality: one
+        identifier: epipetemplate__port_a
+      - name: port_b
+        label: Port Node B
+        peer: InfraPort
+        kind: Attribute
+        cardinality: one
+        identifier: epipetemplate__port_b
 
   - name: EpipeService
     label: Epipe Service
     include_in_menu: false
     namespace: Infra
     display_labels:
-    - name__value
+      - name__value
     attributes:
-    - name: name
-      kind: Text
-      unique: true
-      optional: false
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
     relationships:
-    - name: epipe_a
-      label: Epipe A-Side
-      peer: InfraEpipe
-      kind: Component
-      cardinality: one
-      optional: false
-      identifier: epipeservice__epipe_a
-    - name: epipe_z
-      label: Epipe Z-Side
-      peer: InfraEpipe
-      kind: Component
-      cardinality: one
-      optional: false
-      identifier: epipeservice__epipe_z
-    - name: customer
-      label: Customer
-      peer: ServicesCustomer
-      kind: Attribute
-      cardinality: one
-      optional: false
-      identifier: epipeservice__customer
+      - name: epipe_a
+        label: Epipe A-Side
+        peer: InfraEpipe
+        kind: Component
+        cardinality: one
+        optional: false
+        identifier: epipeservice__epipe_a
+      - name: epipe_z
+        label: Epipe Z-Side
+        peer: InfraEpipe
+        kind: Component
+        cardinality: one
+        optional: false
+        identifier: epipeservice__epipe_z
+      - name: customer
+        label: Customer
+        peer: ServicesCustomer
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: epipeservice__customer
