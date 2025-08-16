@@ -1,0 +1,156 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+
+version: "1.0"
+nodes:
+  - name: LSP
+    label: LSP
+    include_in_menu: false
+    namespace: Infra
+    display_labels:
+      - name__value
+    attributes:
+      - name: name
+        kind: Text
+        optional: true
+        unique: true
+      - name: role
+        kind: Dropdown
+        choices:
+          - name: low_latency
+            label: Low Latency
+          - name: igp_cost
+            label: IGP Cost
+          - name: disjoint
+            label: Disjoint
+    relationships:
+      - name: src_ip
+        kind: Attribute
+        peer: IpamIPAddress
+        optional: false
+        cardinality: one
+        identifier: infra_lsp__src_ip
+      - name: dst_ip
+        kind: Attribute
+        peer: IpamIPAddress
+        optional: false
+        cardinality: one
+        identifier: infra_lsp__dst_ip
+      - name: sdp
+        kind: Attribute
+        peer: InfraSDP
+        cardinality: one
+        optional: true
+
+  - name: SDP
+    label: SDP
+    include_in_menu: false
+    namespace: Infra
+    display_labels:
+      - sdp_id__value
+    human_friendly_id:
+      - lsp__name__value
+      - sdp_id__value
+    uniqueness_constraints:
+      - [lsp, sdp_id__value]
+    attributes:
+      - name: sdp_id
+        kind: Number
+        optional: false
+    relationships:
+      - name: lsp
+        kind: Attribute
+        peer: InfraLSP
+        cardinality: one
+        optional: false
+
+  - name: SAP
+    label: SAP
+    include_in_menu: false
+    namespace: Infra
+    display_labels:
+      - sap_id__value
+    human_friendly_id:
+      - sap_id__value
+    attributes:
+      - name: sap_id
+        kind: Number
+        unique: true
+        optional: false
+      - name: admin_state
+        kind: Dropdown
+        optional: false
+        description: "Administrative state of the SAP"
+        default_value: "enable"
+        choices:
+          - name: enable
+            label: Enable
+            description: "Enable the SAP"
+          - name: disable
+            label: Disable
+            description: "Disable the SAP"
+      - name: ingress_bandwidth
+        kind: Bandwidth
+        description: "Ingress bandwidth rate in kbps"
+        default_value: 10240000
+        optional: false
+      - name: egress_bandwidth
+        kind: Bandwidth
+        description: "Egress bandwidth rate in kbps"
+        default_value: 10240000
+        optional: false
+      - name: llf_admin_state
+        kind: Dropdown
+        description: "Link Loss Forwarding administrative state"
+        optional: false
+        default_value: "enable"
+        choices:
+          - name: enable
+            label: Enable
+            description: "Enable link loss forwarding"
+          - name: disable
+            label: Disable
+            description: "Disable link loss forwarding"
+    relationships:
+      - name: port
+        kind: Attribute
+        peer: InfraPort
+        cardinality: one
+        optional: false
+      - name: epipe
+        kind: Attribute
+        peer: InfraEpipe
+        cardinality: one
+        optional: true
+
+  - name: Epipe
+    label: Epipe
+    namespace: Infra
+    include_in_menu: false
+    display_labels:
+      - name__value
+    human_friendly_id:
+      - name__value
+    uniqueness_constraints:
+      - [sap, name__value]
+    attributes:
+      - name: epipe_id
+        kind: Number
+        state: absent
+        unique: true
+        optional: false
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+    relationships:
+      - name: sap
+        kind: Attribute
+        peer: InfraSAP
+        cardinality: one
+        optional: false
+      - name: sdp
+        kind: Attribute
+        peer: InfraSDP
+        cardinality: one
+        optional: false
