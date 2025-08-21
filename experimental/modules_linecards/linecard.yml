@@ -6,7 +6,9 @@ version: "1.0"
 nodes:
   - name: LinecardType
     namespace: Device
+    menu_placement: DeviceLinecard
     description: "Linecard Type information, detailing specifications such as part number and manufacturer."
+    icon: mdi:poll
     label: "Linecard Type"
     inherit_from:
       - DeviceGenericModuleType
@@ -22,20 +24,9 @@ nodes:
     description: "A Linecard installed in a device, specifying slot, power status, and functionalities."
     label: "Linecard"
     icon: "bi:pci-card"
+    menu_placement: DeviceGenericModule
     inherit_from:
       - DeviceGenericModule
-    uniqueness_constraints:
-      - ["serial_number__value"]
-      #  # Only one Linecard per Device Slot
-      # - ["device", "slot__value"]
-    human_friendly_id:
-      - device__name__value
-      - slot__value
-    order_by:
-      - device__name__value
-      - slot__value
-    display_labels:
-      - serial_number__value
     attributes:
       - name: slot
         kind: Number
@@ -70,18 +61,23 @@ nodes:
     namespace: Device
     description: "Physical Interface Card (PIC) installed in the Linecard, containing multiple ports."
     label: "PIC"
+    menu_placement: DeviceLinecard
+    icon: mdi:memory
     uniqueness_constraints:
       # Only one PIC per slot within a Linecard
       - ["linecard", "slot__value"]
     human_friendly_id:
-      - linecard__serial_number__value
-      - slot__value
+      - serial_number__value
     display_labels:
-      - slot__value
+      - serial_number__value
     order_by:
       - linecard__serial_number__value
-      - slot__value
     attributes:
+      - name: serial_number
+        kind: Text
+        unique: true
+        description: "Unique serial number of the PIC."
+        order_weight: 1000
       - name: slot
         kind: Number
         description: "Slot number of the PIC within the Linecard"
@@ -97,7 +93,7 @@ nodes:
         order_weight: 1000
       - name: ports
         label: Ports
-        peer: InfraPort
+        peer: DevicePort
         optional: true
         cardinality: many
         kind: Component
@@ -108,16 +104,18 @@ nodes:
     namespace: Device
     description: "A network port on a PIC, specifying speed and port number."
     label: "Port"
+    menu_placement: DeviceLinecard
+
+    icon: mdi:ethernet
     uniqueness_constraints:
       - ["pic", "port_number__value"] # Each port must be unique within a PIC
     human_friendly_id:
-      - pic__slot__value
+      - pic__serial_number__value
       - port_number__value
     display_labels:
       - port_number__value
     order_by:
-      - pic__slot__value
-      - port_number__value
+      - pic__serial_number__value
     attributes:
       - name: port_number
         kind: Number

@@ -8,6 +8,13 @@ generics:
     namespace: Device
     description: "A generic module, such as a Linecard or Routing Engine, installed in a device."
     label: "Module"
+    icon: mdi:expansion-card
+    human_friendly_id:
+      - serial_number__value
+    display_labels:
+      - serial_number__value
+    order_by:
+      - serial_number__value
     attributes:
       - name: serial_number
         kind: Text
@@ -64,8 +71,11 @@ generics:
     namespace: Device
     description: "A generic module type, with common specifications like part number and manufacturer."
     label: "Module Type"
+    icon: mdi:database-cog
+    menu_placement: DeviceGenericModule
+    display_labels:
+      - name__value
     uniqueness_constraints:
-      - ["part_number__value"]
       - ["name__value", "manufacturer"]
     human_friendly_id:
       - name__value
@@ -87,6 +97,7 @@ generics:
         label: Part Number
         kind: Text
         optional: true
+        unique: true
         description: "Part number of the module."
         order_weight: 1200
     relationships:
