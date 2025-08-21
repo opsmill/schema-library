@@ -39,6 +39,12 @@ experimental/circuit_service:
     - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...)
     - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side
   name: Circuit Service
+experimental/epipe:
+  attribution: "[Jordy Dehaes](https://www.linkedin.com/in/jordy-dehaes/)"
+  dependencies:
+    - base
+  description: This schema extension contains models for MPLS Epipes
+  name: MPLS Epipes
 experimental/infiniband:
   dependencies:
     - base
