@@ -147,7 +147,8 @@ nodes:
         optional: true
         cardinality: many
         kind: Component
-      - name: modules
+      - name: patch_panel_modules
+        label: Modules
         peer: DcimPatchPanelModule
         optional: true
         cardinality: many
