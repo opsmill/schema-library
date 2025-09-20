@@ -6,7 +6,8 @@ generics:
   # This implementation of MlagDomain is very minimalist
   # The goal is to make it easy to blend with existing models you might have
   # e.g. if you are operating in a data center fabric environment you might already have a LeafGroup or similar concept
-  # In that case you can have your LeafGroup inherit from GenericMlagDomain and add the necessary relationships/attributes
+  # In that case you can have your LeafGroup inherit from GenericMlagDomain
+  # and add the necessary relationships/attributes to it following MlagDomain node example below
   - name: MlagDomain
     namespace: Generic
     include_in_menu: false
@@ -38,7 +39,8 @@ generics:
         order_weight: 1500
         # Depending on the use-case this could be optional or not
         # Example: User creates a MLAG domain and generator implements it = keep it optional
-        # Example: In a more manual use-case user would create LAG interfaces and then create a MLAG domain using those = make it mandatory
+        # Example: In a more manual use-case user would create LAG interfaces
+        # then create a MLAG domain using those = make it mandatory
         # optional: false
         # Here could be an option to enforce a specific number of peer-links (=2 as one lag for each peer)
         # max_count: 2
@@ -142,7 +144,7 @@ nodes:
         description: "MLAG Domain this MLAG Interface belongs to"
         order_weight: 1750
 
-  # TODO: Placeholder node implementation of MLAG domain
+  # Placeholder node implementation of MLAG domain
   - name: Domain
     namespace: Mlag
     label: MLAG Domain
