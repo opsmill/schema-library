@@ -381,3 +381,18 @@ extensions/vrrp:
     - base
   description: This schema extension contains models for VRRP.
   name: VRRP
+extensions/mlag:
+  name: MLAG
+  dependencies:
+    - base
+    - extensions/lag
+  description: |
+    This schema extension contains the foundations to capture Multi-Chassis Link Aggregation Group (MLAG). It comes on top of the LAG extension.
+
+    In this implementation, a MLAG interface is essentially a LAG interface but linked to a MLAG domain (instead of a device). The MLAG domain regroup devices together (usually 2) and is built over LAG interfaces used as peer-link between the devices. MLAG interfaces defined at the MLAG domain level are then spread across all devices in the domain.
+
+    Note: This is a very minimalist implementation of MLAG, the goal is to make it easy to blend with existing models you might have. For example, if you are operating in a data center fabric environment you might already have a LeafGroup or similar concept. In that case you can have your LeafGroup inherit from GenericMlagDomain and add the necessary relationships/attributes.
+
+    Next steps:
+      - Add support for layer 3 overlay for MLAG interfaces (loopback, peer address ...)
+      - Create virtual relationship so MLAG interfaces can be seen on the devices in the domain
