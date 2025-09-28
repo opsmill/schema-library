@@ -39,6 +39,11 @@ experimental/circuit_service:
     - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...)
     - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side
   name: Circuit Service
+experimental/cisco_netascode:
+  dependencies:
+    - base
+  description: This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
+  name: Cisco NetAsCode
 experimental/infiniband:
   dependencies:
     - base

@@ -1,0 +1,923 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+---
+version: "1.0"
+
+generics:
+  # Generic base for APIC policies
+  - name: APICPolicy
+    namespace: Cisconac
+    description: "Base class for APIC policies"
+    label: "APIC Policy"
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+      - name: description
+        kind: Text
+        optional: true
+
+  # Generic base for fabric nodes
+  - name: FabricNode
+    namespace: Cisconac
+    description: "Base class for fabric nodes"
+    label: "Fabric Node"
+    attributes:
+      - name: node_id
+        kind: Number
+        unique: true
+      - name: name
+        kind: Text
+      - name: status
+        kind: Dropdown
+        optional: true
+        choices:
+          - name: active
+            label: Active
+            color: "#7fbf7f"
+          - name: provisioning
+            label: Provisioning
+            color: "#ffff7f"
+          - name: maintenance
+            label: Maintenance
+            color: "#ffd27f"
+
+nodes:
+  # APIC Controller Configuration
+  - name: APICController
+    namespace: Cisconac
+    description: "Cisco APIC Controller configuration"
+    label: "APIC Controller"
+    icon: "mdi:server-network"
+    attributes:
+      - name: version
+        kind: Text
+        default_value: "5.2.1g"
+      - name: admin_username
+        kind: Text
+        optional: true
+      - name: apic_conn_pref
+        kind: Dropdown
+        default_value: "inband"
+        choices:
+          - name: inband
+            label: In-Band
+          - name: ooband
+            label: Out-of-Band
+    relationships:
+      - name: fabric_policies
+        cardinality: many
+        peer: CiscoNACFabricPolicies
+        kind: Component
+      - name: tenants
+        cardinality: many
+        peer: CiscoNACTenant
+        kind: Component
+
+  # Bootstrap Configuration
+  - name: BootstrapConfig
+    namespace: Cisconac
+    description: "APIC Bootstrap configuration"
+    label: "Bootstrap Config"
+    attributes:
+      - name: snapshot_policy
+        kind: Text
+        optional: true
+        regex: "^[a-zA-Z0-9_.:-]{1,64}$"
+    relationships:
+      - name: apic_controller
+        cardinality: one
+        peer: CiscoNACAPICController
+        kind: Parent
+
+  # Fabric Policies
+  - name: FabricPolicies
+    namespace: Cisconac
+    description: "APIC Fabric Policies configuration"
+    label: "Fabric Policies"
+    attributes:
+      - name: leaf_switch_profile_name
+        kind: Text
+        default_value: "LEAF\\g<id>"
+        min_length: 1
+        max_length: 64
+      - name: leaf_switch_selector_name
+        kind: Text
+        default_value: "LEAF\\g<id>"
+        min_length: 1
+        max_length: 64
+      - name: leaf_interface_profile_name
+        kind: Text
+        default_value: "LEAF\\g<id>"
+        min_length: 1
+        max_length: 64
+      - name: spine_switch_profile_name
+        kind: Text
+        default_value: "SPINE\\g<id>"
+        min_length: 1
+        max_length: 64
+      - name: spine_switch_selector_name
+        kind: Text
+        default_value: "SPINE\\g<id>"
+        min_length: 1
+        max_length: 64
+      - name: pod_profile_name
+        kind: Text
+        default_value: "POD\\g<id>"
+        min_length: 1
+        max_length: 64
+      - name: config_passphrase
+        kind: Text
+        optional: true
+        max_length: 32
+    relationships:
+      - name: apic_controller
+        cardinality: one
+        peer: CiscoNACAPICController
+        kind: Parent
+      - name: banners
+        cardinality: one
+        peer: CiscoNACBannerConfig
+        kind: Component
+        optional: true
+      - name: ep_loop_protection
+        cardinality: one
+        peer: CiscoNACEPLoopProtection
+        kind: Component
+        optional: true
+
+  # Banner Configuration
+  - name: BannerConfig
+    namespace: Cisconac
+    description: "Banner configuration for APIC"
+    label: "Banner Config"
+    attributes:
+      - name: apic_gui_alias
+        kind: Text
+        optional: true
+      - name: apic_gui_banner_url
+        kind: Text
+        optional: true
+      - name: apic_gui_banner_message
+        kind: Text
+        optional: true
+      - name: apic_cli_banner
+        kind: Text
+        optional: true
+      - name: switch_cli_banner
+        kind: Text
+        optional: true
+      - name: apic_app_banner
+        kind: Text
+        optional: true
+      - name: apic_app_banner_severity
+        kind: Dropdown
+        default_value: "info"
+        choices:
+          - name: critical
+            label: Critical
+            color: "#ff0000"
+          - name: info
+            label: Info
+            color: "#0000ff"
+          - name: warning
+            label: Warning
+            color: "#ffff00"
+      - name: escape_html
+        kind: Boolean
+        default_value: true
+
+  # Endpoint Loop Protection
+  - name: EPLoopProtection
+    namespace: Cisconac
+    description: "Endpoint loop protection configuration"
+    label: "EP Loop Protection"
+    attributes:
+      - name: admin_state
+        kind: Boolean
+        default_value: false
+      - name: detection_interval
+        kind: Number
+        default_value: 60
+        min_value: 30
+        max_value: 300
+      - name: detection_multiplier
+        kind: Number
+        default_value: 4
+        min_value: 1
+        max_value: 255
+      - name: bd_learn_disable
+        kind: Boolean
+        default_value: true
+      - name: port_disable
+        kind: Boolean
+        default_value: false
+
+  # Tenant Configuration
+  - name: Tenant
+    namespace: Cisconac
+    description: "ACI Tenant configuration"
+    label: "Tenant"
+    icon: "mdi:domain"
+    human_friendly_id: ["name__value"]
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        regex: "^[a-zA-Z0-9_.:-]{1,64}$"
+      - name: alias
+        kind: Text
+        optional: true
+        max_length: 64
+      - name: description
+        kind: Text
+        optional: true
+      - name: managed
+        kind: Boolean
+        default_value: true
+      - name: ndo_managed
+        kind: Boolean
+        default_value: false
+    relationships:
+      - name: apic_controller
+        cardinality: one
+        peer: CiscoNACAPICController
+        kind: Parent
+      - name: application_profiles
+        cardinality: many
+        peer: CiscoNACApplicationProfile
+        kind: Component
+      - name: bridge_domains
+        cardinality: many
+        peer: CiscoNACBridgeDomain
+        kind: Component
+      - name: contracts
+        cardinality: many
+        peer: CiscoNACContract
+        kind: Component
+      - name: filters
+        cardinality: many
+        peer: CiscoNACFilter
+        kind: Component
+      - name: l3outs
+        cardinality: many
+        peer: CiscoNACL3Out
+        kind: Component
+      - name: vrfs
+        cardinality: many
+        peer: CiscoNACVRF
+        kind: Component
+
+  # VRF Configuration
+  - name: VRF
+    namespace: Cisconac
+    description: "Virtual Routing and Forwarding instance"
+    label: "VRF"
+    icon: "mdi:router"
+    uniqueness_constraints:
+      - ["tenant", "name__value"]
+    attributes:
+      - name: name
+        kind: Text
+        regex: "^[a-zA-Z0-9_.:-]{1,64}$"
+      - name: alias
+        kind: Text
+        optional: true
+      - name: description
+        kind: Text
+        optional: true
+      - name: data_plane_learning
+        kind: Boolean
+        default_value: true
+      - name: preferred_group
+        kind: Boolean
+        default_value: false
+      - name: ip_data_plane_learning
+        kind: Dropdown
+        default_value: "enabled"
+        choices:
+          - name: enabled
+            label: Enabled
+          - name: disabled
+            label: Disabled
+    relationships:
+      - name: tenant
+        cardinality: one
+        peer: CiscoNACTenant
+        kind: Parent
+      - name: bridge_domains
+        cardinality: many
+        peer: CiscoNACBridgeDomain
+        kind: Component
+
+  # Bridge Domain Configuration
+  - name: BridgeDomain
+    namespace: Cisconac
+    description: "Bridge Domain configuration"
+    label: "Bridge Domain"
+    icon: "mdi:lan"
+    uniqueness_constraints:
+      - ["tenant", "name__value"]
+    attributes:
+      - name: name
+        kind: Text
+        regex: "^[a-zA-Z0-9_.:-]{1,64}$"
+      - name: alias
+        kind: Text
+        optional: true
+      - name: description
+        kind: Text
+        optional: true
+      - name: arp_flooding
+        kind: Boolean
+        default_value: false
+      - name: unicast_routing
+        kind: Boolean
+        default_value: true
+      - name: unknown_unicast
+        kind: Dropdown
+        default_value: "proxy"
+        choices:
+          - name: proxy
+            label: Proxy
+          - name: flood
+            label: Flood
+      - name: unknown_ipv4_multicast
+        kind: Dropdown
+        default_value: "flood"
+        choices:
+          - name: flood
+            label: Flood
+          - name: optimize
+            label: Optimize
+      - name: multi_destination_flooding
+        kind: Dropdown
+        default_value: "bd-flood"
+        choices:
+          - name: bd-flood
+            label: BD Flood
+          - name: drop
+            label: Drop
+          - name: encap-flood
+            label: Encap Flood
+      - name: l2_stretch
+        kind: Boolean
+        default_value: true
+      - name: l3_multicast
+        kind: Boolean
+        default_value: false
+    relationships:
+      - name: tenant
+        cardinality: one
+        peer: CiscoNACTenant
+        kind: Parent
+      - name: vrf
+        cardinality: one
+        peer: CiscoNACVRF
+        kind: Attribute
+        optional: true
+      - name: subnets
+        cardinality: many
+        peer: CiscoNACSubnet
+        kind: Component
+
+  # Subnet Configuration
+  - name: Subnet
+    namespace: Cisconac
+    description: "Subnet configuration for Bridge Domains"
+    label: "Subnet"
+    icon: "mdi:ip-network"
+    attributes:
+      - name: description
+        kind: Text
+        optional: true
+      - name: public
+        kind: Boolean
+        default_value: false
+      - name: private
+        kind: Boolean
+        default_value: true
+      - name: shared
+        kind: Boolean
+        default_value: false
+      - name: virtual
+        kind: Boolean
+        default_value: false
+      - name: preferred
+        kind: Boolean
+        default_value: false
+      - name: primary_ip
+        kind: Boolean
+        default_value: false
+    relationships:
+      - name: bridge_domain
+        cardinality: one
+        peer: CiscoNACBridgeDomain
+        kind: Parent
+      - name: prefix
+        cardinality: one
+        peer: IpamPrefix
+        kind: Attribute
+
+  # Application Profile
+  - name: ApplicationProfile
+    namespace: Cisconac
+    description: "Application Profile configuration"
+    label: "Application Profile"
+    icon: "mdi:application"
+    uniqueness_constraints:
+      - ["tenant", "name__value"]
+    attributes:
+      - name: name
+        kind: Text
+        regex: "^[a-zA-Z0-9_.:-]{1,64}$"
+      - name: alias
+        kind: Text
+        optional: true
+      - name: description
+        kind: Text
+        optional: true
+    relationships:
+      - name: tenant
+        cardinality: one
+        peer: CiscoNACTenant
+        kind: Parent
+      - name: endpoint_groups
+        cardinality: many
+        peer: CiscoNACEndpointGroup
+        kind: Component
+
+  # Endpoint Group
+  - name: EndpointGroup
+    namespace: Cisconac
+    description: "Endpoint Group (EPG) configuration"
+    label: "Endpoint Group"
+    icon: "mdi:ethernet"
+    uniqueness_constraints:
+      - ["application_profile", "name__value"]
+    attributes:
+      - name: name
+        kind: Text
+        regex: "^[a-zA-Z0-9_.:-]{1,64}$"
+      - name: alias
+        kind: Text
+        optional: true
+      - name: description
+        kind: Text
+        optional: true
+      - name: flood_in_encap
+        kind: Boolean
+        default_value: false
+      - name: intra_epg_isolation
+        kind: Boolean
+        default_value: false
+      - name: preferred_group
+        kind: Boolean
+        default_value: false
+      - name: qos_class
+        kind: Dropdown
+        default_value: "unspecified"
+        choices:
+          - name: unspecified
+            label: Unspecified
+          - name: level1
+            label: Level 1
+          - name: level2
+            label: Level 2
+          - name: level3
+            label: Level 3
+          - name: level4
+            label: Level 4
+          - name: level5
+            label: Level 5
+          - name: level6
+            label: Level 6
+    relationships:
+      - name: application_profile
+        cardinality: one
+        peer: CiscoNACApplicationProfile
+        kind: Parent
+      - name: bridge_domain
+        cardinality: one
+        peer: CiscoNACBridgeDomain
+        kind: Attribute
+
+  # Contract
+  - name: Contract
+    namespace: Cisconac
+    description: "Contract configuration"
+    label: "Contract"
+    icon: "mdi:file-document"
+    uniqueness_constraints:
+      - ["tenant", "name__value"]
+    attributes:
+      - name: name
+        kind: Text
+        regex: "^[a-zA-Z0-9_.:-]{1,64}$"
+      - name: alias
+        kind: Text
+        optional: true
+      - name: description
+        kind: Text
+        optional: true
+      - name: scope
+        kind: Dropdown
+        default_value: "context"
+        choices:
+          - name: application-profile
+            label: Application Profile
+          - name: context
+            label: Context
+          - name: global
+            label: Global
+          - name: tenant
+            label: Tenant
+    relationships:
+      - name: tenant
+        cardinality: one
+        peer: CiscoNACTenant
+        kind: Parent
+      - name: subjects
+        cardinality: many
+        peer: CiscoNACContractSubject
+        kind: Component
+
+  # Contract Subject
+  - name: ContractSubject
+    namespace: Cisconac
+    description: "Contract Subject configuration"
+    label: "Contract Subject"
+    uniqueness_constraints:
+      - ["contract", "name__value"]
+    attributes:
+      - name: name
+        kind: Text
+        regex: "^[a-zA-Z0-9_.:-]{1,64}$"
+      - name: alias
+        kind: Text
+        optional: true
+      - name: description
+        kind: Text
+        optional: true
+      - name: service_graph
+        kind: Text
+        optional: true
+      - name: qos_class
+        kind: Dropdown
+        default_value: "unspecified"
+        choices:
+          - name: unspecified
+            label: Unspecified
+          - name: level1
+            label: Level 1
+          - name: level2
+            label: Level 2
+          - name: level3
+            label: Level 3
+    relationships:
+      - name: contract
+        cardinality: one
+        peer: CiscoNACContract
+        kind: Parent
+      - name: filters
+        cardinality: many
+        peer: CiscoNACFilter
+        kind: Attribute
+
+  # Filter
+  - name: Filter
+    namespace: Cisconac
+    description: "Filter configuration"
+    label: "Filter"
+    icon: "mdi:filter"
+    uniqueness_constraints:
+      - ["tenant", "name__value"]
+    attributes:
+      - name: name
+        kind: Text
+        regex: "^[a-zA-Z0-9_.:-]{1,64}$"
+      - name: alias
+        kind: Text
+        optional: true
+      - name: description
+        kind: Text
+        optional: true
+    relationships:
+      - name: tenant
+        cardinality: one
+        peer: CiscoNACTenant
+        kind: Parent
+      - name: entries
+        cardinality: many
+        peer: CiscoNACFilterEntry
+        kind: Component
+
+  # Filter Entry
+  - name: FilterEntry
+    namespace: Cisconac
+    description: "Filter Entry configuration"
+    label: "Filter Entry"
+    uniqueness_constraints:
+      - ["filter", "name__value"]
+    attributes:
+      - name: name
+        kind: Text
+        regex: "^[a-zA-Z0-9_.:-]{1,64}$"
+      - name: alias
+        kind: Text
+        optional: true
+      - name: description
+        kind: Text
+        optional: true
+      - name: ethertype
+        kind: Dropdown
+        default_value: "unspecified"
+        choices:
+          - name: unspecified
+            label: Unspecified
+          - name: ipv4
+            label: IPv4
+          - name: ipv6
+            label: IPv6
+          - name: arp
+            label: ARP
+          - name: fcoe
+            label: FCoE
+          - name: mac_security
+            label: MAC Security
+          - name: mpls_unicast
+            label: MPLS Unicast
+          - name: trill
+            label: TRILL
+      - name: protocol
+        kind: Text
+        optional: true
+      - name: source_from_port
+        kind: Text
+        optional: true
+      - name: source_to_port
+        kind: Text
+        optional: true
+      - name: destination_from_port
+        kind: Text
+        optional: true
+      - name: destination_to_port
+        kind: Text
+        optional: true
+      - name: stateful
+        kind: Boolean
+        default_value: false
+    relationships:
+      - name: filter
+        cardinality: one
+        peer: CiscoNACFilter
+        kind: Parent
+
+  # L3Out Configuration
+  - name: L3Out
+    namespace: Cisconac
+    description: "Layer 3 Outside connection"
+    label: "L3Out"
+    icon: "mdi:router-network"
+    uniqueness_constraints:
+      - ["tenant", "name__value"]
+    attributes:
+      - name: name
+        kind: Text
+        regex: "^[a-zA-Z0-9_.:-]{1,64}$"
+      - name: alias
+        kind: Text
+        optional: true
+      - name: description
+        kind: Text
+        optional: true
+      - name: pim
+        kind: Boolean
+        default_value: false
+      - name: pimv6
+        kind: Boolean
+        default_value: false
+      - name: target_dscp
+        kind: Text
+        default_value: "unspecified"
+      - name: mpls
+        kind: Boolean
+        default_value: false
+      - name: sr_mpls
+        kind: Boolean
+        default_value: false
+    relationships:
+      - name: tenant
+        cardinality: one
+        peer: CiscoNACTenant
+        kind: Parent
+      - name: vrf
+        cardinality: one
+        peer: CiscoNACVRF
+        kind: Attribute
+      - name: external_epgs
+        cardinality: many
+        peer: CiscoNACExternalEPG
+        kind: Component
+
+  # External EPG
+  - name: ExternalEPG
+    namespace: Cisconac
+    description: "External Endpoint Group"
+    label: "External EPG"
+    uniqueness_constraints:
+      - ["l3out", "name__value"]
+    attributes:
+      - name: name
+        kind: Text
+        regex: "^[a-zA-Z0-9_.:-]{1,64}$"
+      - name: alias
+        kind: Text
+        optional: true
+      - name: description
+        kind: Text
+        optional: true
+      - name: preferred_group
+        kind: Boolean
+        default_value: false
+      - name: qos_class
+        kind: Dropdown
+        default_value: "unspecified"
+        choices:
+          - name: unspecified
+            label: Unspecified
+          - name: level1
+            label: Level 1
+          - name: level2
+            label: Level 2
+          - name: level3
+            label: Level 3
+    relationships:
+      - name: l3out
+        cardinality: one
+        peer: CiscoNACL3Out
+        kind: Parent
+      - name: subnets
+        cardinality: many
+        peer: CiscoNACExternalSubnet
+        kind: Component
+
+  # External Subnet
+  - name: ExternalSubnet
+    namespace: Cisconac
+    description: "External subnet for L3Out"
+    label: "External Subnet"
+    attributes:
+      - name: description
+        kind: Text
+        optional: true
+      - name: scope
+        kind: Text
+        optional: true
+        default_value: "import-security"
+      - name: aggregate_import
+        kind: Boolean
+        default_value: false
+      - name: aggregate_export
+        kind: Boolean
+        default_value: false
+      - name: aggregate_shared
+        kind: Boolean
+        default_value: false
+    relationships:
+      - name: external_epg
+        cardinality: one
+        peer: CiscoNACExternalEPG
+        kind: Parent
+      - name: prefix
+        cardinality: one
+        peer: IpamPrefix
+        kind: Attribute
+
+  # Fabric Leaf Switch
+  - name: LeafSwitch
+    namespace: Cisconac
+    inherit_from:
+      - CiscoNACFabricNode
+    description: "Leaf switch in ACI fabric"
+    label: "Leaf Switch"
+    icon: "mdi:switch"
+    attributes:
+      - name: role
+        kind: Text
+        default_value: "leaf"
+    relationships:
+      - name: pod
+        cardinality: one
+        peer: CiscoNACPod
+        kind: Parent
+      - name: interfaces
+        cardinality: many
+        peer: CiscoNACLeafInterface
+        kind: Component
+
+  # Fabric Spine Switch
+  - name: SpineSwitch
+    namespace: Cisconac
+    inherit_from:
+      - CiscoNACFabricNode
+    description: "Spine switch in ACI fabric"
+    label: "Spine Switch"
+    icon: "mdi:switch"
+    attributes:
+      - name: role
+        kind: Text
+        default_value: "spine"
+    relationships:
+      - name: pod
+        cardinality: one
+        peer: CiscoNACPod
+        kind: Parent
+      - name: interfaces
+        cardinality: many
+        peer: CiscoNACSpineInterface
+        kind: Component
+
+  # Pod Configuration
+  - name: Pod
+    namespace: Cisconac
+    description: "ACI Pod configuration"
+    label: "Pod"
+    icon: "mdi:server-network"
+    attributes:
+      - name: pod_id
+        kind: Number
+        unique: true
+      - name: name
+        kind: Text
+      - name: description
+        kind: Text
+        optional: true
+    relationships:
+      - name: apic_controller
+        cardinality: one
+        peer: CiscoNACAPICController
+        kind: Parent
+      - name: leaf_switches
+        cardinality: many
+        peer: CiscoNACLeafSwitch
+        kind: Component
+      - name: spine_switches
+        cardinality: many
+        peer: CiscoNACSpineSwitch
+        kind: Component
+
+  # Leaf Interface
+  - name: LeafInterface
+    namespace: Cisconac
+    description: "Leaf switch interface"
+    label: "Leaf Interface"
+    uniqueness_constraints:
+      - ["leaf_switch", "name__value"]
+    attributes:
+      - name: name
+        kind: Text
+      - name: description
+        kind: Text
+        optional: true
+      - name: speed
+        kind: Number
+        optional: true
+      - name: mtu
+        kind: Number
+        default_value: 1500
+      - name: enabled
+        kind: Boolean
+        default_value: true
+    relationships:
+      - name: leaf_switch
+        cardinality: one
+        peer: CiscoNACLeafSwitch
+        kind: Parent
+
+  # Spine Interface
+  - name: SpineInterface
+    namespace: Cisconac
+    description: "Spine switch interface"
+    label: "Spine Interface"
+    uniqueness_constraints:
+      - ["spine_switch", "name__value"]
+    attributes:
+      - name: name
+        kind: Text
+      - name: description
+        kind: Text
+        optional: true
+      - name: speed
+        kind: Number
+        optional: true
+      - name: mtu
+        kind: Number
+        default_value: 1500
+      - name: enabled
+        kind: Boolean
+        default_value: true
+    relationships:
+      - name: spine_switch
+        cardinality: one
+        peer: CiscoNACSpineSwitch
+        kind: Parent
