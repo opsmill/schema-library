@@ -80,8 +80,8 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 - **Icon:** game-icons:laser-warning
 - **Display Labels:** wdm_type__value, channel__value
 - **Uniqueness Constraints:**
-    - wdm_type__value, channel__value, wavelength__value, frequency__value
-    - wdm_type__value, channel__value
+    - frequency__value, wavelength__value, channel__value, wdm_type__value
+    - channel__value, wdm_type__value
 - **Human Friendly ID:** wdm_type__value, channel__value
 
 #### Attributes
@@ -361,12 +361,12 @@ nodes:
   - wdm_type__value
   - channel__value
   uniqueness_constraints:
-  - - wdm_type__value
-    - channel__value
+  - - frequency__value
     - wavelength__value
-    - frequency__value
-  - - wdm_type__value
     - channel__value
+    - wdm_type__value
+  - - channel__value
+    - wdm_type__value
   human_friendly_id:
   - wdm_type__value
   - channel__value

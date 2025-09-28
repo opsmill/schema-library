@@ -22,7 +22,7 @@ NOTE: This extension is compatible with all sort of device. You can apply the ge
 - **Icon:** carbon:vmdk-disk
 - **Display Labels:** name__value
 - **Uniqueness Constraints:**
-    - name__value, device
+    - device, name__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -86,12 +86,11 @@ nodes:
   human_friendly_id:
   - name__value
   uniqueness_constraints:
-  - - name__value
-    - device
+  - - device
+    - name__value
   attributes:
   - name: name
     kind: Text
-    unique: false
     optional: false
     order_weight: 900
   - name: disk_type

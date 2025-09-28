@@ -133,6 +133,7 @@ This list provides an overview of the schemas available in this repository. Each
 |------|-------------|
 | **[Azure](./reference/azure.mdx)** | This schema extension introduces cloud support for Microsoft Azure. |
 | **[Circuit Service](./reference/circuit_service.mdx)** | This schema extension contains model coming on top of circuit to capture a single service shared across multiple circuits. For example you have a MPLS network supported by a provider connecting multiple locations: - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...) - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side |
+| **[Cisco NetAsCode](./reference/cisco_netascode.mdx)** | This schema extension is an Infrahub translation of Cisco's NetAsCode schema. |
 | **[Infiniband](./reference/infiniband.mdx)** | This schema extension adds support for InfiniBand switches. |
 | **[Location Extended](./reference/location_extended.mdx)** | This schema extension is the most detailed when it comes to location, you'll find all the layers you can think of. |
 | **[Modules Linecards](./reference/modules_linecards.mdx)** | This schema extension allows you to capture Linecard related information like the version. You can insert the Linecard into a Dcim Physical Device and leverage the Linecard type model. The Linecard can accept PIC to help configure PORT information like breakout-capabilities and configurations. |
