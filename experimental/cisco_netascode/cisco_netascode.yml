@@ -198,13 +198,15 @@ nodes:
       - name: detection_interval
         kind: Number
         default_value: 60
-        min_value: 30
-        max_value: 300
+        parameters:
+          min_value: 30
+          max_value: 300
       - name: detection_multiplier
         kind: Number
         default_value: 4
-        min_value: 1
-        max_value: 255
+        parameters:
+          min_value: 1
+          max_value: 255
       - name: bd_learn_disable
         kind: Boolean
         default_value: true
