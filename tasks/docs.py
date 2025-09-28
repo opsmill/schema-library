@@ -19,6 +19,13 @@ def _sanitize_description(desc):
     return desc.replace("\n", " ").replace("  ", " ").strip()
 
 
+def _escape_mdx_html(value):
+    """Escape angle brackets for MDX compatibility."""
+    if not isinstance(value, str):
+        return value
+    return value.replace("<", "&lt;").replace(">", "&gt;")
+
+
 def _generate_toc_content(metadata) -> defaultdict[str, list]:
     """Based on the metadata, generate the Table of Content for the reference page."""
 
@@ -123,6 +130,7 @@ def _generate_home_page_documentation() -> None:
 
     # Render the template
     environment = jinja2.Environment(trim_blocks=True)
+    environment.filters['escape_mdx_html'] = _escape_mdx_html
     template = environment.from_string(template_text)
     rendered_file = template.render(toc=toc_content)
 
@@ -146,6 +154,7 @@ def _generate_per_extension_documentation() -> None:
 
     # Render the template
     environment = jinja2.Environment(trim_blocks=True)
+    environment.filters['escape_mdx_html'] = _escape_mdx_html
     template = environment.from_string(template_text)
 
     # Open the metadata file

@@ -37,7 +37,7 @@
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 {% for attr in attributes %}
-| {{ attr.name }} | {{ attr.description or "" }} | {{ attr.kind }} | {{ attr.optional }} | {{ attr.default_value|default("") }} | {% if attr.choices %}{{ attr.choices|map(attribute='name')|join(', ') }}{% endif %} |
+| {{ attr.name }} | {{ attr.description or "" }} | {{ attr.kind }} | {{ attr.optional }} | {{ attr.default_value|default("")|escape_mdx_html }} | {% if attr.choices %}{{ attr.choices|map(attribute='name')|join(', ') }}{% endif %} |
 {% endfor %}
 {% endif %}
 {% endmacro %}

@@ -30,8 +30,8 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| fabric_policies | CiscoNACFabricPolicies |  | many | Component |
-| tenants | CiscoNACTenant |  | many | Component |
+| fabric_policies | CisconacFabricPolicies |  | many | Component |
+| tenants | CisconacTenant |  | many | Component |
 
 ### BootstrapConfig
 
@@ -49,7 +49,7 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| apic_controller | CiscoNACAPICController |  | one | Parent |
+| apic_controller | CisconacAPICController | False | one | Parent |
 
 ### FabricPolicies
 
@@ -61,21 +61,21 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| leaf_switch_profile_name |  | Text |  | LEAF\g<id> |  |
-| leaf_switch_selector_name |  | Text |  | LEAF\g<id> |  |
-| leaf_interface_profile_name |  | Text |  | LEAF\g<id> |  |
-| spine_switch_profile_name |  | Text |  | SPINE\g<id> |  |
-| spine_switch_selector_name |  | Text |  | SPINE\g<id> |  |
-| pod_profile_name |  | Text |  | POD\g<id> |  |
+| leaf_switch_profile_name |  | Text |  | LEAF\g&lt;id&gt; |  |
+| leaf_switch_selector_name |  | Text |  | LEAF\g&lt;id&gt; |  |
+| leaf_interface_profile_name |  | Text |  | LEAF\g&lt;id&gt; |  |
+| spine_switch_profile_name |  | Text |  | SPINE\g&lt;id&gt; |  |
+| spine_switch_selector_name |  | Text |  | SPINE\g&lt;id&gt; |  |
+| pod_profile_name |  | Text |  | POD\g&lt;id&gt; |  |
 | config_passphrase |  | Text | True |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| apic_controller | CiscoNACAPICController |  | one | Parent |
-| banners | CiscoNACBannerConfig | True | one | Component |
-| ep_loop_protection | CiscoNACEPLoopProtection | True | one | Component |
+| apic_controller | CisconacAPICController | False | one | Parent |
+| banners | CisconacBannerConfig | True | one | Component |
+| ep_loop_protection | CisconacEPLoopProtection | True | one | Component |
 
 ### BannerConfig
 
@@ -136,13 +136,13 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| apic_controller | CiscoNACAPICController |  | one | Parent |
-| application_profiles | CiscoNACApplicationProfile |  | many | Component |
-| bridge_domains | CiscoNACBridgeDomain |  | many | Component |
-| contracts | CiscoNACContract |  | many | Component |
-| filters | CiscoNACFilter |  | many | Component |
-| l3outs | CiscoNACL3Out |  | many | Component |
-| vrfs | CiscoNACVRF |  | many | Component |
+| apic_controller | CisconacAPICController | False | one | Parent |
+| application_profiles | CisconacApplicationProfile |  | many | Component |
+| bridge_domains | CisconacBridgeDomain |  | many | Component |
+| contracts | CisconacContract |  | many | Component |
+| filters | CisconacFilter |  | many | Component |
+| l3outs | CisconacL3Out |  | many | Component |
+| vrfs | CisconacVRF |  | many | Component |
 
 ### VRF
 
@@ -168,8 +168,8 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| tenant | CiscoNACTenant |  | one | Parent |
-| bridge_domains | CiscoNACBridgeDomain |  | many | Component |
+| tenant | CisconacTenant | False | one | Parent |
+| bridge_domains | CisconacBridgeDomain |  | many | Component |
 
 ### BridgeDomain
 
@@ -199,9 +199,9 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| tenant | CiscoNACTenant |  | one | Parent |
-| vrf | CiscoNACVRF | True | one | Attribute |
-| subnets | CiscoNACSubnet |  | many | Component |
+| tenant | CisconacTenant | False | one | Parent |
+| vrf | CisconacVRF | True | one | Attribute |
+| subnets | CisconacSubnet |  | many | Component |
 
 ### Subnet
 
@@ -226,7 +226,7 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| bridge_domain | CiscoNACBridgeDomain |  | one | Parent |
+| bridge_domain | CisconacBridgeDomain | False | one | Parent |
 | prefix | IpamPrefix |  | one | Attribute |
 
 ### ApplicationProfile
@@ -250,8 +250,8 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| tenant | CiscoNACTenant |  | one | Parent |
-| endpoint_groups | CiscoNACEndpointGroup |  | many | Component |
+| tenant | CisconacTenant | False | one | Parent |
+| endpoint_groups | CisconacEndpointGroup |  | many | Component |
 
 ### EndpointGroup
 
@@ -278,8 +278,8 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| application_profile | CiscoNACApplicationProfile |  | one | Parent |
-| bridge_domain | CiscoNACBridgeDomain |  | one | Attribute |
+| application_profile | CisconacApplicationProfile | False | one | Parent |
+| bridge_domain | CisconacBridgeDomain |  | one | Attribute |
 
 ### Contract
 
@@ -303,8 +303,8 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| tenant | CiscoNACTenant |  | one | Parent |
-| subjects | CiscoNACContractSubject |  | many | Component |
+| tenant | CisconacTenant | False | one | Parent |
+| subjects | CisconacContractSubject |  | many | Component |
 
 ### ContractSubject
 
@@ -328,8 +328,8 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| contract | CiscoNACContract |  | one | Parent |
-| filters | CiscoNACFilter |  | many | Attribute |
+| contract | CisconacContract | False | one | Parent |
+| filters | CisconacFilter |  | many | Attribute |
 
 ### Filter
 
@@ -352,8 +352,8 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| tenant | CiscoNACTenant |  | one | Parent |
-| entries | CiscoNACFilterEntry |  | many | Component |
+| tenant | CisconacTenant | False | one | Parent |
+| entries | CisconacFilterEntry |  | many | Component |
 
 ### FilterEntry
 
@@ -382,7 +382,7 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| filter | CiscoNACFilter |  | one | Parent |
+| filter | CisconacFilter | False | one | Parent |
 
 ### L3Out
 
@@ -410,9 +410,9 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| tenant | CiscoNACTenant |  | one | Parent |
-| vrf | CiscoNACVRF |  | one | Attribute |
-| external_epgs | CiscoNACExternalEPG |  | many | Component |
+| tenant | CisconacTenant | False | one | Parent |
+| vrf | CisconacVRF |  | one | Attribute |
+| external_epgs | CisconacExternalEPG |  | many | Component |
 
 ### ExternalEPG
 
@@ -436,8 +436,8 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| l3out | CiscoNACL3Out |  | one | Parent |
-| subnets | CiscoNACExternalSubnet |  | many | Component |
+| l3out | CisconacL3Out | False | one | Parent |
+| subnets | CisconacExternalSubnet |  | many | Component |
 
 ### ExternalSubnet
 
@@ -459,7 +459,7 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| external_epg | CiscoNACExternalEPG |  | one | Parent |
+| external_epg | CisconacExternalEPG | False | one | Parent |
 | prefix | IpamPrefix |  | one | Attribute |
 
 ### LeafSwitch
@@ -468,7 +468,7 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 - **Description:** Leaf switch in ACI fabric
 - **Namespace:** Cisconac
 - **Icon:** mdi:switch
-- **Inherit From:** CiscoNACFabricNode
+- **Inherit From:** CisconacFabricNode
 
 #### Attributes
 
@@ -480,8 +480,8 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| pod | CiscoNACPod |  | one | Parent |
-| interfaces | CiscoNACLeafInterface |  | many | Component |
+| pod | CisconacPod | False | one | Parent |
+| interfaces | CisconacLeafInterface |  | many | Component |
 
 ### SpineSwitch
 
@@ -489,7 +489,7 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 - **Description:** Spine switch in ACI fabric
 - **Namespace:** Cisconac
 - **Icon:** mdi:switch
-- **Inherit From:** CiscoNACFabricNode
+- **Inherit From:** CisconacFabricNode
 
 #### Attributes
 
@@ -501,8 +501,8 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| pod | CiscoNACPod |  | one | Parent |
-| interfaces | CiscoNACSpineInterface |  | many | Component |
+| pod | CisconacPod | False | one | Parent |
+| interfaces | CisconacSpineInterface |  | many | Component |
 
 ### Pod
 
@@ -523,9 +523,9 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| apic_controller | CiscoNACAPICController |  | one | Parent |
-| leaf_switches | CiscoNACLeafSwitch |  | many | Component |
-| spine_switches | CiscoNACSpineSwitch |  | many | Component |
+| apic_controller | CisconacAPICController | False | one | Parent |
+| leaf_switches | CisconacLeafSwitch |  | many | Component |
+| spine_switches | CisconacSpineSwitch |  | many | Component |
 
 ### LeafInterface
 
@@ -549,7 +549,7 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| leaf_switch | CiscoNACLeafSwitch |  | one | Parent |
+| leaf_switch | CisconacLeafSwitch | False | one | Parent |
 
 ### SpineInterface
 
@@ -573,7 +573,7 @@ This schema extension is an Infrahub translation of Cisco's NetAsCode schema.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| spine_switch | CiscoNACSpineSwitch |  | one | Parent |
+| spine_switch | CisconacSpineSwitch | False | one | Parent |
 
 ## Generics
 
@@ -670,11 +670,11 @@ nodes:
   relationships:
   - name: fabric_policies
     cardinality: many
-    peer: CiscoNACFabricPolicies
+    peer: CisconacFabricPolicies
     kind: Component
   - name: tenants
     cardinality: many
-    peer: CiscoNACTenant
+    peer: CisconacTenant
     kind: Component
 - name: BootstrapConfig
   namespace: Cisconac
@@ -688,8 +688,9 @@ nodes:
   relationships:
   - name: apic_controller
     cardinality: one
-    peer: CiscoNACAPICController
+    peer: CisconacAPICController
     kind: Parent
+    optional: false
 - name: FabricPolicies
   namespace: Cisconac
   description: APIC Fabric Policies configuration
@@ -732,16 +733,17 @@ nodes:
   relationships:
   - name: apic_controller
     cardinality: one
-    peer: CiscoNACAPICController
+    peer: CisconacAPICController
     kind: Parent
+    optional: false
   - name: banners
     cardinality: one
-    peer: CiscoNACBannerConfig
+    peer: CisconacBannerConfig
     kind: Component
     optional: true
   - name: ep_loop_protection
     cardinality: one
-    peer: CiscoNACEPLoopProtection
+    peer: CisconacEPLoopProtection
     kind: Component
     optional: true
 - name: BannerConfig
@@ -837,31 +839,32 @@ nodes:
   relationships:
   - name: apic_controller
     cardinality: one
-    peer: CiscoNACAPICController
+    peer: CisconacAPICController
     kind: Parent
+    optional: false
   - name: application_profiles
     cardinality: many
-    peer: CiscoNACApplicationProfile
+    peer: CisconacApplicationProfile
     kind: Component
   - name: bridge_domains
     cardinality: many
-    peer: CiscoNACBridgeDomain
+    peer: CisconacBridgeDomain
     kind: Component
   - name: contracts
     cardinality: many
-    peer: CiscoNACContract
+    peer: CisconacContract
     kind: Component
   - name: filters
     cardinality: many
-    peer: CiscoNACFilter
+    peer: CisconacFilter
     kind: Component
   - name: l3outs
     cardinality: many
-    peer: CiscoNACL3Out
+    peer: CisconacL3Out
     kind: Component
   - name: vrfs
     cardinality: many
-    peer: CiscoNACVRF
+    peer: CisconacVRF
     kind: Component
 - name: VRF
   namespace: Cisconac
@@ -898,11 +901,12 @@ nodes:
   relationships:
   - name: tenant
     cardinality: one
-    peer: CiscoNACTenant
+    peer: CisconacTenant
     kind: Parent
+    optional: false
   - name: bridge_domains
     cardinality: many
-    peer: CiscoNACBridgeDomain
+    peer: CisconacBridgeDomain
     kind: Component
 - name: BridgeDomain
   namespace: Cisconac
@@ -963,16 +967,17 @@ nodes:
   relationships:
   - name: tenant
     cardinality: one
-    peer: CiscoNACTenant
+    peer: CisconacTenant
     kind: Parent
+    optional: false
   - name: vrf
     cardinality: one
-    peer: CiscoNACVRF
+    peer: CisconacVRF
     kind: Attribute
     optional: true
   - name: subnets
     cardinality: many
-    peer: CiscoNACSubnet
+    peer: CisconacSubnet
     kind: Component
 - name: Subnet
   namespace: Cisconac
@@ -1004,8 +1009,9 @@ nodes:
   relationships:
   - name: bridge_domain
     cardinality: one
-    peer: CiscoNACBridgeDomain
+    peer: CisconacBridgeDomain
     kind: Parent
+    optional: false
   - name: prefix
     cardinality: one
     peer: IpamPrefix
@@ -1031,11 +1037,12 @@ nodes:
   relationships:
   - name: tenant
     cardinality: one
-    peer: CiscoNACTenant
+    peer: CisconacTenant
     kind: Parent
+    optional: false
   - name: endpoint_groups
     cardinality: many
-    peer: CiscoNACEndpointGroup
+    peer: CisconacEndpointGroup
     kind: Component
 - name: EndpointGroup
   namespace: Cisconac
@@ -1085,11 +1092,12 @@ nodes:
   relationships:
   - name: application_profile
     cardinality: one
-    peer: CiscoNACApplicationProfile
+    peer: CisconacApplicationProfile
     kind: Parent
+    optional: false
   - name: bridge_domain
     cardinality: one
-    peer: CiscoNACBridgeDomain
+    peer: CisconacBridgeDomain
     kind: Attribute
 - name: Contract
   namespace: Cisconac
@@ -1124,11 +1132,12 @@ nodes:
   relationships:
   - name: tenant
     cardinality: one
-    peer: CiscoNACTenant
+    peer: CisconacTenant
     kind: Parent
+    optional: false
   - name: subjects
     cardinality: many
-    peer: CiscoNACContractSubject
+    peer: CisconacContractSubject
     kind: Component
 - name: ContractSubject
   namespace: Cisconac
@@ -1165,11 +1174,12 @@ nodes:
   relationships:
   - name: contract
     cardinality: one
-    peer: CiscoNACContract
+    peer: CisconacContract
     kind: Parent
+    optional: false
   - name: filters
     cardinality: many
-    peer: CiscoNACFilter
+    peer: CisconacFilter
     kind: Attribute
 - name: Filter
   namespace: Cisconac
@@ -1192,11 +1202,12 @@ nodes:
   relationships:
   - name: tenant
     cardinality: one
-    peer: CiscoNACTenant
+    peer: CisconacTenant
     kind: Parent
+    optional: false
   - name: entries
     cardinality: many
-    peer: CiscoNACFilterEntry
+    peer: CisconacFilterEntry
     kind: Component
 - name: FilterEntry
   namespace: Cisconac
@@ -1256,8 +1267,9 @@ nodes:
   relationships:
   - name: filter
     cardinality: one
-    peer: CiscoNACFilter
+    peer: CisconacFilter
     kind: Parent
+    optional: false
 - name: L3Out
   namespace: Cisconac
   description: Layer 3 Outside connection
@@ -1294,15 +1306,16 @@ nodes:
   relationships:
   - name: tenant
     cardinality: one
-    peer: CiscoNACTenant
+    peer: CisconacTenant
     kind: Parent
+    optional: false
   - name: vrf
     cardinality: one
-    peer: CiscoNACVRF
+    peer: CisconacVRF
     kind: Attribute
   - name: external_epgs
     cardinality: many
-    peer: CiscoNACExternalEPG
+    peer: CisconacExternalEPG
     kind: Component
 - name: ExternalEPG
   namespace: Cisconac
@@ -1339,11 +1352,12 @@ nodes:
   relationships:
   - name: l3out
     cardinality: one
-    peer: CiscoNACL3Out
+    peer: CisconacL3Out
     kind: Parent
+    optional: false
   - name: subnets
     cardinality: many
-    peer: CiscoNACExternalSubnet
+    peer: CisconacExternalSubnet
     kind: Component
 - name: ExternalSubnet
   namespace: Cisconac
@@ -1369,8 +1383,9 @@ nodes:
   relationships:
   - name: external_epg
     cardinality: one
-    peer: CiscoNACExternalEPG
+    peer: CisconacExternalEPG
     kind: Parent
+    optional: false
   - name: prefix
     cardinality: one
     peer: IpamPrefix
@@ -1378,7 +1393,7 @@ nodes:
 - name: LeafSwitch
   namespace: Cisconac
   inherit_from:
-  - CiscoNACFabricNode
+  - CisconacFabricNode
   description: Leaf switch in ACI fabric
   label: Leaf Switch
   icon: mdi:switch
@@ -1389,16 +1404,17 @@ nodes:
   relationships:
   - name: pod
     cardinality: one
-    peer: CiscoNACPod
+    peer: CisconacPod
     kind: Parent
+    optional: false
   - name: interfaces
     cardinality: many
-    peer: CiscoNACLeafInterface
+    peer: CisconacLeafInterface
     kind: Component
 - name: SpineSwitch
   namespace: Cisconac
   inherit_from:
-  - CiscoNACFabricNode
+  - CisconacFabricNode
   description: Spine switch in ACI fabric
   label: Spine Switch
   icon: mdi:switch
@@ -1409,11 +1425,12 @@ nodes:
   relationships:
   - name: pod
     cardinality: one
-    peer: CiscoNACPod
+    peer: CisconacPod
     kind: Parent
+    optional: false
   - name: interfaces
     cardinality: many
-    peer: CiscoNACSpineInterface
+    peer: CisconacSpineInterface
     kind: Component
 - name: Pod
   namespace: Cisconac
@@ -1432,15 +1449,16 @@ nodes:
   relationships:
   - name: apic_controller
     cardinality: one
-    peer: CiscoNACAPICController
+    peer: CisconacAPICController
     kind: Parent
+    optional: false
   - name: leaf_switches
     cardinality: many
-    peer: CiscoNACLeafSwitch
+    peer: CisconacLeafSwitch
     kind: Component
   - name: spine_switches
     cardinality: many
-    peer: CiscoNACSpineSwitch
+    peer: CisconacSpineSwitch
     kind: Component
 - name: LeafInterface
   namespace: Cisconac
@@ -1467,8 +1485,9 @@ nodes:
   relationships:
   - name: leaf_switch
     cardinality: one
-    peer: CiscoNACLeafSwitch
+    peer: CisconacLeafSwitch
     kind: Parent
+    optional: false
 - name: SpineInterface
   namespace: Cisconac
   description: Spine switch interface
@@ -1494,7 +1513,8 @@ nodes:
   relationships:
   - name: spine_switch
     cardinality: one
-    peer: CiscoNACSpineSwitch
+    peer: CisconacSpineSwitch
     kind: Parent
+    optional: false
 
 ```
