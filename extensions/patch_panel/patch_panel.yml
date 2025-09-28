@@ -147,7 +147,7 @@ nodes:
         optional: true
         cardinality: many
         kind: Component
-      - name: modules
+      - name: patch_panel_modules
         peer: DcimPatchPanelModule
         optional: true
         cardinality: many
@@ -230,7 +230,6 @@ nodes:
       - patch_panel__name__value
       - name__value
     display_labels:
-      #  - patch_panel  # FIXME: DcimInterface.display_labels: this property only supports attributes, not relationships
       - name__value
     order_by:
       - patch_panel__name__value

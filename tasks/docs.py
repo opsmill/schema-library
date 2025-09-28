@@ -130,7 +130,7 @@ def _generate_home_page_documentation() -> None:
 
     # Render the template
     environment = jinja2.Environment(trim_blocks=True)
-    environment.filters['escape_mdx_html'] = _escape_mdx_html
+    environment.filters["escape_mdx_html"] = _escape_mdx_html
     template = environment.from_string(template_text)
     rendered_file = template.render(toc=toc_content)
 
@@ -154,7 +154,7 @@ def _generate_per_extension_documentation() -> None:
 
     # Render the template
     environment = jinja2.Environment(trim_blocks=True)
-    environment.filters['escape_mdx_html'] = _escape_mdx_html
+    environment.filters["escape_mdx_html"] = _escape_mdx_html
     template = environment.from_string(template_text)
 
     # Open the metadata file
