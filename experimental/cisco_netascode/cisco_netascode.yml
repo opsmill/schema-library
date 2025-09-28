@@ -66,11 +66,11 @@ nodes:
     relationships:
       - name: fabric_policies
         cardinality: many
-        peer: CiscoNACFabricPolicies
+        peer: CisconacFabricPolicies
         kind: Component
       - name: tenants
         cardinality: many
-        peer: CiscoNACTenant
+        peer: CisconacTenant
         kind: Component
 
   # Bootstrap Configuration
@@ -86,8 +86,9 @@ nodes:
     relationships:
       - name: apic_controller
         cardinality: one
-        peer: CiscoNACAPICController
+        peer: CisconacAPICController
         kind: Parent
+        optional: false
 
   # Fabric Policies
   - name: FabricPolicies
@@ -132,16 +133,17 @@ nodes:
     relationships:
       - name: apic_controller
         cardinality: one
-        peer: CiscoNACAPICController
+        peer: CisconacAPICController
         kind: Parent
+        optional: false
       - name: banners
         cardinality: one
-        peer: CiscoNACBannerConfig
+        peer: CisconacBannerConfig
         kind: Component
         optional: true
       - name: ep_loop_protection
         cardinality: one
-        peer: CiscoNACEPLoopProtection
+        peer: CisconacEPLoopProtection
         kind: Component
         optional: true
 
@@ -242,31 +244,32 @@ nodes:
     relationships:
       - name: apic_controller
         cardinality: one
-        peer: CiscoNACAPICController
+        peer: CisconacAPICController
         kind: Parent
+        optional: false
       - name: application_profiles
         cardinality: many
-        peer: CiscoNACApplicationProfile
+        peer: CisconacApplicationProfile
         kind: Component
       - name: bridge_domains
         cardinality: many
-        peer: CiscoNACBridgeDomain
+        peer: CisconacBridgeDomain
         kind: Component
       - name: contracts
         cardinality: many
-        peer: CiscoNACContract
+        peer: CisconacContract
         kind: Component
       - name: filters
         cardinality: many
-        peer: CiscoNACFilter
+        peer: CisconacFilter
         kind: Component
       - name: l3outs
         cardinality: many
-        peer: CiscoNACL3Out
+        peer: CisconacL3Out
         kind: Component
       - name: vrfs
         cardinality: many
-        peer: CiscoNACVRF
+        peer: CisconacVRF
         kind: Component
 
   # VRF Configuration
@@ -304,11 +307,12 @@ nodes:
     relationships:
       - name: tenant
         cardinality: one
-        peer: CiscoNACTenant
+        peer: CisconacTenant
         kind: Parent
+        optional: false
       - name: bridge_domains
         cardinality: many
-        peer: CiscoNACBridgeDomain
+        peer: CisconacBridgeDomain
         kind: Component
 
   # Bridge Domain Configuration
@@ -370,16 +374,17 @@ nodes:
     relationships:
       - name: tenant
         cardinality: one
-        peer: CiscoNACTenant
+        peer: CisconacTenant
         kind: Parent
+        optional: false
       - name: vrf
         cardinality: one
-        peer: CiscoNACVRF
+        peer: CisconacVRF
         kind: Attribute
         optional: true
       - name: subnets
         cardinality: many
-        peer: CiscoNACSubnet
+        peer: CisconacSubnet
         kind: Component
 
   # Subnet Configuration
@@ -413,8 +418,9 @@ nodes:
     relationships:
       - name: bridge_domain
         cardinality: one
-        peer: CiscoNACBridgeDomain
+        peer: CisconacBridgeDomain
         kind: Parent
+        optional: false
       - name: prefix
         cardinality: one
         peer: IpamPrefix
@@ -441,11 +447,12 @@ nodes:
     relationships:
       - name: tenant
         cardinality: one
-        peer: CiscoNACTenant
+        peer: CisconacTenant
         kind: Parent
+        optional: false
       - name: endpoint_groups
         cardinality: many
-        peer: CiscoNACEndpointGroup
+        peer: CisconacEndpointGroup
         kind: Component
 
   # Endpoint Group
@@ -496,11 +503,12 @@ nodes:
     relationships:
       - name: application_profile
         cardinality: one
-        peer: CiscoNACApplicationProfile
+        peer: CisconacApplicationProfile
         kind: Parent
+        optional: false
       - name: bridge_domain
         cardinality: one
-        peer: CiscoNACBridgeDomain
+        peer: CisconacBridgeDomain
         kind: Attribute
 
   # Contract
@@ -536,11 +544,12 @@ nodes:
     relationships:
       - name: tenant
         cardinality: one
-        peer: CiscoNACTenant
+        peer: CisconacTenant
         kind: Parent
+        optional: false
       - name: subjects
         cardinality: many
-        peer: CiscoNACContractSubject
+        peer: CisconacContractSubject
         kind: Component
 
   # Contract Subject
@@ -578,11 +587,12 @@ nodes:
     relationships:
       - name: contract
         cardinality: one
-        peer: CiscoNACContract
+        peer: CisconacContract
         kind: Parent
+        optional: false
       - name: filters
         cardinality: many
-        peer: CiscoNACFilter
+        peer: CisconacFilter
         kind: Attribute
 
   # Filter
@@ -606,11 +616,12 @@ nodes:
     relationships:
       - name: tenant
         cardinality: one
-        peer: CiscoNACTenant
+        peer: CisconacTenant
         kind: Parent
+        optional: false
       - name: entries
         cardinality: many
-        peer: CiscoNACFilterEntry
+        peer: CisconacFilterEntry
         kind: Component
 
   # Filter Entry
@@ -671,8 +682,9 @@ nodes:
     relationships:
       - name: filter
         cardinality: one
-        peer: CiscoNACFilter
+        peer: CisconacFilter
         kind: Parent
+        optional: false
 
   # L3Out Configuration
   - name: L3Out
@@ -710,15 +722,16 @@ nodes:
     relationships:
       - name: tenant
         cardinality: one
-        peer: CiscoNACTenant
+        peer: CisconacTenant
         kind: Parent
+        optional: false
       - name: vrf
         cardinality: one
-        peer: CiscoNACVRF
+        peer: CisconacVRF
         kind: Attribute
       - name: external_epgs
         cardinality: many
-        peer: CiscoNACExternalEPG
+        peer: CisconacExternalEPG
         kind: Component
 
   # External EPG
@@ -756,11 +769,12 @@ nodes:
     relationships:
       - name: l3out
         cardinality: one
-        peer: CiscoNACL3Out
+        peer: CisconacL3Out
         kind: Parent
+        optional: false
       - name: subnets
         cardinality: many
-        peer: CiscoNACExternalSubnet
+        peer: CisconacExternalSubnet
         kind: Component
 
   # External Subnet
@@ -788,8 +802,9 @@ nodes:
     relationships:
       - name: external_epg
         cardinality: one
-        peer: CiscoNACExternalEPG
+        peer: CisconacExternalEPG
         kind: Parent
+        optional: false
       - name: prefix
         cardinality: one
         peer: IpamPrefix
@@ -799,7 +814,7 @@ nodes:
   - name: LeafSwitch
     namespace: Cisconac
     inherit_from:
-      - CiscoNACFabricNode
+      - CisconacFabricNode
     description: "Leaf switch in ACI fabric"
     label: "Leaf Switch"
     icon: "mdi:switch"
@@ -810,18 +825,19 @@ nodes:
     relationships:
       - name: pod
         cardinality: one
-        peer: CiscoNACPod
+        peer: CisconacPod
         kind: Parent
+        optional: false
       - name: interfaces
         cardinality: many
-        peer: CiscoNACLeafInterface
+        peer: CisconacLeafInterface
         kind: Component
 
   # Fabric Spine Switch
   - name: SpineSwitch
     namespace: Cisconac
     inherit_from:
-      - CiscoNACFabricNode
+      - CisconacFabricNode
     description: "Spine switch in ACI fabric"
     label: "Spine Switch"
     icon: "mdi:switch"
@@ -832,11 +848,12 @@ nodes:
     relationships:
       - name: pod
         cardinality: one
-        peer: CiscoNACPod
+        peer: CisconacPod
         kind: Parent
+        optional: false
       - name: interfaces
         cardinality: many
-        peer: CiscoNACSpineInterface
+        peer: CisconacSpineInterface
         kind: Component
 
   # Pod Configuration
@@ -857,15 +874,16 @@ nodes:
     relationships:
       - name: apic_controller
         cardinality: one
-        peer: CiscoNACAPICController
+        peer: CisconacAPICController
         kind: Parent
+        optional: false
       - name: leaf_switches
         cardinality: many
-        peer: CiscoNACLeafSwitch
+        peer: CisconacLeafSwitch
         kind: Component
       - name: spine_switches
         cardinality: many
-        peer: CiscoNACSpineSwitch
+        peer: CisconacSpineSwitch
         kind: Component
 
   # Leaf Interface
@@ -893,8 +911,9 @@ nodes:
     relationships:
       - name: leaf_switch
         cardinality: one
-        peer: CiscoNACLeafSwitch
+        peer: CisconacLeafSwitch
         kind: Parent
+        optional: false
 
   # Spine Interface
   - name: SpineInterface
@@ -921,5 +940,6 @@ nodes:
     relationships:
       - name: spine_switch
         cardinality: one
-        peer: CiscoNACSpineSwitch
+        peer: CisconacSpineSwitch
         kind: Parent
+        optional: false
