@@ -15,8 +15,7 @@ nodes:
       - name__value
     order_by:
       - name__value
-    display_labels:
-      - name__value
+    display_label: "{{ name__value }}"
     attributes:
       - name: name
         kind: Text
@@ -83,8 +82,7 @@ nodes:
     icon: mdi:domain-switch
     human_friendly_id:
       - name__value
-    display_labels:
-      - name__value
+    display_label: "{{ name__value }}"
     attributes:
       - name: name
         kind: Text

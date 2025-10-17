@@ -9,9 +9,7 @@ generics:
     label: SFP
     icon: mdi:gpu
     include_in_menu: true
-    display_labels:
-      - form_factor__value
-      - sfp_type__value
+    display_label: "{{ form_factor__value }} {{ sfp_type__value }}"
     attributes:
       - name: serial
         kind: Text

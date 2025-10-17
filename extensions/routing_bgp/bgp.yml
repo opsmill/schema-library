@@ -15,9 +15,7 @@ nodes:
     order_by:
       - asn__value
       - name__value
-    display_labels:
-      - asn__value
-      - name__value
+    display_label: "AS {{ asn__value }}: {{ name__value }}"
     attributes:
       - name: name
         kind: Text
@@ -64,9 +62,7 @@ nodes:
       - description__value
     order_by:
       - name__value
-    display_labels:
-      - name__value
-      - description__value
+    display_label: "{{ name__value }} - {{ description__value }}"
     attributes:
       - name: name
         kind: Text
@@ -136,8 +132,7 @@ nodes:
       - "RoutingProtocol"
     order_by:
       - remote_as__asn__value
-    display_labels:
-      - description__value
+    display_label: "{{ description__value }}"
     attributes:
       - name: import_policies
         kind: Text

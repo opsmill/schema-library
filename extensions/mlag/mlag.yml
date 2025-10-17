@@ -12,8 +12,7 @@ generics:
     namespace: Generic
     include_in_menu: false
     label: MLAG Domain
-    display_labels:
-      - domain_id__value
+    display_label: "{{ domain_id__value }}"
     human_friendly_id:
       - domain_id__value
     attributes:
@@ -69,8 +68,7 @@ nodes:
       - name__value
     order_by:
       - name__value
-    display_labels:
-      - name__value
+    display_label: "{{ name__value }}"
     attributes:
       - name: name
         kind: Text
