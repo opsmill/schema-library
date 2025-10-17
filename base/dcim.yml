@@ -12,8 +12,7 @@ generics:
       - name__value
     order_by:
       - name__value
-    display_labels:
-      - name__value
+    display_label: "{{ name__value }}"
     attributes:
       - name: name
         kind: Text
@@ -128,8 +127,7 @@ generics:
     description: "Generic Network Interface"
     label: Interface
     include_in_menu: false
-    display_labels:
-      - name__value
+    display_label: "{{ name__value }}"
     order_by:
       - device__name__value
       - name__value
@@ -310,8 +308,7 @@ nodes:
     icon: mdi:poll
     human_friendly_id:
       - name__value
-    display_labels:
-      - name__value
+    display_label: "{{ name__value }}"
     order_by:
       - manufacturer__name__value
       - name__value
@@ -373,8 +370,7 @@ nodes:
     icon: mdi:application-cog-outline
     human_friendly_id:
       - name__value
-    display_labels:
-      - name__value
+    display_label: "{{ name__value }}"
     order_by:
       - manufacturer__name__value
       - name__value

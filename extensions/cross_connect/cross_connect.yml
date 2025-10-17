@@ -12,9 +12,7 @@ nodes:
       - DcimConnector
     order_by:
       - provider__name__value
-    display_labels:
-      # TODO: Add provider name here when display label supports relationships
-      - identifier__value
+    display_label: "{{ identifier__value }} (Provider: {{ provider__name__value }})"
     human_friendly_id:
       - provider__name__value
       - identifier__value

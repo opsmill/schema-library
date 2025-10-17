@@ -13,8 +13,7 @@ nodes:
       - circuit_id__value
     order_by:
       - circuit_id__value
-    display_labels:
-      - circuit_id__value
+    display_label: "{{ circuit_id__value }}"
     attributes:
       - name: circuit_id
         kind: Text
@@ -95,8 +94,7 @@ nodes:
       - [circuit, name__value]
     order_by:
       - name__value
-    display_labels:
-      - name__value
+    display_label: "{{ name__value }}"
     attributes:
       - name: name
         kind: Text
