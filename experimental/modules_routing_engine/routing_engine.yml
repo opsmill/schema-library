@@ -33,8 +33,7 @@ nodes:
     order_by:
       - device__name__value
       - slot__value
-    display_labels:
-      - serial_number__value
+    display_label: "{{ serial_number__value }}"
     attributes:
       - name: slot
         kind: Number

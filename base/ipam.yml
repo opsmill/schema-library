@@ -12,8 +12,7 @@ nodes:
     include_in_menu: false
     order_by:
       - address__value
-    display_labels:
-      - address__value
+    display_label: "{{ address__value }}"
     inherit_from:
       - BuiltinIPAddress
     uniqueness_constraints:
@@ -42,8 +41,7 @@ nodes:
     label: Prefix
     order_by:
       - prefix__value
-    display_labels:
-      - prefix__value
+    display_label: "{{ prefix__value }}"
     inherit_from:
       - BuiltinIPPrefix
     uniqueness_constraints:

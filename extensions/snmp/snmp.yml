@@ -10,8 +10,7 @@ generics:
     icon: iconoir:community
     human_friendly_id:
       - name__value
-    display_labels:
-      - name__value
+    display_label: "{{ name__value }}"
     order_by:
       - name__value
     attributes:
@@ -38,8 +37,7 @@ nodes:
     menu_placement: SnmpCommunity
     human_friendly_id:
       - name__value
-    display_labels:
-      - name__value
+    display_label: "{{ name__value }}"
     order_by:
       - name__value
     inherit_from:
@@ -63,8 +61,7 @@ nodes:
     menu_placement: SnmpCommunity
     human_friendly_id:
       - name__value
-    display_labels:
-      - name__value
+    display_label: "{{ name__value }}"
     order_by:
       - name__value
     inherit_from:
@@ -122,8 +119,7 @@ nodes:
     menu_placement: SnmpCommunity
     human_friendly_id:
       - name__value
-    display_labels:
-      - name__value
+    display_label: "{{ name__value }}"
     order_by:
       - name__value
     attributes:
