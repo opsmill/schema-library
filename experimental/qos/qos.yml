@@ -7,7 +7,7 @@ nodes:
     namespace: Qos
     label: Forwarding Class
     description: Represents a forwarding class in QoS with distinct loss priorities.
-    display_label: "{{ name__value }}"
+    display_label: name__value
     order_by:
       - name__value
     human_friendly_id:
@@ -36,7 +36,7 @@ nodes:
     namespace: Qos
     label: Class of Service
     description: Defines a Class of Service configuration.
-    display_label: "{{ name__value }}"
+    display_label: name__value
     order_by:
       - name__value
     human_friendly_id:
@@ -61,7 +61,7 @@ nodes:
     namespace: Qos
     label: Traffic Control Profile
     description: Defines a traffic control profile with an active/inactive state.
-    display_label: "{{ name__value }}"
+    display_label: name__value
     order_by:
       - name__value
     human_friendly_id:
@@ -90,7 +90,7 @@ nodes:
     namespace: Qos
     label: Classifier
     description: Represents a classifier mapping DSCP or EXP values to forwarding classes.
-    display_label: "{{ name__value }}"
+    display_label: name__value
     order_by:
       - name__value
     human_friendly_id:
@@ -127,7 +127,7 @@ nodes:
     namespace: Qos
     label: Scheduler
     description: Represents a scheduler configuration.
-    display_label: "{{ name__value }}"
+    display_label: name__value
     order_by:
       - name__value
     human_friendly_id:
@@ -178,7 +178,7 @@ nodes:
     namespace: Qos
     label: Scheduler Map
     description: Defines mappings of schedulers to forwarding classes.
-    display_label: "{{ name__value }}"
+    display_label: name__value
     order_by:
       - name__value
     human_friendly_id:

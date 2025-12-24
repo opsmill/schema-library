@@ -16,7 +16,7 @@ generics:
   - name: GenericAddressGroup
     namespace: Security
     include_in_menu: false
-    display_label: "{{ name__value }}"
+    display_label: name__value
     hierarchical: true
     attributes:
       - name: name
@@ -36,7 +36,7 @@ generics:
         optional: true
   - name: GenericAddress
     namespace: Security
-    display_label: "{{ name__value }}"
+    display_label: name__value
     include_in_menu: false
     attributes:
       - name: name
@@ -53,7 +53,7 @@ generics:
     namespace: Security
     include_in_menu: false
     hierarchical: true
-    display_label: "{{ name__value }}"
+    display_label: name__value
     attributes:
       - name: name
         label: Name
@@ -73,7 +73,7 @@ generics:
   - name: GenericService
     include_in_menu: false
     namespace: Security
-    display_label: "{{ name__value }}"
+    display_label: name__value
     attributes:
       - name: name
         label: Name
@@ -96,7 +96,7 @@ nodes:
     menu_placement: SecurityPolicy
     human_friendly_id:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     include_in_menu: true
     icon: "game-icons:fire-zone"
     description: "Security zones"
@@ -205,7 +205,7 @@ nodes:
     label: "IP Range"
     human_friendly_id:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     inherit_from:
       - "SecurityGenericAddress"
     order_by:
@@ -228,7 +228,7 @@ nodes:
     label: "FQDN"
     human_friendly_id:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     inherit_from:
       - "SecurityGenericAddress"
     order_by:
@@ -251,7 +251,7 @@ nodes:
     human_friendly_id:
       - name__value
     parent: SecurityAddressGroup
-    display_label: "{{ name__value }}"
+    display_label: name__value
     inherit_from:
       - SecurityGenericAddressGroup
 
@@ -264,7 +264,7 @@ nodes:
     label: IP Protocols
     human_friendly_id:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     order_by:
       - name__value
     inherit_from:
@@ -283,7 +283,7 @@ nodes:
     label: Service
     human_friendly_id:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     order_by:
       - name__value
     inherit_from:
@@ -307,7 +307,7 @@ nodes:
     label: Service range
     human_friendly_id:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     order_by:
       - name__value
     inherit_from:
@@ -335,7 +335,7 @@ nodes:
     description: "Group of services"
     human_friendly_id:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     order_by:
       - name__value
     inherit_from:
@@ -345,7 +345,7 @@ nodes:
     label: "Security Policy"
     human_friendly_id:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     order_by:
       - name__value
     attributes:
@@ -606,7 +606,7 @@ nodes:
     menu_placement: "InfraGenericDevice"
     include_in_menu: false
     icon: "mdi:ethernet"
-    display_label: "{{ name__value }}"
+    display_label: name__value
     inherit_from:
       - InfraInterface
       - InfraEndpoint

@@ -12,7 +12,7 @@ nodes:
       - name__value
     order_by:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     attributes:
       - name: name
         kind: Text
@@ -57,7 +57,7 @@ nodes:
       - name__value
     order_by:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     attributes:
       # TODO: regex to comply with RFC 4360 (nautobot doesn't enforce that)
       - name: name

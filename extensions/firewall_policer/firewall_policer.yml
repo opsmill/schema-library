@@ -8,7 +8,7 @@ nodes:
     label: Network Policer
     icon: mdi:car-speed-limiter
     description: A generic policer configuration.
-    display_label: "{{ name__value }}"
+    display_label: name__value
     order_by:
       - name__value
     human_friendly_id:

@@ -12,7 +12,7 @@ nodes:
       - "CoreArtifactTarget"
     order_by:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     attributes:
       - name: name
         kind: Text
@@ -135,7 +135,7 @@ nodes:
     human_friendly_id: ["switch__name__value", "name__value"]
     order_by:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     uniqueness_constraints:
       - ["switch", "name__value"]
     attributes:
@@ -246,7 +246,7 @@ nodes:
     human_friendly_id: ["switch__name__value", "name__value"]
     order_by:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     uniqueness_constraints:
       - ["switch", "name__value"]
     attributes:
@@ -294,7 +294,7 @@ nodes:
     human_friendly_id: ["description__value"]
     order_by:
       - speed__value
-    display_label: "{{ speed__value }}"
+    display_label: speed__value
     attributes:
       - name: speed
         kind: Dropdown
@@ -333,7 +333,7 @@ nodes:
     icon: "mdi:network"
     order_by:
       - identifier__value
-    display_label: "{{ identifier__value }}"
+    display_label: identifier__value
     uniqueness_constraints:
       - ["identifier__value"]
     attributes:
@@ -370,7 +370,7 @@ nodes:
       - "CoreArtifactTarget"
     order_by:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     attributes:
       - name: name
         kind: Text

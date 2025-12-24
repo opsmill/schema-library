@@ -9,7 +9,7 @@ generics:
     label: Topology
     icon: carbon:network-3
     # default_filter: name__value
-    # display_label: "{{ name__value }}"
+    # display_label: name__value
     attributes:
       # TODO: I believe at some point some Containerlab tricks will happen here
       # e.g. boolean "is container lab topo" then if ticked we generate artifact

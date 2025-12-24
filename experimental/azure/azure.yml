@@ -25,7 +25,7 @@ nodes:
   - name: Location
     namespace: Azure
     menu_placement: AzureResource
-    display_label: "{{ name__value }}"
+    display_label: name__value
     attributes:
       - name: name
         kind: Text
@@ -68,7 +68,7 @@ nodes:
   - name: ResourceGroup
     namespace: Azure
     menu_placement: AzureResource
-    display_label: "{{ name__value }}"
+    display_label: name__value
     attributes:
       - name: name
         kind: Text
@@ -87,7 +87,7 @@ nodes:
     label: "Virtual Networks"
     namespace: Azure
     menu_placement: AzureResource
-    display_label: "{{ name__value }}"
+    display_label: name__value
     inherit_from:
       - AzureResource
     relationships:
@@ -105,7 +105,7 @@ nodes:
     namespace: Azure
     menu_placement: AzureResource
     include_in_menu: true
-    display_label: "{{ name__value }}"
+    display_label: name__value
     attributes:
       - name: name
         kind: Text

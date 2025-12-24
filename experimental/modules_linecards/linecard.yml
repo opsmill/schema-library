@@ -68,7 +68,7 @@ nodes:
       - ["linecard", "slot__value"]
     human_friendly_id:
       - serial_number__value
-    display_label: "{{ serial_number__value }}"
+    display_label: serial_number__value
     order_by:
       - linecard__serial_number__value
     attributes:
@@ -111,7 +111,7 @@ nodes:
     human_friendly_id:
       - pic__serial_number__value
       - port_number__value
-    display_label: "{{ port_number__value }}"
+    display_label: port_number__value
     order_by:
       - pic__serial_number__value
     attributes:

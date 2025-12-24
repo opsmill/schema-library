@@ -10,7 +10,7 @@ nodes:
     include_in_menu: true
     menu_placement: "LocationGeneric"
     label: Continent
-    display_label: "{{ name__value }}"
+    display_label: name__value
     parent: ""
     children: "LocationCountry"
     icon: "jam:world"
@@ -20,7 +20,7 @@ nodes:
     include_in_menu: true
     menu_placement: "LocationGeneric"
     label: Country
-    display_label: "{{ name__value }}"
+    display_label: name__value
     parent: "LocationContinent"
     children: "LocationRegion"
     icon: "gis:search-country"
@@ -30,7 +30,7 @@ nodes:
     include_in_menu: true
     menu_placement: "LocationGeneric"
     label: Region
-    display_label: "{{ name__value }}"
+    display_label: name__value
     parent: "LocationCountry"
     children: "LocationMetro"
     icon: "carbon:cics-region-target"
@@ -40,7 +40,7 @@ nodes:
     include_in_menu: true
     menu_placement: "LocationGeneric"
     label: Metro
-    display_label: "{{ name__value }}"
+    display_label: name__value
     parent: "LocationRegion"
     children: "LocationBuilding"
     icon: "healthicons:city"
@@ -50,7 +50,7 @@ nodes:
     include_in_menu: true
     menu_placement: "LocationGeneric"
     label: Building
-    display_label: "{{ name__value }}"
+    display_label: name__value
     parent: "LocationMetro"
     children: "LocationFloor"
     icon: "ri:building-line"
@@ -76,7 +76,7 @@ nodes:
     include_in_menu: true
     menu_placement: "LocationGeneric"
     label: Floor
-    display_label: "{{ name__value }}"
+    display_label: name__value
     parent: "LocationBuilding"
     icon: "mdi:home-floor-0"
     children: "LocationSuite"
@@ -86,7 +86,7 @@ nodes:
     include_in_menu: true
     menu_placement: "LocationGeneric"
     label: Suite
-    display_label: "{{ name__value }}"
+    display_label: name__value
     parent: "LocationFloor"
     children: "LocationRack"
     icon: "game-icons:cage"
@@ -107,7 +107,7 @@ nodes:
     include_in_menu: true
     menu_placement: "LocationGeneric"
     label: Rack
-    display_label: "{{ name__value }}"
+    display_label: name__value
     human_friendly_id:
       - shortname__value
     parent: "LocationSuite"

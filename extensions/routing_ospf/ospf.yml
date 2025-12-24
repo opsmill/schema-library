@@ -19,7 +19,7 @@ nodes:
       - "device__name__value"
       - "vrf__name__value"
       - "version__value"
-    display_label: "{{ description__value }}"
+    display_label: description__value
     inherit_from:
       - "RoutingProtocol"
     attributes:
@@ -73,7 +73,7 @@ nodes:
     include_in_menu: false
     order_by:
       - description__value
-    display_label: "{{ description__value }}"
+    display_label: description__value
     uniqueness_constraints:
       - ["ospf", "interface"]
     human_friendly_id:

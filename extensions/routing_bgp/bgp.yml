@@ -132,7 +132,7 @@ nodes:
       - "RoutingProtocol"
     order_by:
       - remote_as__asn__value
-    display_label: "{{ description__value }}"
+    display_label: description__value
     attributes:
       - name: import_policies
         kind: Text

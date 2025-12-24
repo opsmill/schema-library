@@ -11,7 +11,7 @@ nodes:
     include_in_menu: false
     human_friendly_id:
       - name__value
-    display_label: "{{ name__value }}"
+    display_label: name__value
     attributes:
       - name: name
         kind: Text
