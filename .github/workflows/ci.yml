@@ -38,41 +38,20 @@ jobs:
     if: needs.files-changed.outputs.python == 'true'
     needs: ["files-changed"]
     runs-on: "ubuntu-latest"
-    strategy:
-      matrix:
-        python-version:
-          - "3.12"
-        poetry-version:
-          - "1.8.5"
     timeout-minutes: 5
     steps:
-      - name: "Check out repository code"
+      - name: Check out repository code
         uses: "actions/checkout@v4"
-      - name: "Set up Python ${{ matrix.python-version }}"
-        uses: "actions/setup-python@v5"
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: "Install Poetry ${{ matrix.poetry-version }}"
-        uses: "snok/install-poetry@v1"
-        with:
-          version: ${{ matrix.poetry-version }}
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-          installer-parallel: true
-      - name: "Setup Python environment"
-        run: |
-          poetry config virtualenvs.create true --local
-          poetry env use ${{ matrix.python-version }}
-      - name: "Install dependencies"
-        run: "poetry install --no-interaction --no-ansi --with dev"
+      - name: Setup uv environment
+        uses: ./.github/actions/setup-uv-env
       - name: "Linting: ruff check"
-        run: "poetry run ruff check ."
+        run: "uv run ruff check ."
       - name: "Linting: ruff format"
-        run: "poetry run ruff format --check --diff ."
-      - name: "Mypy Tests"
-        run: "poetry run mypy --show-error-codes ."
-      - name: "Pylint Tests"
-        run: "poetry run pylint --ignore .venv ."
+        run: "uv run ruff format --check --diff ."
+      - name: Mypy Tests
+        run: "uv run mypy --show-error-codes ."
+      - name: Pylint Tests
+        run: "uv run pylint --ignore .venv ."
 
   yaml-lint:
     name: Run yaml lint
@@ -83,10 +62,10 @@ jobs:
     steps:
       - name: "Check out repository code"
         uses: "actions/checkout@v4"
-      - name: "Setup environment"
-        run: "pip install yamllint==1.35.1"
+      - name: Setup uv environment
+        uses: ./.github/actions/setup-uv-env
       - name: "Linting: yamllint"
-        run: "yamllint -s ."
+        run: "uv run yamllint -s ."
 
   schema-test:
     name: Test all schema files
@@ -107,18 +86,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install Invoke
-        run: poetry install --no-interaction --no-ansi --with dev
+      - name: Setup uv environment
+        uses: ./.github/actions/setup-uv-env
       - name: Set job name
         run: echo JOB_NAME="$GITHUB_JOB" >> $GITHUB_ENV
       - name: "Set environment variable INFRAHUB_BUILD_NAME"
         run: echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
       - name: Initialize Infrahub
-        run: poetry run invoke start
+        run: uv run invoke start
       - name: Set infrahub address
         run: |
           PORT=$(docker compose -p $INFRAHUB_BUILD_NAME port infrahub-server 8000 | cut -d: -f2)
@@ -126,10 +101,10 @@ jobs:
       - name: "Store start time"
         run: echo TEST_START_TIME=$(date +%s)000 >> $GITHUB_ENV
       - name: Load all schemas files
-        run: poetry run invoke schemas.load-all-schemas
-      - name: "Clear docker environment and force vmagent to stop"
+        run: uv run invoke schemas.load-all-schemas
+      - name: Clear docker environment and force vmagent to stop
         if: always()
-        run: poetry run invoke destroy
+        run: uv run invoke destroy
 
   documentation:
     defaults:
@@ -144,7 +119,7 @@ jobs:
     runs-on: "ubuntu-22.04"
     timeout-minutes: 5
     steps:
-      - name: "Check out repository code"
+      - name: Check out repository code
         uses: "actions/checkout@v4"
         with:
           submodules: true
@@ -154,15 +129,15 @@ jobs:
           node-version: 20
           cache: 'npm'
           cache-dependency-path: docs/package-lock.json
-      - name: "Setup Python environment"
-        run: "pip install invoke toml"
-      - name: "Install dependencies"
-        run: "invoke docs.install"
-      - name: "Generate reference documentation"
-        run: "invoke docs.generate"
+      - name: Setup uv environment
+        uses: ./.github/actions/setup-uv-env
+      - name: Install doc dependencies
+        run: "uv run invoke docs.install"
+      - name: Generate reference documentation
+        run: "uv run invoke docs.generate"
         working-directory: ./
-      - name: "Build docs website"
-        run: "invoke docs.build"
+      - name: Build docs website
+        run: "uv run invoke docs.build"
 
   validate-documentation-style:
     if: |
@@ -178,7 +153,6 @@ jobs:
         uses: "actions/checkout@v4"
         with:
           submodules: true
-
       # The official GitHub Action for Vale doesn't work, installing manually instead:
       # https://github.com/errata-ai/vale-action/issues/103
       - name: Download Vale

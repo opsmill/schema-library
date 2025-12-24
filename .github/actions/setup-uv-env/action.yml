@@ -1,0 +1,26 @@
+---
+name: "Setup UV Environment"
+description: "Install Python, uv, and sync dependencies"
+inputs:
+  python-version:
+    description: "Python version"
+    required: false
+    default: "3.12"
+  uv-version:
+    description: "uv version"
+    required: false
+    default: "0.9.9"
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        version: ${{ inputs.uv-version }}
+    - name: Install dependencies
+      shell: bash
+      run: uv sync --all-groups

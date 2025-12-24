@@ -3,3 +3,7 @@
 .env
 test.sh
 __pycache__
+
+# uv
+.venv/
+.python-version
