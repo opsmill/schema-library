@@ -22,6 +22,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       documentation: ${{ steps.changes.outputs.documentation_all }}
+      markdown: ${{ steps.changes.outputs.markdown_all }}
       python: ${{ steps.changes.outputs.python_all }}
       yaml: ${{ steps.changes.outputs.yaml_all }}
     steps:
@@ -74,6 +75,24 @@ jobs:
         run: "pip install yamllint==1.35.1"
       - name: "Linting: yamllint"
         run: "yamllint -s ."
+
+  markdown-lint:
+    name: Run markdown lint
+    if: needs.files-changed.outputs.markdown == 'true'
+    needs: ["files-changed"]
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 5
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v4"
+      - name: "Setup Node.js"
+        uses: "actions/setup-node@v4"
+        with:
+          node-version: "20"
+      - name: "Install markdownlint-cli"
+        run: "npm install -g markdownlint-cli"
+      - name: "Linting: markdownlint"
+        run: "markdownlint '**/*.md' '**/*.mdx'"
 
   schema-test:
     name: Test all schema files
