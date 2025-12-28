@@ -6,11 +6,10 @@ This schema extension allows you to capture patch panel related information like
 
 NOTE: This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
 
-
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
+    - [base](dcim)
 
 ## Nodes
 
@@ -38,7 +37,7 @@ NOTE: This extension is compatible with all sort of connectors, meaning you can 
 | ---- | ---- | -------- | ----------- | ---- |
 | front_interfaces | DcimFrontPatchPanelInterface | True | many | Component |
 | rear_interfaces | DcimRearPatchPanelInterface | True | many | Component |
-| modules | DcimPatchPanelModule | True | many | Component |
+| patch_panel_modules | DcimPatchPanelModule | True | many | Component |
 
 ### FrontPatchPanelInterface
 
@@ -49,7 +48,6 @@ NOTE: This extension is compatible with all sort of connectors, meaning you can 
     - patch_panel, name__value
 - **Human Friendly ID:** patch_panel__name__value, name__value
 - **Inherit From:** DcimEndpoint, DcimGenericPatchPanelInterface
-
 
 #### Relationships
 
@@ -67,7 +65,6 @@ NOTE: This extension is compatible with all sort of connectors, meaning you can 
     - patch_panel, name__value
 - **Human Friendly ID:** patch_panel__name__value, name__value
 - **Inherit From:** DcimEndpoint, DcimGenericPatchPanelInterface
-
 
 #### Relationships
 
@@ -117,8 +114,6 @@ NOTE: This extension is compatible with all sort of connectors, meaning you can 
 | name |  | Text |  |  |  |
 | description |  | Text | True |  |  |
 | connector_type |  | Dropdown |  |  | FC, LC, LC_PC, LC_UPC, LC_APC, LSH, LSH_PC, LSH_UPC, LSH_APC, LX_5, LX_5_PC, LX_5_UPC, LX_5_APC, MPO, MTRJ, SC, SC_PC, SC_UPC, SC_APC, ST, CS, SN, SMA_905, SMA_906, URM_P2 |
-
-
 
 ## Code
 
@@ -269,7 +264,8 @@ nodes:
     optional: true
     cardinality: many
     kind: Component
-  - name: modules
+  - name: patch_panel_modules
+    label: Modules
     peer: DcimPatchPanelModule
     optional: true
     cardinality: many

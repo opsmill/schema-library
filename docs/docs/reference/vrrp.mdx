@@ -7,7 +7,7 @@ This schema extension contains models for VRRP.
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
+    - [base](dcim)
 
 ## Nodes
 
@@ -18,8 +18,6 @@ This schema extension contains models for VRRP.
 - **Namespace:** Network
 - **Icon:** fluent:virtual-network-20-filled
 - **Display Labels:** name__value
-- **Uniqueness Constraints:**
-    - name__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -83,7 +81,6 @@ In this context "extensions" refer to modifications or additions to the existing
 | ---- | ---- | -------- | ----------- | ---- |
 | vrrp | NetworkVRRPGroup |  | one | Component |
 
-
 ## Code
 
 ```yaml
@@ -98,8 +95,6 @@ nodes:
   - name__value
   order_by:
   - name__value
-  uniqueness_constraints:
-  - - name__value
   human_friendly_id:
   - name__value
   attributes:

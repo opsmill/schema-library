@@ -1,8 +1,7 @@
 ---
 # yamllint disable rule:line-length
 base/dcim:
-  description:
-    Basic DCIM schema to capture devices, racks, interfaces, and related
+  description: Basic DCIM schema to capture devices, racks, interfaces, and related
     information.
   name: DCIM
 base/ipam:
@@ -12,19 +11,11 @@ base/location:
   description: Basic Location schema to capture locations, sites, and related information.
   name: Locations
 base/organization:
-  description:
-    Basic Organization schema to capture organizations, vendors, and related
+  description: Basic Organization schema to capture organizations, vendors, and related
     information.
   name: Organization
-extensions/cable:
-  dependencies:
-    - base
-  description:
-    This schema extension contains a basic Cable model allowing you to
-    connect two endpoints.
-  name: Cable
 experimental/azure:
-  attribution: "[Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)"
+  attribution: '[Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)'
   dependencies:
     - base
   description: This schema extension introduces cloud support for Microsoft Azure.
@@ -48,16 +39,14 @@ experimental/infiniband:
 experimental/location_extended:
   dependencies:
     - base
-  description:
-    This schema extension is the most detailed when it comes to location,
+  description: This schema extension is the most detailed when it comes to location,
     you'll find all the layers you can think of.
   name: Location Extended
 experimental/modules_linecards:
   dependencies:
     - base
     - extensions/modules
-  description:
-    This schema extension allows you to capture Linecard related information
+  description: This schema extension allows you to capture Linecard related information
     like the version. You can insert the Linecard into a Dcim Physical Device and
     leverage the Linecard type model. The Linecard can accept PIC to help configure
     PORT information like breakout-capabilities and configurations.
@@ -66,8 +55,7 @@ experimental/modules_routing_engine:
   dependencies:
     - base
     - extensions/modules
-  description:
-    This schema extension allows you to capture Routing Engine related
+  description: This schema extension allows you to capture Routing Engine related
     information like the version. You can insert the Routing Engine into a Dcim Physical
     Device and leverage the Routing Engine type model.
   name: Modules Routing Engine
@@ -85,30 +73,32 @@ experimental/tenancy:
   dependencies:
     - base
     - extensions/circuit
-  description:
-    This schema extension introduces tenancy for some of the schema nodes
+  description: This schema extension introduces tenancy for some of the schema nodes
     (circuits...)
   name: Tenancy
 experimental/topology:
   dependencies:
     - base
-  description:
-    A schema for defining and managing network topology, strategies, and
+  description: A schema for defining and managing network topology, strategies, and
     services.
   name: Topology
 experimental/vlan-translation:
   dependencies:
     - base
-  description:
-    This schema extension is based on Juniper VLAN MAP, and not yet test
+  description: This schema extension is based on Juniper VLAN MAP, and not yet test
     out for other vendors.
   name: VLAN Translation
+extensions/cable:
+  dependencies:
+    - base
+  description: This schema extension contains a basic Cable model allowing you to
+    connect two endpoints.
+  name: Cable
 extensions/circuit:
   dependencies:
     - base
     - extensions/location_minimal
-  description:
-    This schema extension contains Circuits and ways to connect them with
+  description: This schema extension contains Circuits and ways to connect them with
     your infrastructure! The circuit could be a fiber connecting two sites, you would
     then have two endpoints, one on each site.
   name: Circuit
@@ -116,24 +106,21 @@ extensions/cluster:
   dependencies:
     - base
     - extensions/compute
-  description:
-    This schema extension contains the foundations to capture clusters.
+  description: This schema extension contains the foundations to capture clusters.
     With this one in place you can unlock various clusters flavors (hosting cluster
     able to host VMs, firewall clusters built with specific appliances ...)
   name: Cluster
 extensions/compute:
   dependencies:
     - base
-  description:
-    With this schema extension in place you will be able to capture all
+  description: With this schema extension in place you will be able to capture all
     your physical servers. It also gives you the baseline to build virtualization.
     You might consider HostingCluster extension to go with!
   name: Compute
 extensions/cross_connect:
   dependencies:
     - base
-  description:
-    This extension contains schema to capture Cross Connect. You can see
+  description: This extension contains schema to capture Cross Connect. You can see
     it as "a cable operated by a provider". You will be able to attach it to a location
     and then connect endpoints to it (e.g. rear interface of a patch panel, circuit
     endpoint ...)
@@ -142,8 +129,7 @@ extensions/dwdm:
   dependencies:
     - base
     - extensions/sfp
-  description:
-    This schema extension contains models for OADM (Optical Add Drop Multiplexer)
+  description: This schema extension contains models for OADM (Optical Add Drop Multiplexer)
     supporting various WDM (Wavelength Division Multiplexing) technologies such as
     DWDM (Dense Wavelength Division Multiplexing) or CWDM (Coarse Wavelength Division
     Multiplexing). With some vendors, the tunable optics are not configured via the
@@ -153,8 +139,7 @@ extensions/dwdm:
 extensions/firewall_policer:
   dependencies:
     - base
-  description:
-    This schema extension contains models for VMs. You might consider Cluster
+  description: This schema extension contains models for VMs. You might consider Cluster
     or/and Hypervisor extension to go with!
   name: Firewall Policer
 extensions/hosting_cluster:
@@ -162,23 +147,20 @@ extensions/hosting_cluster:
     - base
     - extensions/cluster
     - extensions/compute
-  description:
-    A rather generic cluster built with compute units (e.g. servers) and
+  description: A rather generic cluster built with compute units (e.g. servers) and
     able to host VMs.
   name: Hosting Cluster
 extensions/interface_breakout:
   dependencies:
     - base
-  description:
-    This schema extension introduces relationships to support breakout
+  description: This schema extension introduces relationships to support breakout
     interfaces, enabling you to document the breakout of a physical interface into
     smaller physical interfaces.
   name: Interface Breakout
 extensions/lag:
   dependencies:
     - base
-  description:
-    This schema extension includes models for Link Aggregation Groups (LAGs),
+  description: This schema extension includes models for Link Aggregation Groups (LAGs),
     enabling you to link physical interfaces as building blocs of your LAG interface.
     It can be used in standard networking environments as well as in compute scenarios,
     such as capturing bond interfaces.
@@ -186,10 +168,25 @@ extensions/lag:
 extensions/location_minimal:
   dependencies:
     - base
-  description:
-    This schema extension is minimal but will provide you with basic items
+  description: This schema extension is minimal but will provide you with basic items
     to store location related data.
   name: Location Minimal
+extensions/mlag:
+  dependencies:
+    - base
+    - extensions/lag
+  description: |
+    This schema extension contains the foundations to capture Multi-Chassis Link Aggregation Group (MLAG). It comes on top of the LAG extension.
+
+    In this implementation, a MLAG interface is essentially a LAG interface but linked to a MLAG domain (instead of a device). The MLAG domain regroup devices together (usually 2) and is built over LAG interfaces used as peer-link between the devices. MLAG interfaces defined at the MLAG domain level are then spread across all devices in the domain.
+
+    Note: This is a very minimalist implementation of MLAG, the goal is to make it easy to blend with existing models you might have. For example, if you are operating in a data center fabric environment you might already have a LeafGroup or similar concept. In that case you can have your LeafGroup inherit from GenericMlagDomain and add the necessary relationships/attributes.
+
+    Next steps:
+
+    - Add support for layer 3 overlay for MLAG interfaces (loopback, peer address ...)
+    - Create virtual relationship so MLAG interfaces can be seen on the devices in the domain
+  name: MLAG
 extensions/modules:
   dependencies:
     - base
@@ -212,8 +209,7 @@ extensions/peering_ixp:
     - extensions/routing
     - extensions/routing_bgp
     - extensions/routing_bgp_community
-  description:
-    This schema extension contains all you need to model anything revolving
+  description: This schema extension contains all you need to model anything revolving
     around internet peering (Exchange points ...)!
   name: Peering IXP
 extensions/physical_disk:
@@ -228,16 +224,14 @@ extensions/qinq:
   dependencies:
     - base
     - extensions/vlan
-  description:
-    This schema extension brings extensions to VLAN model in order to support
+  description: This schema extension brings extensions to VLAN model in order to support
     QinQ.
   name: QinQ
 extensions/routing:
   dependencies:
     - base
     - extensions/vlan
-  description:
-    This schema extension contains generics to create Routing Protocol
+  description: This schema extension contains generics to create Routing Protocol
     "Instance". The idea is to create one Routing Protocol instance per IpamVRF +
     DcimDevice pair.
   name: Routing
@@ -245,8 +239,7 @@ extensions/routing_aggregate:
   dependencies:
     - base
     - extensions/routing
-  description:
-    This schema extension contains all you need to model the Aggregate
+  description: This schema extension contains all you need to model the Aggregate
     Routing Protocol.
   name: Routing Aggregate
 extensions/routing_bgp:
@@ -266,16 +259,14 @@ extensions/routing_bgp_rr:
     - base
     - extensions/routing
     - extensions/routing_bgp
-  description:
-    This schema extension extend the BGP extension to add BGP Route Reflector
+  description: This schema extension extend the BGP extension to add BGP Route Reflector
     Clustering.
   name: Routing BGP RR
 extensions/routing_ospf:
   dependencies:
     - base
     - extensions/routing
-  description:
-    This schema extension contains all you need to model the OSPF Routing
+  description: This schema extension contains all you need to model the OSPF Routing
     Protocol.
   name: Routing OSPF
 extensions/routing_pim:
@@ -287,8 +278,7 @@ extensions/routing_pim:
 extensions/routing_policies:
   dependencies:
     - base
-  description:
-    This schema extension contains a generic to create Routing Policies.
+  description: This schema extension contains a generic to create Routing Policies.
     This Generic can be extend for each Routing Protocols you may want to use.
   name: Routing Policies
 extensions/routing_policies_aggregate:
@@ -297,8 +287,7 @@ extensions/routing_policies_aggregate:
     - extensions/routing
     - extensions/routing_policies
     - extensions/routing_aggregate
-  description:
-    This extension is using the Routing Policies extensions and the Routing
+  description: This extension is using the Routing Policies extensions and the Routing
     Aggregate one together.
   name: Routing Policies Aggregate
 extensions/routing_policies_bgp:
@@ -307,8 +296,7 @@ extensions/routing_policies_bgp:
     - extensions/routing
     - extensions/routing_policies
     - extensions/routing_bgp
-  description:
-    This extension is using the Routing Policies extensions and the Routing
+  description: This extension is using the Routing Policies extensions and the Routing
     BGP one together.
   name: Routing Policies BGP
 extensions/routing_policies_ospf:
@@ -317,8 +305,7 @@ extensions/routing_policies_ospf:
     - extensions/routing
     - extensions/routing_policies
     - extensions/routing_ospf
-  description:
-    This extension is using the Routing Policies extensions and the Routing
+  description: This extension is using the Routing Policies extensions and the Routing
     OSPF one together.
   name: Routing Policies OSPF
 extensions/routing_policies_pim:
@@ -327,8 +314,7 @@ extensions/routing_policies_pim:
     - extensions/routing
     - extensions/routing_policies
     - extensions/routing_pim
-  description:
-    This schema inherits the `RoutingPolicy` schema and removes `import_policies`
+  description: This schema inherits the `RoutingPolicy` schema and removes `import_policies`
     and `export_policies` attributes. However it adds a number of relationships to
     `RoutingPIM`.
   name: Routing Policies (PIM)
@@ -349,16 +335,14 @@ extensions/sfp:
 extensions/snmp:
   dependencies:
     - base
-  description:
-    This schema extension contains models for SNMP Communities and SNMP
+  description: This schema extension contains models for SNMP Communities and SNMP
     Clients. As you can see this extension is not linked to Tenancy or Device, as
     you could decide to link the Community to different models based on your use case.
   name: SNMP
 extensions/topology:
   dependencies:
     - base
-  description:
-    This schema extension introduces abstract network pods and services
+  description: This schema extension introduces abstract network pods and services
     running in the pods, such as MPLS and EVPN.
   name: Topology
 extensions/users:
@@ -381,18 +365,3 @@ extensions/vrrp:
     - base
   description: This schema extension contains models for VRRP.
   name: VRRP
-extensions/mlag:
-  name: MLAG
-  dependencies:
-    - base
-    - extensions/lag
-  description: |
-    This schema extension contains the foundations to capture Multi-Chassis Link Aggregation Group (MLAG). It comes on top of the LAG extension.
-
-    In this implementation, a MLAG interface is essentially a LAG interface but linked to a MLAG domain (instead of a device). The MLAG domain regroup devices together (usually 2) and is built over LAG interfaces used as peer-link between the devices. MLAG interfaces defined at the MLAG domain level are then spread across all devices in the domain.
-
-    Note: This is a very minimalist implementation of MLAG, the goal is to make it easy to blend with existing models you might have. For example, if you are operating in a data center fabric environment you might already have a LeafGroup or similar concept. In that case you can have your LeafGroup inherit from GenericMlagDomain and add the necessary relationships/attributes.
-
-    Next steps:
-      - Add support for layer 3 overlay for MLAG interfaces (loopback, peer address ...)
-      - Create virtual relationship so MLAG interfaces can be seen on the devices in the domain

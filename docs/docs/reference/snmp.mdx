@@ -7,7 +7,7 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
+    - [base](dcim)
 
 ## Nodes
 
@@ -27,7 +27,6 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | community_string |  | Password |  |  |  |
 | access |  | Text |  |  |  |
-
 
 ### CommunityV3
 
@@ -49,7 +48,6 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 | privacy_protocol |  | Text |  |  |  |
 | privacy_password |  | Password | True |  |  |
 | security_level |  | Dropdown |  |  | noAuthNoPriv, authNoPriv, authPriv |
-
 
 ### Client
 
@@ -96,7 +94,6 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | clients | SnmpClient |  | many | Component |
-
 
 ## Code
 

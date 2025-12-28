@@ -7,9 +7,9 @@ This schema extension extend the BGP extension to add BGP Route Reflector Cluste
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
-  - [extensions/routing](routing)
-  - [extensions/routing_bgp](routing_bgp)
+    - [base](dcim)
+    - [extensions/routing](routing)
+    - [extensions/routing_bgp](routing_bgp)
 
 ## Nodes
 
@@ -20,8 +20,6 @@ This schema extension extend the BGP extension to add BGP Route Reflector Cluste
 - **Namespace:** Routing
 - **Icon:** mdi:router-network
 - **Display Labels:** name__value
-- **Uniqueness Constraints:**
-    - name__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -54,7 +52,6 @@ In this context "extensions" refer to modifications or additions to the existing
 | ---- | ---- | -------- | ----------- | ---- |
 | rr_cluster | RoutingBGPRRCluster |  | one | Attribute |
 
-
 ## Code
 
 ```yaml
@@ -66,8 +63,6 @@ nodes:
   label: Route Reflector Cluster
   icon: mdi:router-network
   include_in_menu: false
-  uniqueness_constraints:
-  - - name__value
   human_friendly_id:
   - name__value
   display_labels:
@@ -77,6 +72,7 @@ nodes:
     kind: Text
     description: Name of the Route Reflector Cluster
     order_weight: 1000
+    unique: true
   - name: description
     kind: Text
     description: Optional description of the Route Reflector Cluster

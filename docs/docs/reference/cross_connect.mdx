@@ -7,7 +7,7 @@ This extension contains schema to capture Cross Connect. You can see it as "a ca
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
+    - [base](dcim)
 
 ## Nodes
 
@@ -19,7 +19,7 @@ This extension contains schema to capture Cross Connect. You can see it as "a ca
 - **Icon:** streamline:arrow-crossover-right-solid
 - **Display Labels:** identifier__value
 - **Uniqueness Constraints:**
-    - provider, identifier__value
+    - identifier__value, provider
 - **Human Friendly ID:** provider__name__value, identifier__value
 - **Inherit From:** DcimConnector
 
@@ -37,7 +37,6 @@ This extension contains schema to capture Cross Connect. You can see it as "a ca
 | ---- | ---- | -------- | ----------- | ---- |
 | location | LocationHosting | False | one | Attribute |
 | provider | OrganizationProvider | False | one | Attribute |
-
 
 ## Code
 
@@ -59,8 +58,8 @@ nodes:
   - provider__name__value
   - identifier__value
   uniqueness_constraints:
-  - - provider
-    - identifier__value
+  - - identifier__value
+    - provider
   attributes:
   - name: identifier
     kind: Text

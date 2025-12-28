@@ -8,11 +8,10 @@ For example you have a MPLS network supported by a provider connecting multiple 
 - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...)
 - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side
 
-
 ## Details
 
 - **Dependencies:**
-  - [extensions/circuit](circuit)
+    - [extensions/circuit](circuit)
 
 ## Nodes
 
@@ -63,7 +62,6 @@ In this context "extensions" refer to modifications or additions to the existing
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | circuit_service | CircuitService | True | one |  |
-
 
 ## Code
 

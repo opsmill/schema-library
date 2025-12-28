@@ -7,10 +7,10 @@ This extension is using the Routing Policies extensions and the Routing BGP one 
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
-  - [extensions/routing](routing)
-  - [extensions/routing_policies](routing_policies)
-  - [extensions/routing_bgp](routing_bgp)
+    - [base](dcim)
+    - [extensions/routing](routing)
+    - [extensions/routing_policies](routing_policies)
+    - [extensions/routing_bgp](routing_bgp)
 
 ## Nodes
 
@@ -22,8 +22,6 @@ This extension is using the Routing Policies extensions and the Routing BGP one 
 - **Icon:** carbon:deployment-policy
 - **Inherit From:** RoutingPolicy
 
-
-
 ## Extensions
 
 :::note
@@ -33,6 +31,7 @@ In this context "extensions" refer to modifications or additions to the existing
 :::
 
 ### RoutingBGPPeerGroup
+
 #### Attributes
 
 | name | description | kind | optional | default_value | choices |
@@ -48,6 +47,7 @@ In this context "extensions" refer to modifications or additions to the existing
 | export_routing_policies | RoutingPolicyBGP |  | many | Generic |
 
 ### RoutingBGPSession
+
 #### Attributes
 
 | name | description | kind | optional | default_value | choices |
@@ -61,7 +61,6 @@ In this context "extensions" refer to modifications or additions to the existing
 | ---- | ---- | -------- | ----------- | ---- |
 | import_routing_policies | RoutingPolicy |  | many | Generic |
 | export_routing_policies | RoutingPolicy |  | many | Generic |
-
 
 ## Code
 

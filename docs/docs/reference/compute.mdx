@@ -7,7 +7,7 @@ With this schema extension in place you will be able to capture all your physica
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
+    - [base](dcim)
 
 ## Nodes
 
@@ -24,7 +24,6 @@ With this schema extension in place you will be able to capture all your physica
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | status |  | Dropdown | False |  | active, provisioning, maintenance, drained |
-
 
 ### VirtualMachine
 
@@ -56,20 +55,16 @@ With this schema extension in place you will be able to capture all your physica
 - **Description:** A generic unit that can compute (e.g. server, vm ...).
 - **Namespace:** Compute
 
-
-
 ### HostVirtualMachine
 
 - **Description:** A generic unit that can host VM
 - **Namespace:** Virtualization
-
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | virtual_machines | VirtualizationVirtualMachine | True | many | Component |
-
 
 ## Code
 
