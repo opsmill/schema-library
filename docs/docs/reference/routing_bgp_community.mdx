@@ -7,8 +7,8 @@ This schema extension adds the BGP Communities models.
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
-  - [extensions/routing](routing)
+    - [base](dcim)
+    - [extensions/routing](routing)
 
 ## Nodes
 
@@ -19,9 +19,6 @@ This schema extension adds the BGP Communities models.
 - **Namespace:** Routing
 - **Icon:** iconoir:community
 - **Display Labels:** name__value, community__value
-- **Uniqueness Constraints:**
-    - name__value
-    - community__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -39,7 +36,6 @@ This schema extension adds the BGP Communities models.
 | routing_policy | RoutingPolicy |  | many | Generic |
 | tags | BuiltinTag | True | many | Attribute |
 
-
 ## Code
 
 ```yaml
@@ -50,9 +46,6 @@ nodes:
   icon: iconoir:community
   label: BGP Community
   description: Defines a BGP community.
-  uniqueness_constraints:
-  - - name__value
-  - - community__value
   human_friendly_id:
   - name__value
   order_by:
@@ -65,6 +58,7 @@ nodes:
     kind: Text
     description: The name of the BGP community.
     order_weight: 1000
+    unique: true
   - name: description
     kind: Text
     description: An optional description of the BGP community.
@@ -74,6 +68,7 @@ nodes:
     kind: Text
     description: The value of the BGP community (RFC1997, RFC4360, RFC8092).
     order_weight: 1200
+    unique: true
   relationships:
   - name: routing_policy
     label: Routing Policies

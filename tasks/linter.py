@@ -6,54 +6,89 @@ from invoke import Context, task  # type: ignore
 
 CURRENT_DIRECTORY = Path(__file__).resolve()
 DOCUMENTATION_DIRECTORY = CURRENT_DIRECTORY.parent / "docs"
-MAIN_DIRECTORY_PATH = Path(__file__).parent
+MAIN_DIRECTORY_PATH = Path(__file__).parent.parent
 METADATA_FILE = ".metadata.yml"
 
 
-@task(name="format_code")
+@task(name="format")
 def format_code(context: Context) -> None:
     """Run RUFF to format all Python files."""
-
     exec_cmds = ["ruff format .", "ruff check . --fix"]
     with context.cd(MAIN_DIRECTORY_PATH):
         for cmd in exec_cmds:
             context.run(cmd)
 
 
-@task
+@task(name="yaml")
 def lint_yaml(context: Context) -> None:
-    """Run Linter to check all Python files."""
+    """Run yamllint to check all YAML files."""
     print(" - Check code with yamllint")
-    exec_cmd = "yamllint ."
+    exec_cmd = "yamllint -s ."
     with context.cd(MAIN_DIRECTORY_PATH):
         context.run(exec_cmd)
 
 
-@task
+@task(name="markdown")
+def lint_markdown(context: Context) -> None:
+    """Run markdownlint to check all Markdown files."""
+    print(" - Check code with markdownlint")
+    exec_cmd = "markdownlint '**/*.md' '**/*.mdx'"
+    with context.cd(MAIN_DIRECTORY_PATH):
+        context.run(exec_cmd)
+
+
+@task(name="mypy")
 def lint_mypy(context: Context) -> None:
-    """Run Linter to check all Python files."""
+    """Run mypy to check all Python files."""
     print(" - Check code with mypy")
     exec_cmd = "mypy --show-error-codes ."
     with context.cd(MAIN_DIRECTORY_PATH):
         context.run(exec_cmd)
 
 
-@task
+@task(name="ruff")
 def lint_ruff(context: Context) -> None:
-    """Run Linter to check all Python files."""
+    """Run ruff check on all Python files."""
     print(" - Check code with ruff")
     exec_cmd = "ruff check ."
     with context.cd(MAIN_DIRECTORY_PATH):
         context.run(exec_cmd)
 
 
+@task(name="ruff-format")
+def lint_ruff_format(context: Context) -> None:
+    """Run ruff format check on all Python files."""
+    print(" - Check formatting with ruff format")
+    exec_cmd = "ruff format --check --diff ."
+    with context.cd(MAIN_DIRECTORY_PATH):
+        context.run(exec_cmd)
+
+
+@task(name="pylint")
+def lint_pylint(context: Context) -> None:
+    """Run pylint on all Python files."""
+    print(" - Check code with pylint")
+    exec_cmd = "pylint --ignore .venv ."
+    with context.cd(MAIN_DIRECTORY_PATH):
+        context.run(exec_cmd)
+
+
+@task(name="python")
+def lint_python(context: Context) -> None:
+    """Run all Python linters (ruff, ruff format, mypy, pylint)."""
+    lint_ruff(context)
+    lint_ruff_format(context)
+    lint_mypy(context)
+    lint_pylint(context)
+
+
 @task(name="lint")
 def lint_all(context: Context) -> None:
     """Run all linters."""
     sort_metadata(context)
+    lint_markdown(context)
     lint_yaml(context)
-    lint_ruff(context)
-    lint_mypy(context)
+    lint_python(context)
 
 
 def sort_dict(d):

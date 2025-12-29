@@ -7,7 +7,7 @@ This schema extension introduces cloud support for Microsoft Azure.
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
+    - [base](dcim)
 - **Attribution:** [Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)
 
 ## Nodes
@@ -22,7 +22,6 @@ This schema extension introduces cloud support for Microsoft Azure.
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name |  | Text |  |  |  |
-
 
 ### Tenant
 
@@ -86,7 +85,6 @@ This schema extension introduces cloud support for Microsoft Azure.
 - **Display Labels:** name__value
 - **Inherit From:** AzureResource
 
-
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
@@ -132,7 +130,6 @@ This schema extension introduces cloud support for Microsoft Azure.
 | ---- | ---- | -------- | ----------- | ---- |
 | location | AzureLocation |  | one | Attribute |
 | resourcegroup | AzureResourceGroup | False | one | Parent |
-
 
 ## Code
 

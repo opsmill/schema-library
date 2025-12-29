@@ -7,7 +7,7 @@ This schema extension contains models for Quality of Service (QoS)
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
+    - [base](dcim)
 
 ## Nodes
 
@@ -28,7 +28,6 @@ This schema extension contains models for Quality of Service (QoS)
 | name | Name of the forwarding class. | Text |  |  |  |
 | high_loss_priority_code | List of code points for high loss priority. | List | True |  |  |
 | low_loss_priority_code | List of code points for low loss priority. | List | True |  |  |
-
 
 ### ClassOfService
 
@@ -68,7 +67,6 @@ This schema extension contains models for Quality of Service (QoS)
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name | Name of the traffic control profile. | Text |  |  |  |
 | status | Status of the traffic control profile (active/inactive). | Dropdown |  | inactive | active, inactive |
-
 
 ### Classifier
 
@@ -113,7 +111,6 @@ This schema extension contains models for Quality of Service (QoS)
 | priority | Priority of the scheduler. | Dropdown | True |  | low, high, strict-high |
 | excess_priority | Excess priority when applicable. | Dropdown | True |  | low, high |
 
-
 ### SchedulerMap
 
 - **Label:** Scheduler Map
@@ -136,7 +133,6 @@ This schema extension contains models for Quality of Service (QoS)
 | ---- | ---- | -------- | ----------- | ---- |
 | schedulers | QosScheduler | True | many |  |
 | forwarding_classes | QosForwardingClass | True | many |  |
-
 
 ## Code
 

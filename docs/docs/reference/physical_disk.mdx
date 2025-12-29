@@ -6,11 +6,10 @@ Simple schema allowing you to capture physical disks information for the sake of
 
 NOTE: This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares.
 
-
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
+    - [base](dcim)
 
 ## Nodes
 
@@ -22,7 +21,7 @@ NOTE: This extension is compatible with all sort of device. You can apply the ge
 - **Icon:** carbon:vmdk-disk
 - **Display Labels:** name__value
 - **Uniqueness Constraints:**
-    - name__value, device
+    - device, name__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -49,13 +48,11 @@ NOTE: This extension is compatible with all sort of device. You can apply the ge
 - **Description:** Generic that hold relationship toward physical disks. To apply on device that can have physical disks.
 - **Namespace:** Dcim
 
-
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | physical_disks | DcimPhysicalDisk | True | many | Component |
-
 
 ## Code
 
@@ -86,12 +83,11 @@ nodes:
   human_friendly_id:
   - name__value
   uniqueness_constraints:
-  - - name__value
-    - device
+  - - device
+    - name__value
   attributes:
   - name: name
     kind: Text
-    unique: false
     optional: false
     order_weight: 900
   - name: disk_type

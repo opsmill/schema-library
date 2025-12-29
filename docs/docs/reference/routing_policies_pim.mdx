@@ -7,10 +7,10 @@ This schema inherits the `RoutingPolicy` schema and removes `import_policies` an
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
-  - [extensions/routing](routing)
-  - [extensions/routing_policies](routing_policies)
-  - [extensions/routing_pim](routing_pim)
+    - [base](dcim)
+    - [extensions/routing](routing)
+    - [extensions/routing_policies](routing_policies)
+    - [extensions/routing_pim](routing_pim)
 
 ## Nodes
 
@@ -22,8 +22,6 @@ This schema inherits the `RoutingPolicy` schema and removes `import_policies` an
 - **Icon:** carbon:deployment-policy
 - **Inherit From:** RoutingPolicy
 
-
-
 ## Extensions
 
 :::note
@@ -33,6 +31,7 @@ In this context "extensions" refer to modifications or additions to the existing
 :::
 
 ### RoutingPIM
+
 #### Attributes
 
 | name | description | kind | optional | default_value | choices |
@@ -46,7 +45,6 @@ In this context "extensions" refer to modifications or additions to the existing
 | ---- | ---- | -------- | ----------- | ---- |
 | import_routing_policies | RoutingPolicyPIM |  | many | Generic |
 | export_routing_policies | RoutingPolicyPIM |  | many | Generic |
-
 
 ## Code
 
