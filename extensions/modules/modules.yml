@@ -11,8 +11,7 @@ generics:
     icon: mdi:expansion-card
     human_friendly_id:
       - serial_number__value
-    display_labels:
-      - serial_number__value
+    display_label: serial_number__value
     order_by:
       - serial_number__value
     attributes:
@@ -73,8 +72,7 @@ generics:
     label: "Module Type"
     icon: mdi:database-cog
     menu_placement: DeviceGenericModule
-    display_labels:
-      - name__value
+    display_label: name__value
     uniqueness_constraints:
       - ["name__value", "manufacturer"]
     human_friendly_id:

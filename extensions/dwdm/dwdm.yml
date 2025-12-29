@@ -117,8 +117,7 @@ nodes:
       - name__value
     order_by:
       - name__value
-    display_labels:
-      - name__value
+    display_label: name__value
     inherit_from:
       - DcimPhysicalDevice
     attributes:
@@ -166,9 +165,7 @@ nodes:
     human_friendly_id:
       - optical_multiplexer__name__value
       - name__value
-    display_labels:
-      #  - optical_multiplexer  # FIXME: DcimInterface.display_labels: this property only supports attributes
-      - name__value
+    display_label: "{{ optical_multiplexer__name__value }} > {{ name__value }}"
     order_by:
       - optical_multiplexer__name__value
       - name__value
@@ -199,9 +196,7 @@ nodes:
     human_friendly_id:
       - optical_multiplexer__name__value
       - name__value
-    display_labels:
-      #  - dwdm  # FIXME: DcimInterface.display_labels: this property only supports attributes, not relationships
-      - name__value
+    display_label: "{{ optical_multiplexer__name__value }} > {{ name__value }}"
     order_by:
       - optical_multiplexer__name__value
       - name__value
@@ -227,9 +222,7 @@ nodes:
     order_by:
       - wdm_type__value
       - channel__value
-    display_labels:
-      - wdm_type__value
-      - channel__value
+    display_label: "{{ wdm_type__value }} Channel {{ channel__value }}"
     uniqueness_constraints:
       # Combination must be unique
       - [frequency__value, wavelength__value, channel__value, wdm_type__value]

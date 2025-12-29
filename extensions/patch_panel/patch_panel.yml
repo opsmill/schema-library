@@ -116,8 +116,7 @@ nodes:
       - name__value
     order_by:
       - name__value
-    display_labels:
-      - name__value
+    display_label: name__value
     inherit_from:
       - DcimPhysicalDevice
     attributes:
@@ -161,9 +160,7 @@ nodes:
     human_friendly_id:
       - patch_panel__name__value
       - name__value
-    display_labels:
-      #  - patch_panel  # FIXME: DcimInterface.display_labels: this property only supports attributes, not relationships
-      - name__value
+    display_label: "{{ patch_panel__name__value }} > {{ name__value }}"
     order_by:
       - corresponding_front_rear__name__value
       - name__value
@@ -195,9 +192,7 @@ nodes:
     human_friendly_id:
       - patch_panel__name__value
       - name__value
-    display_labels:
-      #  - patch_panel  # FIXME: DcimInterface.display_labels: this property only supports attributes, not relationships
-      - name__value
+    display_label: "{{ patch_panel__name__value }} > {{ name__value }}"
     order_by:
       - patch_panel__name__value
       - name__value
@@ -230,9 +225,7 @@ nodes:
     human_friendly_id:
       - patch_panel__name__value
       - name__value
-    display_labels:
-      #  - patch_panel  # FIXME: DcimInterface.display_labels: this property only supports attributes, not relationships
-      - name__value
+    display_label: "{{ patch_panel__name__value }} > {{ name__value }}"
     order_by:
       - patch_panel__name__value
       - position__value

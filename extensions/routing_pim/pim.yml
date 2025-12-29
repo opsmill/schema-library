@@ -19,8 +19,7 @@ nodes:
     human_friendly_id:
       - "device__name__value"
       - "vrf__name__value"
-    display_labels:
-      - description__value
+    display_label: description__value
     attributes:
       - name: dr_priority
         kind: Number
@@ -59,8 +58,7 @@ nodes:
     include_in_menu: false
     order_by:
       - description__value
-    display_labels:
-      - description__value
+    display_label: description__value
     uniqueness_constraints:
       - ["pim", "interface"]
     human_friendly_id:

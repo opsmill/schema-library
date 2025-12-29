@@ -12,8 +12,7 @@ generics:
       - "name__value"
     order_by:
       - name__value
-    display_labels:
-      - name__value
+    display_label: name__value
     attributes:
       - name: name
         kind: Text

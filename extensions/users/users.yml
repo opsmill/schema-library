@@ -8,8 +8,7 @@ nodes:
     description: "User Group"
     label: "User Groups"
     icon: "iconoir:group"
-    display_labels:
-      - name__value
+    display_label: name__value
     order_by:
       - name__value
     human_friendly_id:
@@ -47,8 +46,7 @@ nodes:
     description: "User login and authentication"
     label: "User Account"
     icon: "mdi:account-key"
-    display_labels:
-      - name__value
+    display_label: name__value
     order_by:
       - name__value
     human_friendly_id:

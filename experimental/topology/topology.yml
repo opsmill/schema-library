@@ -8,7 +8,7 @@ generics:
     label: "Network Management Servers"
     human_friendly_id:
       - name__value
-    display_labels: [name__value]
+    display_label: name__value
     order_by: [name__value]
     include_in_menu: true
     attributes:
@@ -55,7 +55,7 @@ generics:
     icon: "carbon:network-3-reference"
     human_friendly_id:
       - name__value
-    display_labels: [name__value]
+    display_label: name__value
     order_by: [name__value]
     include_in_menu: false
     menu_placement: "TopologyTopology"
@@ -83,7 +83,7 @@ generics:
     icon: "iconoir:strategy"
     human_friendly_id:
       - name__value
-    display_labels: [name__value]
+    display_label: name__value
     order_by: [name__value]
     include_in_menu: true
     menu_placement: "TopologyTopology"
@@ -110,8 +110,7 @@ nodes:
     icon: "carbon:network-3"
     human_friendly_id:
       - name__value
-    display_labels:
-      - name__value
+    display_label: name__value
     order_by: [name__value]
     inherit_from:
       - CoreArtifactTarget
@@ -164,8 +163,7 @@ nodes:
     human_friendly_id:
       - name__value
     order_by: [name__value]
-    display_labels:
-      - name__value
+    display_label: name__value
     attributes:
       - name: underlay
         kind: Dropdown
@@ -197,8 +195,7 @@ nodes:
     human_friendly_id:
       - name__value
     order_by: [name__value]
-    display_labels:
-      - name__value
+    display_label: name__value
     attributes:
       - name: underlay
         kind: Dropdown
@@ -227,8 +224,7 @@ nodes:
     human_friendly_id:
       - name__value
     order_by: [name__value]
-    display_labels:
-      - name__value
+    display_label: name__value
     inherit_from:
       - TopologyGenericElement
     attributes:
@@ -284,7 +280,7 @@ nodes:
     include_in_menu: false
     human_friendly_id:
       - name__value
-    display_labels: [name__value]
+    display_label: name__value
     order_by: [name__value]
     attributes:
       - name: name
@@ -309,7 +305,7 @@ nodes:
     include_in_menu: false
     human_friendly_id:
       - name__value
-    display_labels: [name__value]
+    display_label: name__value
     order_by: [name__value]
     inherit_from:
       - NetworkManagementServer
@@ -331,7 +327,7 @@ nodes:
     menu_placement: "NetworkManagementServer"
     human_friendly_id:
       - name__value
-    display_labels: [name__value]
+    display_label: name__value
     order_by: [name__value]
     inherit_from:
       - NetworkManagementServer
@@ -343,7 +339,7 @@ nodes:
     menu_placement: "NetworkManagementServer"
     human_friendly_id:
       - name__value
-    display_labels: [name__value]
+    display_label: name__value
     order_by: [name__value]
     inherit_from:
       - NetworkManagementServer
@@ -359,8 +355,7 @@ nodes:
       - identifier__value
     order_by:
       - identifier__value
-    display_labels:
-      - identifier__value
+    display_label: identifier__value
     attributes:
       - name: identifier
         kind: Number
@@ -379,8 +374,7 @@ nodes:
       - name__value
     order_by:
       - name__value
-    display_labels:
-      - name__value
+    display_label: name__value
     attributes:
       - name: name
         label: Service Name
