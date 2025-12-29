@@ -163,7 +163,7 @@ jobs:
     runs-on: "ubuntu-22.04"
     timeout-minutes: 5
     steps:
-      - name: Check out repository code
+      - name: "Check out repository code"
         uses: "actions/checkout@v4"
         with:
           submodules: true
