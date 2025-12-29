@@ -7,8 +7,8 @@ This schema extension contains all you need to model your BGP platform.
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
-  - [extensions/routing](routing)
+    - [base](dcim)
+    - [extensions/routing](routing)
 
 ## Nodes
 
@@ -19,9 +19,6 @@ This schema extension contains all you need to model your BGP platform.
 - **Namespace:** Routing
 - **Icon:** mdi:bank-circle-outline
 - **Display Labels:** asn__value, name__value
-- **Uniqueness Constraints:**
-    - asn__value
-    - name__value
 - **Human Friendly ID:** asn__value, name__value
 
 #### Attributes
@@ -47,8 +44,6 @@ This schema extension contains all you need to model your BGP platform.
 - **Namespace:** Routing
 - **Icon:** mdi:view-grid-plus-outline
 - **Display Labels:** name__value, description__value
-- **Uniqueness Constraints:**
-    - name__value
 - **Human Friendly ID:** name__value, description__value
 - **Inherit From:** RoutingProtocol
 
@@ -126,7 +121,6 @@ In this context "extensions" refer to modifications or additions to the existing
 | ---- | ---- | -------- | ----------- | ---- |
 | asn | RoutingAutonomousSystem | True | many |  |
 
-
 ## Code
 
 ```yaml
@@ -139,9 +133,6 @@ nodes:
   label: Autonomous System
   icon: mdi:bank-circle-outline
   menu_placement: RoutingBGPSession
-  uniqueness_constraints:
-  - - asn__value
-  - - name__value
   human_friendly_id:
   - asn__value
   - name__value
@@ -156,10 +147,12 @@ nodes:
     kind: Text
     description: Name of the Autonomous System
     order_weight: 1000
+    unique: true
   - name: asn
     kind: Number
     description: Autonomous System Number
     order_weight: 1050
+    unique: true
   - name: description
     kind: Text
     optional: true
@@ -190,8 +183,6 @@ nodes:
   menu_placement: RoutingBGPSession
   inherit_from:
   - RoutingProtocol
-  uniqueness_constraints:
-  - - name__value
   human_friendly_id:
   - name__value
   - description__value
@@ -204,6 +195,7 @@ nodes:
   - name: name
     kind: Text
     optional: false
+    unique: true
     description: Name of the BGP Group
     order_weight: 1000
   - name: import_policies

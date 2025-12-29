@@ -7,7 +7,7 @@ This schema extension contains models for implementing detailed security.
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
+    - [base](dcim)
 
 ## Nodes
 
@@ -91,7 +91,6 @@ This schema extension contains models for implementing detailed security.
 | address |  | IPHost |  |  |  |
 | description |  | Text | True |  |  |
 
-
 ### Prefix
 
 - **Label:** Prefix
@@ -108,7 +107,6 @@ This schema extension contains models for implementing detailed security.
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | prefix |  | IPNetwork | False |  |  |
 | description |  | Text | True |  |  |
-
 
 ### IPRange
 
@@ -127,7 +125,6 @@ This schema extension contains models for implementing detailed security.
 | start |  | IPHost | False |  |  |
 | end |  | IPHost | False |  |  |
 
-
 ### FQDN
 
 - **Label:** FQDN
@@ -144,7 +141,6 @@ This schema extension contains models for implementing detailed security.
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | fqdn |  | Text | False |  |  |
 
-
 ### AddressGroup
 
 - **Label:** Address Group
@@ -154,8 +150,6 @@ This schema extension contains models for implementing detailed security.
 - **Display Labels:** name__value
 - **Human Friendly ID:** name__value
 - **Inherit From:** SecurityGenericAddressGroup
-
-
 
 ### IPProtocol
 
@@ -172,7 +166,6 @@ This schema extension contains models for implementing detailed security.
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | protocol |  | Number | True |  |  |
-
 
 ### Service
 
@@ -228,8 +221,6 @@ This schema extension contains models for implementing detailed security.
 - **Display Labels:** name__value
 - **Human Friendly ID:** name__value
 - **Inherit From:** SecurityGenericServiceGroup
-
-
 
 ### Policy
 
@@ -345,7 +336,6 @@ This schema extension contains models for implementing detailed security.
 - **Display Labels:** name__value
 - **Inherit From:** InfraInterface, InfraEndpoint
 
-
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
@@ -359,7 +349,6 @@ This schema extension contains models for implementing detailed security.
 
 - **Label:** Security Policy
 - **Namespace:** Security
-
 
 #### Relationships
 
@@ -453,7 +442,6 @@ In this context "extensions" refer to modifications or additions to the existing
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | policy | SecurityPolicy |  | one | Attribute |
-
 
 ## Code
 

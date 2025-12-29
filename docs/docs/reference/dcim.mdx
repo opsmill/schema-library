@@ -85,7 +85,6 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 | status |  | Dropdown | False |  | active, provisioning, maintenance, drained |
 | role |  | Dropdown | True |  | core, edge, cpe, spine, leaf, tor |
 
-
 ### Physical
 
 - **Label:** Physical Interface
@@ -93,15 +92,12 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 - **Namespace:** Interface
 - **Inherit From:** DcimInterface, InterfaceLayer2, InterfaceLayer3, DcimEndpoint, InterfaceHasSubInterface
 
-
-
 ### Virtual
 
 - **Label:** Virtual Interface
 - **Description:** Virtual interface like VLAN or Loopback
 - **Namespace:** Interface
 - **Inherit From:** DcimInterface, InterfaceLayer2, InterfaceLayer3
-
 
 #### Relationships
 
@@ -162,7 +158,6 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 - **Description:** Generic Endpoint to receive a connector.
 - **Namespace:** Dcim
 
-
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
@@ -173,7 +168,6 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 
 - **Description:** Generic Connector to link two endpoints together.
 - **Namespace:** Dcim
-
 
 #### Relationships
 
@@ -220,7 +214,6 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | l2_mode | Layer 2 mode of the interface | Dropdown | True |  | access, trunk, trunk_all |
 
-
 ### Layer3
 
 - **Label:** Layer 3 Interface
@@ -245,13 +238,11 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 - **Description:** A generic interface that can have sub-interfaces
 - **Namespace:** Interface
 
-
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | sub_interfaces | InterfaceVirtual | True | many | Attribute |
-
 
 ## Code
 

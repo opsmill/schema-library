@@ -7,8 +7,8 @@ This schema extension allows you to capture Linecard related information like th
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
-  - [extensions/modules](modules)
+    - [base](dcim)
+    - [extensions/modules](modules)
 
 ## Nodes
 
@@ -17,8 +17,8 @@ This schema extension allows you to capture Linecard related information like th
 - **Label:** Linecard Type
 - **Description:** Linecard Type information, detailing specifications such as part number and manufacturer.
 - **Namespace:** Device
+- **Icon:** mdi:poll
 - **Inherit From:** DeviceGenericModuleType
-
 
 #### Relationships
 
@@ -32,10 +32,6 @@ This schema extension allows you to capture Linecard related information like th
 - **Description:** A Linecard installed in a device, specifying slot, power status, and functionalities.
 - **Namespace:** Device
 - **Icon:** bi:pci-card
-- **Display Labels:** serial_number__value
-- **Uniqueness Constraints:**
-    - serial_number__value
-- **Human Friendly ID:** device__name__value, slot__value
 - **Inherit From:** DeviceGenericModule
 
 #### Attributes
@@ -57,15 +53,17 @@ This schema extension allows you to capture Linecard related information like th
 - **Label:** PIC
 - **Description:** Physical Interface Card (PIC) installed in the Linecard, containing multiple ports.
 - **Namespace:** Device
-- **Display Labels:** slot__value
+- **Icon:** mdi:memory
+- **Display Labels:** serial_number__value
 - **Uniqueness Constraints:**
     - linecard, slot__value
-- **Human Friendly ID:** linecard__serial_number__value, slot__value
+- **Human Friendly ID:** serial_number__value
 
 #### Attributes
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
+| serial_number | Unique serial number of the PIC. | Text |  |  |  |
 | slot | Slot number of the PIC within the Linecard | Number |  |  |  |
 
 #### Relationships
@@ -73,17 +71,18 @@ This schema extension allows you to capture Linecard related information like th
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | linecard | DeviceLinecard | False | one | Parent |
-| ports | InfraPort | True | many | Component |
+| ports | DevicePort | True | many | Component |
 
 ### Port
 
 - **Label:** Port
 - **Description:** A network port on a PIC, specifying speed and port number.
 - **Namespace:** Device
+- **Icon:** mdi:ethernet
 - **Display Labels:** port_number__value
 - **Uniqueness Constraints:**
     - pic, port_number__value
-- **Human Friendly ID:** pic__slot__value, port_number__value
+- **Human Friendly ID:** pic__serial_number__value, port_number__value
 
 #### Attributes
 
@@ -98,7 +97,6 @@ This schema extension allows you to capture Linecard related information like th
 | ---- | ---- | -------- | ----------- | ---- |
 | pic | DevicePic | False | one | Parent |
 
-
 ## Code
 
 ```yaml
@@ -106,8 +104,10 @@ version: '1.0'
 nodes:
 - name: LinecardType
   namespace: Device
+  menu_placement: DeviceLinecard
   description: Linecard Type information, detailing specifications such as part number
     and manufacturer.
+  icon: mdi:poll
   label: Linecard Type
   inherit_from:
   - DeviceGenericModuleType
@@ -123,18 +123,9 @@ nodes:
     functionalities.
   label: Linecard
   icon: bi:pci-card
+  menu_placement: DeviceGenericModule
   inherit_from:
   - DeviceGenericModule
-  uniqueness_constraints:
-  - - serial_number__value
-  human_friendly_id:
-  - device__name__value
-  - slot__value
-  order_by:
-  - device__name__value
-  - slot__value
-  display_labels:
-  - serial_number__value
   attributes:
   - name: slot
     kind: Number
@@ -167,18 +158,23 @@ nodes:
   description: Physical Interface Card (PIC) installed in the Linecard, containing
     multiple ports.
   label: PIC
+  menu_placement: DeviceLinecard
+  icon: mdi:memory
   uniqueness_constraints:
   - - linecard
     - slot__value
   human_friendly_id:
-  - linecard__serial_number__value
-  - slot__value
+  - serial_number__value
   display_labels:
-  - slot__value
+  - serial_number__value
   order_by:
   - linecard__serial_number__value
-  - slot__value
   attributes:
+  - name: serial_number
+    kind: Text
+    unique: true
+    description: Unique serial number of the PIC.
+    order_weight: 1000
   - name: slot
     kind: Number
     description: Slot number of the PIC within the Linecard
@@ -194,7 +190,7 @@ nodes:
     order_weight: 1000
   - name: ports
     label: Ports
-    peer: InfraPort
+    peer: DevicePort
     optional: true
     cardinality: many
     kind: Component
@@ -203,17 +199,18 @@ nodes:
   namespace: Device
   description: A network port on a PIC, specifying speed and port number.
   label: Port
+  menu_placement: DeviceLinecard
+  icon: mdi:ethernet
   uniqueness_constraints:
   - - pic
     - port_number__value
   human_friendly_id:
-  - pic__slot__value
+  - pic__serial_number__value
   - port_number__value
   display_labels:
   - port_number__value
   order_by:
-  - pic__slot__value
-  - port_number__value
+  - pic__serial_number__value
   attributes:
   - name: port_number
     kind: Number

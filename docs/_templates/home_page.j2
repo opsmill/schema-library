@@ -45,6 +45,7 @@ One of Infrahub's key strengths is its flexibility. **We encourage you to copy a
 ### How to load schemas
 
 There are two main ways to load schemas into Infrahub, depending on where you are in your Infrahub journey:
+
 - **Quick View**: To quickly view a schema, you can use `infrahubctl`. Please reference the [`infrahubctl` Guide](https://docs.infrahub.app/infrahubctl) for further instructions.
 - **Controlled Integration**: For a more organized and unified approach, you can connect a Git repository. Follow [this guide](https://docs.infrahub.app/guides/repository) to connect a Git repository.
 
@@ -82,9 +83,9 @@ This list provides an overview of the schemas available in this repository. Each
 ### {{ folder }}
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 {% for extension in extensions %}
-{{ "| **[{}]({})** | {} |".format(extension.name, extension.link, extension.description) }}
+| **[{{ extension.name }}]({{ extension.link }})** | {{ extension.description }} |
 {% endfor %}
 {% endfor %}
 <!-- vale on -->

@@ -6,11 +6,10 @@ This schema extension allows you to capture Device Modules related information l
 
 NOTE: This extension doesn't contain any Nodes, you can use the extension module_linecards or modules_routing_engine to use it
 
-
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
+    - [base](dcim)
 
 ## Generics
 
@@ -19,6 +18,9 @@ NOTE: This extension doesn't contain any Nodes, you can use the extension module
 - **Label:** Module
 - **Description:** A generic module, such as a Linecard or Routing Engine, installed in a device.
 - **Namespace:** Device
+- **Icon:** mdi:expansion-card
+- **Display Labels:** serial_number__value
+- **Human Friendly ID:** serial_number__value
 
 #### Attributes
 
@@ -40,8 +42,9 @@ NOTE: This extension doesn't contain any Nodes, you can use the extension module
 - **Label:** Module Type
 - **Description:** A generic module type, with common specifications like part number and manufacturer.
 - **Namespace:** Device
+- **Icon:** mdi:database-cog
+- **Display Labels:** name__value
 - **Uniqueness Constraints:**
-    - part_number__value
     - name__value, manufacturer
 - **Human Friendly ID:** name__value
 
@@ -76,7 +79,6 @@ In this context "extensions" refer to modifications or additions to the existing
 | ---- | ---- | -------- | ----------- | ---- |
 | modules | DeviceGenericModule |  | many | Component |
 
-
 ## Code
 
 ```yaml
@@ -87,6 +89,13 @@ generics:
   description: A generic module, such as a Linecard or Routing Engine, installed in
     a device.
   label: Module
+  icon: mdi:expansion-card
+  human_friendly_id:
+  - serial_number__value
+  display_labels:
+  - serial_number__value
+  order_by:
+  - serial_number__value
   attributes:
   - name: serial_number
     kind: Text
@@ -142,8 +151,11 @@ generics:
   description: A generic module type, with common specifications like part number
     and manufacturer.
   label: Module Type
+  icon: mdi:database-cog
+  menu_placement: DeviceGenericModule
+  display_labels:
+  - name__value
   uniqueness_constraints:
-  - - part_number__value
   - - name__value
     - manufacturer
   human_friendly_id:
@@ -166,6 +178,7 @@ generics:
     label: Part Number
     kind: Text
     optional: true
+    unique: true
     description: Part number of the module.
     order_weight: 1200
   relationships:

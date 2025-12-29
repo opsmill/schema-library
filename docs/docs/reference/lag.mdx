@@ -7,7 +7,7 @@ This schema extension includes models for Link Aggregation Groups (LAGs), enabli
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
+    - [base](dcim)
 
 ## Nodes
 
@@ -16,7 +16,7 @@ This schema extension includes models for Link Aggregation Groups (LAGs), enabli
 - **Label:** LAG Interface
 - **Description:** LAG interface
 - **Namespace:** Interface
-- **Inherit From:** DcimInterface, InterfaceLayer2, InterfaceLayer3, InterfaceHasSubInterface
+- **Inherit From:** DcimInterface, InterfaceLayer2, InterfaceLayer3, InterfaceHasSubInterface, GenericInterfaceBundle
 
 #### Attributes
 
@@ -30,6 +30,25 @@ This schema extension includes models for Link Aggregation Groups (LAGs), enabli
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | lag_members | InterfacePhysical |  | many | Attribute |
+
+## Generics
+
+### InterfaceBundle
+
+- **Label:** Generic Interface Bundle
+- **Namespace:** Generic
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name | Name of the interface | Text |  |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| bundle_members | InterfacePhysical |  | many | Attribute |
 
 ## Extensions
 
@@ -45,13 +64,30 @@ In this context "extensions" refer to modifications or additions to the existing
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| lag_parent | InterfaceLag | True | one | Attribute |
-
+| bundle | GenericInterfaceBundle | True | one | Attribute |
 
 ## Code
 
 ```yaml
 version: '1.0'
+generics:
+- name: InterfaceBundle
+  namespace: Generic
+  label: Generic Interface Bundle
+  include_in_menu: false
+  attributes:
+  - name: name
+    kind: Text
+    description: Name of the interface
+    order_weight: 1000
+  relationships:
+  - name: bundle_members
+    label: Bundle members
+    peer: InterfacePhysical
+    cardinality: many
+    kind: Attribute
+    description: Physical Interfaces that are members of this aggregate
+    order_weight: 1800
 nodes:
 - name: Lag
   namespace: Interface
@@ -62,6 +98,7 @@ nodes:
   - InterfaceLayer2
   - InterfaceLayer3
   - InterfaceHasSubInterface
+  - GenericInterfaceBundle
   include_in_menu: false
   attributes:
   - name: lacp_rate
@@ -95,6 +132,7 @@ nodes:
     order_weight: 1750
   relationships:
   - name: lag_members
+    common_parent: device
     label: Member(s)
     peer: InterfacePhysical
     cardinality: many
@@ -105,13 +143,13 @@ extensions:
   nodes:
   - kind: InterfacePhysical
     relationships:
-    - name: lag_parent
-      label: LAG
-      peer: InterfaceLag
+    - name: bundle
+      label: Interface Bundle
+      peer: GenericInterfaceBundle
       optional: true
       cardinality: one
       kind: Attribute
-      description: LAG Interface using this Physical Interface
+      description: Interface Bundle using this Physical Interface
       order_weight: 1800
 
 ```

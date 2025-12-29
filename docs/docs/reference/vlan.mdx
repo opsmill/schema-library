@@ -7,7 +7,7 @@ This schema extension contains models to support VLANs in you network.
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
+    - [base](dcim)
 
 ## Nodes
 
@@ -19,7 +19,7 @@ This schema extension contains models to support VLANs in you network.
 - **Icon:** mdi:lan-pending
 - **Display Labels:** name__value
 - **Uniqueness Constraints:**
-    - l2domain, vlan_id__value
+    - vlan_id__value, l2domain
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -94,7 +94,6 @@ In this context "extensions" refer to modifications or additions to the existing
 | ---- | ---- | -------- | ----------- | ---- |
 | vlans | IpamVLAN | True | many |  |
 
-
 ## Code
 
 ```yaml
@@ -107,8 +106,8 @@ nodes:
   icon: mdi:lan-pending
   menu_placement: IpamL2Domain
   uniqueness_constraints:
-  - - l2domain
-    - vlan_id__value
+  - - vlan_id__value
+    - l2domain
   human_friendly_id:
   - name__value
   order_by:

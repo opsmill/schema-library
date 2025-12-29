@@ -7,7 +7,7 @@ This schema extension contains a generic to create Routing Policies. This Generi
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
+    - [base](dcim)
 
 ## Generics
 
@@ -17,8 +17,6 @@ This schema extension contains a generic to create Routing Policies. This Generi
 - **Namespace:** Routing
 - **Icon:** carbon:deployment-policy
 - **Display Labels:** name__value
-- **Uniqueness Constraints:**
-    - name__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -31,8 +29,6 @@ This schema extension contains a generic to create Routing Policies. This Generi
 | weight | Priority of the routing policy. The higher the number, the higher the priority. | Number | True | 1000 |  |
 | address_family | The address family for the routing policy indicating the type of IP address. | Dropdown |  | all | ipv4, ipv6, all |
 
-
-
 ## Code
 
 ```yaml
@@ -43,8 +39,6 @@ generics:
   icon: carbon:deployment-policy
   include_in_menu: false
   description: Policy defining the rules for routing traffic in a network.
-  uniqueness_constraints:
-  - - name__value
   human_friendly_id:
   - name__value
   order_by:

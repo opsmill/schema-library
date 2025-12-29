@@ -7,8 +7,8 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
-  - [extensions/sfp](sfp)
+    - [base](dcim)
+    - [extensions/sfp](sfp)
 
 ## Nodes
 
@@ -47,7 +47,6 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 - **Human Friendly ID:** optical_multiplexer__name__value, name__value
 - **Inherit From:** DcimEndpoint, DcimGenericOadmInterface
 
-
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
@@ -65,7 +64,6 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 - **Human Friendly ID:** optical_multiplexer__name__value, name__value
 - **Inherit From:** DcimEndpoint, DcimGenericOadmInterface
 
-
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
@@ -80,8 +78,8 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 - **Icon:** game-icons:laser-warning
 - **Display Labels:** wdm_type__value, channel__value
 - **Uniqueness Constraints:**
-    - wdm_type__value, channel__value, wavelength__value, frequency__value
-    - wdm_type__value, channel__value
+    - frequency__value, wavelength__value, channel__value, wdm_type__value
+    - channel__value, wdm_type__value
 - **Human Friendly ID:** wdm_type__value, channel__value
 
 #### Attributes
@@ -92,7 +90,6 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 | wdm_type | Type of WDM (e.g CWDM. DWDM) | Dropdown | False | dwdm | cwdm, dwdm |
 | wavelength | Wavelength of the channel in nm. | Text |  |  |  |
 | frequency | Frequency of the channel in GHz. | Text |  |  |  |
-
 
 ### WdmSFP
 
@@ -129,8 +126,6 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 | name |  | Text |  |  |  |
 | description |  | Text | True |  |  |
 | connector_type |  | Dropdown |  |  | FC, LC, LC_PC, LC_UPC, LC_APC, LSH, LSH_PC, LSH_UPC, LSH_APC, LX_5, LX_5_PC, LX_5_UPC, LX_5_APC, MPO, MTRJ, SC, SC_PC, SC_UPC, SC_APC, ST, CS, SN, SMA_905, SMA_906, URM_P2 |
-
-
 
 ## Code
 
@@ -361,12 +356,12 @@ nodes:
   - wdm_type__value
   - channel__value
   uniqueness_constraints:
-  - - wdm_type__value
-    - channel__value
+  - - frequency__value
     - wavelength__value
-    - frequency__value
-  - - wdm_type__value
     - channel__value
+    - wdm_type__value
+  - - channel__value
+    - wdm_type__value
   human_friendly_id:
   - wdm_type__value
   - channel__value

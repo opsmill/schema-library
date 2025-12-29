@@ -3,21 +3,21 @@ name = "schema-library"
 version = "0.1.0"
 description = ""
 authors = [{name = "OpsMill", email = "info@opsmill.com"}]
-requires-python = ">=3.10,<=3.14.2"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     "infrahub-sdk[all]>=1.17.0",
-    "invoke>=2.1.2",
+    "invoke>=2.2.1",
     "toml>=0.10.2",
 ]
 
 [dependency-groups]
 dev = [
-    "ruff>=0.9.1",
-    "yamllint>=1.35.1",
-    "mypy>=1.14.1",
-    "pylint>=3.3.4",
-    "vale>=3.9.4.0",
-    "types-pyyaml>=6.0.12.20250516",
+    "ruff>=0.14.10",
+    "yamllint>=1.37.1",
+    "mypy>=1.19.1",
+    "pylint>=4.0.4",
+    "vale>=3.13.0.0",
+    "types-pyyaml>=6.0.12.20250915",
 ]
 
 [tool.pylint.messages_control]

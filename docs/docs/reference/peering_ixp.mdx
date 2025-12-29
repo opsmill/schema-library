@@ -7,10 +7,10 @@ This schema extension contains all you need to model anything revolving around i
 ## Details
 
 - **Dependencies:**
-  - [base](dcim)
-  - [extensions/routing](routing)
-  - [extensions/routing_bgp](routing_bgp)
-  - [extensions/routing_bgp_community](routing_bgp_community)
+    - [base](dcim)
+    - [extensions/routing](routing)
+    - [extensions/routing_bgp](routing_bgp)
+    - [extensions/routing_bgp_community](routing_bgp_community)
 
 ## Nodes
 
@@ -21,8 +21,6 @@ This schema extension contains all you need to model anything revolving around i
 - **Namespace:** Peering
 - **Icon:** mdi:network
 - **Display Labels:** name__value
-- **Uniqueness Constraints:**
-    - name__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -76,7 +74,6 @@ This schema extension contains all you need to model anything revolving around i
 | router | DcimDevice |  | one | Attribute |
 | tags | BuiltinTag |  | many | Attribute |
 
-
 ## Code
 
 ```yaml
@@ -87,8 +84,6 @@ nodes:
   description: An Internet Exchange Point (IXP) for peering
   label: Internet Exchange
   icon: mdi:network
-  uniqueness_constraints:
-  - - name__value
   human_friendly_id:
   - name__value
   order_by:

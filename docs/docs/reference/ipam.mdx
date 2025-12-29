@@ -18,7 +18,7 @@ Basic IPAM schema to capture IP addresses, subnets, and related information.
 - **Icon:** mdi:ip
 - **Display Labels:** address__value
 - **Uniqueness Constraints:**
-    - ip_namespace, address__value
+    - address__value, ip_namespace
 - **Human Friendly ID:** address__value, ip_namespace__name__value
 - **Inherit From:** BuiltinIPAddress
 
@@ -42,7 +42,7 @@ Basic IPAM schema to capture IP addresses, subnets, and related information.
 - **Icon:** mdi:ip-network
 - **Display Labels:** prefix__value
 - **Uniqueness Constraints:**
-    - ip_namespace, prefix__value
+    - prefix__value, ip_namespace
 - **Human Friendly ID:** prefix__value, ip_namespace__name__value
 - **Inherit From:** BuiltinIPPrefix
 
@@ -60,7 +60,6 @@ Basic IPAM schema to capture IP addresses, subnets, and related information.
 | organization | OrganizationGeneric | True | one | Attribute |
 | location | LocationHosting | True | one | Attribute |
 | gateway | IpamIPAddress | True | one | Attribute |
-
 
 ## Code
 
@@ -80,8 +79,8 @@ nodes:
   inherit_from:
   - BuiltinIPAddress
   uniqueness_constraints:
-  - - ip_namespace
-    - address__value
+  - - address__value
+    - ip_namespace
   human_friendly_id:
   - address__value
   - ip_namespace__name__value
@@ -109,8 +108,8 @@ nodes:
   inherit_from:
   - BuiltinIPPrefix
   uniqueness_constraints:
-  - - ip_namespace
-    - prefix__value
+  - - prefix__value
+    - ip_namespace
   human_friendly_id:
   - prefix__value
   - ip_namespace__name__value
