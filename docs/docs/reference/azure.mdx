@@ -15,7 +15,6 @@ This schema extension introduces cloud support for Microsoft Azure.
 ### Location
 
 - **Namespace:** Azure
-- **Display Labels:** name__value
 
 #### Attributes
 
@@ -26,7 +25,6 @@ This schema extension introduces cloud support for Microsoft Azure.
 ### Tenant
 
 - **Namespace:** Azure
-- **Display Labels:** name__value, tenant_id__value
 
 #### Attributes
 
@@ -44,7 +42,6 @@ This schema extension introduces cloud support for Microsoft Azure.
 ### Subscription
 
 - **Namespace:** Azure
-- **Display Labels:** name__value, subscription_id__value
 
 #### Attributes
 
@@ -63,7 +60,6 @@ This schema extension introduces cloud support for Microsoft Azure.
 ### ResourceGroup
 
 - **Namespace:** Azure
-- **Display Labels:** name__value
 
 #### Attributes
 
@@ -82,7 +78,6 @@ This schema extension introduces cloud support for Microsoft Azure.
 
 - **Label:** Virtual Networks
 - **Namespace:** Azure
-- **Display Labels:** name__value
 - **Inherit From:** AzureResource
 
 #### Relationships
@@ -96,7 +91,6 @@ This schema extension introduces cloud support for Microsoft Azure.
 
 - **Label:** Subnets
 - **Namespace:** Azure
-- **Display Labels:** name__value
 
 #### Attributes
 
@@ -157,17 +151,14 @@ nodes:
 - name: Location
   namespace: Azure
   menu_placement: AzureResource
-  display_labels:
-  - name__value
+  display_label: name__value
   attributes:
   - name: name
     kind: Text
 - name: Tenant
   namespace: Azure
   menu_placement: AzureResource
-  display_labels:
-  - name__value
-  - tenant_id__value
+  display_label: '{{ name__value }} (Tenant ID: {{ tenant_id__value }})'
   attributes:
   - name: name
     kind: Text
@@ -181,9 +172,7 @@ nodes:
 - name: Subscription
   namespace: Azure
   menu_placement: AzureResource
-  display_labels:
-  - name__value
-  - subscription_id__value
+  display_label: '{{ name__value }} (Subscription ID: {{ subscription_id__value }})'
   attributes:
   - name: name
     kind: Text
@@ -202,8 +191,7 @@ nodes:
 - name: ResourceGroup
   namespace: Azure
   menu_placement: AzureResource
-  display_labels:
-  - name__value
+  display_label: name__value
   attributes:
   - name: name
     kind: Text
@@ -221,8 +209,7 @@ nodes:
   label: Virtual Networks
   namespace: Azure
   menu_placement: AzureResource
-  display_labels:
-  - name__value
+  display_label: name__value
   inherit_from:
   - AzureResource
   relationships:
@@ -239,8 +226,7 @@ nodes:
   namespace: Azure
   menu_placement: AzureResource
   include_in_menu: true
-  display_labels:
-  - name__value
+  display_label: name__value
   attributes:
   - name: name
     kind: Text

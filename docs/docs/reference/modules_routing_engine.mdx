@@ -31,7 +31,6 @@ This schema extension allows you to capture Routing Engine related information l
 - **Description:** A Routing Engine (RE) installed in a device, responsible for routing functionalities.
 - **Namespace:** Device
 - **Icon:** mdi:cpu-64-bit
-- **Display Labels:** serial_number__value
 - **Uniqueness Constraints:**
     - serial_number__value
 - **Human Friendly ID:** device__name__value, slot__value
@@ -84,8 +83,7 @@ nodes:
   order_by:
   - device__name__value
   - slot__value
-  display_labels:
-  - serial_number__value
+  display_label: serial_number__value
   attributes:
   - name: slot
     kind: Number

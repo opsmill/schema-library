@@ -16,7 +16,6 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 - **Description:** A model of device
 - **Namespace:** Dcim
 - **Icon:** mdi:poll
-- **Display Labels:** name__value
 - **Uniqueness Constraints:**
     - manufacturer, name__value
 - **Human Friendly ID:** name__value
@@ -46,7 +45,6 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 - **Description:** A Platform represent the type of software running on a device.
 - **Namespace:** Dcim
 - **Icon:** mdi:application-cog-outline
-- **Display Labels:** name__value
 - **Uniqueness Constraints:**
     - name__value
 - **Human Friendly ID:** name__value
@@ -113,7 +111,6 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 - **Description:** Generic Device object.
 - **Namespace:** Dcim
 - **Icon:** mdi:server
-- **Display Labels:** name__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -180,7 +177,6 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 - **Label:** Interface
 - **Description:** Generic Network Interface
 - **Namespace:** Dcim
-- **Display Labels:** name__value
 - **Uniqueness Constraints:**
     - device, name__value
 - **Human Friendly ID:** device__name__value, name__value
@@ -258,8 +254,7 @@ generics:
   - name__value
   order_by:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   attributes:
   - name: name
     kind: Text
@@ -370,8 +365,7 @@ generics:
   description: Generic Network Interface
   label: Interface
   include_in_menu: false
-  display_labels:
-  - name__value
+  display_label: name__value
   order_by:
   - device__name__value
   - name__value
@@ -548,8 +542,7 @@ nodes:
   icon: mdi:poll
   human_friendly_id:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   order_by:
   - manufacturer__name__value
   - name__value
@@ -611,8 +604,7 @@ nodes:
   icon: mdi:application-cog-outline
   human_friendly_id:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   order_by:
   - manufacturer__name__value
   - name__value

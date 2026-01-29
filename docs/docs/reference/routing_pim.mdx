@@ -18,7 +18,6 @@ This schema extension contains all you need to model the PIM Protocol.
 - **Description:** Protocol Independent Multicast (PIM) instance on a Virtual Router.
 - **Namespace:** Routing
 - **Icon:** mdi:network-outline
-- **Display Labels:** description__value
 - **Uniqueness Constraints:**
     - device, vrf
 - **Human Friendly ID:** device__name__value, vrf__name__value
@@ -45,7 +44,6 @@ This schema extension contains all you need to model the PIM Protocol.
 - **Description:** Interface configuration for PIM.
 - **Namespace:** Routing
 - **Icon:** mdi:ethernet
-- **Display Labels:** description__value
 - **Uniqueness Constraints:**
     - pim, interface
 - **Human Friendly ID:** description__value
@@ -88,8 +86,7 @@ nodes:
   human_friendly_id:
   - device__name__value
   - vrf__name__value
-  display_labels:
-  - description__value
+  display_label: description__value
   attributes:
   - name: dr_priority
     kind: Number
@@ -127,8 +124,7 @@ nodes:
   include_in_menu: false
   order_by:
   - description__value
-  display_labels:
-  - description__value
+  display_label: description__value
   uniqueness_constraints:
   - - pim
     - interface

@@ -18,7 +18,6 @@ This schema extension adds the BGP Communities models.
 - **Description:** Defines a BGP community.
 - **Namespace:** Routing
 - **Icon:** iconoir:community
-- **Display Labels:** name__value, community__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -50,9 +49,7 @@ nodes:
   - name__value
   order_by:
   - name__value
-  display_labels:
-  - name__value
-  - community__value
+  display_label: '{{ name__value }} ({{ community__value }})'
   attributes:
   - name: name
     kind: Text

@@ -54,7 +54,6 @@ This schema extension allows you to capture Linecard related information like th
 - **Description:** Physical Interface Card (PIC) installed in the Linecard, containing multiple ports.
 - **Namespace:** Device
 - **Icon:** mdi:memory
-- **Display Labels:** serial_number__value
 - **Uniqueness Constraints:**
     - linecard, slot__value
 - **Human Friendly ID:** serial_number__value
@@ -79,7 +78,6 @@ This schema extension allows you to capture Linecard related information like th
 - **Description:** A network port on a PIC, specifying speed and port number.
 - **Namespace:** Device
 - **Icon:** mdi:ethernet
-- **Display Labels:** port_number__value
 - **Uniqueness Constraints:**
     - pic, port_number__value
 - **Human Friendly ID:** pic__serial_number__value, port_number__value
@@ -165,8 +163,7 @@ nodes:
     - slot__value
   human_friendly_id:
   - serial_number__value
-  display_labels:
-  - serial_number__value
+  display_label: serial_number__value
   order_by:
   - linecard__serial_number__value
   attributes:
@@ -207,8 +204,7 @@ nodes:
   human_friendly_id:
   - pic__serial_number__value
   - port_number__value
-  display_labels:
-  - port_number__value
+  display_label: port_number__value
   order_by:
   - pic__serial_number__value
   attributes:

@@ -18,7 +18,6 @@ This schema extension contains all you need to model the OSPF Routing Protocol.
 - **Description:** OSPF (Open Shortest Path First) instance on a Virtual Router.
 - **Namespace:** Routing
 - **Icon:** mdi:network-outline
-- **Display Labels:** description__value
 - **Uniqueness Constraints:**
     - device, vrf, version__value
 - **Human Friendly ID:** device__name__value, vrf__name__value, version__value
@@ -46,7 +45,6 @@ This schema extension contains all you need to model the OSPF Routing Protocol.
 - **Description:** Pivot table linking OSPF configuration to an interface.
 - **Namespace:** Routing
 - **Icon:** mdi:ethernet
-- **Display Labels:** description__value
 - **Uniqueness Constraints:**
     - ospf, interface
 - **Human Friendly ID:** description__value
@@ -92,8 +90,7 @@ nodes:
   - device__name__value
   - vrf__name__value
   - version__value
-  display_labels:
-  - description__value
+  display_label: description__value
   inherit_from:
   - RoutingProtocol
   attributes:
@@ -146,8 +143,7 @@ nodes:
   include_in_menu: false
   order_by:
   - description__value
-  display_labels:
-  - description__value
+  display_label: description__value
   uniqueness_constraints:
   - - ospf
     - interface
