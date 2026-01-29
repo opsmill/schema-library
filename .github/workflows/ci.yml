@@ -218,8 +218,25 @@ jobs:
           git config --global user.name "documentator"
           git config --global user.email "documentator@opsmill.com"
           git add docs/reference/
-          git commit -m "docs: auto-generate reference [skip ci]" || echo "No changes to commit!"
-          git push
+          if git commit -m "docs: auto-generate reference [skip ci]"; then
+            git push
+            echo "pushed=true" >> $GITHUB_OUTPUT
+            echo "new_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          else
+            echo "No changes to commit!"
+            echo "pushed=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Report CI status on new commit
+        if: steps.push.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/${{ github.repository }}/statuses/${{ steps.push.outputs.new_sha }} \
+            -f state=success \
+            -f context="CI" \
+            -f description="CI passed on parent commit" \
+            -f target_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        working-directory: ./
 
   validate-documentation:
     if: |
