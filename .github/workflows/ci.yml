@@ -41,6 +41,7 @@ jobs:
       documentation: ${{ steps.changes.outputs.documentation_all }}
       markdown: ${{ steps.changes.outputs.markdown_all }}
       python: ${{ steps.changes.outputs.python_all }}
+      schema: ${{ steps.changes.outputs.schema_all }}
       yaml: ${{ steps.changes.outputs.yaml_all }}
     steps:
       - name: "Check out repository code"
@@ -128,7 +129,7 @@ jobs:
       always() && !cancelled() &&
       !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled') &&
-      needs.files-changed.outputs.yaml == 'true'
+      needs.files-changed.outputs.schema == 'true'
     runs-on:
       group: huge-runners
     env:
@@ -215,7 +216,7 @@ jobs:
         run: |
           git config --global user.name "documentator"
           git config --global user.email "documentator@opsmill.com"
-          git add docs/docs/reference/
+          git add docs/reference/
           git commit -m "docs: auto-generate reference [skip ci]" || echo "No changes to commit!"
           git push
 
