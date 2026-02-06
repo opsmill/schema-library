@@ -20,6 +20,10 @@ yaml_all: &yaml_all
 markdown_all: &markdown_all
   - "**/*.{md,mdx}"
 
+schema_all: &schema_all
+  - "base/**/*.{yml,yaml}"
+  - "extensions/**/*.{yml,yaml}"
+
 documentation_all:
   - *doc_files
   - *markdown_all

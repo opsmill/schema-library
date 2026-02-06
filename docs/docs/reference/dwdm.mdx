@@ -18,7 +18,6 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 - **Description:** An OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies.
 - **Namespace:** Dcim
 - **Icon:** mdi:transit-connection-variant
-- **Display Labels:** name__value
 - **Human Friendly ID:** name__value
 - **Inherit From:** DcimPhysicalDevice
 
@@ -41,7 +40,6 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 
 - **Label:** Optical Multiplexer Front Interfaces
 - **Namespace:** Dcim
-- **Display Labels:** name__value
 - **Uniqueness Constraints:**
     - optical_multiplexer, name__value
 - **Human Friendly ID:** optical_multiplexer__name__value, name__value
@@ -58,7 +56,6 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 
 - **Label:** Optical Multiplexer Rear Interfaces
 - **Namespace:** Dcim
-- **Display Labels:** name__value
 - **Uniqueness Constraints:**
     - optical_multiplexer, name__value
 - **Human Friendly ID:** optical_multiplexer__name__value, name__value
@@ -76,7 +73,6 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 - **Description:** A WDM channel with its wavelength and frequency.
 - **Namespace:** Dcim
 - **Icon:** game-icons:laser-warning
-- **Display Labels:** wdm_type__value, channel__value
 - **Uniqueness Constraints:**
     - frequency__value, wavelength__value, channel__value, wdm_type__value
     - channel__value, wdm_type__value
@@ -244,8 +240,7 @@ nodes:
   - name__value
   order_by:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   inherit_from:
   - DcimPhysicalDevice
   attributes:
@@ -293,8 +288,7 @@ nodes:
   human_friendly_id:
   - optical_multiplexer__name__value
   - name__value
-  display_labels:
-  - name__value
+  display_label: '{{ optical_multiplexer__name__value }} > {{ name__value }}'
   order_by:
   - optical_multiplexer__name__value
   - name__value
@@ -325,8 +319,7 @@ nodes:
   human_friendly_id:
   - optical_multiplexer__name__value
   - name__value
-  display_labels:
-  - name__value
+  display_label: '{{ optical_multiplexer__name__value }} > {{ name__value }}'
   order_by:
   - optical_multiplexer__name__value
   - name__value
@@ -352,9 +345,7 @@ nodes:
   order_by:
   - wdm_type__value
   - channel__value
-  display_labels:
-  - wdm_type__value
-  - channel__value
+  display_label: '{{ wdm_type__value }} Channel {{ channel__value }}'
   uniqueness_constraints:
   - - frequency__value
     - wavelength__value

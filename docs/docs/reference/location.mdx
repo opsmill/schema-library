@@ -16,7 +16,6 @@ Basic Location schema to capture locations, sites, and related information.
 - **Description:** Generic Location, could be a country, city ...
 - **Namespace:** Location
 - **Icon:** mingcute:location-line
-- **Display Labels:** name__value
 - **Human Friendly ID:** shortname__value
 
 #### Attributes
@@ -37,6 +36,13 @@ Basic Location schema to capture locations, sites, and related information.
 
 - **Description:** Location directly hosting device and services.
 - **Namespace:** Location
+- **Human Friendly ID:** shortname__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| shortname |  | Text |  |  |  |
 
 #### Relationships
 
@@ -61,8 +67,7 @@ generics:
   - shortname__value
   order_by:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   attributes:
   - name: name
     kind: Text
@@ -85,6 +90,13 @@ generics:
   namespace: Location
   description: Location directly hosting device and services.
   include_in_menu: false
+  human_friendly_id:
+  - shortname__value
+  attributes:
+  - name: shortname
+    kind: Text
+    unique: true
+    order_weight: 1100
   relationships:
   - name: prefixes
     label: Prefixes

@@ -18,7 +18,6 @@ This schema extension contains Circuits and ways to connect them with your infra
 - **Description:** A Circuit represent service operated by a provider.
 - **Namespace:** Dcim
 - **Icon:** mdi:cable-data
-- **Display Labels:** circuit_id__value
 - **Human Friendly ID:** circuit_id__value
 
 #### Attributes
@@ -44,7 +43,6 @@ This schema extension contains Circuits and ways to connect them with your infra
 - **Description:** A circuit endpoint, could be a position in a MMR...
 - **Namespace:** Dcim
 - **Icon:** mdi:ethernet
-- **Display Labels:** name__value
 - **Uniqueness Constraints:**
     - circuit, name__value
 - **Human Friendly ID:** circuit__circuit_id__value, name__value
@@ -103,8 +101,7 @@ nodes:
   - circuit_id__value
   order_by:
   - circuit_id__value
-  display_labels:
-  - circuit_id__value
+  display_label: circuit_id__value
   attributes:
   - name: circuit_id
     kind: Text
@@ -186,8 +183,7 @@ nodes:
     - name__value
   order_by:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   attributes:
   - name: name
     kind: Text

@@ -17,7 +17,6 @@ This schema extension contains models for implementing detailed security.
 - **Description:** Security zones
 - **Namespace:** Security
 - **Icon:** game-icons:fire-zone
-- **Display Labels:** name__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -80,7 +79,6 @@ This schema extension contains models for implementing detailed security.
 - **Description:** IPv4/6 address
 - **Namespace:** Security
 - **Icon:** mdi:ip-outline
-- **Display Labels:** name__value, address__value
 - **Human Friendly ID:** name__value
 - **Inherit From:** SecurityGenericAddress
 
@@ -97,7 +95,6 @@ This schema extension contains models for implementing detailed security.
 - **Description:** IPv4/6 prefix
 - **Namespace:** Security
 - **Icon:** mdi:ip-network-outline
-- **Display Labels:** name__value, prefix__value
 - **Human Friendly ID:** name__value
 - **Inherit From:** SecurityGenericAddress
 
@@ -114,7 +111,6 @@ This schema extension contains models for implementing detailed security.
 - **Description:** IPv4/6 Range
 - **Namespace:** Security
 - **Icon:** mdi:ip-outline
-- **Display Labels:** name__value
 - **Human Friendly ID:** name__value
 - **Inherit From:** SecurityGenericAddress
 
@@ -131,7 +127,6 @@ This schema extension contains models for implementing detailed security.
 - **Description:** Full Qualified Domain Name
 - **Namespace:** Security
 - **Icon:** eos-icons:dns
-- **Display Labels:** name__value
 - **Human Friendly ID:** name__value
 - **Inherit From:** SecurityGenericAddress
 
@@ -147,7 +142,6 @@ This schema extension contains models for implementing detailed security.
 - **Description:** Group of addresses
 - **Namespace:** Security
 - **Icon:** material-symbols:menu-book-outline-rounded
-- **Display Labels:** name__value
 - **Human Friendly ID:** name__value
 - **Inherit From:** SecurityGenericAddressGroup
 
@@ -157,7 +151,6 @@ This schema extension contains models for implementing detailed security.
 - **Description:** IP protocol
 - **Namespace:** Security
 - **Icon:** mdi:protocol
-- **Display Labels:** name__value
 - **Human Friendly ID:** name__value
 - **Inherit From:** SecurityGenericService
 
@@ -173,7 +166,6 @@ This schema extension contains models for implementing detailed security.
 - **Description:** Service
 - **Namespace:** Security
 - **Icon:** eos-icons:application-outlined
-- **Display Labels:** name__value
 - **Human Friendly ID:** name__value
 - **Inherit From:** SecurityGenericService
 
@@ -195,7 +187,6 @@ This schema extension contains models for implementing detailed security.
 - **Description:** Service range
 - **Namespace:** Security
 - **Icon:** eos-icons:application-outlined
-- **Display Labels:** name__value
 - **Human Friendly ID:** name__value
 - **Inherit From:** SecurityGenericService
 
@@ -218,7 +209,6 @@ This schema extension contains models for implementing detailed security.
 - **Description:** Group of services
 - **Namespace:** Security
 - **Icon:** material-symbols:menu-book-outline-rounded
-- **Display Labels:** name__value
 - **Human Friendly ID:** name__value
 - **Inherit From:** SecurityGenericServiceGroup
 
@@ -226,7 +216,6 @@ This schema extension contains models for implementing detailed security.
 
 - **Label:** Security Policy
 - **Namespace:** Security
-- **Display Labels:** name__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -333,7 +322,6 @@ This schema extension contains models for implementing detailed security.
 - **Label:** Firewall Interface
 - **Namespace:** Security
 - **Icon:** mdi:ethernet
-- **Display Labels:** name__value
 - **Inherit From:** InfraInterface, InfraEndpoint
 
 #### Relationships
@@ -359,7 +347,6 @@ This schema extension contains models for implementing detailed security.
 ### GenericAddressGroup
 
 - **Namespace:** Security
-- **Display Labels:** name__value
 
 #### Attributes
 
@@ -377,7 +364,6 @@ This schema extension contains models for implementing detailed security.
 ### GenericAddress
 
 - **Namespace:** Security
-- **Display Labels:** name__value
 
 #### Attributes
 
@@ -394,7 +380,6 @@ This schema extension contains models for implementing detailed security.
 ### GenericServiceGroup
 
 - **Namespace:** Security
-- **Display Labels:** name__value
 
 #### Attributes
 
@@ -412,7 +397,6 @@ This schema extension contains models for implementing detailed security.
 ### GenericService
 
 - **Namespace:** Security
-- **Display Labels:** name__value
 
 #### Attributes
 
@@ -462,8 +446,7 @@ generics:
 - name: GenericAddressGroup
   namespace: Security
   include_in_menu: false
-  display_labels:
-  - name__value
+  display_label: name__value
   hierarchical: true
   attributes:
   - name: name
@@ -483,8 +466,7 @@ generics:
     optional: true
 - name: GenericAddress
   namespace: Security
-  display_labels:
-  - name__value
+  display_label: name__value
   include_in_menu: false
   attributes:
   - name: name
@@ -501,8 +483,7 @@ generics:
   namespace: Security
   include_in_menu: false
   hierarchical: true
-  display_labels:
-  - name__value
+  display_label: name__value
   attributes:
   - name: name
     label: Name
@@ -522,8 +503,7 @@ generics:
 - name: GenericService
   include_in_menu: false
   namespace: Security
-  display_labels:
-  - name__value
+  display_label: name__value
   attributes:
   - name: name
     label: Name
@@ -545,8 +525,7 @@ nodes:
   menu_placement: SecurityPolicy
   human_friendly_id:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   include_in_menu: true
   icon: game-icons:fire-zone
   description: Security zones
@@ -617,9 +596,7 @@ nodes:
   - SecurityGenericAddress
   order_by:
   - address__value
-  display_labels:
-  - name__value
-  - address__value
+  display_label: '{{ name__value }} ({{ address__value }})'
   attributes:
   - name: address
     kind: IPHost
@@ -639,9 +616,7 @@ nodes:
   - SecurityGenericAddress
   order_by:
   - name__value
-  display_labels:
-  - name__value
-  - prefix__value
+  display_label: '{{ name__value }} ({{ prefix__value }})'
   attributes:
   - name: prefix
     kind: IPNetwork
@@ -659,8 +634,7 @@ nodes:
   label: IP Range
   human_friendly_id:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   inherit_from:
   - SecurityGenericAddress
   order_by:
@@ -683,8 +657,7 @@ nodes:
   label: FQDN
   human_friendly_id:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   inherit_from:
   - SecurityGenericAddress
   order_by:
@@ -706,8 +679,7 @@ nodes:
   human_friendly_id:
   - name__value
   parent: SecurityAddressGroup
-  display_labels:
-  - name__value
+  display_label: name__value
   inherit_from:
   - SecurityGenericAddressGroup
 - name: IPProtocol
@@ -719,8 +691,7 @@ nodes:
   label: IP Protocols
   human_friendly_id:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   order_by:
   - name__value
   inherit_from:
@@ -738,8 +709,7 @@ nodes:
   label: Service
   human_friendly_id:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   order_by:
   - name__value
   inherit_from:
@@ -762,8 +732,7 @@ nodes:
   label: Service range
   human_friendly_id:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   order_by:
   - name__value
   inherit_from:
@@ -790,8 +759,7 @@ nodes:
   description: Group of services
   human_friendly_id:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   order_by:
   - name__value
   inherit_from:
@@ -801,8 +769,7 @@ nodes:
   label: Security Policy
   human_friendly_id:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   order_by:
   - name__value
   attributes:
@@ -1070,8 +1037,7 @@ nodes:
   menu_placement: InfraGenericDevice
   include_in_menu: false
   icon: mdi:ethernet
-  display_labels:
-  - name__value
+  display_label: name__value
   inherit_from:
   - InfraInterface
   - InfraEndpoint

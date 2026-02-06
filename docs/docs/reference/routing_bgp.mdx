@@ -18,7 +18,6 @@ This schema extension contains all you need to model your BGP platform.
 - **Description:** An Autonomous System (AS) is a set of Internet routable IP prefixes belonging to a network
 - **Namespace:** Routing
 - **Icon:** mdi:bank-circle-outline
-- **Display Labels:** asn__value, name__value
 - **Human Friendly ID:** asn__value, name__value
 
 #### Attributes
@@ -43,7 +42,6 @@ This schema extension contains all you need to model your BGP platform.
 - **Description:** A BGP Peer Group is used to regroup parameters that are shared across multiple peers
 - **Namespace:** Routing
 - **Icon:** mdi:view-grid-plus-outline
-- **Display Labels:** name__value, description__value
 - **Human Friendly ID:** name__value, description__value
 - **Inherit From:** RoutingProtocol
 
@@ -72,7 +70,6 @@ This schema extension contains all you need to model your BGP platform.
 - **Description:** A BGP Session represent a point to point connection between two routers
 - **Namespace:** Routing
 - **Icon:** mdi:router
-- **Display Labels:** description__value
 - **Inherit From:** RoutingProtocol
 
 #### Attributes
@@ -139,9 +136,7 @@ nodes:
   order_by:
   - asn__value
   - name__value
-  display_labels:
-  - asn__value
-  - name__value
+  display_label: 'AS {{ asn__value }}: {{ name__value }}'
   attributes:
   - name: name
     kind: Text
@@ -188,9 +183,7 @@ nodes:
   - description__value
   order_by:
   - name__value
-  display_labels:
-  - name__value
-  - description__value
+  display_label: '{{ name__value }} - {{ description__value }}'
   attributes:
   - name: name
     kind: Text
@@ -260,8 +253,7 @@ nodes:
   - RoutingProtocol
   order_by:
   - remote_as__asn__value
-  display_labels:
-  - description__value
+  display_label: description__value
   attributes:
   - name: import_policies
     kind: Text

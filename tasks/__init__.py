@@ -6,7 +6,7 @@ from . import docs, linter, schemas
 
 VERSION = os.getenv("INFRAHUB_VERSION", None)
 DOCKER_PROJECT = os.getenv("INFRAHUB_BUILD_NAME", "schema-library-ci")
-COMPOSE_COMMAND = f"curl https://infrahub.opsmill.io/{VERSION if VERSION else 'stable'} | sed 's/8000:8000/0:8000/' | docker compose -p {DOCKER_PROJECT} -f -"  # noqa: line-too-long
+COMPOSE_COMMAND = f"curl -fsSL https://infrahub.opsmill.io/{VERSION if VERSION else 'stable'} | sed 's/8000:8000/0:8000/' | docker compose -p {DOCKER_PROJECT} -f -"  # noqa: line-too-long
 
 ns = Collection()
 

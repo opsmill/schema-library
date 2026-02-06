@@ -16,7 +16,6 @@ Basic IPAM schema to capture IP addresses, subnets, and related information.
 - **Description:** IP Address
 - **Namespace:** Ipam
 - **Icon:** mdi:ip
-- **Display Labels:** address__value
 - **Uniqueness Constraints:**
     - address__value, ip_namespace
 - **Human Friendly ID:** address__value, ip_namespace__name__value
@@ -40,7 +39,6 @@ Basic IPAM schema to capture IP addresses, subnets, and related information.
 - **Description:** IPv4 or IPv6 network (with mask)
 - **Namespace:** Ipam
 - **Icon:** mdi:ip-network
-- **Display Labels:** prefix__value
 - **Uniqueness Constraints:**
     - prefix__value, ip_namespace
 - **Human Friendly ID:** prefix__value, ip_namespace__name__value
@@ -74,8 +72,7 @@ nodes:
   include_in_menu: false
   order_by:
   - address__value
-  display_labels:
-  - address__value
+  display_label: address__value
   inherit_from:
   - BuiltinIPAddress
   uniqueness_constraints:
@@ -103,8 +100,7 @@ nodes:
   label: Prefix
   order_by:
   - prefix__value
-  display_labels:
-  - prefix__value
+  display_label: prefix__value
   inherit_from:
   - BuiltinIPPrefix
   uniqueness_constraints:

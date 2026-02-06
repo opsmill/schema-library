@@ -17,7 +17,6 @@ This schema extension contains models to support VLANs in you network.
 - **Description:** A VLAN is isolated layer two domain
 - **Namespace:** Ipam
 - **Icon:** mdi:lan-pending
-- **Display Labels:** name__value
 - **Uniqueness Constraints:**
     - vlan_id__value, l2domain
 - **Human Friendly ID:** name__value
@@ -46,7 +45,6 @@ This schema extension contains models to support VLANs in you network.
 - **Description:** Represents layer 2 domain.
 - **Namespace:** Ipam
 - **Icon:** mdi:domain-switch
-- **Display Labels:** name__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -112,8 +110,7 @@ nodes:
   - name__value
   order_by:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   attributes:
   - name: name
     kind: Text
@@ -179,8 +176,7 @@ nodes:
   icon: mdi:domain-switch
   human_friendly_id:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   attributes:
   - name: name
     kind: Text

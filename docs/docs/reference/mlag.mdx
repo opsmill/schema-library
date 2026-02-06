@@ -26,7 +26,6 @@ Next steps:
 - **Label:** MLAG Interface
 - **Description:** Multi-Chassis Link Aggregation Group Interface
 - **Namespace:** Mlag
-- **Display Labels:** name__value
 - **Uniqueness Constraints:**
     - mlag_domain, name__value
 - **Human Friendly ID:** mlag_domain__domain_id__value, name__value
@@ -68,7 +67,6 @@ Next steps:
 
 - **Label:** MLAG Domain
 - **Namespace:** Generic
-- **Display Labels:** domain_id__value
 - **Human Friendly ID:** domain_id__value
 
 #### Attributes
@@ -118,8 +116,7 @@ generics:
   namespace: Generic
   include_in_menu: false
   label: MLAG Domain
-  display_labels:
-  - domain_id__value
+  display_label: domain_id__value
   human_friendly_id:
   - domain_id__value
   attributes:
@@ -168,8 +165,7 @@ nodes:
   - name__value
   order_by:
   - name__value
-  display_labels:
-  - name__value
+  display_label: name__value
   attributes:
   - name: name
     kind: Text

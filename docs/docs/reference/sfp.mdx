@@ -50,7 +50,6 @@ Improvements:
 - **Description:** Generic base for all Small Form-factor Pluggable (SFP) transceivers.
 - **Namespace:** Dcim
 - **Icon:** mdi:gpu
-- **Display Labels:** form_factor__value, sfp_type__value
 
 #### Attributes
 
@@ -112,9 +111,7 @@ generics:
   label: SFP
   icon: mdi:gpu
   include_in_menu: true
-  display_labels:
-  - form_factor__value
-  - sfp_type__value
+  display_label: '{{ form_factor__value }} {{ sfp_type__value }}'
   attributes:
   - name: serial
     kind: Text

@@ -1,17 +1,28 @@
 ---
+# Markdownlint configuration
+# https://github.com/DavidAnson/markdownlint
+
 default: true
+
+# MD007/ul-indent - Unordered list indentation
 MD007:
-    indent: 4   # sets indent size to 4 spaces
-MD013: false    # disables max line-length
-MD024: false    # disables 'no duplicate headings',
-                # which we use in tabs for instructions
+  indent: 4
+
+# MD013/line-length - Line length (disabled for readability in prose)
+MD013: false
+
+# MD024/no-duplicate-heading - Multiple headings with the same content
+# Allow duplicate headings in different sections
+MD024:
+  siblings_only: true
+
+# MD025/single-title - Multiple top-level headings
+# Prevent collisions with h1s and frontmatter titles
 MD025:
-    front_matter_title: ""  # prevent collisions with h1s
-                            # and frontmatter titles
-MD029: false    # allows manually creating ordered lists
-MD033: false    # allows inline html to override markdown styles
-MD034: false    # no-bare-urls
-MD045: false    # no alt text around images
-MD047: false    # single trailing newline
-MD014: false    # dollar signs used before commands
-MD060: false    # table column style - disabled for generated tables
+  front_matter_title: ""
+
+# MD033/no-inline-html - Inline HTML (disabled for MDX React components)
+MD033: false
+
+# MD060/table-column-style - Table column style (disabled for generated tables)
+MD060: false
