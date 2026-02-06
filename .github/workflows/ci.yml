@@ -198,7 +198,7 @@ jobs:
         working-directory: ./
       - name: "Check for outdated documentation"
         run: |
-          if ! git diff --exit-code docs/reference/; then
+          if ! git diff --exit-code -- docs/reference/; then
             echo "::error::Generated documentation is out of date. Please run 'invoke docs.generate' locally and commit the changes."
             exit 1
           fi
