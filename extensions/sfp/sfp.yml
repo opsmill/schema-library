@@ -126,11 +126,12 @@ generics:
             color: "#0099cc"
     relationships:
       - name: interface
-        peer: DcimInterface
+        peer: InterfacePhysical
         kind: Attribute
         optional: true
         cardinality: one
         order_weight: 1200
+        identifier: sfp__interface
       - name: spare_location
         peer: LocationHosting
         kind: Attribute
@@ -178,12 +179,13 @@ nodes:
 
 extensions:
   nodes:
-    - kind: DcimInterface
+    - kind: InterfacePhysical
       relationships:
         - name: plugged_sfp
           peer: DcimGenericSFP
           cardinality: one
           optional: true
+          identifier: sfp__interface
     - kind: LocationHosting
       relationships:
         - name: spare_sfps
