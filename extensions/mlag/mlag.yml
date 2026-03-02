@@ -74,11 +74,6 @@ nodes:
         kind: Text
         description: "Name of the interface"
         order_weight: 1000
-      - name: mlag_id
-        label: "MLAG ID"
-        kind: Number
-        description: "Identifier for the MLAG interface"
-        order_weight: 1050
       - name: description
         kind: Text
         optional: true
