@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+---
+version: "1.0"
+nodes:
+  - name: CircuitContract
+    namespace: Dcim
+    inherit_from:
+      - CoreFileObject
+    description: A contract document associated with a circuit service, including terms, costs, and validity period.
+    label: Circuit Contract
+    icon: mdi:file-sign
+    menu_placement: DcimCircuit
+    human_friendly_id:
+      - name__value
+    order_by:
+      - contract_end__value
+    display_label: "Contract (Circuit `{{ circuit__circuit_id__value }}`)"
+    attributes:
+      - name: name
+        kind: Text
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "contract_{{ circuit__circuit_id__value }}"
+        read_only: true # You must set the attribute to read-only as the value will be handled by the system
+        optional: false # As it's a Jinja2 kind of attribute you can make it mandatory
+      - name: contract_start
+        kind: DateTime
+        optional: false
+      - name: contract_end
+        kind: DateTime
+        optional: false
+      - name: monthly_cost
+        kind: Number
+        optional: true
+      - name: currency
+        kind: Dropdown
+        optional: true
+        choices:
+          - name: usd
+            label: USD
+            description: United States Dollar
+          - name: eur
+            label: EUR
+            description: Euro
+          - name: gbp
+            label: GBP
+            description: British Pound Sterling
+    relationships:
+      # Example of a relationship to capture the account that signed the contract
+      # - name: signed_by
+      #   peer: CoreAccount
+      #   kind: Attribute
+      #   cardinality: one
+      #   optional: true
+      - name: circuit
+        peer: DcimCircuit
+        kind: Attribute
+        cardinality: one
+        optional: false
+        order_weight: 950
+
+extensions:
+  nodes:
+    - kind: DcimCircuit
+      relationships:
+        - name: contract
+          peer: DcimCircuitContract
+          cardinality: one
+          optional: true
