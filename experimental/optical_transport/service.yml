@@ -1,0 +1,289 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+---
+version: "1.0"
+
+# Depends on:
+#   - experimental/optical_transport/wavelength.yml         (DcimDWDMChannel, DcimChannelMapping)
+#   - experimental/optical_transport/equipment.yml          (DcimTransponderModule)
+
+# ==============================================================================
+# SERVICE LAYER - End-to-End Optical Services
+# ==============================================================================
+# This schema implements optical services (customer circuits) that span
+# multiple sites and use the underlying optical transport infrastructure.
+#
+# SERVICE LAYER sits above the three infrastructure layers:
+# 1. Logical Topology (OpticalNodes, FiberLinks)
+# 2. Physical Inventory (Devices, Modules)
+# 3. Configuration (ROADM degrees, cross-connects)
+# 4. SERVICE LAYER (OpticalService, OpticalPath, PathSegment) <- THIS FILE
+# ==============================================================================
+
+nodes:
+  # ============================================================================
+  # OpticalService - End-to-End Customer Circuit
+  # ============================================================================
+  - name: OpticalService # DcimOpticalService
+    namespace: Dcim
+    include_in_menu: true
+    label: "Optical Service"
+    description: "End-to-end optical transport service (customer circuit) spanning multiple sites"
+    icon: mdi:transit-connection-variant
+    display_label: service_name__value
+    human_friendly_id:
+      - service_id__value
+    uniqueness_constraints:
+      - [service_id__value]
+    order_by:
+      - service_id__value
+    attributes:
+      - name: service_id
+        kind: Text
+        optional: false
+        description: "Unique service identifier"
+      - name: service_name
+        kind: Text
+        optional: false
+        description: "Customer service name (e.g., 'ATC 10G - Albion to Arco #2')"
+      - name: service_type
+        kind: Dropdown
+        optional: false
+        choices:
+          - name: wavelength
+            label: "Wavelength Service"
+            description: "Dedicated wavelength end-to-end"
+            color: "#9c27b0"
+          - name: transport
+            label: "Transport Service"
+            description: "Layer 1 optical transport"
+            color: "#2196f3"
+          - name: ip_transit
+            label: "IP Transit"
+            description: "Layer 3 IP service over optical"
+            color: "#4caf50"
+        description: "Type of optical service"
+      - name: bandwidth
+        kind: Text
+        optional: false
+        description: "Service bandwidth (e.g., '10G', '100G', '400G')"
+      - name: status
+        kind: Dropdown
+        optional: false
+        default_value: "planned"
+        choices:
+          - name: planned
+            label: "Planned"
+            description: "Service planned but not provisioned"
+            color: "#95a5a6"
+          - name: provisioned
+            label: "Provisioned"
+            description: "Service configured but not active"
+            color: "#f5a623"
+          - name: active
+            label: "Active"
+            description: "Service in production"
+            color: "#00cc00"
+          - name: maintenance
+            label: "Maintenance"
+            description: "Service under maintenance"
+            color: "#ff9800"
+          - name: failed
+            label: "Failed"
+            description: "Service down"
+            color: "#cc0000"
+        description: "Service operational status"
+      - name: customer_circuit_id
+        kind: Text
+        optional: true
+        description: "Customer's circuit ID (e.g., '99/OKFS/000029//SYG')"
+      - name: provision_date
+        kind: DateTime
+        optional: true
+        description: "Date service was provisioned"
+      - name: description
+        kind: Text
+        optional: true
+        description: "Additional service details"
+    relationships:
+      - name: transponders
+        peer: DcimTransponderModule
+        cardinality: many
+        min_count: 2
+        max_count: 2
+        kind: Attribute
+        optional: false
+        identifier: "transponder_module__optical_services"
+        description: "Two transponders (endpoints) for this service (bidirectional)"
+      - name: channel
+        peer: DcimDWDMChannel
+        cardinality: one
+        kind: Attribute
+        optional: false
+        identifier: "dwdm_channel__services"
+        description: "DWDM channel used for this service"
+      - name: primary_path
+        peer: DcimOpticalPath
+        cardinality: one
+        kind: Component
+        optional: false
+        identifier: "optical_service__primary_path"
+        description: "Primary optical path for this service"
+      - name: backup_path
+        peer: DcimOpticalPath
+        cardinality: one
+        kind: Component
+        optional: true
+        identifier: "optical_service__backup_path"
+        description: "Backup/protection path for this service"
+
+  # ============================================================================
+  # OpticalPath - Network Path Through Multiple Sites
+  # ============================================================================
+  - name: OpticalPath # DcimOpticalPath
+    namespace: Dcim
+    include_in_menu: true
+    label: "Optical Path"
+    description: "Ordered sequence of segments forming an optical path through the network"
+    icon: mdi:map-marker-path
+    display_label: name__value
+    human_friendly_id:
+      - name__value
+    attributes:
+      - name: name
+        kind: Text
+        optional: false
+        unique: true
+        description: "Path name (e.g., MS-W17D5-primary)"
+      - name: path_type
+        kind: Dropdown
+        optional: false
+        choices:
+          - name: primary
+            label: "Primary"
+            description: "Primary working path"
+            color: "#2196f3"
+          - name: backup
+            label: "Backup"
+            description: "Backup/protection path"
+            color: "#ff9800"
+          - name: express
+            label: "Express"
+            description: "Express bypass path"
+            color: "#9c27b0"
+        description: "Type of path (primary, backup, express)"
+      # TODO: Computed ?
+      - name: total_distance_km
+        kind: Text
+        optional: true
+        description: "Total path distance in kilometers"
+      # TODO: Computed ?
+      - name: total_loss_db
+        kind: Text
+        optional: true
+        description: "Total optical loss in dB"
+      # TODO: Computed ?
+      - name: hop_count
+        kind: Number
+        optional: true
+        description: "Number of ROADM hops in path"
+      # TODO: Replace with a status
+      - name: is_active
+        kind: Boolean
+        optional: false
+        default_value: true
+        description: "Whether this path is currently active"
+    relationships:
+      - name: segments
+        peer: DcimPathSegment
+        identifier: optical_path__segments
+        cardinality: many
+        kind: Component
+        optional: true
+        description: "Ordered segments forming this path"
+      - name: is_primary_of_service
+        peer: DcimOpticalService
+        identifier: optical_service__primary_path
+        cardinality: one
+        kind: Attribute
+        optional: true
+        description: "Optical service using this path"
+      - name: is_backup_of_service
+        peer: DcimOpticalService
+        identifier: optical_service__backup_path
+        cardinality: one
+        kind: Attribute
+        optional: true
+        description: "Optical service using this path as backup"
+
+  # ============================================================================
+  # PathSegment - One Hop in the Optical Path
+  # ============================================================================
+  - name: PathSegment # DcimPathSegment
+    namespace: Dcim
+    include_in_menu: true
+    label: "Path Segment"
+    description: "One hop in optical path - references channel mapping (fiber, cable, or cross-connect)"
+    icon: mdi:ray-start-arrow
+    display_label: computed_name__value
+    human_friendly_id:
+      - computed_name__value
+    uniqueness_constraints:
+      - [path, segment_order__value]
+    attributes:
+      - name: computed_name
+        kind: Text
+        read_only: true
+        optional: false
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "{{ path__name__value }}-SEG{{ segment_order__value }}"
+        description: "Computed segment name (e.g., MS-W17D5-primary-SEG1)"
+      - name: segment_order
+        kind: Number
+        optional: false
+        description: "Order of this segment in the path (1, 2, 3...)"
+      - name: segment_type
+        kind: Dropdown
+        optional: false
+        choices:
+          - name: fiber
+            label: "Fiber"
+            description: "Segment traverses a long-haul fiber link"
+            color: "#2196f3"
+          - name: cross_connect
+            label: "Cross-Connect"
+            description: "Segment crosses through ROADM degrees (internal WSS)"
+            color: "#9c27b0"
+          - name: cable
+            label: "Cable"
+            description: "Segment traverses a local patch cable"
+            color: "#ff9800"
+          - name: add
+            label: "Add"
+            description: "Service added at this point (A-end)"
+            color: "#4caf50"
+          - name: drop
+            label: "Drop"
+            description: "Service dropped at this point (Z-end)"
+            color: "#ff5722"
+        description: "Type of segment"
+      - name: loss_db
+        kind: Text
+        optional: true
+        description: "Optical loss for this segment in dB"
+    relationships:
+      - name: path
+        peer: DcimOpticalPath
+        cardinality: one
+        kind: Parent
+        optional: false
+        identifier: optical_path__segments
+        description: "Parent path containing this segment"
+      - name: channel_mapping
+        peer: DcimChannelMapping
+        cardinality: one
+        kind: Attribute
+        on_delete: cascade
+        optional: true
+        identifier: "channel_mapping__path_segments"
+        description: "Channel mapping (WSS Connect, Cable Mapping, or Fiber Mapping)"

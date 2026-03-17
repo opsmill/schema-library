@@ -1,0 +1,389 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+---
+version: "1.0"
+
+# Depends on:
+#   - base/dcim.yml                                        (DcimGenericDevice, DcimPhysicalDevice)
+#   - experimental/optical_transport/topology.yml           (DcimOpticalDevice, DcimFiberLink)
+#   - experimental/optical_transport/equipment.yml          (DcimRoadmDegree, DcimOpticalMultiplexerModule)
+#   - experimental/optical_transport/service.yml            (DcimPathSegment)
+
+generics:
+  # ============================================================================
+  # ChannelMapping - Generic for any channel allocation/routing
+  # ============================================================================
+  - name: ChannelMapping  # DcimChannelMapping
+    namespace: Dcim
+    description: "Generic base for any channel allocation/routing (fiber, cable, or internal cross-connect)"
+    label: "Channel Mapping"
+    include_in_menu: true
+    attributes:
+      # TODO: Replace with a proper status
+      - name: is_active
+        kind: Boolean
+        optional: false
+        default_value: true
+        description: "Whether this mapping is currently active"
+      - name: configured_date
+        kind: DateTime
+        optional: true
+        description: "Date this mapping was configured"
+    relationships:
+      - name: segment
+        peer: DcimPathSegment
+        cardinality: one
+        kind: Parent
+        optional: false
+        identifier: "channel_mapping__path_segments"
+        description: "Optical Path segment associated with this mapping"
+      - name: channel
+        peer: DcimDWDMChannel
+        cardinality: one
+        kind: Attribute
+        optional: false
+        identifier: "dwdm_channel__mappings"
+        description: "DWDM channel being mapped/routed"
+      - name: degrees
+        peer: DcimRoadmDegree
+        cardinality: many
+        max_count: 2
+        kind: Attribute
+        optional: false
+        identifier: "roadm_degree__channel_mappings"
+        description: "Two ROADM degrees involved in this mapping (bidirectional)"
+
+# ==============================================================================
+# NODES - Wavelength and Channel Definitions
+# ==============================================================================
+nodes:
+  # ============================================================================
+  # ITUGrid - ITU-T G.694.1 DWDM Grid Standards
+  # ============================================================================
+  - name: ITUGrid # DcimITUGrid
+    namespace: Dcim
+    include_in_menu: true
+    label: "ITU-T DWDM Grid"
+    description: "ITU-T G.694.1 frequency grid standards for DWDM"
+    icon: mdi:grid
+    display_label: name__value
+    human_friendly_id:
+      - name__value
+    uniqueness_constraints:
+      - [name__value]
+    attributes:
+      - name: name
+        kind: Text
+        optional: false
+        description: "Grid name (e.g., 50GHz, 100GHz)"
+      - name: channel_spacing_ghz
+        kind: Number
+        optional: false
+        description: "Channel spacing in GHz (50, 100, etc.)"
+      - name: reference_frequency_thz
+        kind: Text
+        optional: false
+        description: "Reference frequency in THz (e.g., '193.1' for 1550nm)"
+      - name: description
+        kind: Text
+        optional: true
+        description: "Grid description and use cases"
+    relationships:
+      - name: bands
+        peer: DcimOpticalBand
+        cardinality: many
+        kind: Component
+        optional: true
+        description: "Optical bands using this grid"
+
+  # ============================================================================
+  # OpticalBand - C-Band, L-Band, etc.
+  # ============================================================================
+  - name: OpticalBand # DcimOpticalBand
+    namespace: Dcim
+    include_in_menu: true
+    label: "Optical Band"
+    description: "Optical frequency band (C-Band, L-Band, S-Band)"
+    icon: mdi:sine-wave
+    display_label: computed_name__value
+    human_friendly_id: [grid__name__value, band_name__value]
+    uniqueness_constraints:
+      - [grid, band_name__value]
+    attributes:
+      - name: band_name
+        kind: Dropdown
+        optional: false
+        choices:
+          - name: c_band
+            label: "C-Band"
+            description: "Conventional Band (1530-1565 nm)"
+            color: "#ff6b6b"
+          - name: l_band
+            label: "L-Band"
+            description: "Long Band (1565-1625 nm)"
+            color: "#4ecdc4"
+          - name: s_band
+            label: "S-Band"
+            description: "Short Band (1460-1530 nm)"
+            color: "#95e1d3"
+          - name: o_band
+            label: "O-Band"
+            description: "Original Band (1260-1360 nm)"
+            color: "#f38181"
+        description: "Optical band designation"
+      - name: start_frequency_thz
+        kind: Text
+        optional: false
+        description: "Band start frequency in THz (e.g., '191.0')"
+      - name: end_frequency_thz
+        kind: Text
+        optional: false
+        description: "Band end frequency in THz (e.g., '196.1')"
+      - name: start_wavelength_nm
+        kind: Text
+        optional: true
+        description: "Band start wavelength in nm (e.g., '1530.0')"
+      - name: end_wavelength_nm
+        kind: Text
+        optional: true
+        description: "Band end wavelength in nm (e.g., '1565.0')"
+      - name: computed_name
+        kind: Text
+        read_only: true
+        optional: false
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "{{ grid__name__value }}-{{ band_name__value|upper }}"
+        description: "Auto-generated band identifier (e.g., 50GHz-C_BAND)"
+    relationships:
+      - name: grid
+        peer: DcimITUGrid
+        cardinality: one
+        kind: Parent
+        optional: false
+        description: "Parent ITU grid"
+      - name: channels
+        peer: DcimDWDMChannel
+        cardinality: many
+        kind: Component
+        optional: true
+        description: "DWDM channels in this band"
+
+  # ============================================================================
+  # DWDMChannel - Individual Wavelength/Channel
+  # ============================================================================
+  - name: DWDMChannel # DcimDWDMChannel
+    namespace: Dcim
+    include_in_menu: true
+    label: "DWDM Channel"
+    description: "Individual DWDM wavelength/channel (CH20, CH21, etc.)"
+    icon: mdi:wave
+    display_label: channel_name__value
+    human_friendly_id:
+      - channel_name__value
+    order_by:
+      - band__computed_name__value
+      - channel_number__value
+    uniqueness_constraints:
+      - [band, channel_number__value]
+      - [channel_name__value]
+      - [channel_number__value, frequency_thz__value, wavelength_nm__value]
+    attributes:
+      - name: channel_name
+        kind: Text
+        read_only: true
+        optional: false
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "CH{{ channel_number__value }}"
+        description: "ITU DWDM Channel identifier (computed as CH + channel number, e.g., CH20, CH21, CH40)"
+      - name: adva_channel_name
+        kind: Text
+        optional: true
+        description: "ADVA-specific channel name (e.g., D02, DC1, D32)"
+      - name: channel_number
+        kind: Number
+        optional: false
+        description: "ITU channel number (e.g., 20, 21, 60)"
+      - name: frequency_thz
+        kind: Text
+        optional: false
+        description: "Center frequency in THz (e.g., '192.1')"
+      - name: wavelength_nm
+        kind: Text
+        optional: false
+        description: "Center wavelength in nm (e.g., '1560.61')"
+      - name: description
+        kind: Text
+        optional: true
+        description: "Channel notes and usage"
+    relationships:
+      - name: band
+        peer: DcimOpticalBand
+        cardinality: one
+        kind: Parent
+        optional: false
+        description: "Parent optical band"
+      - name: mux_assignments
+        peer: DcimMuxChannelAssignment
+        cardinality: many
+        kind: Component
+        optional: true
+        description: "Mux port assignments for this channel"
+      - name: mappings
+        peer: DcimChannelMapping
+        cardinality: many
+        kind: Generic
+        optional: true
+        description: "Fiber allocations for this channel"
+
+  # ============================================================================
+  # MuxChannelAssignment - Channel to Mux Port Mapping
+  # ============================================================================
+  - name: MuxChannelAssignment # DcimMuxChannelAssignment
+    namespace: Dcim
+    include_in_menu: true
+    label: "Mux Channel Assignment"
+    description: "Maps DWDM channel to multiplexer port (equipment configuration)"
+    icon: mdi:cable-data
+    display_label: computed_name__value
+    human_friendly_id:
+      - optical_device__computed_name__value
+      - port_number__value
+    uniqueness_constraints:
+      - [optical_device, port_number__value]
+      - [optical_device, channel]
+    attributes:
+      - name: port_number
+        kind: Number
+        optional: false
+        description: "Physical port number on multiplexer (e.g., 1-96)"
+      - name: tx_power_dbm
+        kind: Text
+        optional: true
+        description: "Configured transmit power in dBm (e.g., '0.0')"
+      - name: status
+        kind: Dropdown
+        optional: false
+        default_value: "configured"
+        choices:
+          - name: configured
+            label: "Configured"
+            description: "Channel is configured on port"
+            color: "#f5a623"
+          - name: active
+            label: "Active"
+            description: "Channel is actively transmitting"
+            color: "#00cc00"
+          - name: disabled
+            label: "Disabled"
+            description: "Channel is disabled"
+            color: "#cccccc"
+          - name: failed
+            label: "Failed"
+            description: "Channel has failed"
+            color: "#cc0000"
+        description: "Channel assignment status"
+      - name: computed_name
+        kind: Text
+        read_only: true
+        optional: false
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: >-
+            {{ optical_device__computed_name__value }}-P{{ '{:02d}'.format(port_number__value) }}-{{ channel__channel_name__value }}
+        description: "Auto-generated assignment identifier"
+    relationships:
+      - name: channel
+        peer: DcimDWDMChannel
+        cardinality: one
+        kind: Attribute
+        optional: false
+        description: "DWDM channel assigned to this port"
+      - name: optical_device
+        peer: DcimOpticalDevice
+        cardinality: one
+        kind: Parent
+        optional: false
+        identifier: "mux_channel_assignments"
+        description: "Multiplexer device (OpticalNode or PassiveMultiplexer)"
+
+  # ============================================================================
+  # FiberMapping - Channel Allocation on Long-Haul Fiber
+  # ============================================================================
+  - name: FiberMapping # DcimFiberMapping
+    namespace: Dcim
+    inherit_from:
+      - DcimChannelMapping
+    include_in_menu: true
+    label: "Fiber Mapping"
+    description: "Long-haul fiber link between degrees on DIFFERENT ROADMs/sites (kilometers distance)"
+    icon: mdi:fiber-optic
+    display_label: computed_name__value
+    human_friendly_id:
+      - fiber_link__link_id__value
+      - channel__channel_name__value
+    uniqueness_constraints:
+      - [fiber_link, channel]
+    attributes:
+      - name: allocation_status
+        kind: Dropdown
+        optional: false
+        default_value: "reserved"
+        choices:
+          - name: reserved
+            label: "Reserved"
+            description: "Channel reserved but not in use"
+            color: "#f5a623"
+          - name: allocated
+            label: "Allocated"
+            description: "Channel allocated to service"
+            color: "#0099cc"
+          - name: in_use
+            label: "In Use"
+            description: "Channel actively carrying traffic"
+            color: "#00cc00"
+          - name: maintenance
+            label: "Maintenance"
+            description: "Channel under maintenance"
+            color: "#ff9800"
+          - name: failed
+            label: "Failed"
+            description: "Channel has failed"
+            color: "#cc0000"
+        description: "Allocation status"
+      - name: tx_power_dbm
+        kind: Text
+        optional: true
+        description: "Measured transmit power in dBm (e.g., '0.5')"
+      - name: rx_power_dbm
+        kind: Text
+        optional: true
+        description: "Measured receive power in dBm (e.g., '-2.3')"
+      - name: osnr_db
+        kind: Text
+        optional: true
+        description: "Optical Signal-to-Noise Ratio in dB (e.g., '25.5')"
+      - name: allocated_date
+        kind: DateTime
+        optional: true
+        description: "Date channel was allocated"
+      - name: computed_name
+        kind: Text
+        read_only: true
+        optional: false
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "{{ fiber_link__link_id__value }}-{{ channel__channel_name__value }}"
+        description: "Auto-generated mapping identifier"
+      - name: description
+        kind: Text
+        optional: true
+        description: "Additional fiber mapping details"
+    relationships:
+      - name: fiber_link
+        peer: DcimFiberLink
+        cardinality: one
+        kind: Attribute
+        optional: false
+        identifier: "fiber_channel_mappings"
+        description: "Long-haul fiber link connecting the degrees"

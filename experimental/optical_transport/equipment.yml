@@ -1,0 +1,591 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+---
+version: "1.0"
+
+# Depends on:
+#   - extensions/modules/modules.yml                       (DeviceGenericModule, DeviceGenericModuleType)
+#   - extensions/cable/cable.yml                           (DcimCable)
+#   - experimental/optical_transport/wavelength.yml         (DcimChannelMapping, DcimDWDMChannel)
+#   - experimental/optical_transport/topology.yml           (DcimOpticalNode, DcimFiberLink)
+
+nodes:
+  # ============================================================================
+  # OpticalModuleType - Specific optical module categorization
+  # ============================================================================
+  - name: OpticalModuleType # DcimOpticalModuleType
+    namespace: Dcim
+    include_in_menu: true
+    label: "Optical Module Type"
+    description: "Categorization of optical modules by function"
+    icon: mdi:expansion-card
+    inherit_from:
+      - DeviceGenericModuleType
+    attributes:
+      - name: name
+        kind: Text
+        optional: false
+        description: "Module type name"
+      - name: description
+        kind: Text
+        optional: true
+        description: "Module type description"
+      - name: module_category
+        kind: Dropdown
+        optional: false
+        description: "Functional category of the module"
+        choices:
+          - name: transponder
+            label: "Transponder"
+            description: "Optical-electrical-optical conversion"
+            color: "#2196f3"
+          - name: multiplexer
+            label: "Multiplexer/ROADM"
+            description: "Wavelength multiplexing and switching"
+            color: "#9c27b0"
+          - name: amplifier
+            label: "Amplifier"
+            description: "Optical signal amplification"
+            color: "#ff9800"
+          - name: monitoring
+            label: "Monitoring"
+            description: "Optical performance monitoring"
+            color: "#4caf50"
+          - name: control
+            label: "Control"
+            description: "System control and management"
+            color: "#607d8b"
+          - name: power
+            label: "Power Supply"
+            description: "Power management modules"
+            color: "#795548"
+          - name: cooling
+            label: "Cooling"
+            description: "Thermal management"
+            color: "#00bcd4"
+
+  # ============================================================================
+  # TransponderModule - Wavelength Transmitter/Receiver Module
+  # ============================================================================
+  - name: TransponderModule # DcimTransponderModule
+    namespace: Dcim
+    include_in_menu: true
+    label: "Transponder Module"
+    description: "Optical-electrical-optical conversion module (100G, 400G coherent) installed in chassis"
+    icon: mdi:chip
+    inherit_from:
+      - DeviceGenericModule
+    display_label: computed_name__value
+    uniqueness_constraints:
+      - [computed_name__value]
+    human_friendly_id:
+      - computed_name__value
+    attributes:
+      - name: computed_name
+        kind: Text
+        read_only: true
+        optional: false
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "{{ device__serial__value }}-TPD-{{ slot_number__value }}"
+        description: "Computed module name (e.g., ABC123-TPD-1/1)"
+      - name: slot_number
+        kind: Text
+        optional: false
+        description: "Slot number in chassis (e.g., '1/1', '1/2', '2/1')"
+      - name: capacity_gbps
+        kind: Number
+        optional: false
+        description: "Line rate capacity in Gbps (e.g., 100, 200, 400)"
+      - name: modulation_format
+        kind: Dropdown
+        optional: false
+        choices:
+          - name: dp_qpsk
+            label: "DP-QPSK"
+            description: "Dual-polarization QPSK (100G)"
+            color: "#2196f3"
+          - name: dp_16qam
+            label: "DP-16QAM"
+            description: "Dual-polarization 16QAM (200G)"
+            color: "#9c27b0"
+          - name: dp_8qam
+            label: "DP-8QAM"
+            description: "Dual-polarization 8QAM (150G)"
+            color: "#ff9800"
+          - name: dp_64qam
+            label: "DP-64QAM"
+            description: "Dual-polarization 64QAM (400G)"
+            color: "#4caf50"
+        description: "Modulation format for optical transmission"
+      - name: tunable_range
+        kind: Dropdown
+        optional: false
+        choices:
+          - name: c_band
+            label: "C-Band (1530-1565nm)"
+            description: "Full C-Band tunable"
+            color: "#9933cc"
+          - name: c_l_band
+            label: "C+L-Band (1530-1625nm)"
+            description: "Extended C+L-Band tunable"
+            color: "#cc33cc"
+          - name: fixed
+            label: "Fixed Wavelength"
+            description: "Non-tunable, fixed wavelength"
+            color: "#95a5a6"
+        description: "Wavelength tuning capability"
+      - name: fec_type
+        kind: Dropdown
+        optional: true
+        choices:
+          - name: sd_fec
+            label: "SD-FEC"
+            description: "Soft-decision FEC (7% overhead)"
+            color: "#2196f3"
+          - name: hd_fec
+            label: "HD-FEC"
+            description: "Hard-decision FEC (25% overhead)"
+            color: "#ff9800"
+          - name: c_fec
+            label: "C-FEC"
+            description: "Concatenated FEC"
+            color: "#4caf50"
+          - name: o_fec
+            label: "O-FEC"
+            description: "OpenFEC"
+            color: "#9c27b0"
+        description: "Forward error correction type"
+      - name: client_interface
+        kind: Text
+        optional: true
+        description: "Client-side interface (e.g., 100GE, 400GE, OTU4)"
+      - name: line_interface
+        kind: Text
+        optional: true
+        description: "Line-side interface (e.g., CFP2-DCO, QSFP28, QSFP-DD)"
+    relationships:
+      - name: tuned_channel
+        peer: DcimDWDMChannel
+        cardinality: one
+        kind: Attribute
+        optional: true
+        identifier: "dwdm_channel__transponder_modules"
+        description: "DWDM channel currently tuned/configured"
+      - name: connected_to_optical_node
+        peer: DcimOpticalNode
+        cardinality: one
+        kind: Attribute
+        optional: true
+        identifier: optical_node__transponder_modules
+        description: "Optical node this transponder module connects to (for cross-connects)"
+
+  # ============================================================================
+  # OpticalMultiplexerModule - Mux/Demux/ROADM Module
+  # ============================================================================
+  - name: OpticalMultiplexerModule # DcimOpticalMultiplexerModule
+    namespace: Dcim
+    include_in_menu: true
+    label: "Optical Multiplexer Module"
+    description: "Multiplexer/Demultiplexer/ROADM module for wavelength management installed in chassis"
+    icon: mdi:router-network
+    inherit_from:
+      - DeviceGenericModule
+    display_label: computed_name__value
+    human_friendly_id:
+      - computed_name__value
+    attributes:
+      - name: computed_name
+        kind: Text
+        read_only: true
+        optional: false
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "{{ device__serial__value }}-MUX-{{ slot_number__value }}"
+        description: "Computed module name (e.g., ABC123-MUX-1/3)"
+      - name: slot_number
+        kind: Text
+        optional: false
+        description: "Slot number in chassis (e.g., '1/3', '1/4', '2/3')"
+      - name: mux_type
+        kind: Dropdown
+        optional: false
+        choices:
+          - name: passive_mux
+            label: "Passive Mux"
+            description: "Passive wavelength multiplexer (fixed)"
+            color: "#95a5a6"
+          - name: passive_demux
+            label: "Passive Demux"
+            description: "Passive wavelength demultiplexer (fixed)"
+            color: "#7f8c8d"
+          - name: oadm
+            label: "OADM"
+            description: "Optical Add-Drop Multiplexer"
+            color: "#3498db"
+          - name: roadm
+            label: "ROADM"
+            description: "Reconfigurable Optical Add-Drop Multiplexer"
+            color: "#9b59b6"
+          - name: wss
+            label: "WSS"
+            description: "Wavelength Selective Switch"
+            color: "#e74c3c"
+        description: "Type of multiplexer technology"
+      - name: channel_capacity
+        kind: Number
+        optional: false
+        description: "Number of supported DWDM channels (e.g., 40, 80, 96)"
+      - name: technology
+        kind: Dropdown
+        optional: true
+        choices:
+          - name: thin_film_filter
+            label: "Thin Film Filter"
+            description: "Passive thin film filter technology"
+            color: "#95a5a6"
+          - name: awg
+            label: "AWG"
+            description: "Arrayed Waveguide Grating"
+            color: "#3498db"
+          - name: wss_lcos
+            label: "WSS (LCOS)"
+            description: "Wavelength Selective Switch (Liquid Crystal on Silicon)"
+            color: "#9b59b6"
+          - name: wss_mems
+            label: "WSS (MEMS)"
+            description: "Wavelength Selective Switch (Micro-Electro-Mechanical Systems)"
+            color: "#e74c3c"
+        description: "Underlying multiplexer technology"
+      - name: degree_count
+        kind: Number
+        optional: true
+        description: "Number of ROADM degrees (e.g., 2, 4, 8, 16)"
+      - name: colorless
+        kind: Boolean
+        optional: true
+        default_value: false
+        description: "Colorless add/drop capability (any channel on any port)"
+      - name: directionless
+        kind: Boolean
+        optional: true
+        default_value: false
+        description: "Directionless add/drop capability (any port to any degree)"
+      - name: contentionless
+        kind: Boolean
+        optional: true
+        default_value: false
+        description: "Contentionless add/drop (CDC - Colorless, Directionless, Contentionless)"
+    relationships:
+      - name: degrees
+        peer: DcimRoadmDegree
+        cardinality: many
+        kind: Component
+        optional: true
+        identifier: "optical_multiplexer_module__degrees"
+        description: "ROADM degrees (line ports) on this multiplexer module"
+      - name: mappings
+        peer: DcimChannelMapping
+        cardinality: many
+        kind: Attribute
+        optional: true
+        identifier: "roadm_module__channel_mappings"
+        description: "Channel mappings (DirectConnect, CableMapping, FiberMapping) associated with this module"
+
+  # ============================================================================
+  # RoadmDegree - ROADM Degree with Line Port
+  # ============================================================================
+  - name: RoadmDegree # DcimRoadmDegree
+    namespace: Dcim
+    include_in_menu: true
+    label: "ROADM Degree"
+    description: "ROADM degree with line port (OL-1, OL-2, etc.)"
+    icon: mdi:lan-connect
+    display_label: computed_name__value
+    human_friendly_id:
+      - computed_name__value
+    uniqueness_constraints:
+      - [roadm, degree_number__value]
+      - [roadm, line_port__value]
+    attributes:
+      - name: computed_name
+        kind: Text
+        read_only: true
+        optional: false
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "{{ roadm__computed_name__value }}-{{ line_port__value }}"
+        description: "Computed name (e.g., ROADM-SITE-A-OL-1)"
+      - name: degree_number
+        kind: Number
+        optional: false
+        description: "Degree number (1-based, e.g., 1, 2, 3, 4)"
+      # TODO: Should we compute it based on degree_number and degree_type
+      - name: line_port
+        kind: Text
+        optional: false
+        description: "Line port designation (e.g., OL-1, OL-2, OL-7)"
+      - name: direction
+        kind: Dropdown
+        optional: false
+        choices:
+          - name: north
+            label: "North"
+            description: "Northbound direction"
+            color: "#3498db"
+          - name: south
+            label: "South"
+            description: "Southbound direction"
+            color: "#e74c3c"
+          - name: east
+            label: "East"
+            description: "Eastbound direction"
+            color: "#2ecc71"
+          - name: west
+            label: "West"
+            description: "Westbound direction"
+            color: "#f39c12"
+          - name: express
+            label: "Express"
+            description: "Express port (bypass)"
+            color: "#9b59b6"
+          - name: local
+            label: "Local"
+            description: "Local add/drop"
+            color: "#95a5a6"
+        description: "Directional designation of degree"
+      - name: degree_type
+        kind: Dropdown
+        optional: false
+        choices:
+          - name: line
+            label: "Line"
+            description: "Line port (connects to fiber link)"
+            color: "#2196f3"
+          - name: express
+            label: "Express"
+            description: "Express port (R-x ports, bypass)"
+            color: "#9c27b0"
+          - name: add_drop
+            label: "Add/Drop"
+            description: "Local add/drop for transponders"
+            color: "#4caf50"
+        description: "Type of ROADM degree"
+      - name: wavelength_capacity
+        kind: Number
+        optional: true
+        description: "Number of wavelengths supported on this degree"
+      - name: description
+        kind: Text
+        optional: true
+        description: "Additional degree details"
+    relationships:
+      - name: roadm
+        peer: DcimOpticalMultiplexerModule
+        cardinality: one
+        kind: Parent
+        optional: false
+        identifier: "optical_multiplexer_module__degrees"
+        description: "Parent ROADM module containing this degree"
+      - name: connected_fiber
+        peer: DcimFiberLink
+        cardinality: one
+        kind: Attribute
+        optional: true
+        identifier: "fiber_link__roadm_degree"
+        description: "Fiber link connected to this line port"
+      - name: channel_mappings
+        peer: DcimChannelMapping
+        cardinality: many
+        kind: Attribute
+        optional: true
+        identifier: "roadm_degree__channel_mappings"
+        description: "Channel mappings involving this degree"
+
+  # ============================================================================
+  # WSSConnect - Internal WSS Cross-Connect (Same ROADM)
+  # ============================================================================
+  - name: WSSConnect # DcimWSSConnect
+    namespace: Dcim
+    inherit_from:
+      - DcimChannelMapping
+    include_in_menu: true
+    label: "WSS Connect"
+    description: "Internal WSS cross-connect between degrees on SAME ROADM device (0m distance)"
+    icon: mdi:swap-horizontal
+    display_label: computed_name__value
+    human_friendly_id:
+      - computed_name__value
+    uniqueness_constraints:
+      # FIXME: enforce per degrees ?
+      - [roadm, channel]
+    attributes:
+      - name: computed_name
+        kind: Text
+        read_only: true
+        optional: false
+        computed_attribute:
+          kind: Jinja2
+          # TODO: should have the degrees, but need computed with Python for that
+          jinja2_template: "{{ roadm__computed_name__value }}-{{ channel__channel_name__value }}"
+        description: "Computed connection ID"
+      - name: description
+        kind: Text
+        optional: true
+        description: "Additional cross-connect details"
+    relationships:
+      - name: roadm
+        peer: DcimOpticalMultiplexerModule
+        cardinality: one
+        kind: Attribute
+        optional: false
+        identifier: "roadm_module__channel_mappings"
+        description: "Parent ROADM device"
+    # Note: channel and degrees relationships inherited from ChannelMapping generic
+    # TODO: Add validation to ensure both degrees have same parent as roadm
+
+  # ============================================================================
+  # CableMapping - Local Patch Cable Mapping (Different ROADMs, Same Site)
+  # ============================================================================
+  - name: CableMapping # DcimCableMapping
+    namespace: Dcim
+    inherit_from:
+      - DcimChannelMapping
+    include_in_menu: true
+    label: "Cable Mapping"
+    description: "Local patch cable between degrees on DIFFERENT ROADMs (meters distance, same site)"
+    icon: mdi:cable-data
+    display_label: computed_name__value
+    human_friendly_id:
+      - computed_name__value
+    uniqueness_constraints:
+      - [cable, channel]
+    attributes:
+      - name: computed_name
+        kind: Text
+        read_only: true
+        optional: false
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "{{ cable__label__value }}-{{ channel__channel_name__value }}"
+        description: "Computed mapping name (e.g., CABLE-123-CH58)"
+      - name: description
+        kind: Text
+        optional: true
+        description: "Additional cable mapping details"
+    relationships:
+      - name: cable
+        peer: DcimCable
+        cardinality: one
+        kind: Attribute
+        optional: false
+        identifier: "cable__channel_mappings"
+        description: "Physical patch cable connecting the degrees"
+    # Note: channel and degrees relationships inherited from ChannelMapping generic
+    # TODO: Add validation to ensure degrees are from different ROADMs
+
+  # ============================================================================
+  # OpticalAmplifierModule - EDFA/Raman/VGC Amplifier Module
+  # ============================================================================
+  - name: OpticalAmplifierModule # DcimOpticalAmplifierModule
+    namespace: Dcim
+    include_in_menu: true
+    label: "Optical Amplifier Module"
+    description: "Optical signal amplifier module (EDFA, Raman, VGC) installed in chassis"
+    icon: mdi:amplifier
+    inherit_from:
+      - DeviceGenericModule
+    display_label: computed_name__value
+    human_friendly_id:
+      - computed_name__value
+    attributes:
+      - name: computed_name
+        kind: Text
+        read_only: true
+        optional: false
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "{{ device__serial__value }}-AMP-{{ slot_number__value }}"
+        description: "Computed module name (e.g., ABC123-AMP-1/5)"
+      - name: slot_number
+        kind: Text
+        optional: false
+        description: "Slot number in chassis (e.g., '1/5', '1/6', '2/5')"
+      - name: amplifier_type
+        kind: Dropdown
+        optional: false
+        choices:
+          - name: edfa
+            label: "EDFA"
+            description: "Erbium-Doped Fiber Amplifier"
+            color: "#2196f3"
+          - name: raman
+            label: "Raman"
+            description: "Raman Amplifier (distributed)"
+            color: "#9c27b0"
+          - name: soa
+            label: "SOA"
+            description: "Semiconductor Optical Amplifier"
+            color: "#ff9800"
+          - name: vgc
+            label: "VGC"
+            description: "Variable Gain Controller"
+            color: "#4caf50"
+          - name: hybrid
+            label: "Hybrid"
+            description: "Hybrid amplifier (e.g., EDFA + Raman)"
+            color: "#607d8b"
+        description: "Type of optical amplifier"
+      - name: stage
+        kind: Dropdown
+        optional: false
+        choices:
+          - name: booster
+            label: "Booster"
+            description: "Power amplifier (transmit side)"
+            color: "#e74c3c"
+          - name: inline
+            label: "Inline"
+            description: "In-line amplifier (along fiber span)"
+            color: "#3498db"
+          - name: preamplifier
+            label: "Pre-Amplifier"
+            description: "Low-noise amplifier (receive side)"
+            color: "#2ecc71"
+        description: "Amplifier stage position"
+      - name: gain_db
+        kind: Text
+        optional: true
+        description: "Typical gain in dB (e.g., '20.0', '17.5')"
+      - name: max_output_power_dbm
+        kind: Text
+        optional: true
+        description: "Maximum output power in dBm (e.g., '17.0', '23.0')"
+      - name: noise_figure_db
+        kind: Text
+        optional: true
+        description: "Noise figure in dB (e.g., '5.5', '4.8')"
+      - name: operating_band
+        kind: Dropdown
+        optional: false
+        choices:
+          - name: c_band
+            label: "C-Band (1530-1565nm)"
+            description: "C-Band operation"
+            color: "#9933cc"
+          - name: l_band
+            label: "L-Band (1565-1625nm)"
+            description: "L-Band operation"
+            color: "#cc33cc"
+          - name: c_l_band
+            label: "C+L-Band"
+            description: "Dual-band operation"
+            color: "#ff33cc"
+        description: "Operating wavelength band"
+    relationships:
+      - name: amplified_link
+        peer: DcimFiberLink
+        cardinality: one
+        kind: Attribute
+        optional: true
+        identifier: "fiber_link__amplifier_modules"
+        description: "Fiber link being amplified (for inline amplifiers)"
