@@ -290,7 +290,9 @@ nodes:
         computed_attribute:
           kind: Jinja2
           jinja2_template: >-
-            {{ optical_device__computed_name__value }}-P{{ '{:02d}'.format(port_number__value) }}-{{ channel__channel_name__value }}
+            {{ optical_device__computed_name__value
+            }}-P{{ '{:02d}'.format(port_number__value)
+            }}-{{ channel__channel_name__value }}
         description: "Auto-generated assignment identifier"
     relationships:
       - name: channel
