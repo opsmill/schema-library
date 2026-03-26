@@ -1,0 +1,1950 @@
+---
+title: Optical Transport
+---
+
+Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3000 and similar platforms). Covers four layers: wavelength (ITU-T G.694.1 grid, optical bands, DWDM channels), topology (logical optical nodes, passive multiplexers, fiber links), equipment (transponder/amplifier/ROADM modules, ROADM degrees, WSS cross-connects), and service (end-to-end optical services, optical paths, path segments). Not designed to be loaded together with extensions/dwdm.
+
+## Details
+
+- **Dependencies:**
+    - [base](dcim)
+    - [extensions/modules](modules)
+    - [extensions/cable](cable)
+
+## Nodes
+
+### ITUGrid
+
+- **Label:** ITU-T DWDM Grid
+- **Description:** ITU-T G.694.1 frequency grid standards for DWDM
+- **Namespace:** Dcim
+- **Icon:** mdi:grid
+- **Uniqueness Constraints:**
+    - name__value
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name | Grid name (e.g., 50GHz, 100GHz) | Text | False |  |  |
+| channel_spacing_ghz | Channel spacing in GHz (50, 100, etc.) | Number | False |  |  |
+| reference_frequency_thz | Reference frequency in THz (e.g., '193.1' for 1550nm) | Text | False |  |  |
+| description | Grid description and use cases | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| bands | DcimOpticalBand | True | many | Component |
+
+### OpticalBand
+
+- **Label:** Optical Band
+- **Description:** Optical frequency band (C-Band, L-Band, S-Band)
+- **Namespace:** Dcim
+- **Icon:** mdi:sine-wave
+- **Uniqueness Constraints:**
+    - grid, band_name__value
+- **Human Friendly ID:** grid__name__value, band_name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| band_name | Optical band designation | Dropdown | False |  | c_band, l_band, s_band, o_band |
+| start_frequency_thz | Band start frequency in THz (e.g., '191.0') | Text | False |  |  |
+| end_frequency_thz | Band end frequency in THz (e.g., '196.1') | Text | False |  |  |
+| start_wavelength_nm | Band start wavelength in nm (e.g., '1530.0') | Text | True |  |  |
+| end_wavelength_nm | Band end wavelength in nm (e.g., '1565.0') | Text | True |  |  |
+| computed_name | Auto-generated band identifier (e.g., 50GHz-C_BAND) | Text | False |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| grid | DcimITUGrid | False | one | Parent |
+| channels | DcimDWDMChannel | True | many | Component |
+
+### DWDMChannel
+
+- **Label:** DWDM Channel
+- **Description:** Individual DWDM wavelength/channel (CH20, CH21, etc.)
+- **Namespace:** Dcim
+- **Icon:** mdi:wave
+- **Uniqueness Constraints:**
+    - band, channel_number__value
+    - channel_name__value
+    - channel_number__value, frequency_thz__value, wavelength_nm__value
+- **Human Friendly ID:** channel_name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| channel_name | ITU DWDM Channel identifier (computed as CH + channel number, e.g., CH20, CH21, CH40) | Text | False |  |  |
+| adva_channel_name | ADVA-specific channel name (e.g., D02, DC1, D32) | Text | True |  |  |
+| channel_number | ITU channel number (e.g., 20, 21, 60) | Number | False |  |  |
+| frequency_thz | Center frequency in THz (e.g., '192.1') | Text | False |  |  |
+| wavelength_nm | Center wavelength in nm (e.g., '1560.61') | Text | False |  |  |
+| description | Channel notes and usage | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| band | DcimOpticalBand | False | one | Parent |
+| mux_assignments | DcimMuxChannelAssignment | True | many | Component |
+| mappings | DcimChannelMapping | True | many | Generic |
+
+### MuxChannelAssignment
+
+- **Label:** Mux Channel Assignment
+- **Description:** Maps DWDM channel to multiplexer port (equipment configuration)
+- **Namespace:** Dcim
+- **Icon:** mdi:cable-data
+- **Uniqueness Constraints:**
+    - optical_device, port_number__value
+    - optical_device, channel
+- **Human Friendly ID:** optical_device__computed_name__value, port_number__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| port_number | Physical port number on multiplexer (e.g., 1-96) | Number | False |  |  |
+| tx_power_dbm | Configured transmit power in dBm (e.g., '0.0') | Text | True |  |  |
+| status | Channel assignment status | Dropdown | False | configured | configured, active, disabled, failed |
+| computed_name | Auto-generated assignment identifier | Text | False |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| channel | DcimDWDMChannel | False | one | Attribute |
+| optical_device | DcimOpticalDevice | False | one | Parent |
+
+### FiberMapping
+
+- **Label:** Fiber Mapping
+- **Description:** Long-haul fiber link between degrees on DIFFERENT ROADMs/sites (kilometers distance)
+- **Namespace:** Dcim
+- **Icon:** mdi:fiber-optic
+- **Uniqueness Constraints:**
+    - fiber_link, channel
+- **Human Friendly ID:** fiber_link__link_id__value, channel__channel_name__value
+- **Inherit From:** DcimChannelMapping
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| allocation_status | Allocation status | Dropdown | False | reserved | reserved, allocated, in_use, maintenance, failed |
+| tx_power_dbm | Measured transmit power in dBm (e.g., '0.5') | Text | True |  |  |
+| rx_power_dbm | Measured receive power in dBm (e.g., '-2.3') | Text | True |  |  |
+| osnr_db | Optical Signal-to-Noise Ratio in dB (e.g., '25.5') | Text | True |  |  |
+| allocated_date | Date channel was allocated | DateTime | True |  |  |
+| computed_name | Auto-generated mapping identifier | Text | False |  |  |
+| description | Additional fiber mapping details | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| fiber_link | DcimFiberLink | False | one | Attribute |
+
+### OpticalNode
+
+- **Label:** Optical Node
+- **Description:** Logical network endpoint in optical topology (graph node, not physical device)
+- **Namespace:** Dcim
+- **Icon:** mdi:lan
+- **Uniqueness Constraints:**
+    - name__value
+- **Human Friendly ID:** name__value
+- **Inherit From:** DcimOpticalDevice
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| computed_name | Computed name for display | Text | False |  |  |
+| name | Logical node name (e.g., GENESIS-OL-10, SKYLINE-OL-1) | Text | False |  |  |
+| node_type | Topology role of this node | Dropdown | False |  | endpoint, intermediate, branching |
+| description | Node notes and function | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| device | DcimPhysicalDevice | True | one | Attribute |
+| transponder_modules | DcimTransponderModule | True | many | Attribute |
+| links | DcimFiberLink | True | many | Component |
+
+### PassiveMultiplexer
+
+- **Label:** Passive Multiplexer
+- **Description:** Passive CWDM/DWDM multiplexer (fixed port count, no modules)
+- **Namespace:** Dcim
+- **Icon:** mdi:resistor-nodes
+- **Uniqueness Constraints:**
+    - name__value
+- **Human Friendly ID:** name__value
+- **Inherit From:** DcimPhysicalDevice
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| computed_name | Computed name for display | Text | False |  |  |
+| name | Passive mux name (e.g., CHI-PMUX-01) | Text | False |  |  |
+| port_count | Number of fixed ports (e.g., 8, 16, 32, 40) | Number | False |  |  |
+| mux_type | Type of passive multiplexer | Dropdown | False |  | cwdm, dwdm |
+| description | Device notes | Text | True |  |  |
+
+### FiberLink
+
+- **Label:** Fiber Link
+- **Description:** Fiber connecting two optical nodes (graph edge)
+- **Namespace:** Dcim
+- **Icon:** mdi:cable-data
+- **Uniqueness Constraints:**
+    - link_id__value
+- **Human Friendly ID:** link_id__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| link_id | Unique link identifier (e.g., LINK-001) | Text | False |  |  |
+| distance_km | Physical distance in kilometers (e.g., '920.5') | Text | True |  |  |
+| attenuation_db | Total fiber attenuation in dB (e.g., '18.4') | Text | True |  |  |
+| status | Operational status of fiber link | Dropdown | False | planned | planned, active, standby, maintenance, failed |
+| commissioned_date | Date link was commissioned | DateTime | True |  |  |
+| description | Additional link details | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| endpoints | DcimOpticalNode | False | many | Attribute |
+| mappings | DcimFiberMapping | True | many | Component |
+
+### OpticalModuleType
+
+- **Label:** Optical Module Type
+- **Description:** Categorization of optical modules by function
+- **Namespace:** Dcim
+- **Icon:** mdi:expansion-card
+- **Inherit From:** DeviceGenericModuleType
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name | Module type name | Text | False |  |  |
+| description | Module type description | Text | True |  |  |
+| module_category | Functional category of the module | Dropdown | False |  | transponder, multiplexer, amplifier, monitoring, control, power, cooling |
+
+### TransponderModule
+
+- **Label:** Transponder Module
+- **Description:** Optical-electrical-optical conversion module (100G, 400G coherent) installed in chassis
+- **Namespace:** Dcim
+- **Icon:** mdi:chip
+- **Uniqueness Constraints:**
+    - computed_name__value
+- **Human Friendly ID:** computed_name__value
+- **Inherit From:** DeviceGenericModule
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| computed_name | Computed module name (e.g., ABC123-TPD-1/1) | Text | False |  |  |
+| slot_number | Slot number in chassis (e.g., '1/1', '1/2', '2/1') | Text | False |  |  |
+| capacity_gbps | Line rate capacity in Gbps (e.g., 100, 200, 400) | Number | False |  |  |
+| modulation_format | Modulation format for optical transmission | Dropdown | False |  | dp_qpsk, dp_16qam, dp_8qam, dp_64qam |
+| tunable_range | Wavelength tuning capability | Dropdown | False |  | c_band, c_l_band, fixed |
+| fec_type | Forward error correction type | Dropdown | True |  | sd_fec, hd_fec, c_fec, o_fec |
+| client_interface | Client-side interface (e.g., 100GE, 400GE, OTU4) | Text | True |  |  |
+| line_interface | Line-side interface (e.g., CFP2-DCO, QSFP28, QSFP-DD) | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| tuned_channel | DcimDWDMChannel | True | one | Attribute |
+| connected_to_optical_node | DcimOpticalNode | True | one | Attribute |
+
+### OpticalMultiplexerModule
+
+- **Label:** Optical Multiplexer Module
+- **Description:** Multiplexer/Demultiplexer/ROADM module for wavelength management installed in chassis
+- **Namespace:** Dcim
+- **Icon:** mdi:router-network
+- **Human Friendly ID:** computed_name__value
+- **Inherit From:** DeviceGenericModule
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| computed_name | Computed module name (e.g., ABC123-MUX-1/3) | Text | False |  |  |
+| slot_number | Slot number in chassis (e.g., '1/3', '1/4', '2/3') | Text | False |  |  |
+| mux_type | Type of multiplexer technology | Dropdown | False |  | passive_mux, passive_demux, oadm, roadm, wss |
+| channel_capacity | Number of supported DWDM channels (e.g., 40, 80, 96) | Number | False |  |  |
+| technology | Underlying multiplexer technology | Dropdown | True |  | thin_film_filter, awg, wss_lcos, wss_mems |
+| degree_count | Number of ROADM degrees (e.g., 2, 4, 8, 16) | Number | True |  |  |
+| colorless | Colorless add/drop capability (any channel on any port) | Boolean | True | False |  |
+| directionless | Directionless add/drop capability (any port to any degree) | Boolean | True | False |  |
+| contentionless | Contentionless add/drop (CDC - Colorless, Directionless, Contentionless) | Boolean | True | False |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| degrees | DcimRoadmDegree | True | many | Component |
+| mappings | DcimChannelMapping | True | many | Attribute |
+
+### RoadmDegree
+
+- **Label:** ROADM Degree
+- **Description:** ROADM degree with line port (OL-1, OL-2, etc.)
+- **Namespace:** Dcim
+- **Icon:** mdi:lan-connect
+- **Uniqueness Constraints:**
+    - roadm, degree_number__value
+    - roadm, line_port__value
+- **Human Friendly ID:** computed_name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| computed_name | Computed name (e.g., ROADM-SITE-A-OL-1) | Text | False |  |  |
+| degree_number | Degree number (1-based, e.g., 1, 2, 3, 4) | Number | False |  |  |
+| line_port | Line port designation (e.g., OL-1, OL-2, OL-7) | Text | False |  |  |
+| direction | Directional designation of degree | Dropdown | False |  | north, south, east, west, express, local |
+| degree_type | Type of ROADM degree | Dropdown | False |  | line, express, add_drop |
+| wavelength_capacity | Number of wavelengths supported on this degree | Number | True |  |  |
+| description | Additional degree details | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| roadm | DcimOpticalMultiplexerModule | False | one | Parent |
+| connected_fiber | DcimFiberLink | True | one | Attribute |
+| channel_mappings | DcimChannelMapping | True | many | Attribute |
+
+### WSSConnect
+
+- **Label:** WSS Connect
+- **Description:** Internal WSS cross-connect between degrees on SAME ROADM device (0m distance)
+- **Namespace:** Dcim
+- **Icon:** mdi:swap-horizontal
+- **Uniqueness Constraints:**
+    - roadm, channel
+- **Human Friendly ID:** computed_name__value
+- **Inherit From:** DcimChannelMapping
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| computed_name | Computed connection ID | Text | False |  |  |
+| description | Additional cross-connect details | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| roadm | DcimOpticalMultiplexerModule | False | one | Attribute |
+
+### CableMapping
+
+- **Label:** Cable Mapping
+- **Description:** Local patch cable between degrees on DIFFERENT ROADMs (meters distance, same site)
+- **Namespace:** Dcim
+- **Icon:** mdi:cable-data
+- **Uniqueness Constraints:**
+    - cable, channel
+- **Human Friendly ID:** computed_name__value
+- **Inherit From:** DcimChannelMapping
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| computed_name | Computed mapping name (e.g., CABLE-123-CH58) | Text | False |  |  |
+| description | Additional cable mapping details | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| cable | DcimCable | False | one | Attribute |
+
+### OpticalAmplifierModule
+
+- **Label:** Optical Amplifier Module
+- **Description:** Optical signal amplifier module (EDFA, Raman, VGC) installed in chassis
+- **Namespace:** Dcim
+- **Icon:** mdi:amplifier
+- **Human Friendly ID:** computed_name__value
+- **Inherit From:** DeviceGenericModule
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| computed_name | Computed module name (e.g., ABC123-AMP-1/5) | Text | False |  |  |
+| slot_number | Slot number in chassis (e.g., '1/5', '1/6', '2/5') | Text | False |  |  |
+| amplifier_type | Type of optical amplifier | Dropdown | False |  | edfa, raman, soa, vgc, hybrid |
+| stage | Amplifier stage position | Dropdown | False |  | booster, inline, preamplifier |
+| gain_db | Typical gain in dB (e.g., '20.0', '17.5') | Text | True |  |  |
+| max_output_power_dbm | Maximum output power in dBm (e.g., '17.0', '23.0') | Text | True |  |  |
+| noise_figure_db | Noise figure in dB (e.g., '5.5', '4.8') | Text | True |  |  |
+| operating_band | Operating wavelength band | Dropdown | False |  | c_band, l_band, c_l_band |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| amplified_link | DcimFiberLink | True | one | Attribute |
+
+### OpticalService
+
+- **Label:** Optical Service
+- **Description:** End-to-end optical transport service (customer circuit) spanning multiple sites
+- **Namespace:** Dcim
+- **Icon:** mdi:transit-connection-variant
+- **Uniqueness Constraints:**
+    - service_id__value
+- **Human Friendly ID:** service_id__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| service_id | Unique service identifier | Text | False |  |  |
+| service_name | Customer service name (e.g., 'ATC 10G - Albion to Arco #2') | Text | False |  |  |
+| service_type | Type of optical service | Dropdown | False |  | wavelength, transport, ip_transit |
+| bandwidth | Service bandwidth (e.g., '10G', '100G', '400G') | Text | False |  |  |
+| status | Service operational status | Dropdown | False | planned | planned, provisioned, active, maintenance, failed |
+| customer_circuit_id | Customer's circuit ID (e.g., '99/OKFS/000029//SYG') | Text | True |  |  |
+| provision_date | Date service was provisioned | DateTime | True |  |  |
+| description | Additional service details | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| transponders | DcimTransponderModule | False | many | Attribute |
+| channel | DcimDWDMChannel | False | one | Attribute |
+| primary_path | DcimOpticalPath | False | one | Component |
+| backup_path | DcimOpticalPath | True | one | Component |
+
+### OpticalPath
+
+- **Label:** Optical Path
+- **Description:** Ordered sequence of segments forming an optical path through the network
+- **Namespace:** Dcim
+- **Icon:** mdi:map-marker-path
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name | Path name (e.g., MS-W17D5-primary) | Text | False |  |  |
+| path_type | Type of path (primary, backup, express) | Dropdown | False |  | primary, backup, express |
+| total_distance_km | Total path distance in kilometers | Text | True |  |  |
+| total_loss_db | Total optical loss in dB | Text | True |  |  |
+| hop_count | Number of ROADM hops in path | Number | True |  |  |
+| is_active | Whether this path is currently active | Boolean | False | True |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| segments | DcimPathSegment | True | many | Component |
+| is_primary_of_service | DcimOpticalService | True | one | Attribute |
+| is_backup_of_service | DcimOpticalService | True | one | Attribute |
+
+### PathSegment
+
+- **Label:** Path Segment
+- **Description:** One hop in optical path - references channel mapping (fiber, cable, or cross-connect)
+- **Namespace:** Dcim
+- **Icon:** mdi:ray-start-arrow
+- **Uniqueness Constraints:**
+    - path, segment_order__value
+- **Human Friendly ID:** computed_name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| computed_name | Computed segment name (e.g., MS-W17D5-primary-SEG1) | Text | False |  |  |
+| segment_order | Order of this segment in the path (1, 2, 3...) | Number | False |  |  |
+| segment_type | Type of segment | Dropdown | False |  | fiber, cross_connect, cable, add, drop |
+| loss_db | Optical loss for this segment in dB | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| path | DcimOpticalPath | False | one | Parent |
+| channel_mapping | DcimChannelMapping | True | one | Attribute |
+
+## Generics
+
+### ChannelMapping
+
+- **Label:** Channel Mapping
+- **Description:** Generic base for any channel allocation/routing (fiber, cable, or internal cross-connect)
+- **Namespace:** Dcim
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| is_active | Whether this mapping is currently active | Boolean | False | True |  |
+| configured_date | Date this mapping was configured | DateTime | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| segment | DcimPathSegment | False | one | Parent |
+| channel | DcimDWDMChannel | False | one | Attribute |
+| degrees | DcimRoadmDegree | False | many | Attribute |
+
+### OpticalDevice
+
+- **Label:** Optical Multiplexer Device
+- **Description:** Generic interface for any device that can multiplex DWDM channels (active or passive)
+- **Namespace:** Dcim
+- **Uniqueness Constraints:**
+    - computed_name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| computed_name |  | Text | False |  |  |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### DcimPhysicalDevice
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| optical_node | DcimOpticalNode | True | many | Generic |
+
+## Code
+
+```yaml
+version: '1.0'
+generics:
+- name: ChannelMapping
+  namespace: Dcim
+  description: Generic base for any channel allocation/routing (fiber, cable, or internal
+    cross-connect)
+  label: Channel Mapping
+  include_in_menu: true
+  attributes:
+  - name: is_active
+    kind: Boolean
+    optional: false
+    default_value: true
+    description: Whether this mapping is currently active
+  - name: configured_date
+    kind: DateTime
+    optional: true
+    description: Date this mapping was configured
+  relationships:
+  - name: segment
+    peer: DcimPathSegment
+    cardinality: one
+    kind: Parent
+    optional: false
+    identifier: channel_mapping__path_segments
+    description: Optical Path segment associated with this mapping
+  - name: channel
+    peer: DcimDWDMChannel
+    cardinality: one
+    kind: Attribute
+    optional: false
+    identifier: dwdm_channel__mappings
+    description: DWDM channel being mapped/routed
+  - name: degrees
+    peer: DcimRoadmDegree
+    cardinality: many
+    max_count: 2
+    kind: Attribute
+    optional: false
+    identifier: roadm_degree__channel_mappings
+    description: Two ROADM degrees involved in this mapping (bidirectional)
+- name: OpticalDevice
+  namespace: Dcim
+  description: Generic interface for any device that can multiplex DWDM channels (active
+    or passive)
+  label: Optical Multiplexer Device
+  include_in_menu: true
+  uniqueness_constraints:
+  - - computed_name__value
+  attributes:
+  - name: computed_name
+    kind: Text
+    optional: false
+nodes:
+- name: ITUGrid
+  namespace: Dcim
+  include_in_menu: true
+  label: ITU-T DWDM Grid
+  description: ITU-T G.694.1 frequency grid standards for DWDM
+  icon: mdi:grid
+  display_label: name__value
+  human_friendly_id:
+  - name__value
+  uniqueness_constraints:
+  - - name__value
+  attributes:
+  - name: name
+    kind: Text
+    optional: false
+    description: Grid name (e.g., 50GHz, 100GHz)
+  - name: channel_spacing_ghz
+    kind: Number
+    optional: false
+    description: Channel spacing in GHz (50, 100, etc.)
+  - name: reference_frequency_thz
+    kind: Text
+    optional: false
+    description: Reference frequency in THz (e.g., '193.1' for 1550nm)
+  - name: description
+    kind: Text
+    optional: true
+    description: Grid description and use cases
+  relationships:
+  - name: bands
+    peer: DcimOpticalBand
+    cardinality: many
+    kind: Component
+    optional: true
+    description: Optical bands using this grid
+- name: OpticalBand
+  namespace: Dcim
+  include_in_menu: true
+  label: Optical Band
+  description: Optical frequency band (C-Band, L-Band, S-Band)
+  icon: mdi:sine-wave
+  display_label: computed_name__value
+  human_friendly_id:
+  - grid__name__value
+  - band_name__value
+  uniqueness_constraints:
+  - - grid
+    - band_name__value
+  attributes:
+  - name: band_name
+    kind: Dropdown
+    optional: false
+    choices:
+    - name: c_band
+      label: C-Band
+      description: Conventional Band (1530-1565 nm)
+      color: '#ff6b6b'
+    - name: l_band
+      label: L-Band
+      description: Long Band (1565-1625 nm)
+      color: '#4ecdc4'
+    - name: s_band
+      label: S-Band
+      description: Short Band (1460-1530 nm)
+      color: '#95e1d3'
+    - name: o_band
+      label: O-Band
+      description: Original Band (1260-1360 nm)
+      color: '#f38181'
+    description: Optical band designation
+  - name: start_frequency_thz
+    kind: Text
+    optional: false
+    description: Band start frequency in THz (e.g., '191.0')
+  - name: end_frequency_thz
+    kind: Text
+    optional: false
+    description: Band end frequency in THz (e.g., '196.1')
+  - name: start_wavelength_nm
+    kind: Text
+    optional: true
+    description: Band start wavelength in nm (e.g., '1530.0')
+  - name: end_wavelength_nm
+    kind: Text
+    optional: true
+    description: Band end wavelength in nm (e.g., '1565.0')
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ grid__name__value }}-{{ band_name__value|upper }}'
+    description: Auto-generated band identifier (e.g., 50GHz-C_BAND)
+  relationships:
+  - name: grid
+    peer: DcimITUGrid
+    cardinality: one
+    kind: Parent
+    optional: false
+    description: Parent ITU grid
+  - name: channels
+    peer: DcimDWDMChannel
+    cardinality: many
+    kind: Component
+    optional: true
+    description: DWDM channels in this band
+- name: DWDMChannel
+  namespace: Dcim
+  include_in_menu: true
+  label: DWDM Channel
+  description: Individual DWDM wavelength/channel (CH20, CH21, etc.)
+  icon: mdi:wave
+  display_label: channel_name__value
+  human_friendly_id:
+  - channel_name__value
+  order_by:
+  - band__computed_name__value
+  - channel_number__value
+  uniqueness_constraints:
+  - - band
+    - channel_number__value
+  - - channel_name__value
+  - - channel_number__value
+    - frequency_thz__value
+    - wavelength_nm__value
+  attributes:
+  - name: channel_name
+    kind: Text
+    read_only: true
+    optional: false
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: CH{{ channel_number__value }}
+    description: ITU DWDM Channel identifier (computed as CH + channel number, e.g.,
+      CH20, CH21, CH40)
+  - name: adva_channel_name
+    kind: Text
+    optional: true
+    description: ADVA-specific channel name (e.g., D02, DC1, D32)
+  - name: channel_number
+    kind: Number
+    optional: false
+    description: ITU channel number (e.g., 20, 21, 60)
+  - name: frequency_thz
+    kind: Text
+    optional: false
+    description: Center frequency in THz (e.g., '192.1')
+  - name: wavelength_nm
+    kind: Text
+    optional: false
+    description: Center wavelength in nm (e.g., '1560.61')
+  - name: description
+    kind: Text
+    optional: true
+    description: Channel notes and usage
+  relationships:
+  - name: band
+    peer: DcimOpticalBand
+    cardinality: one
+    kind: Parent
+    optional: false
+    description: Parent optical band
+  - name: mux_assignments
+    peer: DcimMuxChannelAssignment
+    cardinality: many
+    kind: Component
+    optional: true
+    description: Mux port assignments for this channel
+  - name: mappings
+    peer: DcimChannelMapping
+    cardinality: many
+    kind: Generic
+    optional: true
+    description: Fiber allocations for this channel
+- name: MuxChannelAssignment
+  namespace: Dcim
+  include_in_menu: true
+  label: Mux Channel Assignment
+  description: Maps DWDM channel to multiplexer port (equipment configuration)
+  icon: mdi:cable-data
+  display_label: computed_name__value
+  human_friendly_id:
+  - optical_device__computed_name__value
+  - port_number__value
+  uniqueness_constraints:
+  - - optical_device
+    - port_number__value
+  - - optical_device
+    - channel
+  attributes:
+  - name: port_number
+    kind: Number
+    optional: false
+    description: Physical port number on multiplexer (e.g., 1-96)
+  - name: tx_power_dbm
+    kind: Text
+    optional: true
+    description: Configured transmit power in dBm (e.g., '0.0')
+  - name: status
+    kind: Dropdown
+    optional: false
+    default_value: configured
+    choices:
+    - name: configured
+      label: Configured
+      description: Channel is configured on port
+      color: '#f5a623'
+    - name: active
+      label: Active
+      description: Channel is actively transmitting
+      color: '#00cc00'
+    - name: disabled
+      label: Disabled
+      description: Channel is disabled
+      color: '#cccccc'
+    - name: failed
+      label: Failed
+      description: Channel has failed
+      color: '#cc0000'
+    description: Channel assignment status
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ optical_device__computed_name__value }}-P{{ ''{:02d}''.format(port_number__value)
+        }}-{{ channel__channel_name__value }}'
+    description: Auto-generated assignment identifier
+  relationships:
+  - name: channel
+    peer: DcimDWDMChannel
+    cardinality: one
+    kind: Attribute
+    optional: false
+    description: DWDM channel assigned to this port
+  - name: optical_device
+    peer: DcimOpticalDevice
+    cardinality: one
+    kind: Parent
+    optional: false
+    identifier: mux_channel_assignments
+    description: Multiplexer device (OpticalNode or PassiveMultiplexer)
+- name: FiberMapping
+  namespace: Dcim
+  inherit_from:
+  - DcimChannelMapping
+  include_in_menu: true
+  label: Fiber Mapping
+  description: Long-haul fiber link between degrees on DIFFERENT ROADMs/sites (kilometers
+    distance)
+  icon: mdi:fiber-optic
+  display_label: computed_name__value
+  human_friendly_id:
+  - fiber_link__link_id__value
+  - channel__channel_name__value
+  uniqueness_constraints:
+  - - fiber_link
+    - channel
+  attributes:
+  - name: allocation_status
+    kind: Dropdown
+    optional: false
+    default_value: reserved
+    choices:
+    - name: reserved
+      label: Reserved
+      description: Channel reserved but not in use
+      color: '#f5a623'
+    - name: allocated
+      label: Allocated
+      description: Channel allocated to service
+      color: '#0099cc'
+    - name: in_use
+      label: In Use
+      description: Channel actively carrying traffic
+      color: '#00cc00'
+    - name: maintenance
+      label: Maintenance
+      description: Channel under maintenance
+      color: '#ff9800'
+    - name: failed
+      label: Failed
+      description: Channel has failed
+      color: '#cc0000'
+    description: Allocation status
+  - name: tx_power_dbm
+    kind: Text
+    optional: true
+    description: Measured transmit power in dBm (e.g., '0.5')
+  - name: rx_power_dbm
+    kind: Text
+    optional: true
+    description: Measured receive power in dBm (e.g., '-2.3')
+  - name: osnr_db
+    kind: Text
+    optional: true
+    description: Optical Signal-to-Noise Ratio in dB (e.g., '25.5')
+  - name: allocated_date
+    kind: DateTime
+    optional: true
+    description: Date channel was allocated
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ fiber_link__link_id__value }}-{{ channel__channel_name__value
+        }}'
+    description: Auto-generated mapping identifier
+  - name: description
+    kind: Text
+    optional: true
+    description: Additional fiber mapping details
+  relationships:
+  - name: fiber_link
+    peer: DcimFiberLink
+    cardinality: one
+    kind: Attribute
+    optional: false
+    identifier: fiber_channel_mappings
+    description: Long-haul fiber link connecting the degrees
+- name: OpticalNode
+  namespace: Dcim
+  include_in_menu: true
+  label: Optical Node
+  description: Logical network endpoint in optical topology (graph node, not physical
+    device)
+  icon: mdi:lan
+  inherit_from:
+  - DcimOpticalDevice
+  display_label: computed_name__value
+  human_friendly_id:
+  - name__value
+  uniqueness_constraints:
+  - - name__value
+  attributes:
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ name__value }}'
+    description: Computed name for display
+  - name: name
+    kind: Text
+    optional: false
+    description: Logical node name (e.g., GENESIS-OL-10, SKYLINE-OL-1)
+  - name: node_type
+    kind: Dropdown
+    optional: false
+    choices:
+    - name: endpoint
+      label: Endpoint
+      description: Edge node (traffic originates/terminates)
+      color: '#2196f3'
+    - name: intermediate
+      label: Intermediate
+      description: Pass-through node (ROADM only)
+      color: '#9c27b0'
+    - name: branching
+      label: Branching
+      description: Multiple fiber paths meet (hub)
+      color: '#ff9800'
+    description: Topology role of this node
+  - name: description
+    kind: Text
+    optional: true
+    description: Node notes and function
+  relationships:
+  - name: device
+    peer: DcimPhysicalDevice
+    cardinality: one
+    kind: Attribute
+    optional: true
+    identifier: optical_nodes__physical_device
+    description: Physical chassis that implements this logical node
+  - name: transponder_modules
+    peer: DcimTransponderModule
+    cardinality: many
+    kind: Attribute
+    optional: true
+    identifier: optical_node__transponder_modules
+    description: Transponder modules connected to this optical node (for cross-connects)
+  - name: links
+    peer: DcimFiberLink
+    cardinality: many
+    kind: Component
+    optional: true
+    identifier: optical_node__links
+    description: Fiber links connected to this node
+- name: PassiveMultiplexer
+  namespace: Dcim
+  include_in_menu: true
+  label: Passive Multiplexer
+  description: Passive CWDM/DWDM multiplexer (fixed port count, no modules)
+  icon: mdi:resistor-nodes
+  inherit_from:
+  - DcimPhysicalDevice
+  display_label: computed_name__value
+  human_friendly_id:
+  - name__value
+  uniqueness_constraints:
+  - - name__value
+  attributes:
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ name__value }}'
+    description: Computed name for display
+  - name: name
+    kind: Text
+    optional: false
+    description: Passive mux name (e.g., CHI-PMUX-01)
+  - name: port_count
+    kind: Number
+    optional: false
+    description: Number of fixed ports (e.g., 8, 16, 32, 40)
+  - name: mux_type
+    kind: Dropdown
+    optional: false
+    choices:
+    - name: cwdm
+      label: CWDM
+      description: Coarse Wavelength Division Multiplexing
+      color: '#4a90e2'
+    - name: dwdm
+      label: DWDM
+      description: Dense Wavelength Division Multiplexing
+      color: '#9933cc'
+    description: Type of passive multiplexer
+  - name: description
+    kind: Text
+    optional: true
+    description: Device notes
+- name: FiberLink
+  namespace: Dcim
+  include_in_menu: true
+  label: Fiber Link
+  description: Fiber connecting two optical nodes (graph edge)
+  icon: mdi:cable-data
+  display_label: link_id__value
+  human_friendly_id:
+  - link_id__value
+  uniqueness_constraints:
+  - - link_id__value
+  attributes:
+  - name: link_id
+    kind: Text
+    optional: false
+    description: Unique link identifier (e.g., LINK-001)
+  - name: distance_km
+    kind: Text
+    optional: true
+    description: Physical distance in kilometers (e.g., '920.5')
+  - name: attenuation_db
+    kind: Text
+    optional: true
+    description: Total fiber attenuation in dB (e.g., '18.4')
+  - name: status
+    kind: Dropdown
+    optional: false
+    default_value: planned
+    choices:
+    - name: planned
+      label: Planned
+      description: Link is planned but not yet installed
+      color: '#95a5a6'
+    - name: active
+      label: Active
+      description: Link is in service
+      color: '#00cc00'
+    - name: standby
+      label: Standby
+      description: Link is installed but not active
+      color: '#f5a623'
+    - name: maintenance
+      label: Maintenance
+      description: Link is under maintenance
+      color: '#ff9800'
+    - name: failed
+      label: Failed
+      description: Link has failed
+      color: '#cc0000'
+    description: Operational status of fiber link
+  - name: commissioned_date
+    kind: DateTime
+    optional: true
+    description: Date link was commissioned
+  - name: description
+    kind: Text
+    optional: true
+    description: Additional link details
+  relationships:
+  - name: endpoints
+    peer: DcimOpticalNode
+    identifier: optical_node__links
+    cardinality: many
+    kind: Attribute
+    optional: false
+    max_count: 2
+    description: Port-level endpoints participating in this link
+  - name: mappings
+    peer: DcimFiberMapping
+    cardinality: many
+    kind: Component
+    identifier: fiber_channel_mappings
+    optional: true
+    description: DWDM channels allocated on this link
+- name: OpticalModuleType
+  namespace: Dcim
+  include_in_menu: true
+  label: Optical Module Type
+  description: Categorization of optical modules by function
+  icon: mdi:expansion-card
+  inherit_from:
+  - DeviceGenericModuleType
+  attributes:
+  - name: name
+    kind: Text
+    optional: false
+    description: Module type name
+  - name: description
+    kind: Text
+    optional: true
+    description: Module type description
+  - name: module_category
+    kind: Dropdown
+    optional: false
+    description: Functional category of the module
+    choices:
+    - name: transponder
+      label: Transponder
+      description: Optical-electrical-optical conversion
+      color: '#2196f3'
+    - name: multiplexer
+      label: Multiplexer/ROADM
+      description: Wavelength multiplexing and switching
+      color: '#9c27b0'
+    - name: amplifier
+      label: Amplifier
+      description: Optical signal amplification
+      color: '#ff9800'
+    - name: monitoring
+      label: Monitoring
+      description: Optical performance monitoring
+      color: '#4caf50'
+    - name: control
+      label: Control
+      description: System control and management
+      color: '#607d8b'
+    - name: power
+      label: Power Supply
+      description: Power management modules
+      color: '#795548'
+    - name: cooling
+      label: Cooling
+      description: Thermal management
+      color: '#00bcd4'
+- name: TransponderModule
+  namespace: Dcim
+  include_in_menu: true
+  label: Transponder Module
+  description: Optical-electrical-optical conversion module (100G, 400G coherent)
+    installed in chassis
+  icon: mdi:chip
+  inherit_from:
+  - DeviceGenericModule
+  display_label: computed_name__value
+  uniqueness_constraints:
+  - - computed_name__value
+  human_friendly_id:
+  - computed_name__value
+  attributes:
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ device__serial__value }}-TPD-{{ slot_number__value }}'
+    description: Computed module name (e.g., ABC123-TPD-1/1)
+  - name: slot_number
+    kind: Text
+    optional: false
+    description: Slot number in chassis (e.g., '1/1', '1/2', '2/1')
+  - name: capacity_gbps
+    kind: Number
+    optional: false
+    description: Line rate capacity in Gbps (e.g., 100, 200, 400)
+  - name: modulation_format
+    kind: Dropdown
+    optional: false
+    choices:
+    - name: dp_qpsk
+      label: DP-QPSK
+      description: Dual-polarization QPSK (100G)
+      color: '#2196f3'
+    - name: dp_16qam
+      label: DP-16QAM
+      description: Dual-polarization 16QAM (200G)
+      color: '#9c27b0'
+    - name: dp_8qam
+      label: DP-8QAM
+      description: Dual-polarization 8QAM (150G)
+      color: '#ff9800'
+    - name: dp_64qam
+      label: DP-64QAM
+      description: Dual-polarization 64QAM (400G)
+      color: '#4caf50'
+    description: Modulation format for optical transmission
+  - name: tunable_range
+    kind: Dropdown
+    optional: false
+    choices:
+    - name: c_band
+      label: C-Band (1530-1565nm)
+      description: Full C-Band tunable
+      color: '#9933cc'
+    - name: c_l_band
+      label: C+L-Band (1530-1625nm)
+      description: Extended C+L-Band tunable
+      color: '#cc33cc'
+    - name: fixed
+      label: Fixed Wavelength
+      description: Non-tunable, fixed wavelength
+      color: '#95a5a6'
+    description: Wavelength tuning capability
+  - name: fec_type
+    kind: Dropdown
+    optional: true
+    choices:
+    - name: sd_fec
+      label: SD-FEC
+      description: Soft-decision FEC (7% overhead)
+      color: '#2196f3'
+    - name: hd_fec
+      label: HD-FEC
+      description: Hard-decision FEC (25% overhead)
+      color: '#ff9800'
+    - name: c_fec
+      label: C-FEC
+      description: Concatenated FEC
+      color: '#4caf50'
+    - name: o_fec
+      label: O-FEC
+      description: OpenFEC
+      color: '#9c27b0'
+    description: Forward error correction type
+  - name: client_interface
+    kind: Text
+    optional: true
+    description: Client-side interface (e.g., 100GE, 400GE, OTU4)
+  - name: line_interface
+    kind: Text
+    optional: true
+    description: Line-side interface (e.g., CFP2-DCO, QSFP28, QSFP-DD)
+  relationships:
+  - name: tuned_channel
+    peer: DcimDWDMChannel
+    cardinality: one
+    kind: Attribute
+    optional: true
+    identifier: dwdm_channel__transponder_modules
+    description: DWDM channel currently tuned/configured
+  - name: connected_to_optical_node
+    peer: DcimOpticalNode
+    cardinality: one
+    kind: Attribute
+    optional: true
+    identifier: optical_node__transponder_modules
+    description: Optical node this transponder module connects to (for cross-connects)
+- name: OpticalMultiplexerModule
+  namespace: Dcim
+  include_in_menu: true
+  label: Optical Multiplexer Module
+  description: Multiplexer/Demultiplexer/ROADM module for wavelength management installed
+    in chassis
+  icon: mdi:router-network
+  inherit_from:
+  - DeviceGenericModule
+  display_label: computed_name__value
+  human_friendly_id:
+  - computed_name__value
+  attributes:
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ device__serial__value }}-MUX-{{ slot_number__value }}'
+    description: Computed module name (e.g., ABC123-MUX-1/3)
+  - name: slot_number
+    kind: Text
+    optional: false
+    description: Slot number in chassis (e.g., '1/3', '1/4', '2/3')
+  - name: mux_type
+    kind: Dropdown
+    optional: false
+    choices:
+    - name: passive_mux
+      label: Passive Mux
+      description: Passive wavelength multiplexer (fixed)
+      color: '#95a5a6'
+    - name: passive_demux
+      label: Passive Demux
+      description: Passive wavelength demultiplexer (fixed)
+      color: '#7f8c8d'
+    - name: oadm
+      label: OADM
+      description: Optical Add-Drop Multiplexer
+      color: '#3498db'
+    - name: roadm
+      label: ROADM
+      description: Reconfigurable Optical Add-Drop Multiplexer
+      color: '#9b59b6'
+    - name: wss
+      label: WSS
+      description: Wavelength Selective Switch
+      color: '#e74c3c'
+    description: Type of multiplexer technology
+  - name: channel_capacity
+    kind: Number
+    optional: false
+    description: Number of supported DWDM channels (e.g., 40, 80, 96)
+  - name: technology
+    kind: Dropdown
+    optional: true
+    choices:
+    - name: thin_film_filter
+      label: Thin Film Filter
+      description: Passive thin film filter technology
+      color: '#95a5a6'
+    - name: awg
+      label: AWG
+      description: Arrayed Waveguide Grating
+      color: '#3498db'
+    - name: wss_lcos
+      label: WSS (LCOS)
+      description: Wavelength Selective Switch (Liquid Crystal on Silicon)
+      color: '#9b59b6'
+    - name: wss_mems
+      label: WSS (MEMS)
+      description: Wavelength Selective Switch (Micro-Electro-Mechanical Systems)
+      color: '#e74c3c'
+    description: Underlying multiplexer technology
+  - name: degree_count
+    kind: Number
+    optional: true
+    description: Number of ROADM degrees (e.g., 2, 4, 8, 16)
+  - name: colorless
+    kind: Boolean
+    optional: true
+    default_value: false
+    description: Colorless add/drop capability (any channel on any port)
+  - name: directionless
+    kind: Boolean
+    optional: true
+    default_value: false
+    description: Directionless add/drop capability (any port to any degree)
+  - name: contentionless
+    kind: Boolean
+    optional: true
+    default_value: false
+    description: Contentionless add/drop (CDC - Colorless, Directionless, Contentionless)
+  relationships:
+  - name: degrees
+    peer: DcimRoadmDegree
+    cardinality: many
+    kind: Component
+    optional: true
+    identifier: optical_multiplexer_module__degrees
+    description: ROADM degrees (line ports) on this multiplexer module
+  - name: mappings
+    peer: DcimChannelMapping
+    cardinality: many
+    kind: Attribute
+    optional: true
+    identifier: roadm_module__channel_mappings
+    description: Channel mappings (DirectConnect, CableMapping, FiberMapping) associated
+      with this module
+- name: RoadmDegree
+  namespace: Dcim
+  include_in_menu: true
+  label: ROADM Degree
+  description: ROADM degree with line port (OL-1, OL-2, etc.)
+  icon: mdi:lan-connect
+  display_label: computed_name__value
+  human_friendly_id:
+  - computed_name__value
+  uniqueness_constraints:
+  - - roadm
+    - degree_number__value
+  - - roadm
+    - line_port__value
+  attributes:
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ roadm__computed_name__value }}-{{ line_port__value }}'
+    description: Computed name (e.g., ROADM-SITE-A-OL-1)
+  - name: degree_number
+    kind: Number
+    optional: false
+    description: Degree number (1-based, e.g., 1, 2, 3, 4)
+  - name: line_port
+    kind: Text
+    optional: false
+    description: Line port designation (e.g., OL-1, OL-2, OL-7)
+  - name: direction
+    kind: Dropdown
+    optional: false
+    choices:
+    - name: north
+      label: North
+      description: Northbound direction
+      color: '#3498db'
+    - name: south
+      label: South
+      description: Southbound direction
+      color: '#e74c3c'
+    - name: east
+      label: East
+      description: Eastbound direction
+      color: '#2ecc71'
+    - name: west
+      label: West
+      description: Westbound direction
+      color: '#f39c12'
+    - name: express
+      label: Express
+      description: Express port (bypass)
+      color: '#9b59b6'
+    - name: local
+      label: Local
+      description: Local add/drop
+      color: '#95a5a6'
+    description: Directional designation of degree
+  - name: degree_type
+    kind: Dropdown
+    optional: false
+    choices:
+    - name: line
+      label: Line
+      description: Line port (connects to fiber link)
+      color: '#2196f3'
+    - name: express
+      label: Express
+      description: Express port (R-x ports, bypass)
+      color: '#9c27b0'
+    - name: add_drop
+      label: Add/Drop
+      description: Local add/drop for transponders
+      color: '#4caf50'
+    description: Type of ROADM degree
+  - name: wavelength_capacity
+    kind: Number
+    optional: true
+    description: Number of wavelengths supported on this degree
+  - name: description
+    kind: Text
+    optional: true
+    description: Additional degree details
+  relationships:
+  - name: roadm
+    peer: DcimOpticalMultiplexerModule
+    cardinality: one
+    kind: Parent
+    optional: false
+    identifier: optical_multiplexer_module__degrees
+    description: Parent ROADM module containing this degree
+  - name: connected_fiber
+    peer: DcimFiberLink
+    cardinality: one
+    kind: Attribute
+    optional: true
+    identifier: fiber_link__roadm_degree
+    description: Fiber link connected to this line port
+  - name: channel_mappings
+    peer: DcimChannelMapping
+    cardinality: many
+    kind: Attribute
+    optional: true
+    identifier: roadm_degree__channel_mappings
+    description: Channel mappings involving this degree
+- name: WSSConnect
+  namespace: Dcim
+  inherit_from:
+  - DcimChannelMapping
+  include_in_menu: true
+  label: WSS Connect
+  description: Internal WSS cross-connect between degrees on SAME ROADM device (0m
+    distance)
+  icon: mdi:swap-horizontal
+  display_label: computed_name__value
+  human_friendly_id:
+  - computed_name__value
+  uniqueness_constraints:
+  - - roadm
+    - channel
+  attributes:
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ roadm__computed_name__value }}-{{ channel__channel_name__value
+        }}'
+    description: Computed connection ID
+  - name: description
+    kind: Text
+    optional: true
+    description: Additional cross-connect details
+  relationships:
+  - name: roadm
+    peer: DcimOpticalMultiplexerModule
+    cardinality: one
+    kind: Attribute
+    optional: false
+    identifier: roadm_module__channel_mappings
+    description: Parent ROADM device
+- name: CableMapping
+  namespace: Dcim
+  inherit_from:
+  - DcimChannelMapping
+  include_in_menu: true
+  label: Cable Mapping
+  description: Local patch cable between degrees on DIFFERENT ROADMs (meters distance,
+    same site)
+  icon: mdi:cable-data
+  display_label: computed_name__value
+  human_friendly_id:
+  - computed_name__value
+  uniqueness_constraints:
+  - - cable
+    - channel
+  attributes:
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ cable__label__value }}-{{ channel__channel_name__value
+        }}'
+    description: Computed mapping name (e.g., CABLE-123-CH58)
+  - name: description
+    kind: Text
+    optional: true
+    description: Additional cable mapping details
+  relationships:
+  - name: cable
+    peer: DcimCable
+    cardinality: one
+    kind: Attribute
+    optional: false
+    identifier: cable__channel_mappings
+    description: Physical patch cable connecting the degrees
+- name: OpticalAmplifierModule
+  namespace: Dcim
+  include_in_menu: true
+  label: Optical Amplifier Module
+  description: Optical signal amplifier module (EDFA, Raman, VGC) installed in chassis
+  icon: mdi:amplifier
+  inherit_from:
+  - DeviceGenericModule
+  display_label: computed_name__value
+  human_friendly_id:
+  - computed_name__value
+  attributes:
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ device__serial__value }}-AMP-{{ slot_number__value }}'
+    description: Computed module name (e.g., ABC123-AMP-1/5)
+  - name: slot_number
+    kind: Text
+    optional: false
+    description: Slot number in chassis (e.g., '1/5', '1/6', '2/5')
+  - name: amplifier_type
+    kind: Dropdown
+    optional: false
+    choices:
+    - name: edfa
+      label: EDFA
+      description: Erbium-Doped Fiber Amplifier
+      color: '#2196f3'
+    - name: raman
+      label: Raman
+      description: Raman Amplifier (distributed)
+      color: '#9c27b0'
+    - name: soa
+      label: SOA
+      description: Semiconductor Optical Amplifier
+      color: '#ff9800'
+    - name: vgc
+      label: VGC
+      description: Variable Gain Controller
+      color: '#4caf50'
+    - name: hybrid
+      label: Hybrid
+      description: Hybrid amplifier (e.g., EDFA + Raman)
+      color: '#607d8b'
+    description: Type of optical amplifier
+  - name: stage
+    kind: Dropdown
+    optional: false
+    choices:
+    - name: booster
+      label: Booster
+      description: Power amplifier (transmit side)
+      color: '#e74c3c'
+    - name: inline
+      label: Inline
+      description: In-line amplifier (along fiber span)
+      color: '#3498db'
+    - name: preamplifier
+      label: Pre-Amplifier
+      description: Low-noise amplifier (receive side)
+      color: '#2ecc71'
+    description: Amplifier stage position
+  - name: gain_db
+    kind: Text
+    optional: true
+    description: Typical gain in dB (e.g., '20.0', '17.5')
+  - name: max_output_power_dbm
+    kind: Text
+    optional: true
+    description: Maximum output power in dBm (e.g., '17.0', '23.0')
+  - name: noise_figure_db
+    kind: Text
+    optional: true
+    description: Noise figure in dB (e.g., '5.5', '4.8')
+  - name: operating_band
+    kind: Dropdown
+    optional: false
+    choices:
+    - name: c_band
+      label: C-Band (1530-1565nm)
+      description: C-Band operation
+      color: '#9933cc'
+    - name: l_band
+      label: L-Band (1565-1625nm)
+      description: L-Band operation
+      color: '#cc33cc'
+    - name: c_l_band
+      label: C+L-Band
+      description: Dual-band operation
+      color: '#ff33cc'
+    description: Operating wavelength band
+  relationships:
+  - name: amplified_link
+    peer: DcimFiberLink
+    cardinality: one
+    kind: Attribute
+    optional: true
+    identifier: fiber_link__amplifier_modules
+    description: Fiber link being amplified (for inline amplifiers)
+- name: OpticalService
+  namespace: Dcim
+  include_in_menu: true
+  label: Optical Service
+  description: End-to-end optical transport service (customer circuit) spanning multiple
+    sites
+  icon: mdi:transit-connection-variant
+  display_label: service_name__value
+  human_friendly_id:
+  - service_id__value
+  uniqueness_constraints:
+  - - service_id__value
+  order_by:
+  - service_id__value
+  attributes:
+  - name: service_id
+    kind: Text
+    optional: false
+    description: Unique service identifier
+  - name: service_name
+    kind: Text
+    optional: false
+    description: 'Customer service name (e.g., ''ATC 10G - Albion to Arco #2'')'
+  - name: service_type
+    kind: Dropdown
+    optional: false
+    choices:
+    - name: wavelength
+      label: Wavelength Service
+      description: Dedicated wavelength end-to-end
+      color: '#9c27b0'
+    - name: transport
+      label: Transport Service
+      description: Layer 1 optical transport
+      color: '#2196f3'
+    - name: ip_transit
+      label: IP Transit
+      description: Layer 3 IP service over optical
+      color: '#4caf50'
+    description: Type of optical service
+  - name: bandwidth
+    kind: Text
+    optional: false
+    description: Service bandwidth (e.g., '10G', '100G', '400G')
+  - name: status
+    kind: Dropdown
+    optional: false
+    default_value: planned
+    choices:
+    - name: planned
+      label: Planned
+      description: Service planned but not provisioned
+      color: '#95a5a6'
+    - name: provisioned
+      label: Provisioned
+      description: Service configured but not active
+      color: '#f5a623'
+    - name: active
+      label: Active
+      description: Service in production
+      color: '#00cc00'
+    - name: maintenance
+      label: Maintenance
+      description: Service under maintenance
+      color: '#ff9800'
+    - name: failed
+      label: Failed
+      description: Service down
+      color: '#cc0000'
+    description: Service operational status
+  - name: customer_circuit_id
+    kind: Text
+    optional: true
+    description: Customer's circuit ID (e.g., '99/OKFS/000029//SYG')
+  - name: provision_date
+    kind: DateTime
+    optional: true
+    description: Date service was provisioned
+  - name: description
+    kind: Text
+    optional: true
+    description: Additional service details
+  relationships:
+  - name: transponders
+    peer: DcimTransponderModule
+    cardinality: many
+    min_count: 2
+    max_count: 2
+    kind: Attribute
+    optional: false
+    identifier: transponder_module__optical_services
+    description: Two transponders (endpoints) for this service (bidirectional)
+  - name: channel
+    peer: DcimDWDMChannel
+    cardinality: one
+    kind: Attribute
+    optional: false
+    identifier: dwdm_channel__services
+    description: DWDM channel used for this service
+  - name: primary_path
+    peer: DcimOpticalPath
+    cardinality: one
+    kind: Component
+    optional: false
+    identifier: optical_service__primary_path
+    description: Primary optical path for this service
+  - name: backup_path
+    peer: DcimOpticalPath
+    cardinality: one
+    kind: Component
+    optional: true
+    identifier: optical_service__backup_path
+    description: Backup/protection path for this service
+- name: OpticalPath
+  namespace: Dcim
+  include_in_menu: true
+  label: Optical Path
+  description: Ordered sequence of segments forming an optical path through the network
+  icon: mdi:map-marker-path
+  display_label: name__value
+  human_friendly_id:
+  - name__value
+  attributes:
+  - name: name
+    kind: Text
+    optional: false
+    unique: true
+    description: Path name (e.g., MS-W17D5-primary)
+  - name: path_type
+    kind: Dropdown
+    optional: false
+    choices:
+    - name: primary
+      label: Primary
+      description: Primary working path
+      color: '#2196f3'
+    - name: backup
+      label: Backup
+      description: Backup/protection path
+      color: '#ff9800'
+    - name: express
+      label: Express
+      description: Express bypass path
+      color: '#9c27b0'
+    description: Type of path (primary, backup, express)
+  - name: total_distance_km
+    kind: Text
+    optional: true
+    description: Total path distance in kilometers
+  - name: total_loss_db
+    kind: Text
+    optional: true
+    description: Total optical loss in dB
+  - name: hop_count
+    kind: Number
+    optional: true
+    description: Number of ROADM hops in path
+  - name: is_active
+    kind: Boolean
+    optional: false
+    default_value: true
+    description: Whether this path is currently active
+  relationships:
+  - name: segments
+    peer: DcimPathSegment
+    identifier: optical_path__segments
+    cardinality: many
+    kind: Component
+    optional: true
+    description: Ordered segments forming this path
+  - name: is_primary_of_service
+    peer: DcimOpticalService
+    identifier: optical_service__primary_path
+    cardinality: one
+    kind: Attribute
+    optional: true
+    description: Optical service using this path
+  - name: is_backup_of_service
+    peer: DcimOpticalService
+    identifier: optical_service__backup_path
+    cardinality: one
+    kind: Attribute
+    optional: true
+    description: Optical service using this path as backup
+- name: PathSegment
+  namespace: Dcim
+  include_in_menu: true
+  label: Path Segment
+  description: One hop in optical path - references channel mapping (fiber, cable,
+    or cross-connect)
+  icon: mdi:ray-start-arrow
+  display_label: computed_name__value
+  human_friendly_id:
+  - computed_name__value
+  uniqueness_constraints:
+  - - path
+    - segment_order__value
+  attributes:
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ path__name__value }}-SEG{{ segment_order__value }}'
+    description: Computed segment name (e.g., MS-W17D5-primary-SEG1)
+  - name: segment_order
+    kind: Number
+    optional: false
+    description: Order of this segment in the path (1, 2, 3...)
+  - name: segment_type
+    kind: Dropdown
+    optional: false
+    choices:
+    - name: fiber
+      label: Fiber
+      description: Segment traverses a long-haul fiber link
+      color: '#2196f3'
+    - name: cross_connect
+      label: Cross-Connect
+      description: Segment crosses through ROADM degrees (internal WSS)
+      color: '#9c27b0'
+    - name: cable
+      label: Cable
+      description: Segment traverses a local patch cable
+      color: '#ff9800'
+    - name: add
+      label: Add
+      description: Service added at this point (A-end)
+      color: '#4caf50'
+    - name: drop
+      label: Drop
+      description: Service dropped at this point (Z-end)
+      color: '#ff5722'
+    description: Type of segment
+  - name: loss_db
+    kind: Text
+    optional: true
+    description: Optical loss for this segment in dB
+  relationships:
+  - name: path
+    peer: DcimOpticalPath
+    cardinality: one
+    kind: Parent
+    optional: false
+    identifier: optical_path__segments
+    description: Parent path containing this segment
+  - name: channel_mapping
+    peer: DcimChannelMapping
+    cardinality: one
+    kind: Attribute
+    on_delete: cascade
+    optional: true
+    identifier: channel_mapping__path_segments
+    description: Channel mapping (WSS Connect, Cable Mapping, or Fiber Mapping)
+extensions:
+  nodes:
+  - kind: DcimPhysicalDevice
+    relationships:
+    - name: optical_node
+      peer: DcimOpticalNode
+      kind: Generic
+      optional: true
+      cardinality: many
+      identifier: optical_nodes__physical_device
+
+```
