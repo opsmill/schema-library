@@ -12,10 +12,15 @@ generics:
         kind: Text
         description: "Name of the interface"
         order_weight: 1000
+      - name: bundle_number
+        kind: Number
+        description: "Bundle number for the aggregated interface"
+        order_weight: 1100
     relationships:
       - name: bundle_members
-        label: Bundle members
+        label: "Member(s)"
         peer: InterfacePhysical
+        identifier: interface__bundle
         cardinality: many
         kind: Attribute
         description: "Physical Interfaces that are members of this aggregate"
@@ -65,10 +70,11 @@ nodes:
         order_weight: 1750
     relationships:
       # Redifine the relationship here to add common_parent constraint
-      - name: lag_members
+      - name: bundle_members
         common_parent: device
         label: "Member(s)"
         peer: InterfacePhysical
+        identifier: interface__bundle
         cardinality: many
         kind: Attribute
         description: "Physical Interfaces that are members of this aggregate"
@@ -81,6 +87,7 @@ extensions:
         - name: bundle
           label: Interface Bundle
           peer: GenericInterfaceBundle
+          identifier: interface__bundle
           optional: true
           cardinality: one
           kind: Attribute
