@@ -8,6 +8,7 @@ generics:
     description: Generic Device object.
     label: Device
     icon: mdi:server
+    include_in_menu: false
     human_friendly_id:
       - name__value
     order_by:
