@@ -1,0 +1,122 @@
+---
+title: Circuit Contract
+---
+
+This schema extension provides models for managing Circuit Contracts, enabling structured representation of service agreements with network providers. Compatible with Infrahub 1.8.
+
+## Details
+
+- **Dependencies:**
+    - [base](dcim)
+    - [extensions/circuit](circuit)
+
+## Nodes
+
+### CircuitContract
+
+- **Label:** Circuit Contract
+- **Description:** A contract document associated with a circuit service, including terms, costs, and validity period.
+- **Namespace:** Dcim
+- **Icon:** mdi:file-sign
+- **Display Label:** Contract (Circuit `{{ circuit__circuit_id__value }}`)
+- **Human Friendly ID:** name__value
+- **Inherit From:** CoreFileObject
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| contract_start |  | DateTime | False |  |  |
+| contract_end |  | DateTime | False |  |  |
+| monthly_cost |  | Number | True |  |  |
+| currency |  | Dropdown | True |  | usd, eur, gbp |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| circuit | DcimCircuit | False | one | Attribute |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### DcimCircuit
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| contract | DcimCircuitContract | True | one |  |
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: CircuitContract
+  namespace: Dcim
+  inherit_from:
+  - CoreFileObject
+  description: A contract document associated with a circuit service, including terms,
+    costs, and validity period.
+  label: Circuit Contract
+  icon: mdi:file-sign
+  menu_placement: DcimCircuit
+  human_friendly_id:
+  - name__value
+  order_by:
+  - contract_end__value
+  display_label: Contract (Circuit `{{ circuit__circuit_id__value }}`)
+  attributes:
+  - name: name
+    kind: Text
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: contract_{{ circuit__circuit_id__value }}
+    read_only: true
+    optional: false
+  - name: contract_start
+    kind: DateTime
+    optional: false
+  - name: contract_end
+    kind: DateTime
+    optional: false
+  - name: monthly_cost
+    kind: Number
+    optional: true
+  - name: currency
+    kind: Dropdown
+    optional: true
+    choices:
+    - name: usd
+      label: USD
+      description: United States Dollar
+    - name: eur
+      label: EUR
+      description: Euro
+    - name: gbp
+      label: GBP
+      description: British Pound Sterling
+  relationships:
+  - name: circuit
+    peer: DcimCircuit
+    kind: Attribute
+    cardinality: one
+    optional: false
+    order_weight: 950
+extensions:
+  nodes:
+  - kind: DcimCircuit
+    relationships:
+    - name: contract
+      peer: DcimCircuitContract
+      cardinality: one
+      optional: true
+
+```
