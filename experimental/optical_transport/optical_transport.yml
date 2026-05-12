@@ -23,7 +23,7 @@ generics:
     namespace: Dcim
     description: "Generic base for any channel allocation/routing (fiber, cable, or internal cross-connect)"
     label: "Channel Mapping"
-    include_in_menu: true
+    include_in_menu: false
     attributes:
       # TODO: Replace with a proper status
       - name: is_active
@@ -66,7 +66,7 @@ generics:
     namespace: Dcim
     description: "Generic interface for any device that can multiplex DWDM channels (active or passive)"
     label: "Optical Multiplexer Device"
-    include_in_menu: true
+    include_in_menu: false
     uniqueness_constraints:
       - [computed_name__value]
     attributes:
