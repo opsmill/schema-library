@@ -129,7 +129,7 @@ nodes:
         optional: true
     relationships:
       - name: ip_address
-        peer: InfraIPAddress
+        peer: IpamIPAddress
         cardinality: one
         kind: Attribute
         optional: false
@@ -150,7 +150,7 @@ nodes:
         optional: true
     relationships:
       - name: ip_prefix
-        peer: InfraPrefix
+        peer: IpamPrefix
         cardinality: one
         kind: Attribute
         optional: false
@@ -478,14 +478,15 @@ nodes:
   - name: Firewall
     namespace: Security
     inherit_from:
-      - InfraGenericDevice
+      - DcimGenericDevice
+      - DcimPhysicalDevice
       - CoreArtifactTarget
       - SecurityPolicyAssignment
     icon: "mdi:firewall"
     include_in_menu: true
     human_friendly_id:
       - name__value
-    menu_placement: "InfraGenericDevice"
+    menu_placement: "DcimGenericDevice"
     attributes:
       - name: role
         kind: Dropdown
@@ -603,16 +604,16 @@ nodes:
   - name: FirewallInterface
     namespace: Security
     label: Firewall Interface
-    menu_placement: "InfraGenericDevice"
+    menu_placement: "DcimGenericDevice"
     include_in_menu: false
     icon: "mdi:ethernet"
     display_label: name__value
     inherit_from:
-      - InfraInterface
-      - InfraEndpoint
+      - DcimInterface
+      - DcimEndpoint
     relationships:
       - name: ip_addresses
-        peer: InfraIPAddress
+        peer: IpamIPAddress
         optional: true
         cardinality: many
         kind: Component
