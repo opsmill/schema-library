@@ -1,0 +1,52 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+version: "1.0"
+
+generics:
+  - name: Generic
+    namespace: Location
+    description: Generic Location, could be a country, city ...
+    label: Location
+    icon: mingcute:location-line
+    include_in_menu: true
+    hierarchical: true
+    human_friendly_id:
+      - name__value
+    order_by:
+      - name__value
+    display_label: name__value
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        order_weight: 900
+      - name: description
+        kind: Text
+        optional: true
+        order_weight: 1200
+    relationships:
+      - name: tags
+        peer: BuiltinTag
+        kind: Attribute
+        optional: true
+        cardinality: many
+
+  - name: Hosting
+    namespace: Location
+    description: Location directly hosting device and services.
+    include_in_menu: false
+    # This is only owning relationships toward various assets that could be found on those locations
+    human_friendly_id:
+      - name__value
+    attributes:
+      - name: name
+        kind: Text
+    relationships:
+      - name: devices
+        label: Devices
+        peer: DcimPhysicalDevice
+        cardinality: many
+        optional: true
+        kind: Generic
+        identifier: physical_device__location

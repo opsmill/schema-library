@@ -1,0 +1,38 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+version: "1.0"
+
+nodes:
+  - name: SVLAN
+    namespace: Ipam
+    label: S-VLAN
+    description: A VLAN used to encapsulate multiple CVLANs.
+    include_in_menu: false
+    inherit_from:
+      - GenericVLAN
+    relationships:
+      - name: cvlan
+        label: Customer vlan(s)
+        peer: IpamCVLAN
+        optional: true
+        direction: outbound
+        identifier: vlan__qinq
+        cardinality: many
+        kind: Attribute
+
+  - name: CVLAN
+    namespace: Ipam
+    label: C-VLAN
+    description: A VLAN assigned to customer traffic, encapsulated within an S-VLAN.
+    include_in_menu: false
+    inherit_from:
+      - GenericVLAN
+    relationships:
+      - name: svlan
+        label: Supplier vlan
+        peer: IpamSVLAN
+        optional: false
+        direction: inbound
+        identifier: vlan__qinq
+        cardinality: one
+        kind: Attribute

@@ -1,0 +1,157 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+version: "1.0"
+
+generics:
+  - name: VLANGroupScope
+    namespace: Ipam
+    description: Mixin for objects that can scope a VLAN group (e.g. Region, Site, Rack).
+    include_in_menu: false
+    relationships:
+      - name: vlan_groups
+        label: VLAN Groups
+        peer: IpamVLANGroup
+        identifier: vlan_group__scope
+        cardinality: many
+        optional: true
+        kind: Attribute
+
+  - name: VLAN
+    namespace: Generic
+    description: A VLAN is isolated layer two domain
+    label: VLAN
+    icon: mdi:lan-pending
+    uniqueness_constraints:
+      - [vlan_id__value, vlan_group]
+    human_friendly_id:
+      - name__value
+    order_by:
+      - name__value
+    display_label: name__value
+    attributes:
+      - name: name
+        kind: Text
+        order_weight: 910
+      - name: description
+        kind: Text
+        optional: true
+      - name: vlan_id
+        kind: Number
+        order_weight: 900
+      - name: status
+        kind: Dropdown
+        optional: false
+        default_value: active
+        order_weight: 920
+        choices:
+          - name: active
+            label: Active
+            description: Fully operational and currently in service.
+            color: "#00d25b"
+          - name: provisioning
+            label: Provisioning
+            description: In the process of being set up and configured.
+            color: "#f0ad4e"
+          - name: maintenance
+            label: Maintenance
+            description: Undergoing routine maintenance or repairs.
+            color: "#ff9800"
+          - name: drained
+            label: Drained
+            description: Temporarily taken out of service.
+            color: "#9e9e9e"
+      - name: role
+        kind: Dropdown
+        optional: true
+        choices:
+          - name: server
+            label: Server
+            description: Dedicated systems for managing networked resources.
+            color: "#c4bed7"
+          - name: management
+            label: Management
+            description: Network segments for administrative and control tasks.
+            color: "#9af1e1"
+          - name: user
+            label: User
+            description: Segments designed for end-user access and activities.
+            color: "#a0b78d"
+    relationships:
+      - name: prefixes
+        peer: IpamPrefix
+        optional: true
+        cardinality: many
+        kind: Attribute
+        identifier: vlan__prefix
+      - name: vlan_group
+        label: VLAN Group
+        peer: IpamVLANGroup
+        optional: false
+        cardinality: one
+        kind: Attribute
+        order_weight: 930
+        identifier: vlan_group__vlan
+
+nodes:
+  - name: VLAN
+    namespace: Ipam
+    label: VLAN
+    include_in_menu: false
+    inherit_from:
+      - GenericVLAN
+
+  - name: VLANGroup
+    namespace: Ipam
+    description: A VLAN group scopes VLANs to a domain (site, rack, etc.).
+    label: VLAN Group
+    icon: mdi:domain-switch
+    menu_placement: GenericVLAN
+    human_friendly_id:
+      - name__value
+    display_label: name__value
+    attributes:
+      - name: name
+        kind: Text
+        order_weight: 1000
+    relationships:
+      - name: scope
+        peer: IpamVLANGroupScope
+        identifier: vlan_group__scope
+        optional: true
+        cardinality: one
+        kind: Attribute
+        order_weight: 900
+      - name: vlans
+        peer: GenericVLAN
+        optional: true
+        cardinality: many
+        kind: Component
+        identifier: vlan_group__vlan
+
+extensions:
+  nodes:
+    - kind: IpamPrefix
+      relationships:
+        - name: vlan
+          peer: GenericVLAN
+          optional: true
+          cardinality: one
+          kind: Attribute
+          order_weight: 1400
+          identifier: vlan__prefix
+    - kind: InterfaceLayer2
+      relationships:
+        - name: untagged_vlan
+          label: Untagged VLAN
+          peer: GenericVLAN
+          optional: true
+          cardinality: one
+          kind: Generic
+          identifier: interface_l2__untagged_vlan
+        - name: tagged_vlan
+          label: Tagged VLANs
+          peer: GenericVLAN
+          optional: true
+          cardinality: many
+          kind: Generic
+          identifier: interface_l2__tagged_vlan

@@ -1,0 +1,197 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/menu/latest.json
+---
+apiVersion: infrahub.app/v1
+kind: Menu
+spec:
+  data:
+    # ──────────────────────────────────────────────────────────────
+    # ORGANIZATION  (NetBox: Organization + Racks)
+    # ──────────────────────────────────────────────────────────────
+    - namespace: Location
+      name: OrganizationMenu
+      label: Organization
+      icon: "mdi:domain"
+      children:
+        data:
+          - namespace: Location
+            name: SitesGroup
+            label: Sites
+            icon: "ri:building-line"
+            children:
+              data:
+                - namespace: Location
+                  name: RegionItem
+                  label: Regions
+                  kind: LocationRegion
+                  icon: "carbon:cics-region-target"
+
+                - namespace: Location
+                  name: CountryItem
+                  label: Countries
+                  kind: LocationCountry
+                  icon: "gis:search-country"
+
+                - namespace: Location
+                  name: SiteItem
+                  label: Sites
+                  kind: LocationSite
+                  icon: "ri:building-line"
+
+          - namespace: Location
+            name: RacksGroup
+            label: Racks
+            icon: "clarity:rack-server-line"
+            children:
+              data:
+                - namespace: Location
+                  name: RackItem
+                  label: Racks
+                  kind: LocationRack
+                  icon: "clarity:rack-server-line"
+
+          - namespace: Organization
+            name: OrgsGroup
+            label: Organizations
+            icon: "mdi:domain"
+            children:
+              data:
+                - namespace: Organization
+                  name: ManufacturerItem
+                  label: Manufacturers
+                  kind: OrganizationManufacturer
+                  icon: "mdi:factory"
+
+                - namespace: Organization
+                  name: ProviderItem
+                  label: Providers
+                  kind: OrganizationProvider
+                  icon: "mdi:transit-connection-variant"
+
+    # ──────────────────────────────────────────────────────────────
+    # DEVICES  (NetBox: Devices)
+    # ──────────────────────────────────────────────────────────────
+    - namespace: Dcim
+      name: DevicesMenu
+      label: Devices
+      icon: "mdi:server"
+      children:
+        data:
+          - namespace: Dcim
+            name: DevicesGroup
+            label: Devices
+            icon: "mdi:server"
+            children:
+              data:
+                - namespace: Dcim
+                  name: NetworkDeviceItem
+                  label: Network Devices
+                  kind: DcimDevice
+                  icon: "clarity:network-switch-solid"
+
+                - namespace: Compute
+                  name: PhysicalServerItem
+                  label: Physical Servers
+                  kind: ComputePhysicalServer
+                  icon: "mdi:server"
+
+          - namespace: Dcim
+            name: DeviceTypesGroup
+            label: Device Types
+            icon: "mdi:poll"
+            children:
+              data:
+                - namespace: Dcim
+                  name: DeviceTypeItem
+                  label: Device Types
+                  kind: DcimDeviceType
+                  icon: "mdi:poll"
+
+                - namespace: Dcim
+                  name: PlatformItem
+                  label: Platforms
+                  kind: DcimPlatform
+                  icon: "mdi:application-cog-outline"
+
+          - namespace: Dcim
+            name: InterfacesGroup
+            label: Interfaces
+            icon: "mdi:ethernet"
+            children:
+              data:
+                - namespace: Dcim
+                  name: InterfaceItem
+                  label: Interfaces
+                  kind: DcimInterface
+                  icon: "mdi:ethernet"
+
+                - namespace: Interface
+                  name: LagItem
+                  label: LAG Interfaces
+                  kind: InterfaceLag
+                  icon: "mdi:ethernet"
+
+    # ──────────────────────────────────────────────────────────────
+    # CONNECTIONS  (NetBox: Connections + Circuits)
+    # ──────────────────────────────────────────────────────────────
+    - namespace: Dcim
+      name: ConnectionsMenu
+      label: Connections
+      icon: "mdi:connection"
+      children:
+        data:
+          - namespace: Dcim
+            name: CableItem
+            label: Cables
+            kind: DcimCable
+            icon: "mdi:cable-data"
+
+          - namespace: Dcim
+            name: CircuitsGroup
+            label: Circuits
+            icon: "mdi:transit-connection-variant"
+            children:
+              data:
+                - namespace: Dcim
+                  name: CircuitItem
+                  label: Circuits
+                  kind: DcimCircuit
+                  icon: "mdi:cable-data"
+
+                - namespace: Dcim
+                  name: CircuitEndpointItem
+                  label: Circuit Endpoints
+                  kind: DcimCircuitEndpoint
+                  icon: "mdi:ethernet"
+
+                - namespace: Dcim
+                  name: CircuitContractItem
+                  label: Circuit Contracts
+                  kind: DcimCircuitContract
+                  icon: "mdi:file-sign"
+
+    # ──────────────────────────────────────────────────────────────
+    # VIRTUALIZATION  (NetBox: Virtualization)
+    # ──────────────────────────────────────────────────────────────
+    - namespace: Virtualization
+      name: VirtualizationMenu
+      label: Virtualization
+      icon: "mdi:monitor"
+      children:
+        data:
+          - namespace: Virtualization
+            name: VirtualMachineItem
+            label: Virtual Machines
+            kind: VirtualizationVirtualMachine
+            icon: "carbon:virtual-machine"
+
+          - namespace: Cluster
+            name: ClustersGroup
+            label: Clusters
+            icon: "mdi:dots-hexagon"
+            children:
+              data:
+                - namespace: Cluster
+                  name: HostingClusterItem
+                  label: Hosting Clusters
+                  kind: ClusterHosting
+                  icon: "mdi:dots-hexagon"
