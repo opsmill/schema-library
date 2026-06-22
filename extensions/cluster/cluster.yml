@@ -6,8 +6,8 @@ generics:
   - name: Generic
     namespace: Cluster
     description: A cluster of machines hosting services or other machines.
-    label: Clusters
     icon: mdi:dots-hexagon
+    include_in_menu: false
     human_friendly_id:
       - name__value
     order_by:

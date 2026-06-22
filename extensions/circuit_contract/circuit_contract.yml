@@ -58,6 +58,7 @@ nodes:
         cardinality: one
         optional: false
         order_weight: 950
+        identifier: circuit__contract
 
 extensions:
   nodes:
@@ -67,3 +68,4 @@ extensions:
           peer: DcimCircuitContract
           cardinality: one
           optional: true
+          identifier: circuit__contract

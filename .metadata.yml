@@ -109,6 +109,14 @@ experimental/vlan-translation:
     This schema extension is based on Juniper VLAN MAP, and not yet test
     out for other vendors.
   name: VLAN Translation
+extensions/aggregate:
+  dependencies:
+    - base
+  description:
+    This schema extension contains models to capture IP aggregates assigned by
+    a Regional Internet Registry (RIR). It introduces an Aggregate node (top-level IPv4/IPv6
+    prefix) and an RIR node (registry or private entity managing address space).
+  name: Aggregate
 extensions/cable:
   dependencies:
     - base
@@ -253,6 +261,15 @@ extensions/physical_disk:
 
     NOTE: This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares.
   name: Physical Disk
+extensions/rack:
+  dependencies:
+    - base
+    - extensions/location_minimal
+  description:
+    This schema extension introduces a Rack model representing a physical equipment
+    rack installed at a site. Racks can be placed at a LocationSite and can host devices
+    and other equipment.
+  name: Rack
 extensions/qinq:
   dependencies:
     - base

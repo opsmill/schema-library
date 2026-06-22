@@ -11,18 +11,16 @@ generics:
     include_in_menu: true
     hierarchical: true
     human_friendly_id:
-      - shortname__value
+      - name__value
     order_by:
       - name__value
     display_label: name__value
     attributes:
       - name: name
         kind: Text
-        order_weight: 1000
-      - name: shortname
-        kind: Text
         unique: true
-        order_weight: 1100
+        optional: false
+        order_weight: 900
       - name: description
         kind: Text
         optional: true
@@ -38,22 +36,17 @@ generics:
     namespace: Location
     description: Location directly hosting device and services.
     include_in_menu: false
-    human_friendly_id:
-      - shortname__value
-    attributes:
-      - name: shortname
-        kind: Text
-        unique: true
-        order_weight: 1100
     # This is only owning relationships toward various assets that could be found on those locations
+    human_friendly_id:
+      - name__value
+    attributes:
+      - name: name
+        kind: Text
     relationships:
-      - name: prefixes
-        label: Prefixes
-        peer: IpamPrefix
-        cardinality: many
-        optional: true
       - name: devices
         label: Devices
         peer: DcimPhysicalDevice
         cardinality: many
         optional: true
+        kind: Generic
+        identifier: physical_device__location

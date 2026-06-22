@@ -1,0 +1,62 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+version: "1.0"
+
+nodes:
+  - name: Aggregate
+    namespace: Ipam
+    description: An aggregate is a top-level IPv4 or IPv6 prefix assigned by a RIR.
+    label: Aggregate
+    icon: mdi:ip-network
+    menu_placement: OrganizationRIR
+    include_in_menu: true
+    order_by:
+      - prefix__value
+    display_label: prefix__value
+    human_friendly_id:
+      - prefix__value
+    inherit_from:
+      - BuiltinIPPrefix
+    attributes:
+      - name: description
+        kind: Text
+        optional: true
+        order_weight: 1100
+      - name: date_added
+        label: Date Added
+        kind: DateTime
+        optional: true
+        order_weight: 1200
+    relationships:
+      - name: rir
+        label: RIR
+        peer: OrganizationRIR
+        identifier: aggregate__rir
+        optional: false
+        cardinality: one
+        kind: Attribute
+        order_weight: 1000
+
+  - name: RIR
+    namespace: Organization
+    description: A Regional Internet Registry (ARIN, RIPE, APNIC, LACNIC, AFRINIC) or a private entity managing private address space.
+    label: RIR
+    icon: mdi:certificate
+    include_in_menu: true
+    inherit_from:
+      - OrganizationGeneric
+    attributes:
+      - name: is_private
+        label: Private
+        description: Indicates this RIR manages private (RFC 1918 / RFC 4193) address space.
+        kind: Boolean
+        default_value: false
+        order_weight: 1300
+    relationships:
+      - name: aggregates
+        peer: IpamAggregate
+        identifier: aggregate__rir
+        optional: true
+        cardinality: many
+        kind: Generic
+        order_weight: 1400

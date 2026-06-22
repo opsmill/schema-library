@@ -8,22 +8,27 @@ nodes:
     description: Physical cable connecting two endpoints
     label: Cable
     icon: mdi:cable-data
+    display_label: label__value
+    menu_placement: DcimDevice
+    order_by:
+      - label__value
     inherit_from:
       - DcimConnector
     attributes:
       - name: status
         kind: Dropdown
-        optional: true
+        optional: false
+        default_value: connected
         order_weight: 1000
         choices:
           - name: connected
             label: Connected
             description: Fully operational and currently in connected
-            color: "#7fbf7f"
+            color: "#00d25b"
           - name: planned
             label: Planned
             description: In the process of being set up
-            color: "#ffff7f"
+            color: "#2196f3"
       - name: cable_type
         kind: Dropdown
         optional: true

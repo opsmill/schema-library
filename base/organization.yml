@@ -45,10 +45,14 @@ nodes:
         peer: DcimDeviceType
         cardinality: many
         optional: true
+        kind: Attribute
+        identifier: manufacturer__device_type
       - name: platform
         peer: DcimPlatform
         cardinality: many
         optional: true
+        kind: Attribute
+        identifier: manufacturer__platform
 
   - name: Provider
     namespace: Organization

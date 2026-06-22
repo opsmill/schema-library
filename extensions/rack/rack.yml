@@ -1,0 +1,77 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+version: "1.0"
+
+nodes:
+  - name: Rack
+    namespace: Location
+    label: Rack
+    description: A physical equipment rack installed at a site.
+    icon: clarity:rack-server-line
+    menu_placement: LocationGeneric
+    human_friendly_id:
+      - name__value
+    order_by:
+      - name__value
+    display_label: name__value
+    inherit_from:
+      - LocationHosting
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        order_weight: 1000
+      - name: facility_id
+        kind: Text
+        optional: true
+        order_weight: 1100
+      - name: status
+        kind: Dropdown
+        optional: false
+        default_value: active
+        order_weight: 1200
+        choices:
+          - name: active
+            label: Active
+            color: "#00d25b"
+          - name: planned
+            label: Planned
+            color: "#2196f3"
+          - name: decommissioning
+            label: Decommissioning
+            color: "#ff9800"
+          - name: retired
+            label: Retired
+            color: "#6c757d"
+      - name: height
+        label: Height (U)
+        kind: Number
+        optional: false
+        default_value: 42
+        order_weight: 1300
+    relationships:
+      - name: site
+        peer: LocationSite
+        optional: false
+        cardinality: one
+        kind: Attribute
+        order_weight: 900
+        identifier: site__racks
+      - name: tags
+        peer: BuiltinTag
+        cardinality: many
+        kind: Attribute
+        optional: true
+        order_weight: 3000
+
+extensions:
+  nodes:
+    - kind: LocationSite
+      relationships:
+        - name: racks
+          peer: LocationRack
+          cardinality: many
+          optional: true
+          kind: Component
+          identifier: site__racks
