@@ -39,7 +39,9 @@ nodes:
 
   - name: RIR
     namespace: Organization
-    description: A Regional Internet Registry (ARIN, RIPE, APNIC, LACNIC, AFRINIC) or a private entity managing private address space.
+    description: >-
+      A Regional Internet Registry (ARIN, RIPE, APNIC, LACNIC, AFRINIC) or a private
+      entity managing private address space.
     label: RIR
     icon: mdi:certificate
     include_in_menu: true
