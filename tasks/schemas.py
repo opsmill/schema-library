@@ -95,3 +95,25 @@ def load_all_schemas(context: Context) -> None:
         _load_extension(context, Path(extension))
 
     print("All good! ✨")
+
+
+# TEMPORARY DEMO TASK - load IPAM + DCIM
+@task
+def load_demo_ipam_dcim(context: Context) -> None:
+    """[DEMO] Load IPAM + DCIM base schemas and a handful of common extensions."""
+    schemas_to_load = [
+        "base",
+        "extensions/aggregate",
+        "extensions/cable",
+        "extensions/circuit",
+        "extensions/compute",
+        "extensions/cluster",
+        "extensions/hosting_cluster",
+        "extensions/lag",
+        "extensions/location_minimal",
+        "extensions/vlan",
+        "extensions/qinq",
+        "extensions/rack",
+    ]
+    for path in schemas_to_load:
+        _load_extension(context, Path(path))
