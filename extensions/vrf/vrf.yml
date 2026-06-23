@@ -33,11 +33,14 @@ nodes:
         optional: true
         order_weight: 1200
     relationships:
-      - name: namespace
-        peer: BuiltinIPNamespace
-        optional: false
-        cardinality: one
-        kind: Attribute
+      # TODO: Perhaps add namespace here at some point?
+      # Perhaps would make sense to have multiple flavors of namespace?
+      # - name: namespace
+      #   peer: BuiltinIPNamespace
+      #   identifier: vrf__namespace
+      #   optional: true
+      #   cardinality: one
+      #   kind: Attribute
       - name: import_rt
         identifier: vrf__import
         label: Import Targets
@@ -75,6 +78,7 @@ nodes:
     relationships:
       - name: vrf
         peer: IpamVRF
+        identifier: vrf__route_target
         optional: true
         cardinality: many
 
@@ -85,6 +89,7 @@ extensions:
         - name: vrf
           label: VRF
           peer: IpamVRF
+          identifier: prefix__vrf
           optional: true
           cardinality: one
           kind: Attribute
@@ -94,6 +99,7 @@ extensions:
         - name: vrf
           label: VRF
           peer: IpamVRF
+          identifier: ip_address__vrf
           optional: true
           cardinality: one
           kind: Attribute
