@@ -18,6 +18,7 @@ generics:
         order_weight: 2000
       - name: connector_type
         kind: Dropdown
+        optional: true
         order_weight: 1100
         choices:
           - name: FC
@@ -128,7 +129,7 @@ nodes:
       - name: wdm_type
         kind: Dropdown
         description: Type of WDM (e.g CWDM. DWDM)
-        order_weight: 1110
+        order_weight: 1100
         optional: false
         choices:
           - name: cwdm
@@ -147,13 +148,13 @@ nodes:
     relationships:
       - name: front_interfaces
         peer: DcimOadmFrontInterface
-        identifier: front_interfaces
+        identifier: optical_multiplexer__front_interfaces
         optional: true
         cardinality: many
         kind: Component
       - name: rear_interface
         peer: DcimOadmRearInterface
-        identifier: rear_interfaces
+        identifier: optical_multiplexer__rear_interface
         optional: true
         cardinality: one
         kind: Component
@@ -178,12 +179,13 @@ nodes:
       - name: optical_multiplexer
         peer: DcimOpticalMultiplexer
         order_weight: 900
-        identifier: front_interfaces
+        identifier: optical_multiplexer__front_interfaces
         optional: false
         cardinality: one
         kind: Parent
       - name: channels
         peer: DcimWdmChannel
+        identifier: oadm_interface__channels
         order_weight: 1200
         optional: true
         cardinality: many
@@ -209,7 +211,7 @@ nodes:
       - name: optical_multiplexer
         peer: DcimOpticalMultiplexer
         order_weight: 900
-        identifier: rear_interface
+        identifier: optical_multiplexer__rear_interface
         optional: false
         cardinality: one
         kind: Parent
@@ -236,10 +238,11 @@ nodes:
       - name: channel
         kind: Number
         description: WDM channel number.
+        order_weight: 1000
       - name: wdm_type
         kind: Dropdown
         description: Type of WDM (e.g CWDM. DWDM)
-        order_weight: 1110
+        order_weight: 1100
         optional: false
         choices:
           - name: cwdm
@@ -255,10 +258,12 @@ nodes:
         label: Wavelength (nm)
         kind: Text # Text until float possible in Number Kind
         description: Wavelength of the channel in nm.
+        order_weight: 1200
       - name: frequency
         label: Frequency (GHz)
         kind: Text # Text until float possible in Number Kind
         description: Frequency of the channel in GHz.
+        order_weight: 1300
 
   - name: WdmSFP
     namespace: Dcim
@@ -272,7 +277,7 @@ nodes:
       - name: wdm_type
         kind: Dropdown
         description: Type of WDM (e.g CWDM. DWDM)
-        order_weight: 1110
+        order_weight: 1100
         optional: false
         choices:
           - name: cwdm
@@ -288,6 +293,7 @@ nodes:
       - name: wdm_channel
         label: WDM Channel
         peer: DcimWdmChannel
+        identifier: wdm_sfp__channel
         kind: Attribute
         cardinality: one
         optional: false
