@@ -114,6 +114,7 @@ def load_demo_ipam_dcim(context: Context) -> None:
         "extensions/vlan",
         "extensions/qinq",
         "extensions/rack",
+        "extensions/rack",
     ]
     for path in schemas_to_load:
         _load_extension(context, Path(path))
