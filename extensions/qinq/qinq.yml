@@ -25,8 +25,22 @@ nodes:
     label: C-VLAN
     description: A VLAN assigned to customer traffic, encapsulated within an S-VLAN.
     include_in_menu: false
+    display_label: "{{ svlan__name__value }}-{{ vlan_id__value }}"
+    human_friendly_id:
+      - svlan__name__value
+      - vlan_id__value
+    uniqueness_constraints:
+      - [vlan_id__value, svlan]
     inherit_from:
       - GenericVLAN
+    attributes:
+      - name: name
+        kind: Text
+        optional: true
+        read_only: true
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "{{ svlan__name__value }}-{{ vlan_id__value }}"
     relationships:
       - name: svlan
         label: Supplier vlan
