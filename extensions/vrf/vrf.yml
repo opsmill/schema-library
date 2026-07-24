@@ -76,9 +76,16 @@ nodes:
         kind: Text
         optional: true
     relationships:
-      - name: vrf
+      - name: import_vrf
+        label: Imported by VRFs
+        identifier: vrf__import
         peer: IpamVRF
-        identifier: vrf__route_target
+        optional: true
+        cardinality: many
+      - name: export_vrf
+        label: Exported by VRFs
+        identifier: vrf__export
+        peer: IpamVRF
         optional: true
         cardinality: many
 
