@@ -252,6 +252,7 @@ generics:
       - name: ip_addresses
         label: IP Addresses
         peer: IpamIPAddress
+        identifier: ip_address__interface
         cardinality: many
         kind: Attribute
         optional: true
