@@ -38,7 +38,7 @@ This schema extension allows you to capture Linecard related information like th
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| slot | The slot number where the Linecard is installed within the device | Number |  |  |  |
+| slot | The slot number where the Linecard is installed within the device | Number | True |  |  |
 | bng_enabled | BNG activated or deactivated on the Linecard | Boolean | True | False |  |
 
 #### Relationships
@@ -122,11 +122,13 @@ nodes:
   label: Linecard
   icon: bi:pci-card
   menu_placement: DcimGenericModule
+  generate_template: true
   inherit_from:
   - DcimGenericModule
   attributes:
   - name: slot
     kind: Number
+    optional: true
     description: The slot number where the Linecard is installed within the device
     order_weight: 1050
   - name: bng_enabled
