@@ -146,10 +146,14 @@ nodes:
         kind: Text
         optional: true
       - name: session_type
-        kind: Text
-        enum:
-          - EXTERNAL
-          - INTERNAL
+        kind: Dropdown
+        choices:
+          - name: external
+            label: External
+            description: "Session established with a router in a different autonomous system."
+          - name: internal
+            label: Internal
+            description: "Session established with a router in the same autonomous system."
         description: "Type of BGP Session"
         order_weight: 1200
       - name: role
