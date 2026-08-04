@@ -256,6 +256,8 @@ extensions/peering_ixp:
     - extensions/routing
     - extensions/routing_bgp
     - extensions/routing_bgp_community
+    - extensions/routing_policies
+    - extensions/routing_policies_bgp
   description:
     This schema extension contains all you need to model anything revolving
     around internet peering (Exchange points ...)!
