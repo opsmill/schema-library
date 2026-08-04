@@ -32,14 +32,14 @@ extensions:
         - name: import_routing_policies
           label: Import Routing Policies
           peer: RoutingPolicyBGP
-          identifier: bgp__import_policies
+          identifier: bgppeergroup__import_policies
           description: "The routing-policies used by this instance for import."
           kind: Generic
           cardinality: many
         - name: export_routing_policies
           label: Export Routing Policies
           peer: RoutingPolicyBGP
-          identifier: bgp__export_policies
+          identifier: bgppeergroup__export_policies
           description: "The routing-policies used by this instance for export."
           kind: Generic
           cardinality: many
@@ -55,15 +55,15 @@ extensions:
       relationships:
         - name: import_routing_policies
           label: Import Routing Policies
-          peer: RoutingPolicy
-          identifier: bgp__import_policies
+          peer: RoutingPolicyBGP
+          identifier: bgpsession__import_policies
           description: "The routing-policies used by this instance for import."
           kind: Generic
           cardinality: many
         - name: export_routing_policies
           label: Export Routing Policies
-          peer: RoutingPolicy
-          identifier: bgp__export_policies
+          peer: RoutingPolicyBGP
+          identifier: bgpsession__export_policies
           description: "The routing-policies used by this instance for export."
           kind: Generic
           cardinality: many
