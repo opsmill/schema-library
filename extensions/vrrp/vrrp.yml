@@ -26,10 +26,13 @@ nodes:
         unique: true
         description: Unique name of the entry
         order_weight: 1000
-      - name: group
-        kind: Text
-        description: VRRP Group
-        label: Group
+      - name: vrid
+        kind: Number
+        parameters:
+          min_value: 1
+          max_value: 255
+        description: Virtual Router ID (VRID, should be between 1 and 255)
+        label: VRID
         order_weight: 1100
       - name: password
         kind: HashedPassword
@@ -38,10 +41,10 @@ nodes:
         optional: true
         order_weight: 1400
     relationships:
-      - name: ip_address
+      - name: ip_addresses
         on_delete: cascade
         description: VRRP IP (v4 or v6)
-        label: IP Address
+        label: IP Addresses
         peer: IpamIPAddress
         optional: true
         cardinality: many
@@ -69,9 +72,10 @@ nodes:
       - name: priority
         kind: Number
         label: VRRP Priority
-        description: VRRP Priority (Should be between 0 to 255)
-        # Using a Regex until https://github.com/opsmill/infrahub/issues/2967
-        regex: ^(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])$
+        parameters:
+          min_value: 1
+          max_value: 255
+        description: VRRP Priority (Should be between 1 and 255)
         default_value: 100
         order_weight: 1100
     relationships:
