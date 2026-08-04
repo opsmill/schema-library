@@ -1,0 +1,120 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review — see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
+version: "1.0"
+
+nodes:
+  - name: Tenant
+    namespace: Tenancy
+    description: A tenant is the owner of the corresponding devices, addressing, and locations.
+    icon: mdi:domain
+    include_in_menu: true
+    inherit_from:
+      - OrganizationGeneric
+    relationships:
+      - name: devices
+        label: Devices
+        peer: DcimGenericDevice
+        identifier: tenant__device
+        cardinality: many
+        optional: true
+        kind: Generic
+      - name: prefixes
+        label: Prefixes
+        peer: IpamPrefix
+        identifier: tenant__prefix
+        cardinality: many
+        optional: true
+        kind: Generic
+      - name: addresses
+        label: Addresses
+        peer: IpamIPAddress
+        identifier: tenant__ipaddress
+        cardinality: many
+        optional: true
+        kind: Generic
+      - name: locations
+        label: Locations
+        peer: LocationHosting
+        identifier: tenant__location
+        cardinality: many
+        optional: true
+        kind: Generic
+
+extensions:
+  nodes:
+    - kind: DcimGenericDevice
+      relationships:
+        - name: tenant
+          peer: TenancyTenant
+          identifier: tenant__device
+          optional: true
+          cardinality: one
+          kind: Attribute
+          order_weight: 1800
+    - kind: IpamPrefix
+      relationships:
+        - name: tenant
+          peer: TenancyTenant
+          identifier: tenant__prefix
+          optional: true
+          cardinality: one
+          kind: Attribute
+          order_weight: 1400
+    - kind: IpamIPAddress
+      relationships:
+        - name: tenant
+          peer: TenancyTenant
+          identifier: tenant__ipaddress
+          optional: true
+          cardinality: one
+          kind: Attribute
+          order_weight: 1300
+    - kind: LocationHosting
+      relationships:
+        - name: tenant
+          peer: TenancyTenant
+          identifier: tenant__location
+          optional: true
+          cardinality: one
+          kind: Attribute
+
+# ---------------------------------------------------------------------------
+# Composing with other extensions
+# ---------------------------------------------------------------------------
+# This extension only wires Tenant onto nodes that live in the base schema, so it has
+# no dependency beyond `base` and can always be loaded on its own.
+#
+# Some extensions (e.g. `extensions/circuit`, which defines `DcimCircuit`) are optional
+# and aren't guaranteed to be loaded. Adding a hard `peer: DcimCircuit` relationship here
+# would break schema loading whenever the circuit extension isn't present, so that wiring
+# is intentionally left out of this file.
+#
+# If you do load `extensions/circuit` and want a Tenant on a Circuit, add the reciprocal
+# pair below to your own schema (e.g. a small local extension file that depends on both
+# `extensions/tenancy` and `extensions/circuit`):
+#
+#   extensions:
+#     nodes:
+#       - kind: DcimCircuit
+#         relationships:
+#           - name: tenant
+#             peer: TenancyTenant
+#             identifier: tenant__circuit
+#             optional: true
+#             cardinality: one
+#             kind: Attribute
+#       - kind: TenancyTenant
+#         relationships:
+#           - name: circuits
+#             peer: DcimCircuit
+#             identifier: tenant__circuit
+#             cardinality: many
+#             optional: true
+#             kind: Generic
+#
+# The same pattern applies to any other optional extension node you want tenancy on.
