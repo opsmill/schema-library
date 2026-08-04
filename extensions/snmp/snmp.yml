@@ -31,6 +31,13 @@ generics:
         peer: SnmpClient
         cardinality: many
         kind: Component
+      - name: devices
+        label: Devices
+        description: Devices this community is configured on.
+        peer: DcimDevice
+        cardinality: many
+        kind: Attribute
+        order_weight: 1200
 
 nodes:
   # --------------------  Snmp Community --------------------
@@ -52,10 +59,14 @@ nodes:
         kind: Password
         order_weight: 1300
       - name: access
-        kind: Text
-        enum:
-          - Read-Only
-          - Read-Write
+        kind: Dropdown
+        choices:
+          - name: read_only
+            label: Read-Only
+            description: Read-only access.
+          - name: read_write
+            label: Read-Write
+            description: Read-write access.
         order_weight: 1200
 
   - name: CommunityV3
@@ -77,11 +88,17 @@ nodes:
         order_weight: 1300
       - name: auth_protocol
         label: Authentication Protocol
-        kind: Text
-        enum:
-          - None
-          - MD5
-          - SHA
+        kind: Dropdown
+        choices:
+          - name: none
+            label: None
+            description: No authentication.
+          - name: md5
+            label: MD5
+            description: MD5 authentication.
+          - name: sha
+            label: SHA
+            description: SHA authentication.
         order_weight: 1400
       - name: auth_password
         label: Authentication Password
@@ -90,11 +107,17 @@ nodes:
         optional: true
       - name: privacy_protocol
         label: Privacy Protocol
-        kind: Text
-        enum:
-          - None
-          - DES
-          - AES
+        kind: Dropdown
+        choices:
+          - name: none
+            label: None
+            description: No privacy.
+          - name: des
+            label: DES
+            description: DES encryption.
+          - name: aes
+            label: AES
+            description: AES encryption.
         order_weight: 1600
       - name: privacy_password
         label: Privacy Password
@@ -128,7 +151,6 @@ nodes:
     order_by:
       - name__value
     attributes:
-      # TODO improve - Should it be a relationship to IPAddress or IPPrefix node ?
       - name: name
         kind: Text
         order_weight: 1000
@@ -138,6 +160,13 @@ nodes:
         order_weight: 1100
         optional: true
     relationships:
+      - name: ip_address
+        label: IP Address
+        description: Authorized SNMP client address.
+        peer: IpamIPAddress
+        cardinality: many
+        kind: Attribute
+        order_weight: 1150
       - name: community
         peer: SnmpCommunity
         cardinality: many
