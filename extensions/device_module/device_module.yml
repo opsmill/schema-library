@@ -103,6 +103,7 @@ nodes:
       - name__value
     uniqueness_constraints:
       - ["device", "name__value"]
+      - ["device", "position__value"]
     attributes:
       - name: computed_name
         kind: Text
@@ -116,8 +117,15 @@ nodes:
         order_weight: 800
       - name: name
         kind: Text
-        description: "Name of the bay, e.g. 'slot 1' or 'psu1'."
+        description: "Name of the bay, e.g. 'slot 1' or 'psu 1'."
         order_weight: 1000
+      - name: position
+        kind: Number
+        description: "Numeric position of the bay within the device, used for ordering (e.g. slot 1, 2, 3...)."
+        optional: false
+        parameters:
+          min_value: 1
+        order_weight: 1050
       - name: description
         kind: Text
         optional: true
