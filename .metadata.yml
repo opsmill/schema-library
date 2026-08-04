@@ -41,7 +41,7 @@ experimental/infiniband:
 experimental/optical_transport:
   dependencies:
     - base
-    - extensions/modules
+    - extensions/device_module
     - extensions/cable
   description: >
     Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3000 and similar
@@ -61,7 +61,7 @@ experimental/location_extended:
 experimental/modules_linecards:
   dependencies:
     - base
-    - extensions/modules
+    - extensions/device_module
   description:
     This schema extension allows you to capture Linecard related information
     like the version. You can insert the Linecard into a Dcim Physical Device and
@@ -71,7 +71,7 @@ experimental/modules_linecards:
 experimental/modules_routing_engine:
   dependencies:
     - base
-    - extensions/modules
+    - extensions/device_module
   description:
     This schema extension allows you to capture Routing Engine related
     information like the version. You can insert the Routing Engine into a Dcim Physical
@@ -227,14 +227,21 @@ extensions/mlag:
     - Add support for layer 3 overlay for MLAG interfaces (loopback, peer address ...)
     - Create virtual relationship so MLAG interfaces can be seen on the devices in the domain
   name: MLAG
-extensions/modules:
+extensions/device_module:
   dependencies:
     - base
   description: |
-    This schema extension allows you to capture Device Modules related information like the serial number or the status. You can insert the Module into a Dcim Physical Device.
+    This schema extension lets you capture module bays on a Dcim Physical Device and the modules installed into them (e.g. fan trays, line cards). A device can have any number of module bays, and each bay can optionally hold one module.
 
-    NOTE: This extension doesn't contain any Nodes, you can use the extension module_linecards or modules_routing_engine to use it
-  name: Modules
+    NOTE: This extension ships a standard Module/ModuleType node pair ready to use, alongside the generic Module/ModuleType you can build your own flavors on top of (see the device_psu_module, modules_linecards, or modules_routing_engine extensions).
+  name: Device Modules
+extensions/device_psu_module:
+  dependencies:
+    - base
+    - extensions/device_module
+  description: |
+    This schema extension adds a PSU (Power Supply Unit) flavor on top of the generic Module/ModuleType from extensions/device_module, so you can track power supplies installed in a device's module bays alongside PSU-specific attributes like wattage and hot-swap capability.
+  name: Device PSU Module
 extensions/patch_panel:
   dependencies:
     - base

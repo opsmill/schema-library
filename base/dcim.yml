@@ -62,6 +62,10 @@ generics:
     description: Generic holding attributes and relationships relevant for physical device.
     include_in_menu: false
     attributes:
+      - name: name # Here for computed attribute
+        kind: Text
+        unique: true
+        allow_override: any
       - name: position
         label: Position (U)
         description: Lowest unit.
