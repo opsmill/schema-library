@@ -78,7 +78,7 @@ This schema extension contains all you need to model your BGP platform.
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | import_policies |  | Text | True |  |  |
 | export_policies |  | Text | True |  |  |
-| session_type | Type of BGP Session | Text |  |  |  |
+| session_type | Type of BGP Session | Dropdown |  |  | external, internal |
 | role | Role of the BGP Session | Dropdown |  |  | backbone, upstream, peering |
 | local_pref | Force Local Pref for this BGP Peer Session. | Number | True |  |  |
 
@@ -202,15 +202,17 @@ nodes:
   - name: maximum_routes
     kind: Number
     optional: true
+    parameters:
+      min_value: 0
     description: Maximum routes for the BGP Group.
     order_weight: 1400
-    regex: ^[0-9]+$
   - name: local_pref
     kind: Number
     optional: true
+    parameters:
+      min_value: 0
     description: Force Local Pref for this BGP Peer Group.
     order_weight: 1450
-    regex: ^[0-9]+$
   - name: send_community
     kind: Checkbox
     optional: true
@@ -262,10 +264,14 @@ nodes:
     kind: Text
     optional: true
   - name: session_type
-    kind: Text
-    enum:
-    - EXTERNAL
-    - INTERNAL
+    kind: Dropdown
+    choices:
+    - name: external
+      label: External
+      description: Session established with a router in a different autonomous system.
+    - name: internal
+      label: Internal
+      description: Session established with a router in the same autonomous system.
     description: Type of BGP Session
     order_weight: 1200
   - name: role
@@ -288,9 +294,10 @@ nodes:
   - name: local_pref
     kind: Number
     optional: true
+    parameters:
+      min_value: 0
     description: Force Local Pref for this BGP Peer Session.
     order_weight: 1450
-    regex: ^[0-9]+$
   relationships:
   - name: local_as
     identifier: bgpsession__local_as

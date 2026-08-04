@@ -1,0 +1,155 @@
+---
+title: Rack
+---
+
+This schema extension introduces a Rack model representing a physical equipment rack installed at a site. Racks can be placed at a LocationSite and can host devices and other equipment.
+
+## Details
+
+- **Dependencies:**
+    - [base](dcim)
+    - [extensions/location_minimal](location_minimal)
+
+## Nodes
+
+### Rack
+
+- **Label:** Rack
+- **Description:** A physical equipment rack installed at a site.
+- **Namespace:** Location
+- **Icon:** clarity:rack-server-line
+- **Human Friendly ID:** name__value
+- **Inherit From:** LocationHosting
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| facility_id |  | Text | True |  |  |
+| status |  | Dropdown | False | active | active, available, reserved, planned, decommissioning, deprecated |
+| height |  | Number | False | 42 |  |
+| serial_number |  | Text | True |  |  |
+| asset_tag |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| site | LocationSite | False | one | Attribute |
+| tags | BuiltinTag | True | many | Attribute |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### LocationSite
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| racks | LocationRack | True | many | Component |
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: Rack
+  namespace: Location
+  label: Rack
+  description: A physical equipment rack installed at a site.
+  icon: clarity:rack-server-line
+  menu_placement: LocationGeneric
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  inherit_from:
+  - LocationHosting
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
+  - name: facility_id
+    kind: Text
+    optional: true
+    order_weight: 1100
+  - name: status
+    kind: Dropdown
+    optional: false
+    default_value: active
+    order_weight: 1200
+    choices:
+    - name: active
+      label: Active
+      description: Rack is installed and in use.
+      color: '#00d25b'
+    - name: available
+      label: Available
+      description: Rack is installed and has capacity for new equipment.
+      color: '#00bcd4'
+    - name: reserved
+      label: Reserved
+      description: Rack is allocated but not yet in use.
+      color: '#4d90fe'
+    - name: planned
+      label: Planned
+      description: Rack is planned but not yet installed.
+      color: '#2196f3'
+    - name: decommissioning
+      label: Decommissioning
+      description: Rack is being phased out and emptied.
+      color: '#ff9800'
+    - name: deprecated
+      label: Retired
+      description: Rack has been removed from service.
+      color: '#6c757d'
+  - name: height
+    label: Height (U)
+    kind: Number
+    optional: false
+    default_value: 42
+    order_weight: 1300
+  - name: serial_number
+    kind: Text
+    optional: true
+    order_weight: 1400
+  - name: asset_tag
+    kind: Text
+    optional: true
+    order_weight: 1500
+  relationships:
+  - name: site
+    peer: LocationSite
+    optional: false
+    cardinality: one
+    kind: Attribute
+    order_weight: 900
+    identifier: site__racks
+  - name: tags
+    peer: BuiltinTag
+    cardinality: many
+    kind: Attribute
+    optional: true
+    order_weight: 3000
+extensions:
+  nodes:
+  - kind: LocationSite
+    relationships:
+    - name: racks
+      peer: LocationRack
+      cardinality: many
+      optional: true
+      kind: Component
+      identifier: site__racks
+
+```

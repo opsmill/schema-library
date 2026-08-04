@@ -36,7 +36,6 @@ NOTE: This extension is compatible with all sort of connectors, meaning you can 
 | ---- | ---- | -------- | ----------- | ---- |
 | front_interfaces | DcimFrontPatchPanelInterface | True | many | Component |
 | rear_interfaces | DcimRearPatchPanelInterface | True | many | Component |
-| patch_panel_modules | DcimPatchPanelModule | True | many | Component |
 
 ### FrontPatchPanelInterface
 
@@ -68,31 +67,6 @@ NOTE: This extension is compatible with all sort of connectors, meaning you can 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | corresponding_front_rear | DcimFrontPatchPanelInterface | True | many | Attribute |
-| patch_panel | DcimPatchPanel | False | one | Parent |
-
-### PatchPanelModule
-
-- **Label:** Patch Panel Module
-- **Namespace:** Dcim
-- **Icon:** mdi:expansion-card
-- **Uniqueness Constraints:**
-    - patch_panel, position__value
-- **Human Friendly ID:** patch_panel__name__value, name__value
-
-#### Attributes
-
-| name | description | kind | optional | default_value | choices |
-| ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
-| position | Position for the module inside the Patch Panel. | Number |  |  |  |
-| module_type | Type of module inserted into the patch panel. | Dropdown | True |  | 3_mpo_24_fo_lc |
-| serial |  | Text | True |  |  |
-| description |  | Text | True |  |  |
-
-#### Relationships
-
-| name | peer | optional | cardinality | kind |
-| ---- | ---- | -------- | ----------- | ---- |
 | patch_panel | DcimPatchPanel | False | one | Parent |
 
 ## Generics
@@ -259,12 +233,6 @@ nodes:
     optional: true
     cardinality: many
     kind: Component
-  - name: patch_panel_modules
-    label: Modules
-    peer: DcimPatchPanelModule
-    optional: true
-    cardinality: many
-    kind: Component
 - name: FrontPatchPanelInterface
   label: Patch Panel Front Interfaces
   menu_placement: DcimGenericPatchPanelInterface
@@ -327,56 +295,6 @@ nodes:
     order_weight: 900
     identifier: rear_interfaces
     optional: false
-    cardinality: one
-    kind: Parent
-- name: PatchPanelModule
-  namespace: Dcim
-  label: Patch Panel Module
-  menu_placement: DcimPatchPanel
-  icon: mdi:expansion-card
-  human_friendly_id:
-  - patch_panel__name__value
-  - name__value
-  display_label: '{{ patch_panel__name__value }} > {{ name__value }}'
-  order_by:
-  - patch_panel__name__value
-  - position__value
-  uniqueness_constraints:
-  - - patch_panel
-    - position__value
-  attributes:
-  - name: name
-    kind: Text
-    order_weight: 1000
-  - name: position
-    kind: Number
-    description: Position for the module inside the Patch Panel.
-    order_weight: 1100
-  - name: module_type
-    label: Module Type
-    kind: Dropdown
-    description: Type of module inserted into the patch panel.
-    order_weight: 1200
-    optional: true
-    choices:
-    - name: 3_mpo_24_fo_lc
-      label: 24 FO LC 3 MPO
-      description: High-density MPO cassette with 24 fibers to front and 3 MPO to
-        rear.
-      color: '#7f7fff'
-  - name: serial
-    kind: Text
-    optional: true
-    order_weight: 1500
-  - name: description
-    kind: Text
-    optional: true
-    order_weight: 2000
-  relationships:
-  - name: patch_panel
-    peer: DcimPatchPanel
-    optional: false
-    order_weight: 900
     cardinality: one
     kind: Parent
 

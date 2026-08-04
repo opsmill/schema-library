@@ -16,8 +16,6 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 - **Description:** A model of device
 - **Namespace:** Dcim
 - **Icon:** mdi:poll
-- **Uniqueness Constraints:**
-    - manufacturer, name__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -35,9 +33,7 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| platform | DcimPlatform |  | one | Attribute |
 | manufacturer | OrganizationManufacturer | False | one | Attribute |
-| tags | BuiltinTag | True | many | Attribute |
 
 ### Platform
 
@@ -45,8 +41,6 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 - **Description:** A Platform represent the type of software running on a device.
 - **Namespace:** Dcim
 - **Icon:** mdi:application-cog-outline
-- **Uniqueness Constraints:**
-    - name__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -55,23 +49,18 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name |  | Text |  |  |  |
 | description |  | Text | True |  |  |
-| nornir_platform |  | Text | True |  |  |
-| napalm_driver |  | Text | True |  |  |
-| netmiko_device_type |  | Text | True |  |  |
-| ansible_network_os |  | Text | True |  |  |
-| containerlab_os |  | Text | True |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| devices | DcimGenericDevice | True | many |  |
+| devices | DcimGenericDevice | True | many | Generic |
 | manufacturer | OrganizationManufacturer |  | one | Attribute |
 
 ### Device
 
 - **Label:** Network Device
-- **Description:** A configurable network device for managing and directing data traffic, including routers, switches...
+- **Description:** A configurable network device including routers, switches...
 - **Namespace:** Dcim
 - **Icon:** clarity:network-switch-solid
 - **Inherit From:** CoreArtifactTarget, DcimGenericDevice, DcimPhysicalDevice
@@ -80,7 +69,7 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| status |  | Dropdown | False |  | active, provisioning, maintenance, drained |
+| status |  | Dropdown | False | active | active, reserved, provisioning, maintenance, deprecated |
 | role |  | Dropdown | True |  | core, edge, cpe, spine, leaf, tor |
 
 ### Physical
@@ -89,6 +78,12 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 - **Description:** Physical network port on a device
 - **Namespace:** Interface
 - **Inherit From:** DcimInterface, InterfaceLayer2, InterfaceLayer3, DcimEndpoint, InterfaceHasSubInterface
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| mtu |  | Number |  | 1500 |  |
 
 ### Virtual
 
@@ -119,7 +114,6 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name |  | Text |  |  |  |
 | description |  | Text | True |  |  |
-| os_version |  | Text | True |  |  |
 
 #### Relationships
 
@@ -139,6 +133,7 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text |  |  |  |
 | position | Lowest unit. | Number | True |  |  |
 | serial |  | Text | True |  |  |
 | rack_face | On which face of the rack the device is mounted. | Dropdown | False | front | front, rear |
@@ -170,13 +165,14 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| connected_endpoints | DcimEndpoint | True | many | Generic |
+| connected_endpoints | DcimEndpoint | True | many | Attribute |
 
 ### Interface
 
 - **Label:** Interface
 - **Description:** Generic Network Interface
 - **Namespace:** Dcim
+- **Icon:** mdi:ethernet
 - **Uniqueness Constraints:**
     - device, name__value
 - **Human Friendly ID:** device__name__value, name__value
@@ -187,16 +183,14 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name | Name of the interface | Text |  |  |  |
 | description | A brief description of the interface | Text | True |  |  |
-| mtu |  | Number |  | 1514 |  |
-| status | The status of the interface | Dropdown |  | active | provisioning, free, active, maintenance, disabled, deleted, outage |
-| role | The role of the interface in the network | Dropdown | True |  | lag, core, cust, access, management, peering, upstream |
+| status | The status of the interface | Dropdown | False | active | provisioning, free, active, maintenance, disabled |
+| role | The role of the interface in the network | Dropdown | True |  | core, customer, access, management, peering, upstream |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | device | DcimGenericDevice | False | one | Parent |
-| tags | BuiltinTag | True | many | Attribute |
 
 ### Layer2
 
@@ -208,6 +202,7 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
+| mac_address |  | MacAddress | True |  |  |
 | l2_mode | Layer 2 mode of the interface | Dropdown | True |  | access, trunk, trunk_all |
 
 ### Layer3
@@ -215,13 +210,6 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 - **Label:** Layer 3 Interface
 - **Description:** Layer 3 specific attributes for network interfaces
 - **Namespace:** Interface
-
-#### Attributes
-
-| name | description | kind | optional | default_value | choices |
-| ---- | ----------- | ---- | -------- | ------------- | ------- |
-| dot1q_id | Dot1Q VLAN ID | Number | True |  |  |
-| mac_address |  | Text | True |  |  |
 
 #### Relationships
 
@@ -250,6 +238,7 @@ generics:
   description: Generic Device object.
   label: Device
   icon: mdi:server
+  include_in_menu: false
   human_friendly_id:
   - name__value
   order_by:
@@ -264,10 +253,6 @@ generics:
     kind: Text
     optional: true
     order_weight: 2000
-  - name: os_version
-    kind: Text
-    optional: true
-    order_weight: 2200
   relationships:
   - name: interfaces
     peer: DcimInterface
@@ -284,6 +269,7 @@ generics:
   - name: primary_address
     peer: IpamIPAddress
     label: Primary IP Address
+    identifier: device__primary_address
     optional: true
     cardinality: one
     kind: Attribute
@@ -294,12 +280,17 @@ generics:
     cardinality: one
     kind: Attribute
     order_weight: 1250
+    identifier: device__platform
 - name: PhysicalDevice
   namespace: Dcim
   description: Generic holding attributes and relationships relevant for physical
     device.
   include_in_menu: false
   attributes:
+  - name: name
+    kind: Text
+    unique: true
+    allow_override: any
   - name: position
     label: Position (U)
     description: Lowest unit.
@@ -338,6 +329,7 @@ generics:
     cardinality: one
     kind: Attribute
     order_weight: 1500
+    identifier: physical_device__location
 - name: Endpoint
   namespace: Dcim
   description: Generic Endpoint to receive a connector.
@@ -349,6 +341,7 @@ generics:
     cardinality: one
     order_weight: 1500
     kind: Attribute
+    identifier: connector__endpoint
 - name: Connector
   namespace: Dcim
   description: Generic Connector to link two endpoints together.
@@ -359,12 +352,15 @@ generics:
     optional: true
     cardinality: many
     order_weight: 1500
-    kind: Generic
+    kind: Attribute
+    identifier: connector__endpoint
 - name: Interface
   namespace: Dcim
   description: Generic Network Interface
   label: Interface
-  include_in_menu: false
+  icon: mdi:ethernet
+  include_in_menu: true
+  menu_placement: DcimDevice
   display_label: name__value
   order_by:
   - device__name__value
@@ -385,59 +381,43 @@ generics:
     optional: true
     description: A brief description of the interface
     order_weight: 1100
-  - name: mtu
-    label: MTU
-    kind: Number
-    default_value: 1514
-    order_weight: 1300
   - name: status
     kind: Dropdown
     description: The status of the interface
+    optional: false
+    default_value: active
     choices:
     - name: provisioning
       label: Provisioning
       description: Interface is being provisioned.
-      color: '#A9DFBF'
+      color: '#f0ad4e'
     - name: free
       label: Free
       description: Interface is unused.
-      color: '#CDEACC'
+      color: '#c8e6c9'
     - name: active
       label: Active
       description: Interface is active and operational.
-      color: '#A9CCE3'
+      color: '#00d25b'
     - name: maintenance
       label: Maintenance
       description: Interface is under maintenance.
-      color: '#FFF2CC'
+      color: '#ff9800'
     - name: disabled
       label: Disabled
       description: Interface has been disabled.
-      color: '#D3D3D3'
-    - name: deleted
-      label: Deleted
-      description: Interface has been deleted.
-      color: '#FAD7A0'
-    - name: outage
-      label: Outage
-      description: Interface is currently experiencing an outage.
-      color: '#F4CCCC'
-    default_value: active
+      color: '#6c757d'
     order_weight: 1200
   - name: role
     kind: Dropdown
     optional: true
     description: The role of the interface in the network
     choices:
-    - name: lag
-      label: Lag
-      description: Interface LAG.
-      color: '#A9DFBF'
     - name: core
       label: Core Interface
       description: Central part of the network.
       color: '#A9CCE3'
-    - name: cust
+    - name: customer
       label: Customer Interface
       description: Interface dedicated to customer connections.
       color: '#D2B4DE'
@@ -466,18 +446,17 @@ generics:
     cardinality: one
     kind: Parent
     order_weight: 1025
-  - name: tags
-    peer: BuiltinTag
-    optional: true
-    cardinality: many
-    kind: Attribute
-    order_weight: 3000
 - name: Layer2
   namespace: Interface
   include_in_menu: false
   description: Layer 2 specific attributes for network interfaces
   label: Layer 2 Interface
   attributes:
+  - name: mac_address
+    label: MAC Address
+    kind: MacAddress
+    optional: true
+    order_weight: 1400
   - name: l2_mode
     label: Layer2 Mode
     kind: Dropdown
@@ -499,22 +478,11 @@ generics:
   include_in_menu: false
   description: Layer 3 specific attributes for network interfaces
   label: Layer 3 Interface
-  attributes:
-  - name: dot1q_id
-    label: VLAN ID (dot1q)
-    kind: Number
-    description: Dot1Q VLAN ID
-    order_weight: 1600
-    optional: true
-  - name: mac_address
-    label: Mac Address
-    kind: Text
-    optional: true
-    order_weight: 1550
   relationships:
   - name: ip_addresses
     label: IP Addresses
     peer: IpamIPAddress
+    identifier: ip_address__interface
     cardinality: many
     kind: Attribute
     optional: true
@@ -540,15 +508,13 @@ nodes:
   description: A model of device
   label: Device Type
   icon: mdi:poll
+  menu_placement: DcimDevice
   human_friendly_id:
   - name__value
   display_label: name__value
   order_by:
   - manufacturer__name__value
   - name__value
-  uniqueness_constraints:
-  - - manufacturer
-    - name__value
   attributes:
   - name: name
     kind: Text
@@ -580,36 +546,25 @@ nodes:
     kind: Number
     order_weight: 1600
   relationships:
-  - name: platform
-    peer: DcimPlatform
-    cardinality: one
-    kind: Attribute
-    order_weight: 1300
   - name: manufacturer
     peer: OrganizationManufacturer
     cardinality: one
     kind: Attribute
     order_weight: 1250
     optional: false
-  - name: tags
-    peer: BuiltinTag
-    optional: true
-    cardinality: many
-    kind: Attribute
-    order_weight: 2000
+    identifier: manufacturer__device_type
 - name: Platform
   namespace: Dcim
   description: A Platform represent the type of software running on a device.
   label: Platform
   icon: mdi:application-cog-outline
+  menu_placement: DcimDevice
   human_friendly_id:
   - name__value
   display_label: name__value
   order_by:
   - manufacturer__name__value
   - name__value
-  uniqueness_constraints:
-  - - name__value
   attributes:
   - name: name
     kind: Text
@@ -619,42 +574,25 @@ nodes:
     kind: Text
     optional: true
     order_weight: 1200
-  - name: nornir_platform
-    kind: Text
-    optional: true
-    order_weight: 1500
-  - name: napalm_driver
-    kind: Text
-    optional: true
-    order_weight: 1600
-  - name: netmiko_device_type
-    kind: Text
-    optional: true
-    order_weight: 1700
-  - name: ansible_network_os
-    kind: Text
-    optional: true
-    order_weight: 1800
-  - name: containerlab_os
-    kind: Text
-    optional: true
-    order_weight: 1900
   relationships:
   - name: devices
     peer: DcimGenericDevice
     optional: true
     cardinality: many
+    kind: Generic
     order_weight: 1350
+    identifier: device__platform
   - name: manufacturer
     peer: OrganizationManufacturer
     cardinality: one
     kind: Attribute
     order_weight: 1300
+    identifier: manufacturer__platform
 - name: Device
   label: Network Device
-  description: A configurable network device for managing and directing data traffic,
-    including routers, switches...
+  description: A configurable network device including routers, switches...
   icon: clarity:network-switch-solid
+  generate_template: true
   namespace: Dcim
   inherit_from:
   - CoreArtifactTarget
@@ -664,24 +602,29 @@ nodes:
   - name: status
     kind: Dropdown
     optional: false
+    default_value: active
     order_weight: 1100
     choices:
     - name: active
       label: Active
       description: Fully operational and currently in service.
-      color: '#7fbf7f'
+      color: '#00d25b'
+    - name: reserved
+      label: Reserved
+      description: Reserved for future use, not yet active.
+      color: '#4d90fe'
     - name: provisioning
       label: Provisioning
       description: In the process of being set up and configured.
-      color: '#ffff7f'
+      color: '#f0ad4e'
     - name: maintenance
       label: Maintenance
       description: Undergoing routine maintenance or repairs.
-      color: '#ffd27f'
-    - name: drained
-      label: Drained
-      description: Temporarily taken out of service.
-      color: '#bfbfbf'
+      color: '#ff9800'
+    - name: deprecated
+      label: Deprecated
+      description: No longer in use and scheduled for removal.
+      color: '#e04040'
   - name: role
     kind: Dropdown
     optional: true
@@ -722,6 +665,12 @@ nodes:
   - DcimEndpoint
   - InterfaceHasSubInterface
   include_in_menu: false
+  attributes:
+  - name: mtu
+    label: MTU
+    kind: Number
+    default_value: 1500
+    order_weight: 1300
 - name: Virtual
   namespace: Interface
   label: Virtual Interface

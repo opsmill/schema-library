@@ -10,63 +10,94 @@ This schema extension brings extensions to VLAN model in order to support QinQ.
     - [base](dcim)
     - [extensions/vlan](vlan)
 
-## Extensions
+## Nodes
 
-:::note
+### SVLAN
 
-In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
-
-:::
-
-### IpamVLAN
-
-#### Attributes
-
-| name | description | kind | optional | default_value | choices |
-| ---- | ----------- | ---- | -------- | ------------- | ------- |
-| qinq_role |  | Dropdown | True |  | suplier, customer |
+- **Label:** S-VLAN
+- **Description:** A VLAN used to encapsulate multiple CVLANs.
+- **Namespace:** Ipam
+- **Inherit From:** GenericVLAN
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| svlan | IpamVLAN | True | one | Attribute |
-| cvlan | IpamVLAN | True | many | Attribute |
+| cvlan | IpamCVLAN | True | many | Attribute |
+
+### CVLAN
+
+- **Label:** C-VLAN
+- **Description:** A VLAN assigned to customer traffic, encapsulated within an S-VLAN.
+- **Namespace:** Ipam
+- **Uniqueness Constraints:**
+    - vlan_id__value, svlan
+- **Human Friendly ID:** svlan__name__value, vlan_id__value
+- **Inherit From:** GenericVLAN
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| svlan | IpamSVLAN | False | one | Attribute |
 
 ## Code
 
 ```yaml
 version: '1.0'
-extensions:
-  nodes:
-  - kind: IpamVLAN
-    attributes:
-    - name: qinq_role
-      kind: Dropdown
-      optional: true
-      choices:
-      - name: suplier
-        label: Suplier
-        description: A VLAN used to encapsulate multiple CVLANs.
-      - name: customer
-        label: Customer
-        description: A VLAN assigned to customer traffic.
-    relationships:
-    - name: svlan
-      label: Supplier vlan
-      peer: IpamVLAN
-      optional: true
-      direction: inbound
-      identifier: vlan__qinq
-      cardinality: one
-      kind: Attribute
-    - name: cvlan
-      label: Customer vlan(s)
-      peer: IpamVLAN
-      optional: true
-      direction: outbound
-      identifier: vlan__qinq
-      cardinality: many
-      kind: Attribute
+nodes:
+- name: SVLAN
+  namespace: Ipam
+  label: S-VLAN
+  description: A VLAN used to encapsulate multiple CVLANs.
+  include_in_menu: false
+  inherit_from:
+  - GenericVLAN
+  relationships:
+  - name: cvlan
+    label: Customer vlan(s)
+    peer: IpamCVLAN
+    optional: true
+    direction: outbound
+    identifier: vlan__qinq
+    cardinality: many
+    kind: Attribute
+- name: CVLAN
+  namespace: Ipam
+  label: C-VLAN
+  description: A VLAN assigned to customer traffic, encapsulated within an S-VLAN.
+  include_in_menu: false
+  display_label: '{{ svlan__name__value }}-{{ vlan_id__value }}'
+  human_friendly_id:
+  - svlan__name__value
+  - vlan_id__value
+  uniqueness_constraints:
+  - - vlan_id__value
+    - svlan
+  inherit_from:
+  - GenericVLAN
+  attributes:
+  - name: name
+    kind: Text
+    optional: true
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ svlan__name__value }}-{{ vlan_id__value }}'
+  relationships:
+  - name: svlan
+    label: Supplier vlan
+    peer: IpamSVLAN
+    optional: false
+    direction: inbound
+    identifier: vlan__qinq
+    cardinality: one
+    kind: Attribute
 
 ```

@@ -59,8 +59,8 @@ In this context "extensions" refer to modifications or additions to the existing
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| import_routing_policies | RoutingPolicy |  | many | Generic |
-| export_routing_policies | RoutingPolicy |  | many | Generic |
+| import_routing_policies | RoutingPolicyBGP |  | many | Generic |
+| export_routing_policies | RoutingPolicyBGP |  | many | Generic |
 
 ## Code
 
@@ -89,14 +89,14 @@ extensions:
     - name: import_routing_policies
       label: Import Routing Policies
       peer: RoutingPolicyBGP
-      identifier: bgp__import_policies
+      identifier: bgppeergroup__import_policies
       description: The routing-policies used by this instance for import.
       kind: Generic
       cardinality: many
     - name: export_routing_policies
       label: Export Routing Policies
       peer: RoutingPolicyBGP
-      identifier: bgp__export_policies
+      identifier: bgppeergroup__export_policies
       description: The routing-policies used by this instance for export.
       kind: Generic
       cardinality: many
@@ -111,15 +111,15 @@ extensions:
     relationships:
     - name: import_routing_policies
       label: Import Routing Policies
-      peer: RoutingPolicy
-      identifier: bgp__import_policies
+      peer: RoutingPolicyBGP
+      identifier: bgpsession__import_policies
       description: The routing-policies used by this instance for import.
       kind: Generic
       cardinality: many
     - name: export_routing_policies
       label: Export Routing Policies
-      peer: RoutingPolicy
-      identifier: bgp__export_policies
+      peer: RoutingPolicyBGP
+      identifier: bgpsession__export_policies
       description: The routing-policies used by this instance for export.
       kind: Generic
       cardinality: many

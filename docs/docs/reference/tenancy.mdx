@@ -2,19 +2,18 @@
 title: Tenancy
 ---
 
-This schema extension introduces tenancy for some of the schema nodes (circuits...)
+This schema extension introduces a Tenant node that can own devices, IP prefixes/addresses, and hosting locations. See the comment at the bottom of `tenancy.yml` for an example of how to extend tenancy onto optional extension nodes such as `DcimCircuit`.
 
 ## Details
 
 - **Dependencies:**
     - [base](dcim)
-    - [extensions/circuit](circuit)
 
 ## Nodes
 
 ### Tenant
 
-- **Description:** A tenant is owning the corresponding entity
+- **Description:** A tenant is the owner of the corresponding devices, addressing, and locations.
 - **Namespace:** Tenancy
 - **Icon:** mdi:domain
 - **Inherit From:** OrganizationGeneric
@@ -23,9 +22,50 @@ This schema extension introduces tenancy for some of the schema nodes (circuits.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| tags | BuiltinTag | True | many | Attribute |
-| location | LocationBuilding | True | many |  |
-| circuit | DcimCircuit | True | many |  |
+| devices | DcimGenericDevice | True | many | Generic |
+| prefixes | IpamPrefix | True | many | Generic |
+| addresses | IpamIPAddress | True | many | Generic |
+| locations | LocationHosting | True | many | Generic |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### DcimGenericDevice
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| tenant | TenancyTenant | True | one | Attribute |
+
+### IpamPrefix
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| tenant | TenancyTenant | True | one | Attribute |
+
+### IpamIPAddress
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| tenant | TenancyTenant | True | one | Attribute |
+
+### LocationHosting
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| tenant | TenancyTenant | True | one | Attribute |
 
 ## Code
 
@@ -34,25 +74,77 @@ version: '1.0'
 nodes:
 - name: Tenant
   namespace: Tenancy
-  description: A tenant is owning the corresponding entity
+  description: A tenant is the owner of the corresponding devices, addressing, and
+    locations.
   icon: mdi:domain
   include_in_menu: true
   inherit_from:
   - OrganizationGeneric
   relationships:
-  - name: tags
-    peer: BuiltinTag
-    cardinality: many
-    kind: Attribute
-    optional: true
-    order_weight: 3000
-  - name: location
-    peer: LocationBuilding
+  - name: devices
+    label: Devices
+    peer: DcimGenericDevice
+    identifier: tenant__device
     cardinality: many
     optional: true
-  - name: circuit
-    peer: DcimCircuit
+    kind: Generic
+  - name: prefixes
+    label: Prefixes
+    peer: IpamPrefix
+    identifier: tenant__prefix
     cardinality: many
     optional: true
+    kind: Generic
+  - name: addresses
+    label: Addresses
+    peer: IpamIPAddress
+    identifier: tenant__ipaddress
+    cardinality: many
+    optional: true
+    kind: Generic
+  - name: locations
+    label: Locations
+    peer: LocationHosting
+    identifier: tenant__location
+    cardinality: many
+    optional: true
+    kind: Generic
+extensions:
+  nodes:
+  - kind: DcimGenericDevice
+    relationships:
+    - name: tenant
+      peer: TenancyTenant
+      identifier: tenant__device
+      optional: true
+      cardinality: one
+      kind: Attribute
+      order_weight: 1800
+  - kind: IpamPrefix
+    relationships:
+    - name: tenant
+      peer: TenancyTenant
+      identifier: tenant__prefix
+      optional: true
+      cardinality: one
+      kind: Attribute
+      order_weight: 1400
+  - kind: IpamIPAddress
+    relationships:
+    - name: tenant
+      peer: TenancyTenant
+      identifier: tenant__ipaddress
+      optional: true
+      cardinality: one
+      kind: Attribute
+      order_weight: 1300
+  - kind: LocationHosting
+    relationships:
+    - name: tenant
+      peer: TenancyTenant
+      identifier: tenant__location
+      optional: true
+      cardinality: one
+      kind: Attribute
 
 ```

@@ -1,8 +1,8 @@
 ---
-title: Location Minimal
+title: Location Site
 ---
 
-This schema extension is minimal but will provide you with basic items to store location related data.
+This schema extension introduces a standalone Location.Site node (with facility, physical address, timezone, and status). It defines the same Site node as extensions/location_minimal, so load one or the other, not both.
 
 ## Details
 
@@ -10,20 +10,6 @@ This schema extension is minimal but will provide you with basic items to store 
     - [base](dcim)
 
 ## Nodes
-
-### Region
-
-- **Label:** Region
-- **Namespace:** Location
-- **Icon:** carbon:cics-region-target
-- **Inherit From:** LocationGeneric, IpamPrefixScope
-
-### Country
-
-- **Label:** Country
-- **Namespace:** Location
-- **Icon:** gis:search-country
-- **Inherit From:** LocationGeneric
 
 ### Site
 
@@ -46,25 +32,6 @@ This schema extension is minimal but will provide you with basic items to store 
 ```yaml
 version: '1.0'
 nodes:
-- name: Region
-  namespace: Location
-  label: Region
-  inherit_from:
-  - LocationGeneric
-  - IpamPrefixScope
-  menu_placement: LocationGeneric
-  parent: ''
-  children: LocationCountry
-  icon: carbon:cics-region-target
-- name: Country
-  namespace: Location
-  label: Country
-  inherit_from:
-  - LocationGeneric
-  menu_placement: LocationGeneric
-  parent: LocationRegion
-  children: LocationSite
-  icon: gis:search-country
 - name: Site
   namespace: Location
   label: Site
@@ -75,7 +42,6 @@ nodes:
   - IpamVLANGroupScope
   menu_placement: LocationGeneric
   display_label: name__value
-  parent: LocationCountry
   icon: ri:building-line
   attributes:
   - name: status

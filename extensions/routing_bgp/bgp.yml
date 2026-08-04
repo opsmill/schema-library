@@ -86,15 +86,17 @@ nodes:
       - name: maximum_routes
         kind: Number
         optional: true
+        parameters:
+          min_value: 0
         description: "Maximum routes for the BGP Group."
         order_weight: 1400
-        regex: "^[0-9]+$"
       - name: local_pref
         kind: Number
         optional: true
+        parameters:
+          min_value: 0
         description: "Force Local Pref for this BGP Peer Group."
         order_weight: 1450
-        regex: "^[0-9]+$"
       - name: send_community
         kind: Checkbox
         optional: true
@@ -176,9 +178,10 @@ nodes:
       - name: local_pref
         kind: Number
         optional: true
+        parameters:
+          min_value: 0
         description: "Force Local Pref for this BGP Peer Session."
         order_weight: 1450
-        regex: "^[0-9]+$"
     relationships:
       - name: local_as
         identifier: bgpsession__local_as

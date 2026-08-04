@@ -21,8 +21,8 @@ Basic Organization schema to capture organizations, vendors, and related informa
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| device_type | DcimDeviceType | True | many |  |
-| platform | DcimPlatform | True | many |  |
+| device_type | DcimDeviceType | True | many | Attribute |
+| platform | DcimPlatform | True | many | Attribute |
 
 ### Provider
 
@@ -100,10 +100,14 @@ nodes:
     peer: DcimDeviceType
     cardinality: many
     optional: true
+    kind: Attribute
+    identifier: manufacturer__device_type
   - name: platform
     peer: DcimPlatform
     cardinality: many
     optional: true
+    kind: Attribute
+    identifier: manufacturer__platform
 - name: Provider
   namespace: Organization
   description: Circuit or Location Provider

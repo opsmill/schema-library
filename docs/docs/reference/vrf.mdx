@@ -25,15 +25,15 @@ This schema extension contains models to support VRF in your network.
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name |  | Text | False |  |  |
 | vrf_rd |  | Text | True |  |  |
+| enforce_unique |  | Boolean | True | True |  |
 | description |  | Text | True |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| namespace | BuiltinIPNamespace | False | one | Attribute |
-| import_rt | IpamRouteTarget | True | one | Attribute |
-| export_rt | IpamRouteTarget | True | one | Attribute |
+| import_rt | IpamRouteTarget | True | many | Attribute |
+| export_rt | IpamRouteTarget | True | many | Attribute |
 
 ### RouteTarget
 
@@ -54,7 +54,8 @@ This schema extension contains models to support VRF in your network.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| vrf | IpamVRF | True | many |  |
+| import_vrf | IpamVRF | True | many |  |
+| export_vrf | IpamVRF | True | many |  |
 
 ## Extensions
 
@@ -104,29 +105,30 @@ nodes:
     label: Route Distinguisher
     kind: Text
     optional: true
+  - name: enforce_unique
+    label: Enforce Unique
+    kind: Boolean
+    default_value: true
+    optional: true
+    order_weight: 1100
   - name: description
     kind: Text
     optional: true
     order_weight: 1200
   relationships:
-  - name: namespace
-    peer: BuiltinIPNamespace
-    optional: false
-    cardinality: one
-    kind: Attribute
   - name: import_rt
     identifier: vrf__import
     label: Import Targets
     peer: IpamRouteTarget
     optional: true
-    cardinality: one
+    cardinality: many
     kind: Attribute
   - name: export_rt
     identifier: vrf__export
     label: Export Targets
     peer: IpamRouteTarget
     optional: true
-    cardinality: one
+    cardinality: many
     kind: Attribute
 - name: RouteTarget
   namespace: Ipam
@@ -147,7 +149,15 @@ nodes:
     kind: Text
     optional: true
   relationships:
-  - name: vrf
+  - name: import_vrf
+    label: Imported by VRFs
+    identifier: vrf__import
+    peer: IpamVRF
+    optional: true
+    cardinality: many
+  - name: export_vrf
+    label: Exported by VRFs
+    identifier: vrf__export
     peer: IpamVRF
     optional: true
     cardinality: many
@@ -158,6 +168,7 @@ extensions:
     - name: vrf
       label: VRF
       peer: IpamVRF
+      identifier: prefix__vrf
       optional: true
       cardinality: one
       kind: Attribute
@@ -167,6 +178,7 @@ extensions:
     - name: vrf
       label: VRF
       peer: IpamVRF
+      identifier: ip_address__vrf
       optional: true
       cardinality: one
       kind: Attribute

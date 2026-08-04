@@ -18,7 +18,6 @@ This schema extension provides models for managing Circuit Contracts, enabling s
 - **Description:** A contract document associated with a circuit service, including terms, costs, and validity period.
 - **Namespace:** Dcim
 - **Icon:** mdi:file-sign
-- **Display Label:** Contract (Circuit `{{ circuit__circuit_id__value }}`)
 - **Human Friendly ID:** name__value
 - **Inherit From:** CoreFileObject
 
@@ -110,6 +109,7 @@ nodes:
     cardinality: one
     optional: false
     order_weight: 950
+    identifier: circuit__contract
 extensions:
   nodes:
   - kind: DcimCircuit
@@ -118,5 +118,6 @@ extensions:
       peer: DcimCircuitContract
       cardinality: one
       optional: true
+      identifier: circuit__contract
 
 ```

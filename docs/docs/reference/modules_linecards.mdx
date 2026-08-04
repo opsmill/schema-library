@@ -8,7 +8,7 @@ This schema extension allows you to capture Linecard related information like th
 
 - **Dependencies:**
     - [base](dcim)
-    - [extensions/modules](modules)
+    - [extensions/device_module](device_module)
 
 ## Nodes
 
@@ -18,7 +18,7 @@ This schema extension allows you to capture Linecard related information like th
 - **Description:** Linecard Type information, detailing specifications such as part number and manufacturer.
 - **Namespace:** Device
 - **Icon:** mdi:poll
-- **Inherit From:** DeviceGenericModuleType
+- **Inherit From:** DcimGenericModuleType
 
 #### Relationships
 
@@ -32,7 +32,7 @@ This schema extension allows you to capture Linecard related information like th
 - **Description:** A Linecard installed in a device, specifying slot, power status, and functionalities.
 - **Namespace:** Device
 - **Icon:** bi:pci-card
-- **Inherit From:** DeviceGenericModule
+- **Inherit From:** DcimGenericModule
 
 #### Attributes
 
@@ -108,7 +108,7 @@ nodes:
   icon: mdi:poll
   label: Linecard Type
   inherit_from:
-  - DeviceGenericModuleType
+  - DcimGenericModuleType
   relationships:
   - name: linecards
     peer: DeviceLinecard
@@ -121,9 +121,9 @@ nodes:
     functionalities.
   label: Linecard
   icon: bi:pci-card
-  menu_placement: DeviceGenericModule
+  menu_placement: DcimGenericModule
   inherit_from:
-  - DeviceGenericModule
+  - DcimGenericModule
   attributes:
   - name: slot
     kind: Number

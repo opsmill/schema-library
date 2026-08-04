@@ -11,6 +11,8 @@ This schema extension contains all you need to model anything revolving around i
     - [extensions/routing](routing)
     - [extensions/routing_bgp](routing_bgp)
     - [extensions/routing_bgp_community](routing_bgp_community)
+    - [extensions/routing_policies](routing_policies)
+    - [extensions/routing_policies_bgp](routing_policies_bgp)
 
 ## Nodes
 
@@ -70,7 +72,24 @@ This schema extension contains all you need to model anything revolving around i
 | ipv4_address | IpamIPAddress |  | one | Attribute |
 | internet_exchange_point | PeeringIXP | False | one | Parent |
 | router | DcimDevice |  | one | Attribute |
+| bgp_sessions | RoutingBGPSession | True | many | Component |
 | tags | BuiltinTag |  | many | Attribute |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### RoutingBGPSession
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| ixp_connection | PeeringIXPConnection | True | one | Parent |
 
 ## Code
 
@@ -250,10 +269,31 @@ nodes:
     kind: Attribute
     description: The router this IXP connection is connected to
     order_weight: 1400
+  - name: bgp_sessions
+    label: BGP Sessions
+    peer: RoutingBGPSession
+    identifier: ixpconn__bgpsessions
+    optional: true
+    cardinality: many
+    kind: Component
+    description: BGP sessions established over this IXP connection
+    order_weight: 1450
   - name: tags
     peer: BuiltinTag
     cardinality: many
     kind: Attribute
     order_weight: 3000
+extensions:
+  nodes:
+  - kind: RoutingBGPSession
+    relationships:
+    - name: ixp_connection
+      label: IXP Connection
+      peer: PeeringIXPConnection
+      identifier: ixpconn__bgpsessions
+      optional: true
+      cardinality: one
+      kind: Parent
+      description: The IXP connection (port) this BGP session is established over
 
 ```

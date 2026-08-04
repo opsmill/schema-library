@@ -1,0 +1,327 @@
+---
+title: Device Modules
+---
+
+This schema extension lets you capture module bays on a Dcim Physical Device and the modules installed into them (e.g. fan trays, line cards). A device can have any number of module bays, and each bay can optionally hold one module.
+
+NOTE: This extension ships a standard Module/ModuleType node pair ready to use, alongside the generic Module/ModuleType you can build your own flavors on top of (see the device_psu_module, modules_linecards, or modules_routing_engine extensions).
+
+## Details
+
+- **Dependencies:**
+    - [base](dcim)
+
+## Nodes
+
+### ModuleBay
+
+- **Label:** Module Bay
+- **Description:** A physical bay on a device that can receive a module.
+- **Namespace:** Dcim
+- **Icon:** mdi:tray
+- **Uniqueness Constraints:**
+    - device, name__value
+    - device, position__value
+- **Human Friendly ID:** computed_name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| computed_name | Name computed from the device and bay name. | Text | False |  |  |
+| name | Name of the bay, e.g. 'slot 1' or 'psu 1'. | Text |  |  |  |
+| position | Numeric position of the bay within the device, used for ordering (e.g. slot 1, 2, 3...). | Number | False |  |  |
+| description |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| device | DcimPhysicalDevice | False | one | Parent |
+| installed_module | DcimGenericModule | True | one | Attribute |
+
+### Module
+
+- **Label:** Module
+- **Description:** Standard module installed in a device.
+- **Namespace:** Dcim
+- **Icon:** mdi:expansion-card
+- **Inherit From:** DcimGenericModule
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| computed_name | Name computed from the module bay and module type. | Text | False |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| module_type | DcimModuleType | False | one | Attribute |
+
+### ModuleType
+
+- **Label:** Module Type
+- **Description:** Standard module type, defining common specifications for a Module.
+- **Namespace:** Dcim
+- **Icon:** mdi:database-cog
+- **Inherit From:** DcimGenericModuleType
+
+## Generics
+
+### GenericModule
+
+- **Label:** Module
+- **Description:** A generic module, such as a Linecard or Routing Engine, installed in a module bay.
+- **Namespace:** Dcim
+- **Icon:** mdi:expansion-card
+- **Human Friendly ID:** computed_name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| computed_name |  | Text | False |  |  |
+| serial_number | Serial number of the module, if known. | Text | True |  |  |
+| description |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| module_bay | DcimModuleBay | False | one | Attribute |
+
+### GenericModuleType
+
+- **Label:** Module Type
+- **Description:** A generic module type, with common specifications like part number and manufacturer.
+- **Namespace:** Dcim
+- **Icon:** mdi:database-cog
+- **Uniqueness Constraints:**
+    - name__value, manufacturer
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name | Name of the module type. | Text |  |  |  |
+| description | Description of the module type. | Text | True |  |  |
+| part_number | Part number of the module. | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| manufacturer | OrganizationManufacturer | False | one | Attribute |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### DcimPhysicalDevice
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| module_bays | DcimModuleBay | True | many | Component |
+
+## Code
+
+```yaml
+version: '1.0'
+generics:
+- name: GenericModule
+  namespace: Dcim
+  description: A generic module, such as a Linecard or Routing Engine, installed in
+    a module bay.
+  label: Module
+  icon: mdi:expansion-card
+  human_friendly_id:
+  - computed_name__value
+  display_label: computed_name__value
+  attributes:
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    unique: true
+    allow_override: any
+    order_weight: 1000
+  - name: serial_number
+    kind: Text
+    optional: true
+    description: Serial number of the module, if known.
+    order_weight: 1100
+  - name: description
+    kind: Text
+    optional: true
+    order_weight: 1200
+  relationships:
+  - name: module_bay
+    label: Module Bay
+    peer: DcimModuleBay
+    identifier: module_bay__module
+    optional: false
+    cardinality: one
+    kind: Attribute
+    order_weight: 900
+- name: GenericModuleType
+  namespace: Dcim
+  description: A generic module type, with common specifications like part number
+    and manufacturer.
+  label: Module Type
+  icon: mdi:database-cog
+  menu_placement: DcimGenericModule
+  display_label: name__value
+  uniqueness_constraints:
+  - - name__value
+    - manufacturer
+  human_friendly_id:
+  - name__value
+  order_by:
+  - manufacturer__name__value
+  - name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    description: Name of the module type.
+    order_weight: 1000
+  - name: description
+    kind: Text
+    optional: true
+    description: Description of the module type.
+    order_weight: 1100
+  - name: part_number
+    label: Part Number
+    kind: Text
+    optional: true
+    description: Part number of the module.
+    order_weight: 1200
+  relationships:
+  - name: manufacturer
+    peer: OrganizationManufacturer
+    identifier: manufacturer__moduletype
+    cardinality: one
+    optional: false
+    kind: Attribute
+    description: Manufacturer of the module type.
+    order_weight: 1250
+nodes:
+- name: ModuleBay
+  namespace: Dcim
+  description: A physical bay on a device that can receive a module.
+  label: Module Bay
+  icon: mdi:tray
+  menu_placement: DcimDevice
+  human_friendly_id:
+  - computed_name__value
+  display_label: computed_name__value
+  order_by:
+  - device__name__value
+  - name__value
+  uniqueness_constraints:
+  - - device
+    - name__value
+  - - device
+    - position__value
+  attributes:
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    unique: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ device__name__value }} > {{ name__value }}'
+    description: Name computed from the device and bay name.
+    order_weight: 800
+  - name: name
+    kind: Text
+    description: Name of the bay, e.g. 'slot 1' or 'psu 1'.
+    order_weight: 1000
+  - name: position
+    kind: Number
+    description: Numeric position of the bay within the device, used for ordering
+      (e.g. slot 1, 2, 3...).
+    optional: false
+    parameters:
+      min_value: 1
+    order_weight: 1050
+  - name: description
+    kind: Text
+    optional: true
+    order_weight: 1100
+  relationships:
+  - name: device
+    label: Device
+    peer: DcimPhysicalDevice
+    identifier: device__module_bays
+    optional: false
+    cardinality: one
+    kind: Parent
+    order_weight: 900
+  - name: installed_module
+    label: Installed Module
+    peer: DcimGenericModule
+    identifier: module_bay__module
+    optional: true
+    cardinality: one
+    kind: Attribute
+    order_weight: 1200
+- name: Module
+  namespace: Dcim
+  description: Standard module installed in a device.
+  label: Module
+  icon: mdi:expansion-card
+  include_in_menu: false
+  inherit_from:
+  - DcimGenericModule
+  attributes:
+  - name: computed_name
+    kind: Text
+    read_only: true
+    optional: false
+    unique: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ module_bay__computed_name__value }} ({{ module_type__name__value
+        }})'
+    description: Name computed from the module bay and module type.
+    order_weight: 1000
+  relationships:
+  - name: module_type
+    peer: DcimModuleType
+    optional: false
+    cardinality: one
+    kind: Attribute
+    order_weight: 950
+- name: ModuleType
+  namespace: Dcim
+  description: Standard module type, defining common specifications for a Module.
+  label: Module Type
+  icon: mdi:database-cog
+  include_in_menu: false
+  inherit_from:
+  - DcimGenericModuleType
+extensions:
+  nodes:
+  - kind: DcimPhysicalDevice
+    relationships:
+    - name: module_bays
+      label: Module Bays
+      peer: DcimModuleBay
+      identifier: device__module_bays
+      cardinality: many
+      kind: Component
+      optional: true
+      description: Module bays available on this device.
+
+```

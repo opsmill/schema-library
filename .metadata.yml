@@ -87,14 +87,6 @@ experimental/security:
     - base
   description: This schema extension contains models for implementing detailed security.
   name: Security
-experimental/tenancy:
-  dependencies:
-    - base
-    - extensions/circuit
-  description:
-    This schema extension introduces tenancy for some of the schema nodes
-    (circuits...)
-  name: Tenancy
 experimental/topology:
   dependencies:
     - base
@@ -171,7 +163,7 @@ extensions/dwdm:
     channel number but via the wavelength and/or the frequency. This model provides
     a unique entry in Infrahub for those.
   name: DWDM
-extensions/firewall_policer:
+experimental/firewall_policer:
   dependencies:
     - base
   description:
@@ -211,6 +203,14 @@ extensions/location_minimal:
     This schema extension is minimal but will provide you with basic items
     to store location related data.
   name: Location Minimal
+extensions/location_site:
+  dependencies:
+    - base
+  description: >-
+    This schema extension introduces a standalone Location.Site node (with facility,
+    physical address, timezone, and status). It defines the same Site node as
+    extensions/location_minimal, so load one or the other, not both.
+  name: Location Site
 extensions/mlag:
   dependencies:
     - base
@@ -409,13 +409,15 @@ extensions/snmp:
     Clients. As you can see this extension is not linked to Tenancy or Device, as
     you could decide to link the Community to different models based on your use case.
   name: SNMP
-extensions/topology:
+extensions/tenancy:
   dependencies:
     - base
   description:
-    This schema extension introduces abstract network pods and services
-    running in the pods, such as MPLS and EVPN.
-  name: Topology
+    This schema extension introduces a Tenant node that can own devices, IP
+    prefixes/addresses, and hosting locations. See the comment at the bottom of
+    `tenancy.yml` for an example of how to extend tenancy onto optional extension
+    nodes such as `DcimCircuit`.
+  name: Tenancy
 extensions/users:
   dependencies:
     - base

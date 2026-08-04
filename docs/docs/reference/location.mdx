@@ -16,14 +16,13 @@ Basic Location schema to capture locations, sites, and related information.
 - **Description:** Generic Location, could be a country, city ...
 - **Namespace:** Location
 - **Icon:** mingcute:location-line
-- **Human Friendly ID:** shortname__value
+- **Human Friendly ID:** name__value
 
 #### Attributes
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
-| shortname |  | Text |  |  |  |
+| name |  | Text | False |  |  |
 | description |  | Text | True |  |  |
 
 #### Relationships
@@ -36,20 +35,19 @@ Basic Location schema to capture locations, sites, and related information.
 
 - **Description:** Location directly hosting device and services.
 - **Namespace:** Location
-- **Human Friendly ID:** shortname__value
+- **Human Friendly ID:** name__value
 
 #### Attributes
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| shortname |  | Text |  |  |  |
+| name |  | Text |  |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| prefixes | IpamPrefix | True | many |  |
-| devices | DcimPhysicalDevice | True | many |  |
+| devices | DcimPhysicalDevice | True | many | Generic |
 
 ## Code
 
@@ -64,18 +62,16 @@ generics:
   include_in_menu: true
   hierarchical: true
   human_friendly_id:
-  - shortname__value
+  - name__value
   order_by:
   - name__value
   display_label: name__value
   attributes:
   - name: name
     kind: Text
-    order_weight: 1000
-  - name: shortname
-    kind: Text
     unique: true
-    order_weight: 1100
+    optional: false
+    order_weight: 900
   - name: description
     kind: Text
     optional: true
@@ -91,22 +87,17 @@ generics:
   description: Location directly hosting device and services.
   include_in_menu: false
   human_friendly_id:
-  - shortname__value
+  - name__value
   attributes:
-  - name: shortname
+  - name: name
     kind: Text
-    unique: true
-    order_weight: 1100
   relationships:
-  - name: prefixes
-    label: Prefixes
-    peer: IpamPrefix
-    cardinality: many
-    optional: true
   - name: devices
     label: Devices
     peer: DcimPhysicalDevice
     cardinality: many
     optional: true
+    kind: Generic
+    identifier: physical_device__location
 
 ```
