@@ -10,48 +10,48 @@ version: "1.0"
 nodes:
   - name: SVLAN
     namespace: Ipam
-    label: S-VLAN
     description: A VLAN used to encapsulate multiple CVLANs.
+    label: S-VLAN
     include_in_menu: false
     inherit_from:
       - GenericVLAN
     relationships:
       - name: cvlan
-        label: Customer vlan(s)
         peer: IpamCVLAN
-        optional: true
-        direction: outbound
-        identifier: vlan__qinq
-        cardinality: many
+        label: Customer vlan(s)
         kind: Attribute
 
+        cardinality: many
+        optional: true
+        identifier: vlan__qinq
+        direction: outbound
   - name: CVLAN
     namespace: Ipam
-    label: C-VLAN
     description: A VLAN assigned to customer traffic, encapsulated within an S-VLAN.
+    label: C-VLAN
     include_in_menu: false
-    display_label: "{{ svlan__name__value }}-{{ vlan_id__value }}"
+    inherit_from:
+      - GenericVLAN
     human_friendly_id:
       - svlan__name__value
       - vlan_id__value
+    display_label: "{{ svlan__name__value }}-{{ vlan_id__value }}"
     uniqueness_constraints:
       - [vlan_id__value, svlan]
-    inherit_from:
-      - GenericVLAN
     attributes:
       - name: name
         kind: Text
-        optional: true
         read_only: true
         computed_attribute:
           kind: Jinja2
           jinja2_template: "{{ svlan__name__value }}-{{ vlan_id__value }}"
+        optional: true
     relationships:
       - name: svlan
-        label: Supplier vlan
         peer: IpamSVLAN
-        optional: false
-        direction: inbound
-        identifier: vlan__qinq
-        cardinality: one
+        label: Supplier vlan
         kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: vlan__qinq
+        direction: inbound

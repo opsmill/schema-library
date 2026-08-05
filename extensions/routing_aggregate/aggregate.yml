@@ -12,16 +12,16 @@ nodes:
     namespace: Routing
     description: "Aggregate Protocol with action and BGP communities"
     label: "Aggregate Routes"
-    include_in_menu: false
     icon: "grommet-icons:aggregate"
+    include_in_menu: false
     inherit_from:
       - "RoutingProtocol"
     attributes:
       - name: discard
-        label: Discard
         kind: Boolean
-        optional: true
+        label: Discard
         default_value: false
+        optional: true
         order_weight: 1275
       - name: import_policies
         kind: Text
@@ -33,7 +33,7 @@ nodes:
         order_weight: 1350
     relationships:
       - name: destination
-        kind: Attribute
         peer: IpamPrefix
+        kind: Attribute
         description: "Destination network for the static route."
         order_weight: 1200

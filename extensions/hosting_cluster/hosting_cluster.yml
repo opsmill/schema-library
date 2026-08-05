@@ -10,8 +10,8 @@ version: "1.0"
 nodes:
   - name: Hosting
     namespace: Cluster
-    label: Hosting Cluster
     description: A cluster hosting virtual machines.
+    label: Hosting Cluster
     icon: mdi:dots-hexagon
     menu_placement: VirtualizationVirtualMachine
     inherit_from:
@@ -20,10 +20,8 @@ nodes:
       - ClusterGenericComputeUnitNodes # Means it's built out of regular compute unit (e.g. server)
     attributes:
       - name: technology
-        label: Technology
         kind: Dropdown
-        order_weight: 1200
-        description: Underlying virtualisation or clustering technology.
+        label: Technology
         choices:
           - name: vmware
             label: VMware vSphere
@@ -49,11 +47,11 @@ nodes:
           - name: public_cloud
             label: Public Cloud
             color: "#888888"
+        description: Underlying virtualisation or clustering technology.
+        order_weight: 1200
       - name: status
         kind: Dropdown
-        optional: false
         default_value: active
-        order_weight: 1300
         choices:
           - name: active
             label: Active
@@ -71,3 +69,5 @@ nodes:
             label: Drained
             description: Temporarily taken out of service.
             color: "#9e9e9e"
+        optional: false
+        order_weight: 1300

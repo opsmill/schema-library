@@ -11,20 +11,18 @@ nodes:
   - name: Site
     namespace: Location
     label: Site
+    icon: ri:building-line
+    menu_placement: LocationGeneric
     inherit_from:
       - LocationGeneric
       - LocationHosting
       - IpamPrefixScope
       - IpamVLANGroupScope
-    menu_placement: LocationGeneric
     display_label: name__value
-    icon: ri:building-line
     attributes:
       - name: status
         kind: Dropdown
-        optional: false
         default_value: active
-        order_weight: 1250
         choices:
           - name: active
             label: Active
@@ -41,6 +39,8 @@ nodes:
           - name: retired
             label: Retired
             color: "#6c757d"
+        optional: false
+        order_weight: 1250
       - name: facility
         kind: Text
         unique: false

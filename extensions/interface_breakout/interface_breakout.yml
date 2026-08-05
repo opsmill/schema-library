@@ -13,16 +13,16 @@ extensions:
       attributes:
         - name: breakout_capability
           kind: Boolean
-          optional: false
           default_value: false
+          optional: false
           description: "Indicates if the port supports breakout capability"
       relationships:
         - name: breakout_child_interfaces
           peer: InterfacePhysical
           label: "Breakout child interface(s)"
-          optional: true
-          cardinality: many
           kind: Attribute
+          cardinality: many
+          optional: true
           identifier: "physical__breakout"
           direction: outbound
           description: "Interfaces resulting from the breakout"
@@ -30,9 +30,9 @@ extensions:
         - name: breakout_parent_interface
           peer: InterfacePhysical
           label: "Breakout parent interface"
-          optional: true
-          cardinality: one
           kind: Attribute
+          cardinality: one
+          optional: true
           identifier: "physical__breakout"
           direction: inbound
           description: "Interface from which breakout is created"

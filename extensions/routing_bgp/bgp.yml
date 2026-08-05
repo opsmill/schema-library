@@ -24,14 +24,14 @@ nodes:
     attributes:
       - name: name
         kind: Text
+        unique: true
         description: "Name of the Autonomous System"
         order_weight: 1000
-        unique: true
       - name: asn
         kind: Number
+        unique: true
         description: "Autonomous System Number"
         order_weight: 1050
-        unique: true
       - name: description
         kind: Text
         optional: true
@@ -40,20 +40,20 @@ nodes:
     relationships:
       - name: organization
         peer: OrganizationGeneric
-        optional: false
-        cardinality: one
         kind: Attribute
+        cardinality: one
+        optional: false
       - name: location
         peer: LocationGeneric
-        optional: true
-        cardinality: one
         kind: Attribute
+        cardinality: one
+        optional: true
       - name: devices
         peer: DcimDevice
-        optional: true
-        cardinality: many
         kind: Attribute
 
+        cardinality: many
+        optional: true
   - name: BGPPeerGroup
     namespace: Routing
     description: A BGP Peer Group is used to regroup parameters that are shared across multiple peers
@@ -71,8 +71,8 @@ nodes:
     attributes:
       - name: name
         kind: Text
-        optional: false
         unique: true
+        optional: false
         description: "Name of the BGP Group"
         order_weight: 1000
       - name: import_policies
@@ -85,16 +85,16 @@ nodes:
         order_weight: 1350
       - name: maximum_routes
         kind: Number
-        optional: true
         parameters:
           min_value: 0
+        optional: true
         description: "Maximum routes for the BGP Group."
         order_weight: 1400
       - name: local_pref
         kind: Number
-        optional: true
         parameters:
           min_value: 0
+        optional: true
         description: "Force Local Pref for this BGP Peer Group."
         order_weight: 1450
       - name: send_community
@@ -103,8 +103,8 @@ nodes:
         description: "Whether to send community attributes."
         order_weight: 1500
       - name: address_family
-        description: "The address family for the routing policy indicating the type of IP address."
         kind: Dropdown
+        default_value: "ipv4"
         choices:
           - name: "ipv4"
             label: IPv4
@@ -114,22 +114,22 @@ nodes:
             label: IPv6
             description: "Policy applies to IPv6 addresses."
             color: "#E6E6FA" # lavender
-        default_value: "ipv4"
+        description: "The address family for the routing policy indicating the type of IP address."
         order_weight: 1150
     relationships:
       - name: local_as
-        identifier: bgppeergroup__local_as
         peer: RoutingAutonomousSystem
-        optional: true
-        cardinality: one
         kind: Attribute
-      - name: remote_as
-        identifier: bgppeergroup__remote_as
-        peer: RoutingAutonomousSystem
-        optional: true
         cardinality: one
+        optional: true
+        identifier: bgppeergroup__local_as
+      - name: remote_as
+        peer: RoutingAutonomousSystem
         kind: Attribute
 
+        cardinality: one
+        optional: true
+        identifier: bgppeergroup__remote_as
   - name: BGPSession
     namespace: Routing
     description: A BGP Session represent a point to point connection between two routers
@@ -177,66 +177,66 @@ nodes:
         order_weight: 1600
       - name: local_pref
         kind: Number
-        optional: true
         parameters:
           min_value: 0
+        optional: true
         description: "Force Local Pref for this BGP Peer Session."
         order_weight: 1450
     relationships:
       - name: local_as
+        peer: RoutingAutonomousSystem
+        kind: Attribute
+        cardinality: one
+        optional: true
         identifier: bgpsession__local_as
-        peer: RoutingAutonomousSystem
-        optional: true
-        cardinality: one
-        kind: Attribute
       - name: remote_as
-        identifier: bgpsession__remote_as
         peer: RoutingAutonomousSystem
-        optional: true
-        cardinality: one
         kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: bgpsession__remote_as
       - name: local_ip
+        peer: IpamIPAddress
+        kind: Attribute
+        cardinality: one
+        optional: true
         identifier: bgpsession__local_ip
-        peer: IpamIPAddress
-        optional: true
-        cardinality: one
-        kind: Attribute
       - name: remote_ip
-        identifier: bgpsession__remote_ip
         peer: IpamIPAddress
-        optional: true
-        cardinality: one
         kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: bgpsession__remote_ip
       - name: device
         peer: DcimDevice
-        optional: true
         cardinality: one
+        optional: true
       - name: peer_group
         peer: RoutingBGPPeerGroup
-        optional: true
-        cardinality: one
         kind: Attribute
+        cardinality: one
+        optional: true
       - name: peer_session
         peer: RoutingBGPSession
-        optional: true
-        cardinality: one
         kind: Attribute
 
+        cardinality: one
+        optional: true
 extensions:
   nodes:
     - kind: DcimGenericDevice
       relationships:
         - name: asn
           peer: RoutingAutonomousSystem
-          optional: true
-          cardinality: one
           kind: Attribute
+          cardinality: one
+          optional: true
           order_weight: 1600
     - kind: OrganizationGeneric
       relationships:
         - name: asn
+          peer: RoutingAutonomousSystem
           label: Autonomous System
           cardinality: many
           optional: true
-          peer: RoutingAutonomousSystem
           order_weight: 2000

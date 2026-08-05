@@ -9,10 +9,10 @@ version: "1.0"
 
 generics:
   - name: GenericOadmInterface
-    label: Optical Multiplexer Interfaces
-    menu_placement: DcimOpticalMultiplexer
     namespace: Dcim
+    label: Optical Multiplexer Interfaces
     icon: mdi:ethernet
+    menu_placement: DcimOpticalMultiplexer
     attributes:
       - name: name
         kind: Text
@@ -23,8 +23,6 @@ generics:
         order_weight: 2000
       - name: connector_type
         kind: Dropdown
-        optional: true
-        order_weight: 1100
         choices:
           - name: FC
             label: FC
@@ -112,20 +110,21 @@ generics:
           #   label: Splice
           #   description: "Permanent fiber connection method where two fiber ends are fused."
 
+        optional: true
+        order_weight: 1100
 nodes:
   - name: OpticalMultiplexer
-    label: Optical Multiplexer
-    description: An OADM (Optical Add Drop Multiplexer) supporting various
-      WDM (Wavelength Division Multiplexing) technologies.
-    icon: mdi:transit-connection-variant
     namespace: Dcim
+    description: An OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies.
+    label: Optical Multiplexer
+    icon: mdi:transit-connection-variant
+    inherit_from:
+      - DcimPhysicalDevice
     human_friendly_id:
       - name__value
     order_by:
       - name__value
     display_label: name__value
-    inherit_from:
-      - DcimPhysicalDevice
     attributes:
       - name: name
         kind: Text
@@ -133,9 +132,7 @@ nodes:
         order_weight: 1000
       - name: wdm_type
         kind: Dropdown
-        description: Type of WDM (e.g CWDM. DWDM)
-        order_weight: 1100
-        optional: false
+        default_value: dwdm
         choices:
           - name: cwdm
             label: CWDM (Coarse Wavelength Division Multiplexing)
@@ -145,7 +142,9 @@ nodes:
             label: DWDM (Dense Wavelength Division Multiplexing)
             description: Supports dense wavelengths and amplification for long-distance communication.
             color: "#9933cc"
-        default_value: dwdm
+        optional: false
+        description: Type of WDM (e.g CWDM. DWDM)
+        order_weight: 1100
       - name: description
         kind: Text
         optional: true
@@ -153,79 +152,82 @@ nodes:
     relationships:
       - name: front_interfaces
         peer: DcimOadmFrontInterface
-        identifier: optical_multiplexer__front_interfaces
-        optional: true
-        cardinality: many
         kind: Component
+        cardinality: many
+        optional: true
+        identifier: optical_multiplexer__front_interfaces
       - name: rear_interface
         peer: DcimOadmRearInterface
-        identifier: optical_multiplexer__rear_interface
-        optional: true
-        cardinality: one
         kind: Component
 
+        cardinality: one
+        optional: true
+        identifier: optical_multiplexer__rear_interface
   - name: OadmFrontInterface
+    namespace: Dcim
     label: Optical Multiplexer Front Interfaces
     menu_placement: DcimGenericOadmInterface
-    namespace: Dcim
-    human_friendly_id:
-      - optical_multiplexer__name__value
-      - name__value
-    display_label: "{{ optical_multiplexer__name__value }} > {{ name__value }}"
-    order_by:
-      - optical_multiplexer__name__value
-      - name__value
-    uniqueness_constraints:
-      - [optical_multiplexer, name__value]
     inherit_from:
       - DcimEndpoint
       - DcimGenericOadmInterface
+    human_friendly_id:
+      - optical_multiplexer__name__value
+      - name__value
+    order_by:
+      - optical_multiplexer__name__value
+      - name__value
+    display_label: "{{ optical_multiplexer__name__value }} > {{ name__value }}"
+    uniqueness_constraints:
+      - [optical_multiplexer, name__value]
     relationships:
       - name: optical_multiplexer
         peer: DcimOpticalMultiplexer
-        order_weight: 900
-        identifier: optical_multiplexer__front_interfaces
-        optional: false
-        cardinality: one
         kind: Parent
+        cardinality: one
+        optional: false
+        identifier: optical_multiplexer__front_interfaces
+        order_weight: 900
       - name: channels
         peer: DcimWdmChannel
-        identifier: oadm_interface__channels
-        order_weight: 1200
-        optional: true
-        cardinality: many
         kind: Attribute
 
+        cardinality: many
+        optional: true
+        identifier: oadm_interface__channels
+        order_weight: 1200
   - name: OadmRearInterface
+    namespace: Dcim
     label: Optical Multiplexer Rear Interfaces
     menu_placement: DcimGenericOadmInterface
-    namespace: Dcim
-    human_friendly_id:
-      - optical_multiplexer__name__value
-      - name__value
-    display_label: "{{ optical_multiplexer__name__value }} > {{ name__value }}"
-    order_by:
-      - optical_multiplexer__name__value
-      - name__value
-    uniqueness_constraints:
-      - [optical_multiplexer, name__value]
     inherit_from:
       - DcimEndpoint
       - DcimGenericOadmInterface
+    human_friendly_id:
+      - optical_multiplexer__name__value
+      - name__value
+    order_by:
+      - optical_multiplexer__name__value
+      - name__value
+    display_label: "{{ optical_multiplexer__name__value }} > {{ name__value }}"
+    uniqueness_constraints:
+      - [optical_multiplexer, name__value]
     relationships:
       - name: optical_multiplexer
         peer: DcimOpticalMultiplexer
-        order_weight: 900
-        identifier: optical_multiplexer__rear_interface
-        optional: false
-        cardinality: one
         kind: Parent
 
+        cardinality: one
+        optional: false
+        identifier: optical_multiplexer__rear_interface
+        order_weight: 900
   - name: WdmChannel
     namespace: Dcim
     description: A WDM channel with its wavelength and frequency.
     label: WDM Channel
     icon: game-icons:laser-warning
+    human_friendly_id:
+      - wdm_type__value
+      - channel__value
     order_by:
       - wdm_type__value
       - channel__value
@@ -236,9 +238,6 @@ nodes:
       # For a given type channel number must be unique
       - [channel__value, wdm_type__value]
       # TODO: Maybe add some further validations
-    human_friendly_id:
-      - wdm_type__value
-      - channel__value
     attributes:
       - name: channel
         kind: Number
@@ -246,9 +245,7 @@ nodes:
         order_weight: 1000
       - name: wdm_type
         kind: Dropdown
-        description: Type of WDM (e.g CWDM. DWDM)
-        order_weight: 1100
-        optional: false
+        default_value: dwdm
         choices:
           - name: cwdm
             label: CWDM (Coarse Wavelength Division Multiplexing)
@@ -258,32 +255,32 @@ nodes:
             label: DWDM (Dense Wavelength Division Multiplexing)
             description: Supports dense wavelengths and amplification for long-distance communication.
             color: "#9933cc"
-        default_value: dwdm
+        optional: false
+        description: Type of WDM (e.g CWDM. DWDM)
+        order_weight: 1100
       - name: wavelength
-        label: Wavelength (nm)
         kind: Text # Text until float possible in Number Kind
+        label: Wavelength (nm)
         description: Wavelength of the channel in nm.
         order_weight: 1200
       - name: frequency
-        label: Frequency (GHz)
         kind: Text # Text until float possible in Number Kind
+        label: Frequency (GHz)
         description: Frequency of the channel in GHz.
         order_weight: 1300
 
   - name: WdmSFP
     namespace: Dcim
-    inherit_from:
-      - DcimGenericSFP
     description: SFP with configuration for Wavelength Division Multiplexing.
     label: WDM SFP
     icon: mdi:laser-pointer
     menu_placement: DcimGenericSFP
+    inherit_from:
+      - DcimGenericSFP
     attributes:
       - name: wdm_type
         kind: Dropdown
-        description: Type of WDM (e.g CWDM. DWDM)
-        order_weight: 1100
-        optional: false
+        default_value: dwdm
         choices:
           - name: cwdm
             label: CWDM (Coarse Wavelength Division Multiplexing)
@@ -293,13 +290,15 @@ nodes:
             label: DWDM (Dense Wavelength Division Multiplexing)
             description: Supports dense wavelengths and amplification for long-distance communication.
             color: "#9933cc"
-        default_value: dwdm
+        optional: false
+        description: Type of WDM (e.g CWDM. DWDM)
+        order_weight: 1100
     relationships:
       - name: wdm_channel
-        label: WDM Channel
         peer: DcimWdmChannel
-        identifier: wdm_sfp__channel
+        label: WDM Channel
         kind: Attribute
         cardinality: one
         optional: false
+        identifier: wdm_sfp__channel
         order_weight: 1150

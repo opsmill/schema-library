@@ -15,12 +15,12 @@ nodes:
     icon: streamline:arrow-crossover-right-solid
     inherit_from:
       - DcimConnector
-    order_by:
-      - provider__name__value
-    display_label: "{{ identifier__value }} (Provider: {{ provider__name__value }})"
     human_friendly_id:
       - provider__name__value
       - identifier__value
+    order_by:
+      - provider__name__value
+    display_label: "{{ identifier__value }} (Provider: {{ provider__name__value }})"
     uniqueness_constraints:
       - [identifier__value, provider]
     attributes:
@@ -33,8 +33,6 @@ nodes:
         order_weight: 1300
       - name: status
         kind: Dropdown
-        optional: true
-        order_weight: 1200
         choices:
           - name: connected
             label: Connected
@@ -48,17 +46,19 @@ nodes:
             label: Reserved
             description: "Fully connected and reserved for a future use"
             color: "#9090de"
+        optional: true
+        order_weight: 1200
     relationships:
       - name: location
-        label: Location
         peer: LocationHosting
-        optional: false
-        cardinality: one
+        label: Location
         kind: Attribute
+        cardinality: one
+        optional: false
         order_weight: 1100
       - name: provider
         peer: OrganizationProvider
-        optional: false
-        cardinality: one
         kind: Attribute
+        cardinality: one
+        optional: false
         order_weight: 1000

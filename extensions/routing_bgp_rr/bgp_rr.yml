@@ -20,28 +20,28 @@ nodes:
     attributes:
       - name: name
         kind: Text
+        unique: true
         description: "Name of the Route Reflector Cluster"
         order_weight: 1000
-        unique: true
       - name: description
         kind: Text
-        description: "Optional description of the Route Reflector Cluster"
         optional: true
+        description: "Optional description of the Route Reflector Cluster"
         order_weight: 1100
     relationships:
       - name: cluster_id
-        label: "Cluster ID"
         peer: IpamIPAddress
-        description: "Cluster ID represented as a reference to an IP Address"
-        cardinality: one
+        label: "Cluster ID"
         kind: Attribute
+        cardinality: one
         optional: false
+        description: "Cluster ID represented as a reference to an IP Address"
         order_weight: 1200
       - name: peer_groups
-        label: "BGP Peer Groups"
         peer: RoutingBGPPeerGroup
-        cardinality: many
+        label: "BGP Peer Groups"
         kind: Generic
+        cardinality: many
         optional: true
 
 extensions:
@@ -49,8 +49,8 @@ extensions:
     - kind: RoutingBGPPeerGroup
       relationships:
         - name: rr_cluster
-          label: "RR Cluster"
           peer: RoutingBGPRRCluster
-          cardinality: one
+          label: "RR Cluster"
           kind: Attribute
+          cardinality: one
           order_weight: 1600

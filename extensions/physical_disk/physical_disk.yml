@@ -10,28 +10,26 @@ version: "1.0"
 generics:
   - name: DeviceWithPhysicalDisks
     namespace: Dcim
-    description:
-      Generic that hold relationship toward physical disks. To apply on device that can have physical
-      disks.
+    description: Generic that hold relationship toward physical disks. To apply on device that can have physical disks.
     include_in_menu: false
     relationships:
       - name: physical_disks
-        cardinality: many
         peer: DcimPhysicalDisk
-        optional: true
         kind: Component
 
+        cardinality: many
+        optional: true
 nodes:
   - name: PhysicalDisk
     namespace: Dcim
     description: Physical Disk
     label: Physical Disk
     icon: carbon:vmdk-disk
+    human_friendly_id:
+      - name__value
     order_by:
       - name__value
     display_label: name__value
-    human_friendly_id:
-      - name__value
     uniqueness_constraints:
       - [device, name__value]
     attributes:
@@ -41,9 +39,6 @@ nodes:
         order_weight: 900
       - name: disk_type
         kind: Dropdown
-        description: Specifies the type of disk
-        order_weight: 950
-        optional: true
         choices:
           - name: ssd
             label: SSD
@@ -61,9 +56,11 @@ nodes:
             label: Hybrid
             description: Hybrid Drive
             color: "#ffcc80"
+        optional: true
+        description: Specifies the type of disk
+        order_weight: 950
       - name: status
         kind: Dropdown
-        description: Lifecycle status of the hardware component.
         choices:
           - name: in_inventory
             label: In Inventory
@@ -81,18 +78,19 @@ nodes:
             label: Disposed
             description: The disk has been securely erased and disposed of.
             color: "#dc3545"
+        description: Lifecycle status of the hardware component.
       - name: size
-        label: Size (GB)
         kind: Number
+        label: Size (GB)
         optional: false
-        order_weight: 1000
         description: Disk capacity (in GB).
+        order_weight: 1000
       - name: serial_number
         kind: Text
-        description: Serial number of the disk
         unique: true
-        order_weight: 1100
         optional: true
+        description: Serial number of the disk
+        order_weight: 1100
       - name: description
         kind: Text
         unique: false
@@ -101,7 +99,7 @@ nodes:
     relationships:
       - name: device
         peer: DcimDeviceWithPhysicalDisks
-        optional: false
-        cardinality: one
         kind: Parent
+        cardinality: one
+        optional: false
         order_weight: 800

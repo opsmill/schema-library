@@ -11,42 +11,40 @@ nodes:
   - name: Region
     namespace: Location
     label: Region
+    icon: carbon:cics-region-target
+
+    menu_placement: LocationGeneric
     inherit_from:
       - LocationGeneric
       - IpamPrefixScope
-    menu_placement: LocationGeneric
     parent: ""
     children: LocationCountry
-    icon: carbon:cics-region-target
-
   - name: Country
     namespace: Location
     label: Country
-    inherit_from:
-      - LocationGeneric
-    menu_placement: LocationGeneric
-    parent: LocationRegion
-    children: LocationSite
     icon: gis:search-country
 
+    menu_placement: LocationGeneric
+    inherit_from:
+      - LocationGeneric
+    parent: LocationRegion
+    children: LocationSite
   - name: Site
     namespace: Location
     label: Site
+    icon: ri:building-line
+    menu_placement: LocationGeneric
     inherit_from:
       - LocationGeneric
       - LocationHosting
       - IpamPrefixScope
       - IpamVLANGroupScope
-    menu_placement: LocationGeneric
-    display_label: name__value
     parent: LocationCountry
-    icon: ri:building-line
+    display_label: name__value
     attributes:
       - name: status
         kind: Dropdown
-        optional: false
         default_value: active
-        order_weight: 1250
         choices:
           - name: active
             label: Active
@@ -63,6 +61,8 @@ nodes:
           - name: retired
             label: Retired
             color: "#6c757d"
+        optional: false
+        order_weight: 1250
       - name: facility
         kind: Text
         unique: false

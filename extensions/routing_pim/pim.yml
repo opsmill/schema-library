@@ -16,20 +16,20 @@ nodes:
     include_in_menu: false
     inherit_from:
       - "RoutingProtocol"
-    order_by:
-      - vrf__name__value
-      - device__name__value
-    uniqueness_constraints:
-      - ["device", "vrf"]
     human_friendly_id:
       - "device__name__value"
       - "vrf__name__value"
+    order_by:
+      - vrf__name__value
+      - device__name__value
     display_label: description__value
+    uniqueness_constraints:
+      - ["device", "vrf"]
     attributes:
       - name: dr_priority
         kind: Number
-        optional: true
         default_value: 1
+        optional: true
         description: "Designated Router priority."
         order_weight: 1250
       - name: import_policies
@@ -43,37 +43,37 @@ nodes:
     relationships:
       - name: rp_address
         peer: IpamIPAddress
+        kind: Attribute
+        cardinality: one
         optional: true
         description: "Rendezvous Point (RP) address for PIM."
-        cardinality: one
-        kind: Attribute
       - name: pim_interfaces
-        label: PIM Interfaces
         peer: RoutingPIMInterface
-        identifier: pim__piminterfaces
-        optional: true
-        cardinality: many
+        label: PIM Interfaces
         kind: Component
 
+        cardinality: many
+        optional: true
+        identifier: pim__piminterfaces
   - name: PIMInterface
     namespace: Routing
     description: "Interface configuration for PIM."
     label: "PIM Interface"
     icon: "mdi:ethernet"
     include_in_menu: false
+    human_friendly_id:
+      - "description__value"
     order_by:
       - description__value
     display_label: description__value
     uniqueness_constraints:
       - ["pim", "interface"]
-    human_friendly_id:
-      - "description__value"
     attributes:
       # Could be computed later on based on PIM Instance / Interface Name
       - name: description
         kind: Text
-        optional: false
         unique: true
+        optional: false
         description: "Description of the OSPF interface."
         order_weight: 1100
       - name: pim_mode
@@ -95,27 +95,27 @@ nodes:
         order_weight: 1150
       - name: hello_interval
         kind: Number
-        optional: true
         default_value: 30
+        optional: true
         description: "Interval for PIM hello messages (in seconds)."
         order_weight: 1300
       - name: dr_priority
         kind: Number
-        optional: true
         default_value: 1
+        optional: true
         description: "Designated Router priority on the interface."
         order_weight: 1250
     relationships:
       - name: pim
-        label: PIM
         peer: RoutingPIM
-        identifier: pim__piminterfaces
-        optional: false
-        cardinality: one
+        label: PIM
         kind: Parent
+        cardinality: one
+        optional: false
+        identifier: pim__piminterfaces
       - name: interface
         peer: InterfaceLayer3
-        optional: false
-        cardinality: one
         kind: Attribute
+        cardinality: one
+        optional: false
         order_weight: 1200

@@ -17,70 +17,67 @@ nodes:
       - OrganizationGeneric
     relationships:
       - name: devices
-        label: Devices
         peer: DcimGenericDevice
+        label: Devices
+        kind: Generic
+        cardinality: many
+        optional: true
         identifier: tenant__device
-        cardinality: many
-        optional: true
-        kind: Generic
       - name: prefixes
-        label: Prefixes
         peer: IpamPrefix
+        label: Prefixes
+        kind: Generic
+        cardinality: many
+        optional: true
         identifier: tenant__prefix
-        cardinality: many
-        optional: true
-        kind: Generic
       - name: addresses
-        label: Addresses
         peer: IpamIPAddress
-        identifier: tenant__ipaddress
-        cardinality: many
-        optional: true
+        label: Addresses
         kind: Generic
-      - name: locations
-        label: Locations
-        peer: LocationHosting
-        identifier: tenant__location
         cardinality: many
         optional: true
+        identifier: tenant__ipaddress
+      - name: locations
+        peer: LocationHosting
+        label: Locations
         kind: Generic
 
+        cardinality: many
+        optional: true
+        identifier: tenant__location
 extensions:
   nodes:
     - kind: DcimGenericDevice
       relationships:
         - name: tenant
           peer: TenancyTenant
-          identifier: tenant__device
-          optional: true
-          cardinality: one
           kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: tenant__device
           order_weight: 1800
     - kind: IpamPrefix
       relationships:
         - name: tenant
           peer: TenancyTenant
-          identifier: tenant__prefix
-          optional: true
-          cardinality: one
           kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: tenant__prefix
           order_weight: 1400
     - kind: IpamIPAddress
       relationships:
         - name: tenant
           peer: TenancyTenant
-          identifier: tenant__ipaddress
-          optional: true
-          cardinality: one
           kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: tenant__ipaddress
           order_weight: 1300
     - kind: LocationHosting
       relationships:
         - name: tenant
           peer: TenancyTenant
-          identifier: tenant__location
-          optional: true
-          cardinality: one
           kind: Attribute
 
 # ---------------------------------------------------------------------------
@@ -118,3 +115,6 @@ extensions:
 #             kind: Generic
 #
 # The same pattern applies to any other optional extension node you want tenancy on.
+          cardinality: one
+          optional: true
+          identifier: tenant__location

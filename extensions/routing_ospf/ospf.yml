@@ -14,28 +14,29 @@ nodes:
     label: "OSPF"
     icon: "mdi:network-outline"
     include_in_menu: false
-    order_by:
-      - router_id__address__value
-      - vrf__name__value
-      - device__name__value
-    uniqueness_constraints:
-      - ["device", "vrf", "version__value"]
+    inherit_from:
+      - "RoutingProtocol"
     human_friendly_id:
       - "device__name__value"
       - "vrf__name__value"
       - "version__value"
+    order_by:
+      - router_id__address__value
+      - vrf__name__value
+      - device__name__value
     display_label: description__value
-    inherit_from:
-      - "RoutingProtocol"
+    uniqueness_constraints:
+      - ["device", "vrf", "version__value"]
     attributes:
       - name: reference_bandwidth
         kind: Number
-        optional: true
         default_value: 1000
+        optional: true
         description: "Reference bandwidth for OSPF instance (in Mbps)."
         order_weight: 1150
       - name: version
         kind: Dropdown
+        default_value: ospf
         choices:
           - name: ospf
             label: OSPFv2
@@ -45,7 +46,6 @@ nodes:
             label: OSPFv3
             description: "Open Shortest Path First version 3."
             color: "#E6E6FA" # lavender
-        default_value: ospf
         description: "Version of the OSPF protocol."
         order_weight: 1100
       - name: import_policies
@@ -59,36 +59,36 @@ nodes:
     relationships:
       - name: router_id
         peer: IpamIPAddress
-        optional: true
-        cardinality: one
         kind: Attribute
-      - name: ospf_interfaces
-        label: OSPF Interfaces
-        peer: RoutingOSPFInterface
-        identifier: ospf__ospfinterfaces
+        cardinality: one
         optional: true
-        cardinality: many
+      - name: ospf_interfaces
+        peer: RoutingOSPFInterface
+        label: OSPF Interfaces
         kind: Component
 
+        cardinality: many
+        optional: true
+        identifier: ospf__ospfinterfaces
   - name: OSPFInterface
     namespace: Routing
     description: "Pivot table linking OSPF configuration to an interface."
     label: "OSPF Interface"
     icon: "mdi:ethernet"
     include_in_menu: false
+    human_friendly_id:
+      - "description__value"
     order_by:
       - description__value
     display_label: description__value
     uniqueness_constraints:
       - ["ospf", "interface"]
-    human_friendly_id:
-      - "description__value"
     attributes:
       # Could be computed later on based on OSPF Instance / Interface Name
       - name: description
         kind: Text
-        optional: false
         unique: true
+        optional: false
         description: "Description of the OSPF interface."
         order_weight: 1500
       - name: metric
@@ -98,6 +98,7 @@ nodes:
         order_weight: 1400
       - name: mode
         kind: Dropdown
+        default_value: normal
         choices:
           - name: normal
             label: Normal
@@ -111,13 +112,12 @@ nodes:
             label: Peer-to-Peer
             description: "OSPF peer-to-peer interface mode."
             color: "#E6E6FA" # lavender
-        default_value: normal
         description: "Mode of the OSPF interface."
         order_weight: 1300
       - name: authentication_key
         kind: Password
-        description: "Shared secret used to authenticate and secure routing messages between neighboring routers."
         optional: true
+        description: "Shared secret used to authenticate and secure routing messages between neighboring routers."
         order_weight: 1250
       - name: authentication_mode
         kind: Dropdown
@@ -136,16 +136,16 @@ nodes:
         order_weight: 1200
     relationships:
       - name: ospf
-        label: OSPF
         peer: RoutingOSPF
-        identifier: ospf__ospfinterfaces
-        optional: false
-        cardinality: one
+        label: OSPF
         kind: Parent
+        cardinality: one
+        optional: false
+        identifier: ospf__ospfinterfaces
         order_weight: 1100
       - name: interface
         peer: InterfaceLayer3
-        optional: false
-        cardinality: one
         kind: Attribute
+        cardinality: one
+        optional: false
         order_weight: 1200

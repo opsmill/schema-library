@@ -23,30 +23,31 @@ generics:
         order_weight: 1100
     relationships:
       - name: bundle_members
-        label: "Member(s)"
         peer: InterfacePhysical
-        identifier: interface__bundle
-        cardinality: many
+        label: "Member(s)"
         kind: Attribute
+        cardinality: many
+        identifier: interface__bundle
         description: "Physical Interfaces that are members of this aggregate"
         order_weight: 1800
 
 nodes:
   - name: Lag
     namespace: Interface
-    label: LAG Interface
     description: "LAG interface"
+    label: LAG Interface
+    include_in_menu: false
     inherit_from:
       - DcimInterface
       - InterfaceLayer2
       - InterfaceLayer3
       - InterfaceHasSubInterface
       - GenericInterfaceBundle
-    include_in_menu: false
     attributes:
       - name: lacp_rate
-        label: "LACP Rate"
         kind: Dropdown
+        label: "LACP Rate"
+        default_value: fast
         choices:
           - name: slow
             label: Slow
@@ -54,12 +55,12 @@ nodes:
           - name: fast
             label: Fast
             color: "#E6E6FA" # lavender
-        default_value: fast
         description: "LACP rate for the aggregated interface"
         order_weight: 1700
       - name: lacp_mode
-        label: LACP Mode
         kind: Dropdown
+        label: LACP Mode
+        default_value: active
         choices:
           - name: active
             label: Active
@@ -71,17 +72,16 @@ nodes:
             label: Disabled
             color: "#E6E6FA" # lavender
         description: "LACP mode for the aggregated interface"
-        default_value: active
         order_weight: 1750
     relationships:
       # Redifine the relationship here to add common_parent constraint
       - name: bundle_members
-        common_parent: device
-        label: "Member(s)"
         peer: InterfacePhysical
-        identifier: interface__bundle
-        cardinality: many
+        label: "Member(s)"
         kind: Attribute
+        cardinality: many
+        identifier: interface__bundle
+        common_parent: device
         description: "Physical Interfaces that are members of this aggregate"
         order_weight: 1800
 
@@ -90,11 +90,11 @@ extensions:
     - kind: InterfacePhysical
       relationships:
         - name: bundle
-          label: Interface Bundle
           peer: GenericInterfaceBundle
-          identifier: interface__bundle
-          optional: true
-          cardinality: one
+          label: Interface Bundle
           kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: interface__bundle
           description: "Interface Bundle using this Physical Interface"
           order_weight: 1800

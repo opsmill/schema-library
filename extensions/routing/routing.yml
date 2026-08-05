@@ -1,10 +1,10 @@
+---
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
 # Adapting it for your environment typically requires architectural review — see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
----
 version: "1.0"
 
 generics:
@@ -18,8 +18,8 @@ generics:
       # TODO: Should be computed later
       - name: description
         kind: Text
-        optional: false
         unique: true
+        optional: false
         description: "Description of the protocol"
         order_weight: 1100
       - name: status
@@ -42,14 +42,14 @@ generics:
     relationships:
       - name: device
         peer: DcimDevice
-        optional: false
-        cardinality: one
         kind: Parent
+        cardinality: one
+        optional: false
         order_weight: 1050
       - name: vrf
-        label: VRF
         peer: IpamVRF
-        optional: false
-        cardinality: one
+        label: VRF
         kind: Attribute
+        cardinality: one
+        optional: false
         order_weight: 1075

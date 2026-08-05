@@ -9,10 +9,10 @@ version: "1.0"
 
 generics:
   - name: GenericPatchPanelInterface
-    label: Patch Panel Interfaces
-    menu_placement: DcimPatchPanel
     namespace: Dcim
+    label: Patch Panel Interfaces
     icon: mdi:ethernet
+    menu_placement: DcimPatchPanel
     attributes:
       - name: name
         kind: Text
@@ -23,7 +23,6 @@ generics:
         order_weight: 2000
       - name: connector_type
         kind: Dropdown
-        order_weight: 1100
         choices:
           - name: FC
             label: FC
@@ -111,27 +110,28 @@ generics:
           #   label: Splice
           #   description: "Permanent fiber connection method where two fiber ends are fused."
 
+        order_weight: 1100
 nodes:
   - name: PatchPanel
-    label: Patch Panel
-    description: A Patch Panel used for managing network cable connections in a data center or telecom setup.
-    icon: ic:round-device-hub
     namespace: Dcim
+    description: A Patch Panel used for managing network cable connections in a data center or telecom setup.
+    label: Patch Panel
+    icon: ic:round-device-hub
+    inherit_from:
+      - DcimPhysicalDevice
     human_friendly_id:
       - name__value
     order_by:
       - name__value
     display_label: name__value
-    inherit_from:
-      - DcimPhysicalDevice
     attributes:
       - name: name
         kind: Text
         unique: true # TODO: maybe combine location / name
         order_weight: 1000
       - name: module_capacity
-        label: Module Capacity
         kind: Number
+        label: Module Capacity
         optional: true
         description: The maximum number of modules that can be housed within this patch panel.
       - name: description
@@ -141,77 +141,77 @@ nodes:
     relationships:
       - name: front_interfaces
         peer: DcimFrontPatchPanelInterface
-        identifier: front_interfaces
-        optional: true
-        cardinality: many
         kind: Component
+        cardinality: many
+        optional: true
+        identifier: front_interfaces
       - name: rear_interfaces
         peer: DcimRearPatchPanelInterface
-        identifier: rear_interfaces
-        optional: true
-        cardinality: many
         kind: Component
 
+        cardinality: many
+        optional: true
+        identifier: rear_interfaces
   - name: FrontPatchPanelInterface
+    namespace: Dcim
     label: Patch Panel Front Interfaces
     menu_placement: DcimGenericPatchPanelInterface
-    namespace: Dcim
+    inherit_from:
+      - DcimEndpoint
+      - DcimGenericPatchPanelInterface
     human_friendly_id:
       - patch_panel__name__value
       - name__value
-    display_label: "{{ patch_panel__name__value }} > {{ name__value }}"
     order_by:
       - corresponding_front_rear__name__value
       - name__value
+    display_label: "{{ patch_panel__name__value }} > {{ name__value }}"
     uniqueness_constraints:
       - [patch_panel, name__value]
+    relationships:
+      - name: corresponding_front_rear
+        peer: DcimRearPatchPanelInterface
+        label: Corresponding rear interface
+        kind: Attribute
+        cardinality: one
+        optional: true
+        order_weight: 1200
+      - name: patch_panel
+        peer: DcimPatchPanel
+        kind: Parent
+
+        cardinality: one
+        optional: false
+        identifier: front_interfaces
+        order_weight: 900
+  - name: RearPatchPanelInterface
+    namespace: Dcim
+    label: Patch Panel Rear Interfaces
+    menu_placement: DcimGenericPatchPanelInterface
     inherit_from:
       - DcimEndpoint
       - DcimGenericPatchPanelInterface
-    relationships:
-      - name: corresponding_front_rear
-        label: Corresponding rear interface
-        peer: DcimRearPatchPanelInterface
-        order_weight: 1200
-        optional: true
-        cardinality: one
-        kind: Attribute
-      - name: patch_panel
-        peer: DcimPatchPanel
-        order_weight: 900
-        identifier: front_interfaces
-        optional: false
-        cardinality: one
-        kind: Parent
-
-  - name: RearPatchPanelInterface
-    label: Patch Panel Rear Interfaces
-    menu_placement: DcimGenericPatchPanelInterface
-    namespace: Dcim
     human_friendly_id:
       - patch_panel__name__value
       - name__value
-    display_label: "{{ patch_panel__name__value }} > {{ name__value }}"
     order_by:
       - patch_panel__name__value
       - name__value
+    display_label: "{{ patch_panel__name__value }} > {{ name__value }}"
     uniqueness_constraints:
       - [patch_panel, name__value]
-    inherit_from:
-      - DcimEndpoint
-      - DcimGenericPatchPanelInterface
     relationships:
       - name: corresponding_front_rear
-        label: Corresponding front interfaces
         peer: DcimFrontPatchPanelInterface
-        order_weight: 1200
-        optional: true
-        cardinality: many
+        label: Corresponding front interfaces
         kind: Attribute
+        cardinality: many
+        optional: true
+        order_weight: 1200
       - name: patch_panel
         peer: DcimPatchPanel
-        order_weight: 900
-        identifier: rear_interfaces
-        optional: false
-        cardinality: one
         kind: Parent
+        cardinality: one
+        optional: false
+        identifier: rear_interfaces
+        order_weight: 900

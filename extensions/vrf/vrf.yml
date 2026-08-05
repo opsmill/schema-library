@@ -21,15 +21,15 @@ nodes:
     attributes:
       - name: name
         kind: Text
-        optional: false
         unique: true
+        optional: false
       - name: vrf_rd
-        label: Route Distinguisher
         kind: Text
+        label: Route Distinguisher
         optional: true
       - name: enforce_unique
-        label: Enforce Unique
         kind: Boolean
+        label: Enforce Unique
         default_value: true
         optional: true
         order_weight: 1100
@@ -47,20 +47,20 @@ nodes:
       #   cardinality: one
       #   kind: Attribute
       - name: import_rt
-        identifier: vrf__import
+        peer: IpamRouteTarget
         label: Import Targets
-        peer: IpamRouteTarget
-        optional: true
-        cardinality: many
         kind: Attribute
-      - name: export_rt
-        identifier: vrf__export
-        label: Export Targets
-        peer: IpamRouteTarget
-        optional: true
         cardinality: many
+        optional: true
+        identifier: vrf__import
+      - name: export_rt
+        peer: IpamRouteTarget
+        label: Export Targets
         kind: Attribute
 
+        cardinality: many
+        optional: true
+        identifier: vrf__export
   - name: RouteTarget
     namespace: Ipam
     description: Route Target (RFC 4360)
@@ -82,37 +82,37 @@ nodes:
         optional: true
     relationships:
       - name: import_vrf
+        peer: IpamVRF
         label: Imported by VRFs
-        identifier: vrf__import
-        peer: IpamVRF
-        optional: true
         cardinality: many
-      - name: export_vrf
-        label: Exported by VRFs
-        identifier: vrf__export
-        peer: IpamVRF
         optional: true
+        identifier: vrf__import
+      - name: export_vrf
+        peer: IpamVRF
+        label: Exported by VRFs
         cardinality: many
 
+        optional: true
+        identifier: vrf__export
 extensions:
   nodes:
     - kind: IpamPrefix
       relationships:
         - name: vrf
-          label: VRF
           peer: IpamVRF
-          identifier: prefix__vrf
-          optional: true
-          cardinality: one
+          label: VRF
           kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: prefix__vrf
           order_weight: 1150
     - kind: IpamIPAddress
       relationships:
         - name: vrf
-          label: VRF
           peer: IpamVRF
-          identifier: ip_address__vrf
-          optional: true
-          cardinality: one
+          label: VRF
           kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: ip_address__vrf
           order_weight: 1150

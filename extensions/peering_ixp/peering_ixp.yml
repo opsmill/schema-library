@@ -1,10 +1,10 @@
+---
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
 # Adapting it for your environment typically requires architectural review — see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
----
 version: "1.0"
 nodes:
   - name: IXP
@@ -25,11 +25,12 @@ nodes:
         order_weight: 1000
       - name: description
         kind: Text
-        description: "An optional description of the Internet Exchange"
         optional: true
+        description: "An optional description of the Internet Exchange"
         order_weight: 1100
       - name: status
         kind: Dropdown
+        default_value: "enabled"
         choices:
           - name: enabled
             label: Enabled
@@ -39,49 +40,48 @@ nodes:
             label: Disabled
             description: "Internet Exchange is not operational"
             color: "#b0bec5"
-        default_value: "enabled"
         order_weight: 1200
     relationships:
       - name: connections
         peer: PeeringIXPConnection
-        optional: true
-        cardinality: many
         kind: Component
+        cardinality: many
+        optional: true
         description: "IXP connections associated with this Internet Exchange"
       - name: local_as
         peer: RoutingAutonomousSystem
-        optional: true
-        cardinality: one
         kind: Attribute
+        cardinality: one
+        optional: true
         order_weight: 1300
       - name: import_policies
-        label: Import Routing Policies
         peer: RoutingPolicyBGP
-        identifier: ixp__import_bgppolicies
-        optional: true
-        cardinality: many
+        label: Import Routing Policies
         kind: Generic
+        cardinality: many
+        optional: true
+        identifier: ixp__import_bgppolicies
         description: "Import routing policies applied to the session"
       - name: export_policies
-        label: Export Routing Policies
         peer: RoutingPolicyBGP
-        identifier: ixp__export_bgppolicies
-        optional: true
-        cardinality: many
+        label: Export Routing Policies
         kind: Generic
+        cardinality: many
+        optional: true
+        identifier: ixp__export_bgppolicies
         description: "Export routing policies applied to the session"
       - name: bgp_communities
-        label: "BGP Communities"
         peer: RoutingBGPCommunity
-        optional: true
-        cardinality: many
+        label: "BGP Communities"
         kind: Generic
+        cardinality: many
+        optional: true
         description: "BGP communities associated with the session"
       - name: tags
         peer: BuiltinTag
-        optional: true
-        cardinality: many
         kind: Attribute
+        cardinality: many
+        optional: true
         order_weight: 3000
 
   - name: IXPConnection
@@ -90,13 +90,13 @@ nodes:
     label: "IXP Connection"
     icon: "mdi:lan-connect"
     menu_placement: PeeringIXP
-    uniqueness_constraints:
-      - ["name__value"]
     human_friendly_id:
       - "name__value"
     order_by:
       - name__value
     display_label: name__value
+    uniqueness_constraints:
+      - ["name__value"]
     attributes:
       - name: name
         kind: Text
@@ -109,14 +109,14 @@ nodes:
         description: "Description of the IXP Connection"
         order_weight: 1100
       - name: peeringdb_netixlan
-        label: PeeringDB Netixlan
         kind: Number
+        label: PeeringDB Netixlan
         optional: true
         description: "PeeringDB ID for the IXP connection"
         order_weight: 1150
       - name: status
         kind: Dropdown
-        optional: true
+        default_value: "enabled"
         choices:
           - name: enabled
             label: Enabled
@@ -138,12 +138,12 @@ nodes:
             label: Disabled
             description: "The system is not operational and cannot be used."
             color: "#b0bec5"
-        default_value: "enabled"
+        optional: true
         order_weight: 1200
       - name: vlan
         kind: Number
-        description: "VLAN ID for the connection"
         optional: true
+        description: "VLAN ID for the connection"
         order_weight: 1300
       - name: mac_address
         kind: MacAddress
@@ -153,47 +153,47 @@ nodes:
         order_weight: 1350
     relationships:
       - name: ipv6_address
-        label: IPv6 Address
-        description: "IPv6 address assigned to the connection"
         peer: IpamIPAddress
-        identifier: ixpconn__ipv6_address
-        cardinality: one
+        label: IPv6 Address
         kind: Attribute
+        cardinality: one
+        identifier: ixpconn__ipv6_address
+        description: "IPv6 address assigned to the connection"
         order_weight: 1400
       - name: ipv4_address
-        label: IPv4 Address
-        description: "IPv4 address assigned to the connection"
         peer: IpamIPAddress
-        identifier: ixpconn__ipv4_address
-        cardinality: one
+        label: IPv4 Address
         kind: Attribute
+        cardinality: one
+        identifier: ixpconn__ipv4_address
+        description: "IPv4 address assigned to the connection"
         order_weight: 1375
       - name: internet_exchange_point
-        label: IXP
         peer: PeeringIXP
-        optional: false
-        cardinality: one
+        label: IXP
         kind: Parent
+        cardinality: one
+        optional: false
         description: "The Internet Exchange Point this connection is part of"
       - name: router
         peer: DcimDevice
-        cardinality: one
         kind: Attribute
+        cardinality: one
         description: "The router this IXP connection is connected to"
         order_weight: 1400
       - name: bgp_sessions
-        label: BGP Sessions
         peer: RoutingBGPSession
-        identifier: ixpconn__bgpsessions
-        optional: true
-        cardinality: many
+        label: BGP Sessions
         kind: Component
+        cardinality: many
+        optional: true
+        identifier: ixpconn__bgpsessions
         description: "BGP sessions established over this IXP connection"
         order_weight: 1450
       - name: tags
         peer: BuiltinTag
-        cardinality: many
         kind: Attribute
+        cardinality: many
         order_weight: 3000
 
 extensions:
@@ -201,10 +201,10 @@ extensions:
     - kind: RoutingBGPSession
       relationships:
         - name: ixp_connection
-          label: IXP Connection
           peer: PeeringIXPConnection
-          identifier: ixpconn__bgpsessions
-          optional: true
-          cardinality: one
+          label: IXP Connection
           kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: ixpconn__bgpsessions
           description: "The IXP connection this BGP session is established over"

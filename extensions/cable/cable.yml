@@ -13,18 +13,16 @@ nodes:
     description: Physical cable connecting two endpoints
     label: Cable
     icon: mdi:cable-data
-    display_label: label__value
     menu_placement: DcimDevice
-    order_by:
-      - label__value
     inherit_from:
       - DcimConnector
+    order_by:
+      - label__value
+    display_label: label__value
     attributes:
       - name: status
         kind: Dropdown
-        optional: false
         default_value: connected
-        order_weight: 1000
         choices:
           - name: connected
             label: Connected
@@ -34,10 +32,10 @@ nodes:
             label: Planned
             description: In the process of being set up
             color: "#2196f3"
+        optional: false
+        order_weight: 1000
       - name: cable_type
         kind: Dropdown
-        optional: true
-        order_weight: 1100
         choices:
           # Copper Cables
           - name: cat3
@@ -136,10 +134,10 @@ nodes:
             label: USB
             description: "Universal Serial Bus cable."
             color: "#000000" # Black
+        optional: true
+        order_weight: 1100
       - name: color
         kind: Dropdown
-        optional: true
-        order_weight: 1300
         choices:
           - name: dark-red
             label: Dark Red
@@ -219,13 +217,15 @@ nodes:
           - name: black
             label: Black
             color: "#111111"
+        optional: true
+        order_weight: 1300
       - name: label
         kind: Text
         optional: true
         order_weight: 1200
       # As we can't put float in Number "forcing" length in cm
       - name: length
-        label: Length (in cm)
         kind: Number
+        label: Length (in cm)
         optional: true
         order_weight: 1350

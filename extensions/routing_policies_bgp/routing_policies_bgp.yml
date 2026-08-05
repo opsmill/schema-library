@@ -1,10 +1,10 @@
+---
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
 # Adapting it for your environment typically requires architectural review — see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
----
 version: "1.0"
 
 nodes:
@@ -30,20 +30,20 @@ extensions:
           state: absent
       relationships:
         - name: import_routing_policies
-          label: Import Routing Policies
           peer: RoutingPolicyBGP
-          identifier: bgppeergroup__import_policies
-          description: "The routing-policies used by this instance for import."
+          label: Import Routing Policies
           kind: Generic
           cardinality: many
+          identifier: bgppeergroup__import_policies
+          description: "The routing-policies used by this instance for import."
         - name: export_routing_policies
-          label: Export Routing Policies
           peer: RoutingPolicyBGP
-          identifier: bgppeergroup__export_policies
-          description: "The routing-policies used by this instance for export."
+          label: Export Routing Policies
           kind: Generic
           cardinality: many
 
+          identifier: bgppeergroup__export_policies
+          description: "The routing-policies used by this instance for export."
     - kind: RoutingBGPSession
       attributes:
         - name: import_policies
@@ -54,16 +54,16 @@ extensions:
           state: absent
       relationships:
         - name: import_routing_policies
-          label: Import Routing Policies
           peer: RoutingPolicyBGP
+          label: Import Routing Policies
+          kind: Generic
+          cardinality: many
           identifier: bgpsession__import_policies
           description: "The routing-policies used by this instance for import."
+        - name: export_routing_policies
+          peer: RoutingPolicyBGP
+          label: Export Routing Policies
           kind: Generic
           cardinality: many
-        - name: export_routing_policies
-          label: Export Routing Policies
-          peer: RoutingPolicyBGP
           identifier: bgpsession__export_policies
           description: "The routing-policies used by this instance for export."
-          kind: Generic
-          cardinality: many

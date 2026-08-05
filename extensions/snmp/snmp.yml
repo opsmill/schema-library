@@ -15,28 +15,28 @@ generics:
     icon: iconoir:community
     human_friendly_id:
       - name__value
-    display_label: name__value
     order_by:
       - name__value
+    display_label: name__value
     attributes:
       - name: name
         kind: Text
         order_weight: 1000
       - name: description
         kind: Text
-        order_weight: 1100
         optional: true
+        order_weight: 1100
     relationships:
       - name: clients
         peer: SnmpClient
-        cardinality: many
         kind: Component
-      - name: devices
-        label: Devices
-        description: Devices this community is configured on.
-        peer: DcimDevice
         cardinality: many
+      - name: devices
+        peer: DcimDevice
+        label: Devices
         kind: Attribute
+        cardinality: many
+        description: Devices this community is configured on.
         order_weight: 1200
 
 nodes:
@@ -47,13 +47,13 @@ nodes:
     label: SNMP v1/v2c
     icon: iconoir:community
     menu_placement: SnmpCommunity
-    human_friendly_id:
-      - name__value
-    display_label: name__value
-    order_by:
-      - name__value
     inherit_from:
       - SnmpCommunity
+    human_friendly_id:
+      - name__value
+    order_by:
+      - name__value
+    display_label: name__value
     attributes:
       - name: community_string
         kind: Password
@@ -75,20 +75,20 @@ nodes:
     label: SNMP v3
     icon: iconoir:community
     menu_placement: SnmpCommunity
-    human_friendly_id:
-      - name__value
-    display_label: name__value
-    order_by:
-      - name__value
     inherit_from:
       - SnmpCommunity
+    human_friendly_id:
+      - name__value
+    order_by:
+      - name__value
+    display_label: name__value
     attributes:
       - name: username
         kind: Text
         order_weight: 1300
       - name: auth_protocol
-        label: Authentication Protocol
         kind: Dropdown
+        label: Authentication Protocol
         choices:
           - name: none
             label: None
@@ -101,13 +101,13 @@ nodes:
             description: SHA authentication.
         order_weight: 1400
       - name: auth_password
-        label: Authentication Password
         kind: Password
-        order_weight: 1500
+        label: Authentication Password
         optional: true
+        order_weight: 1500
       - name: privacy_protocol
-        label: Privacy Protocol
         kind: Dropdown
+        label: Privacy Protocol
         choices:
           - name: none
             label: None
@@ -120,13 +120,13 @@ nodes:
             description: AES encryption.
         order_weight: 1600
       - name: privacy_password
-        label: Privacy Password
         kind: Password
-        order_weight: 1700
+        label: Privacy Password
         optional: true
+        order_weight: 1700
       - name: security_level
-        label: Security Level
         kind: Dropdown
+        label: Security Level
         choices:
           - name: noAuthNoPriv
             label: NoAuthNoPriv
@@ -147,25 +147,25 @@ nodes:
     menu_placement: SnmpCommunity
     human_friendly_id:
       - name__value
-    display_label: name__value
     order_by:
       - name__value
+    display_label: name__value
     attributes:
       - name: name
         kind: Text
         order_weight: 1000
       - name: client_description
-        label: Description
         kind: Text
-        order_weight: 1100
+        label: Description
         optional: true
+        order_weight: 1100
     relationships:
       - name: ip_address
-        label: IP Address
-        description: Authorized SNMP client address.
         peer: IpamIPAddress
-        cardinality: many
+        label: IP Address
         kind: Attribute
+        cardinality: many
+        description: Authorized SNMP client address.
         order_weight: 1150
       - name: community
         peer: SnmpCommunity

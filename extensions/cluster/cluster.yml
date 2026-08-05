@@ -21,25 +21,25 @@ generics:
     attributes:
       - name: name
         kind: Text
-        description: Name of the cluster.
         unique: true
+        description: Name of the cluster.
         order_weight: 1000
       - name: description
         kind: Text
         optional: true
     relationships:
       - name: location
-        label: Location
         peer: LocationGeneric
-        optional: false
-        cardinality: many
+        label: Location
         kind: Attribute
+        cardinality: many
+        optional: false
         order_weight: 1400
       - name: tags
         peer: BuiltinTag
-        optional: true
-        cardinality: many
         kind: Attribute
+        cardinality: many
+        optional: true
         order_weight: 2000
 
   - name: GenericComputeUnitNodes
@@ -48,29 +48,29 @@ generics:
     include_in_menu: false
     relationships:
       - name: nodes
-        label: Nodes
-        identifier: worker_in_cluster
-        cardinality: many
         peer: ComputeGenericUnit
+        label: Nodes
         kind: Component
 
+        cardinality: many
+        identifier: worker_in_cluster
 extensions:
   nodes:
     - kind: ComputeGenericUnit
       relationships:
         - name: worker_in_cluster
-          identifier: worker_in_cluster
-          label: Worker in cluster
           peer: ClusterGenericComputeUnitNodes
+          label: Worker in cluster
           cardinality: one
-          description: This device is a worker node of the specified cluster.
           optional: true
+          identifier: worker_in_cluster
+          description: This device is a worker node of the specified cluster.
     - kind: LocationGeneric
       relationships:
         - name: clusters
-          label: Clusters
           peer: ClusterGeneric
-          cardinality: many
+          label: Clusters
           kind: Component
-          description: All clusters available on that location.
+          cardinality: many
           optional: true
+          description: All clusters available on that location.

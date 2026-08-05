@@ -1,18 +1,18 @@
+---
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
 # Adapting it for your environment typically requires architectural review — see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
----
 version: "1.0"
 
 nodes:
   - name: BGPCommunity
     namespace: Routing
-    icon: iconoir:community
-    label: "BGP Community"
     description: "Defines a BGP community."
+    label: "BGP Community"
+    icon: iconoir:community
     human_friendly_id:
       - name__value
     order_by:
@@ -21,29 +21,29 @@ nodes:
     attributes:
       - name: name
         kind: Text
+        unique: true
         description: "The name of the BGP community."
         order_weight: 1000
-        unique: true
       - name: description
         kind: Text
-        description: "An optional description of the BGP community."
         optional: true
+        description: "An optional description of the BGP community."
         order_weight: 1100
       - name: community
         kind: Text
+        unique: true
         description: "The value of the BGP community (RFC1997, RFC4360, RFC8092)."
         order_weight: 1200
-        unique: true
     relationships:
       - name: routing_policy
-        label: Routing Policies
         peer: RoutingPolicy
-        description: "The BGP Policies using this BGP Community."
+        label: Routing Policies
         kind: Generic
         cardinality: many
+        description: "The BGP Policies using this BGP Community."
       - name: tags
         peer: BuiltinTag
         kind: Attribute
-        optional: true
         cardinality: many
+        optional: true
         order_weight: 3000
