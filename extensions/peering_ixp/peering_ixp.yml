@@ -206,5 +206,5 @@ extensions:
           identifier: ixpconn__bgpsessions
           optional: true
           cardinality: one
-          kind: Parent
-          description: "The IXP connection (port) this BGP session is established over"
+          kind: Attribute
+          description: "The IXP connection this BGP session is established over"
