@@ -10,15 +10,15 @@ version: "1.0"
 generics:
   - name: Generic
     namespace: Organization
-    label: Organization
     description: An organization represent a legal entity, a company.
+    label: Organization
+    icon: mdi:domain
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
       - name__value
     display_label: name__value
-    icon: mdi:domain
-    include_in_menu: true
     attributes:
       - name: name
         kind: Text
@@ -31,8 +31,8 @@ generics:
     relationships:
       - name: tags
         peer: BuiltinTag
-        cardinality: many
         kind: Attribute
+        cardinality: many
         optional: true
         order_weight: 3000
 
@@ -41,29 +41,29 @@ nodes:
     namespace: Organization
     description: Device Manufacturer
     icon: mdi:domain
-    inherit_from:
-      - OrganizationGeneric
     include_in_menu: true
     menu_placement: OrganizationGeneric
+    inherit_from:
+      - OrganizationGeneric
     relationships:
       - name: device_type
         peer: DcimDeviceType
+        kind: Attribute
         cardinality: many
         optional: true
-        kind: Attribute
         identifier: manufacturer__device_type
       - name: platform
         peer: DcimPlatform
+        kind: Attribute
         cardinality: many
         optional: true
-        kind: Attribute
         identifier: manufacturer__platform
 
   - name: Provider
     namespace: Organization
     description: Circuit or Location Provider
     icon: mdi:domain
-    inherit_from:
-      - OrganizationGeneric
     include_in_menu: true
     menu_placement: OrganizationGeneric
+    inherit_from:
+      - OrganizationGeneric

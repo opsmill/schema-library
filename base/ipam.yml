@@ -22,34 +22,32 @@ generics:
     relationships:
       - name: prefixes
         peer: IpamPrefix
-        identifier: prefix__prefix_scope
-        cardinality: many
-        optional: true
         kind: Generic
 
+        cardinality: many
+        optional: true
+        identifier: prefix__prefix_scope
 nodes:
   - name: Prefix
     namespace: Ipam
     description: IPv4 or IPv6 network (with mask)
-    include_in_menu: false
-    icon: mdi:ip-network
     label: Prefix
-    order_by:
-      - prefix__value
-    display_label: prefix__value
+    icon: mdi:ip-network
+    include_in_menu: false
     inherit_from:
       - BuiltinIPPrefix
-    uniqueness_constraints:
-      - [prefix__value, ip_namespace]
     human_friendly_id:
       - ip_namespace__name__value
       - prefix__value
+    order_by:
+      - prefix__value
+    display_label: prefix__value
+    uniqueness_constraints:
+      - [prefix__value, ip_namespace]
     attributes:
       - name: status
         kind: Dropdown
-        optional: false
         default_value: active
-        order_weight: 1100
         choices:
           - name: active
             label: Active
@@ -60,14 +58,14 @@ nodes:
           - name: reserved
             label: Reserved
             color: "#4d90fe"
+        optional: false
+        order_weight: 1100
       - name: description
         kind: Text
         optional: true
         order_weight: 1150
       - name: role
         kind: Dropdown
-        optional: true
-        order_weight: 1200
         choices:
           - name: management
             label: Management
@@ -89,31 +87,33 @@ nodes:
             label: Backbone
             description: Core network infrastructure prefixes.
             color: "#AEC6CF"
+        optional: true
+        order_weight: 1200
     relationships:
       - name: scope
         peer: IpamPrefixScope
+        kind: Attribute
+        cardinality: one
         optional: true
         identifier: prefix__prefix_scope
-        cardinality: one
-        kind: Attribute
         order_weight: 1300
 
   - name: IPAddress
     namespace: Ipam
     description: IP Address
-    include_in_menu: false
     label: IP Address
     icon: mdi:ip
-    order_by:
-      - address__value
-    display_label: address__value
+    include_in_menu: false
     inherit_from:
       - BuiltinIPAddress
-    uniqueness_constraints:
-      - [address__value, ip_namespace]
     human_friendly_id:
       - ip_namespace__name__value
       - address__value
+    order_by:
+      - address__value
+    display_label: address__value
+    uniqueness_constraints:
+      - [address__value, ip_namespace]
     attributes:
       - name: description
         kind: Text
@@ -121,9 +121,7 @@ nodes:
         order_weight: 1050
       - name: status
         kind: Dropdown
-        optional: false
         default_value: active
-        order_weight: 1100
         choices:
           - name: active
             label: Active
@@ -134,10 +132,10 @@ nodes:
           - name: deprecated
             label: Deprecated
             color: "#e04040"
+        optional: false
+        order_weight: 1100
       - name: role
         kind: Dropdown
-        optional: true
-        order_weight: 1150
         choices:
           - name: loopback
             label: Loopback
@@ -148,24 +146,26 @@ nodes:
           - name: anycast
             label: Anycast
             color: "#FDFD96"
+        optional: true
+        order_weight: 1150
       - name: fqdn
-        label: FQDN
         kind: Text
+        label: FQDN
+        regex: (?=^.{1,253}$)(^(((?!-)[a-zA-Z0-9-]{1,63}(?<!-))|((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63})$)
         optional: true
         order_weight: 1200
         # https://stackoverflow.com/questions/11809631/fully-qualified-domain-name-validation
-        regex: (?=^.{1,253}$)(^(((?!-)[a-zA-Z0-9-]{1,63}(?<!-))|((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63})$)
     relationships:
       - name: primary_of
-        label: Primary Address Of
         peer: DcimGenericDevice
-        identifier: device__primary_address
-        optional: true
-        cardinality: many
+        label: Primary Address Of
         kind: Attribute
+        cardinality: many
+        optional: true
+        identifier: device__primary_address
         order_weight: 1250
       - name: interface
         peer: InterfaceLayer3
-        optional: true
         cardinality: one
+        optional: true
         identifier: ip_address__interface

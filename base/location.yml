@@ -34,9 +34,9 @@ generics:
       - name: tags
         peer: BuiltinTag
         kind: Attribute
-        optional: true
         cardinality: many
 
+        optional: true
   - name: Hosting
     namespace: Location
     description: Location directly hosting device and services.
@@ -49,9 +49,9 @@ generics:
         kind: Text
     relationships:
       - name: devices
-        label: Devices
         peer: DcimPhysicalDevice
+        label: Devices
+        kind: Generic
         cardinality: many
         optional: true
-        kind: Generic
         identifier: physical_device__location
