@@ -29,7 +29,7 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name | Grid name (e.g., 50GHz, 100GHz) | Text | False |  |  |
 | channel_spacing_ghz | Channel spacing in GHz (50, 100, etc.) | Number | False |  |  |
-| reference_frequency_thz | Reference frequency in THz (e.g., '193.1' for 1550nm) | Text | False |  |  |
+| reference_frequency_ghz | Reference frequency in GHz (193100 for the C-band anchor at 193.1 THz) | Number | False |  |  |
 | description | Grid description and use cases | Text | True |  |  |
 
 #### Relationships
@@ -53,10 +53,10 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | band_name | Optical band designation | Dropdown | False |  | c_band, l_band, s_band, o_band |
-| start_frequency_thz | Band start frequency in THz (e.g., '191.0') | Text | False |  |  |
-| end_frequency_thz | Band end frequency in THz (e.g., '196.1') | Text | False |  |  |
-| start_wavelength_nm | Band start wavelength in nm (e.g., '1530.0') | Text | True |  |  |
-| end_wavelength_nm | Band end wavelength in nm (e.g., '1565.0') | Text | True |  |  |
+| start_frequency_ghz | Band start frequency in GHz (191000 for 191.0 THz) | Number | False |  |  |
+| end_frequency_ghz | Band end frequency in GHz (196100 for 196.1 THz) | Number | False |  |  |
+| start_wavelength_pm | Band start wavelength in picometres, nm x 1000 (1530000 for 1530.0 nm) | Number | True |  |  |
+| end_wavelength_pm | Band end wavelength in picometres, nm x 1000 (1565000 for 1565.0 nm) | Number | True |  |  |
 | computed_name | Auto-generated band identifier (e.g., 50GHz-C_BAND) | Text | False |  |  |
 
 #### Relationships
@@ -75,7 +75,6 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 - **Uniqueness Constraints:**
     - band, channel_number__value
     - channel_name__value
-    - channel_number__value, frequency_thz__value, wavelength_nm__value
 - **Human Friendly ID:** channel_name__value
 
 #### Attributes
@@ -85,8 +84,8 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 | channel_name | ITU DWDM Channel identifier (computed as CH + channel number, e.g., CH20, CH21, CH40) | Text | False |  |  |
 | adva_channel_name | ADVA-specific channel name (e.g., D02, DC1, D32) | Text | True |  |  |
 | channel_number | ITU channel number (e.g., 20, 21, 60) | Number | False |  |  |
-| frequency_thz | Center frequency in THz (e.g., '192.1') | Text | False |  |  |
-| wavelength_nm | Center wavelength in nm (e.g., '1560.61') | Text | False |  |  |
+| frequency_ghz | Centre frequency in GHz (192100 for 192.1 THz) | Number | False |  |  |
+| wavelength_pm | Centre wavelength in picometres, nm x 1000 (1560610 for 1560.61 nm) | Number | False |  |  |
 | description | Channel notes and usage | Text | True |  |  |
 
 #### Relationships
@@ -94,8 +93,10 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | band | DcimOpticalBand | False | one | Parent |
-| mux_assignments | DcimMuxChannelAssignment | True | many | Component |
+| mux_assignments | DcimMuxChannelAssignment | True | many | Attribute |
 | mappings | DcimChannelMapping | True | many | Generic |
+| services | DcimOpticalService | True | many | Attribute |
+| transponder_modules | DcimTransponderModule | True | many | Attribute |
 
 ### MuxChannelAssignment
 
@@ -113,7 +114,7 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | port_number | Physical port number on multiplexer (e.g., 1-96) | Number | False |  |  |
-| tx_power_dbm | Configured transmit power in dBm (e.g., '0.0') | Text | True |  |  |
+| tx_power_ddbm | Configured transmit power in tenths of a dBm (-35 for -3.5 dBm) | Number | True |  |  |
 | status | Channel assignment status | Dropdown | False | configured | configured, active, disabled, failed |
 | computed_name | Auto-generated assignment identifier | Text | False |  |  |
 
@@ -140,9 +141,9 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | allocation_status | Allocation status | Dropdown | False | reserved | reserved, allocated, in_use, maintenance, failed |
-| tx_power_dbm | Measured transmit power in dBm (e.g., '0.5') | Text | True |  |  |
-| rx_power_dbm | Measured receive power in dBm (e.g., '-2.3') | Text | True |  |  |
-| osnr_db | Optical Signal-to-Noise Ratio in dB (e.g., '25.5') | Text | True |  |  |
+| tx_power_ddbm | Measured transmit power in tenths of a dBm (5 for 0.5 dBm) | Number | True |  |  |
+| rx_power_ddbm | Measured receive power in tenths of a dBm (-23 for -2.3 dBm) | Number | True |  |  |
+| osnr_ddb | Optical Signal-to-Noise Ratio in tenths of a dB (255 for 25.5 dB) | Number | True |  |  |
 | allocated_date | Date channel was allocated | DateTime | True |  |  |
 | computed_name | Auto-generated mapping identifier | Text | False |  |  |
 | description | Additional fiber mapping details | Text | True |  |  |
@@ -151,7 +152,7 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| fiber_link | DcimFiberLink | False | one | Attribute |
+| fiber_link | DcimFiberLink | False | one | Parent |
 
 ### OpticalNode
 
@@ -168,7 +169,6 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| computed_name | Computed name for display | Text | False |  |  |
 | name | Logical node name (e.g., GENESIS-OL-10, SKYLINE-OL-1) | Text | False |  |  |
 | node_type | Topology role of this node | Dropdown | False |  | endpoint, intermediate, branching |
 | description | Node notes and function | Text | True |  |  |
@@ -179,7 +179,8 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 | ---- | ---- | -------- | ----------- | ---- |
 | device | DcimPhysicalDevice | True | one | Attribute |
 | transponder_modules | DcimTransponderModule | True | many | Attribute |
-| links | DcimFiberLink | True | many | Component |
+| links_a | DcimFiberLink | True | many | Attribute |
+| links_z | DcimFiberLink | True | many | Attribute |
 
 ### PassiveMultiplexer
 
@@ -190,13 +191,12 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 - **Uniqueness Constraints:**
     - name__value
 - **Human Friendly ID:** name__value
-- **Inherit From:** DcimPhysicalDevice
+- **Inherit From:** DcimPhysicalDevice, DcimOpticalDevice
 
 #### Attributes
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| computed_name | Computed name for display | Text | False |  |  |
 | name | Passive mux name (e.g., CHI-PMUX-01) | Text | False |  |  |
 | port_count | Number of fixed ports (e.g., 8, 16, 32, 40) | Number | False |  |  |
 | mux_type | Type of passive multiplexer | Dropdown | False |  | cwdm, dwdm |
@@ -217,8 +217,8 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | link_id | Unique link identifier (e.g., LINK-001) | Text | False |  |  |
-| distance_km | Physical distance in kilometers (e.g., '920.5') | Text | True |  |  |
-| attenuation_db | Total fiber attenuation in dB (e.g., '18.4') | Text | True |  |  |
+| distance_m | Physical distance in metres (920500 for 920.5 km) | Number | True |  |  |
+| attenuation_ddb | Total fiber attenuation in tenths of a dB (184 for 18.4 dB) | Number | True |  |  |
 | status | Operational status of fiber link | Dropdown | False | planned | planned, active, standby, maintenance, failed |
 | commissioned_date | Date link was commissioned | DateTime | True |  |  |
 | description | Additional link details | Text | True |  |  |
@@ -227,8 +227,11 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| endpoints | DcimOpticalNode | False | many | Attribute |
+| a_end | DcimOpticalNode | False | one | Attribute |
+| z_end | DcimOpticalNode | False | one | Attribute |
 | mappings | DcimFiberMapping | True | many | Component |
+| amplifier_modules | DcimOpticalAmplifierModule | True | many | Attribute |
+| roadm_degrees | DcimRoadmDegree | True | many | Attribute |
 
 ### OpticalModuleType
 
@@ -275,6 +278,7 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | tuned_channel | DcimDWDMChannel | True | one | Attribute |
+| optical_services | DcimOpticalService | True | many | Attribute |
 | connected_to_optical_node | DcimOpticalNode | True | one | Attribute |
 
 ### OpticalMultiplexerModule
@@ -403,9 +407,9 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 | slot_number | Slot number in chassis (e.g., '1/5', '1/6', '2/5') | Text | False |  |  |
 | amplifier_type | Type of optical amplifier | Dropdown | False |  | edfa, raman, soa, vgc, hybrid |
 | stage | Amplifier stage position | Dropdown | False |  | booster, inline, preamplifier |
-| gain_db | Typical gain in dB (e.g., '20.0', '17.5') | Text | True |  |  |
-| max_output_power_dbm | Maximum output power in dBm (e.g., '17.0', '23.0') | Text | True |  |  |
-| noise_figure_db | Noise figure in dB (e.g., '5.5', '4.8') | Text | True |  |  |
+| gain_ddb | Typical gain in tenths of a dB (200 for 20.0 dB, 175 for 17.5 dB) | Number | True |  |  |
+| max_output_power_ddbm | Maximum output power in tenths of a dBm (170 for 17.0 dBm) | Number | True |  |  |
+| noise_figure_ddb | Noise figure in tenths of a dB (55 for 5.5 dB) | Number | True |  |  |
 | operating_band | Operating wavelength band | Dropdown | False |  | c_band, l_band, c_l_band |
 
 #### Relationships
@@ -443,8 +447,8 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 | ---- | ---- | -------- | ----------- | ---- |
 | transponders | DcimTransponderModule | False | many | Attribute |
 | channel | DcimDWDMChannel | False | one | Attribute |
-| primary_path | DcimOpticalPath | False | one | Component |
-| backup_path | DcimOpticalPath | True | one | Component |
+| primary_path | DcimOpticalPath | False | one | Attribute |
+| backup_path | DcimOpticalPath | True | one | Attribute |
 
 ### OpticalPath
 
@@ -460,8 +464,8 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name | Path name (e.g., MS-W17D5-primary) | Text | False |  |  |
 | path_type | Type of path (primary, backup, express) | Dropdown | False |  | primary, backup, express |
-| total_distance_km | Total path distance in kilometers | Text | True |  |  |
-| total_loss_db | Total optical loss in dB | Text | True |  |  |
+| total_distance_m | Total path distance in metres (920500 for 920.5 km) | Number | True |  |  |
+| total_loss_ddb | Total optical loss in tenths of a dB (184 for 18.4 dB) | Number | True |  |  |
 | hop_count | Number of ROADM hops in path | Number | True |  |  |
 | is_active | Whether this path is currently active | Boolean | False | True |  |
 
@@ -490,7 +494,7 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 | computed_name | Computed segment name (e.g., MS-W17D5-primary-SEG1) | Text | False |  |  |
 | segment_order | Order of this segment in the path (1, 2, 3...) | Number | False |  |  |
 | segment_type | Type of segment | Dropdown | False |  | fiber, cross_connect, cable, add, drop |
-| loss_db | Optical loss for this segment in dB | Text | True |  |  |
+| loss_ddb | Optical loss for this segment in tenths of a dB (25 for 2.5 dB) | Number | True |  |  |
 
 #### Relationships
 
@@ -518,9 +522,9 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| segment | DcimPathSegment | False | one | Parent |
 | channel | DcimDWDMChannel | False | one | Attribute |
-| degrees | DcimRoadmDegree | False | many | Attribute |
+| path_segments | DcimPathSegment | True | many | Attribute |
+| degrees | DcimRoadmDegree | True | many | Attribute |
 
 ### OpticalDevice
 
@@ -535,6 +539,12 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | computed_name |  | Text | False |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| mux_assignments | DcimMuxChannelAssignment | True | many | Component |
 
 ## Extensions
 
@@ -552,6 +562,14 @@ In this context "extensions" refer to modifications or additions to the existing
 | ---- | ---- | -------- | ----------- | ---- |
 | optical_node | DcimOpticalNode | True | many | Generic |
 
+### DcimCable
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| channel_mappings | DcimCableMapping | True | many | Attribute |
+
 ## Code
 
 ```yaml
@@ -562,7 +580,7 @@ generics:
   description: Generic base for any channel allocation/routing (fiber, cable, or internal
     cross-connect)
   label: Channel Mapping
-  include_in_menu: true
+  include_in_menu: false
   attributes:
   - name: is_active
     kind: Boolean
@@ -574,13 +592,6 @@ generics:
     optional: true
     description: Date this mapping was configured
   relationships:
-  - name: segment
-    peer: DcimPathSegment
-    cardinality: one
-    kind: Parent
-    optional: false
-    identifier: channel_mapping__path_segments
-    description: Optical Path segment associated with this mapping
   - name: channel
     peer: DcimDWDMChannel
     cardinality: one
@@ -588,26 +599,47 @@ generics:
     optional: false
     identifier: dwdm_channel__mappings
     description: DWDM channel being mapped/routed
+  - name: path_segments
+    label: Path Segments
+    peer: DcimPathSegment
+    cardinality: many
+    kind: Attribute
+    optional: true
+    identifier: channel_mapping__path_segments
+    description: Optical path segments that traverse this mapping
   - name: degrees
     peer: DcimRoadmDegree
     cardinality: many
     max_count: 2
     kind: Attribute
-    optional: false
+    optional: true
     identifier: roadm_degree__channel_mappings
-    description: Two ROADM degrees involved in this mapping (bidirectional)
+    description: ROADM degrees involved in this mapping (two, when bidirectional)
 - name: OpticalDevice
   namespace: Dcim
   description: Generic interface for any device that can multiplex DWDM channels (active
     or passive)
   label: Optical Multiplexer Device
-  include_in_menu: true
+  include_in_menu: false
   uniqueness_constraints:
   - - computed_name__value
   attributes:
   - name: computed_name
     kind: Text
     optional: false
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ name__value }}'
+  relationships:
+  - name: mux_assignments
+    label: Mux Channel Assignments
+    peer: DcimMuxChannelAssignment
+    cardinality: many
+    kind: Component
+    optional: true
+    identifier: mux_channel_assignments
+    description: Channel assignments on this device's ports
 nodes:
 - name: ITUGrid
   namespace: Dcim
@@ -629,10 +661,12 @@ nodes:
     kind: Number
     optional: false
     description: Channel spacing in GHz (50, 100, etc.)
-  - name: reference_frequency_thz
-    kind: Text
+  - name: reference_frequency_ghz
+    label: Reference Frequency (GHz)
+    kind: Number
     optional: false
-    description: Reference frequency in THz (e.g., '193.1' for 1550nm)
+    description: Reference frequency in GHz (193100 for the C-band anchor at 193.1
+      THz)
   - name: description
     kind: Text
     optional: true
@@ -643,6 +677,7 @@ nodes:
     cardinality: many
     kind: Component
     optional: true
+    identifier: itu_grid__bands
     description: Optical bands using this grid
 - name: OpticalBand
   namespace: Dcim
@@ -679,22 +714,28 @@ nodes:
       description: Original Band (1260-1360 nm)
       color: '#f38181'
     description: Optical band designation
-  - name: start_frequency_thz
-    kind: Text
+  - name: start_frequency_ghz
+    label: Start Frequency (GHz)
+    kind: Number
     optional: false
-    description: Band start frequency in THz (e.g., '191.0')
-  - name: end_frequency_thz
-    kind: Text
+    description: Band start frequency in GHz (191000 for 191.0 THz)
+  - name: end_frequency_ghz
+    label: End Frequency (GHz)
+    kind: Number
     optional: false
-    description: Band end frequency in THz (e.g., '196.1')
-  - name: start_wavelength_nm
-    kind: Text
+    description: Band end frequency in GHz (196100 for 196.1 THz)
+  - name: start_wavelength_pm
+    label: Start Wavelength (pm)
+    kind: Number
     optional: true
-    description: Band start wavelength in nm (e.g., '1530.0')
-  - name: end_wavelength_nm
-    kind: Text
+    description: Band start wavelength in picometres, nm x 1000 (1530000 for 1530.0
+      nm)
+  - name: end_wavelength_pm
+    label: End Wavelength (pm)
+    kind: Number
     optional: true
-    description: Band end wavelength in nm (e.g., '1565.0')
+    description: Band end wavelength in picometres, nm x 1000 (1565000 for 1565.0
+      nm)
   - name: computed_name
     kind: Text
     read_only: true
@@ -709,12 +750,14 @@ nodes:
     cardinality: one
     kind: Parent
     optional: false
+    identifier: itu_grid__bands
     description: Parent ITU grid
   - name: channels
     peer: DcimDWDMChannel
     cardinality: many
     kind: Component
     optional: true
+    identifier: optical_band__channels
     description: DWDM channels in this band
 - name: DWDMChannel
   namespace: Dcim
@@ -732,9 +775,6 @@ nodes:
   - - band
     - channel_number__value
   - - channel_name__value
-  - - channel_number__value
-    - frequency_thz__value
-    - wavelength_nm__value
   attributes:
   - name: channel_name
     kind: Text
@@ -753,14 +793,16 @@ nodes:
     kind: Number
     optional: false
     description: ITU channel number (e.g., 20, 21, 60)
-  - name: frequency_thz
-    kind: Text
+  - name: frequency_ghz
+    label: Frequency (GHz)
+    kind: Number
     optional: false
-    description: Center frequency in THz (e.g., '192.1')
-  - name: wavelength_nm
-    kind: Text
+    description: Centre frequency in GHz (192100 for 192.1 THz)
+  - name: wavelength_pm
+    label: Wavelength (pm)
+    kind: Number
     optional: false
-    description: Center wavelength in nm (e.g., '1560.61')
+    description: Centre wavelength in picometres, nm x 1000 (1560610 for 1560.61 nm)
   - name: description
     kind: Text
     optional: true
@@ -771,19 +813,38 @@ nodes:
     cardinality: one
     kind: Parent
     optional: false
+    identifier: optical_band__channels
     description: Parent optical band
   - name: mux_assignments
     peer: DcimMuxChannelAssignment
     cardinality: many
-    kind: Component
+    kind: Attribute
     optional: true
+    identifier: dwdm_channel__mux_assignments
     description: Mux port assignments for this channel
   - name: mappings
     peer: DcimChannelMapping
     cardinality: many
     kind: Generic
     optional: true
+    identifier: dwdm_channel__mappings
     description: Fiber allocations for this channel
+  - name: services
+    label: Optical Services
+    peer: DcimOpticalService
+    cardinality: many
+    kind: Attribute
+    optional: true
+    identifier: dwdm_channel__services
+    description: Optical services carried on this channel
+  - name: transponder_modules
+    label: Transponder Modules
+    peer: DcimTransponderModule
+    cardinality: many
+    kind: Attribute
+    optional: true
+    identifier: dwdm_channel__transponder_modules
+    description: Transponder modules tuned to this channel
 - name: MuxChannelAssignment
   namespace: Dcim
   include_in_menu: true
@@ -804,10 +865,11 @@ nodes:
     kind: Number
     optional: false
     description: Physical port number on multiplexer (e.g., 1-96)
-  - name: tx_power_dbm
-    kind: Text
+  - name: tx_power_ddbm
+    label: TX Power (0.1 dBm)
+    kind: Number
     optional: true
-    description: Configured transmit power in dBm (e.g., '0.0')
+    description: Configured transmit power in tenths of a dBm (-35 for -3.5 dBm)
   - name: status
     kind: Dropdown
     optional: false
@@ -845,6 +907,7 @@ nodes:
     cardinality: one
     kind: Attribute
     optional: false
+    identifier: dwdm_channel__mux_assignments
     description: DWDM channel assigned to this port
   - name: optical_device
     peer: DcimOpticalDevice
@@ -896,18 +959,21 @@ nodes:
       description: Channel has failed
       color: '#cc0000'
     description: Allocation status
-  - name: tx_power_dbm
-    kind: Text
+  - name: tx_power_ddbm
+    label: TX Power (0.1 dBm)
+    kind: Number
     optional: true
-    description: Measured transmit power in dBm (e.g., '0.5')
-  - name: rx_power_dbm
-    kind: Text
+    description: Measured transmit power in tenths of a dBm (5 for 0.5 dBm)
+  - name: rx_power_ddbm
+    label: RX Power (0.1 dBm)
+    kind: Number
     optional: true
-    description: Measured receive power in dBm (e.g., '-2.3')
-  - name: osnr_db
-    kind: Text
+    description: Measured receive power in tenths of a dBm (-23 for -2.3 dBm)
+  - name: osnr_ddb
+    label: OSNR (0.1 dB)
+    kind: Number
     optional: true
-    description: Optical Signal-to-Noise Ratio in dB (e.g., '25.5')
+    description: Optical Signal-to-Noise Ratio in tenths of a dB (255 for 25.5 dB)
   - name: allocated_date
     kind: DateTime
     optional: true
@@ -929,7 +995,7 @@ nodes:
   - name: fiber_link
     peer: DcimFiberLink
     cardinality: one
-    kind: Attribute
+    kind: Parent
     optional: false
     identifier: fiber_channel_mappings
     description: Long-haul fiber link connecting the degrees
@@ -948,14 +1014,6 @@ nodes:
   uniqueness_constraints:
   - - name__value
   attributes:
-  - name: computed_name
-    kind: Text
-    read_only: true
-    optional: false
-    computed_attribute:
-      kind: Jinja2
-      jinja2_template: '{{ name__value }}'
-    description: Computed name for display
   - name: name
     kind: Text
     optional: false
@@ -996,13 +1054,22 @@ nodes:
     optional: true
     identifier: optical_node__transponder_modules
     description: Transponder modules connected to this optical node (for cross-connects)
-  - name: links
+  - name: links_a
+    label: Fiber Links (A-End)
     peer: DcimFiberLink
     cardinality: many
-    kind: Component
+    kind: Attribute
     optional: true
-    identifier: optical_node__links
-    description: Fiber links connected to this node
+    identifier: fiberlink__a_end
+    description: Fiber links that start at this node
+  - name: links_z
+    label: Fiber Links (Z-End)
+    peer: DcimFiberLink
+    cardinality: many
+    kind: Attribute
+    optional: true
+    identifier: fiberlink__z_end
+    description: Fiber links that end at this node
 - name: PassiveMultiplexer
   namespace: Dcim
   include_in_menu: true
@@ -1011,20 +1078,13 @@ nodes:
   icon: mdi:resistor-nodes
   inherit_from:
   - DcimPhysicalDevice
+  - DcimOpticalDevice
   display_label: computed_name__value
   human_friendly_id:
   - name__value
   uniqueness_constraints:
   - - name__value
   attributes:
-  - name: computed_name
-    kind: Text
-    read_only: true
-    optional: false
-    computed_attribute:
-      kind: Jinja2
-      jinja2_template: '{{ name__value }}'
-    description: Computed name for display
   - name: name
     kind: Text
     optional: false
@@ -1066,14 +1126,16 @@ nodes:
     kind: Text
     optional: false
     description: Unique link identifier (e.g., LINK-001)
-  - name: distance_km
-    kind: Text
+  - name: distance_m
+    label: Distance (m)
+    kind: Number
     optional: true
-    description: Physical distance in kilometers (e.g., '920.5')
-  - name: attenuation_db
-    kind: Text
+    description: Physical distance in metres (920500 for 920.5 km)
+  - name: attenuation_ddb
+    label: Attenuation (0.1 dB)
+    kind: Number
     optional: true
-    description: Total fiber attenuation in dB (e.g., '18.4')
+    description: Total fiber attenuation in tenths of a dB (184 for 18.4 dB)
   - name: status
     kind: Dropdown
     optional: false
@@ -1109,14 +1171,20 @@ nodes:
     optional: true
     description: Additional link details
   relationships:
-  - name: endpoints
+  - name: a_end
     peer: DcimOpticalNode
-    identifier: optical_node__links
-    cardinality: many
+    identifier: fiberlink__a_end
+    cardinality: one
     kind: Attribute
     optional: false
-    max_count: 2
-    description: Port-level endpoints participating in this link
+    description: Optical node at the A end of this link
+  - name: z_end
+    peer: DcimOpticalNode
+    identifier: fiberlink__z_end
+    cardinality: one
+    kind: Attribute
+    optional: false
+    description: Optical node at the Z end of this link
   - name: mappings
     peer: DcimFiberMapping
     cardinality: many
@@ -1124,6 +1192,22 @@ nodes:
     identifier: fiber_channel_mappings
     optional: true
     description: DWDM channels allocated on this link
+  - name: amplifier_modules
+    label: Amplifier Modules
+    peer: DcimOpticalAmplifierModule
+    cardinality: many
+    kind: Attribute
+    optional: true
+    identifier: fiber_link__amplifier_modules
+    description: Inline amplifiers on this link
+  - name: roadm_degrees
+    label: ROADM Degrees
+    peer: DcimRoadmDegree
+    cardinality: many
+    kind: Attribute
+    optional: true
+    identifier: fiber_link__roadm_degree
+    description: ROADM degrees whose line port faces this link
 - name: OpticalModuleType
   namespace: Dcim
   include_in_menu: true
@@ -1280,6 +1364,14 @@ nodes:
     optional: true
     identifier: dwdm_channel__transponder_modules
     description: DWDM channel currently tuned/configured
+  - name: optical_services
+    label: Optical Services
+    peer: DcimOpticalService
+    cardinality: many
+    kind: Attribute
+    optional: true
+    identifier: transponder_module__optical_services
+    description: Services terminating on this transponder
   - name: connected_to_optical_node
     peer: DcimOpticalNode
     cardinality: one
@@ -1644,18 +1736,21 @@ nodes:
       description: Low-noise amplifier (receive side)
       color: '#2ecc71'
     description: Amplifier stage position
-  - name: gain_db
-    kind: Text
+  - name: gain_ddb
+    label: Gain (0.1 dB)
+    kind: Number
     optional: true
-    description: Typical gain in dB (e.g., '20.0', '17.5')
-  - name: max_output_power_dbm
-    kind: Text
+    description: Typical gain in tenths of a dB (200 for 20.0 dB, 175 for 17.5 dB)
+  - name: max_output_power_ddbm
+    label: Max Output Power (0.1 dBm)
+    kind: Number
     optional: true
-    description: Maximum output power in dBm (e.g., '17.0', '23.0')
-  - name: noise_figure_db
-    kind: Text
+    description: Maximum output power in tenths of a dBm (170 for 17.0 dBm)
+  - name: noise_figure_ddb
+    label: Noise Figure (0.1 dB)
+    kind: Number
     optional: true
-    description: Noise figure in dB (e.g., '5.5', '4.8')
+    description: Noise figure in tenths of a dB (55 for 5.5 dB)
   - name: operating_band
     kind: Dropdown
     optional: false
@@ -1783,15 +1878,17 @@ nodes:
   - name: primary_path
     peer: DcimOpticalPath
     cardinality: one
-    kind: Component
+    kind: Attribute
     optional: false
+    on_delete: cascade
     identifier: optical_service__primary_path
     description: Primary optical path for this service
   - name: backup_path
     peer: DcimOpticalPath
     cardinality: one
-    kind: Component
+    kind: Attribute
     optional: true
+    on_delete: cascade
     identifier: optical_service__backup_path
     description: Backup/protection path for this service
 - name: OpticalPath
@@ -1826,14 +1923,16 @@ nodes:
       description: Express bypass path
       color: '#9c27b0'
     description: Type of path (primary, backup, express)
-  - name: total_distance_km
-    kind: Text
+  - name: total_distance_m
+    label: Total Distance (m)
+    kind: Number
     optional: true
-    description: Total path distance in kilometers
-  - name: total_loss_db
-    kind: Text
+    description: Total path distance in metres (920500 for 920.5 km)
+  - name: total_loss_ddb
+    label: Total Loss (0.1 dB)
+    kind: Number
     optional: true
-    description: Total optical loss in dB
+    description: Total optical loss in tenths of a dB (184 for 18.4 dB)
   - name: hop_count
     kind: Number
     optional: true
@@ -1916,10 +2015,11 @@ nodes:
       description: Service dropped at this point (Z-end)
       color: '#ff5722'
     description: Type of segment
-  - name: loss_db
-    kind: Text
+  - name: loss_ddb
+    label: Loss (0.1 dB)
+    kind: Number
     optional: true
-    description: Optical loss for this segment in dB
+    description: Optical loss for this segment in tenths of a dB (25 for 2.5 dB)
   relationships:
   - name: path
     peer: DcimOpticalPath
@@ -1932,7 +2032,6 @@ nodes:
     peer: DcimChannelMapping
     cardinality: one
     kind: Attribute
-    on_delete: cascade
     optional: true
     identifier: channel_mapping__path_segments
     description: Channel mapping (WSS Connect, Cable Mapping, or Fiber Mapping)
@@ -1946,5 +2045,14 @@ extensions:
       optional: true
       cardinality: many
       identifier: optical_nodes__physical_device
+  - kind: DcimCable
+    relationships:
+    - name: channel_mappings
+      label: Channel Mappings
+      peer: DcimCableMapping
+      kind: Attribute
+      optional: true
+      cardinality: many
+      identifier: cable__channel_mappings
 
 ```

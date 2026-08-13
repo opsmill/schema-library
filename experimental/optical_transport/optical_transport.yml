@@ -36,13 +36,9 @@ generics:
         optional: true
         description: "Date this mapping was configured"
     relationships:
-      - name: segment
-        peer: DcimPathSegment
-        cardinality: one
-        kind: Parent
-        optional: false
-        identifier: "channel_mapping__path_segments"
-        description: "Optical Path segment associated with this mapping"
+      # The path segment link lives on DcimPathSegment.channel_mapping only. It used
+      # to be a mandatory Parent here, which meant recording a channel on a fibre or
+      # a cable first required inventing an optical path and a path segment.
       - name: channel
         peer: DcimDWDMChannel
         cardinality: one
@@ -50,14 +46,26 @@ generics:
         optional: false
         identifier: "dwdm_channel__mappings"
         description: "DWDM channel being mapped/routed"
+      # Inverse of DcimPathSegment.channel_mapping. Optional and not a Parent, which
+      # is the point: a mapping can exist before, or without, any optical path.
+      - name: path_segments
+        label: "Path Segments"
+        peer: DcimPathSegment
+        cardinality: many
+        kind: Attribute
+        optional: true
+        identifier: "channel_mapping__path_segments"
+        description: "Optical path segments that traverse this mapping"
+      # Optional: only a ROADM cross-connect has degrees. A passive fibre or cable
+      # mapping has none, and making this mandatory made those unrecordable.
       - name: degrees
         peer: DcimRoadmDegree
         cardinality: many
         max_count: 2
         kind: Attribute
-        optional: false
+        optional: true
         identifier: "roadm_degree__channel_mappings"
-        description: "Two ROADM degrees involved in this mapping (bidirectional)"
+        description: "ROADM degrees involved in this mapping (two, when bidirectional)"
 
   # ============================================================================
   # OpticalDevice - Generic for any device that can multiplex channels
@@ -70,10 +78,28 @@ generics:
     uniqueness_constraints:
       - [computed_name__value]
     attributes:
-      # Placeholder, will be overridden in child nodes
+      # Every implementation carries a `name`, so the template lives here once
+      # rather than being re-declared identically on each child node. A mandatory
+      # attribute with no computed_attribute would otherwise have to be written by
+      # hand on every object.
       - name: computed_name
         kind: Text
         optional: false
+        read_only: true
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "{{ name__value }}"
+    relationships:
+      # Inverse of DcimMuxChannelAssignment.optical_device, so a multiplexer can be
+      # asked what is on its ports.
+      - name: mux_assignments
+        label: "Mux Channel Assignments"
+        peer: DcimMuxChannelAssignment
+        cardinality: many
+        kind: Component
+        optional: true
+        identifier: "mux_channel_assignments"
+        description: "Channel assignments on this device's ports"
 
 # ==============================================================================
 # NODES
@@ -106,10 +132,13 @@ nodes:
         kind: Number
         optional: false
         description: "Channel spacing in GHz (50, 100, etc.)"
-      - name: reference_frequency_thz
-        kind: Text
+      # GHz, as an integer: the Number kind is integer only, and GHz is exact on
+      # every ITU grid. Text was not filterable or sortable.
+      - name: reference_frequency_ghz
+        label: "Reference Frequency (GHz)"
+        kind: Number
         optional: false
-        description: "Reference frequency in THz (e.g., '193.1' for 1550nm)"
+        description: "Reference frequency in GHz (193100 for the C-band anchor at 193.1 THz)"
       - name: description
         kind: Text
         optional: true
@@ -120,6 +149,7 @@ nodes:
         cardinality: many
         kind: Component
         optional: true
+        identifier: itu_grid__bands
         description: "Optical bands using this grid"
 
   # ============================================================================
@@ -157,22 +187,28 @@ nodes:
             description: "Original Band (1260-1360 nm)"
             color: "#f38181"
         description: "Optical band designation"
-      - name: start_frequency_thz
-        kind: Text
+      # Integer GHz and picometres, so band edges can be compared numerically
+      # against a channel's own frequency_ghz / wavelength_pm.
+      - name: start_frequency_ghz
+        label: "Start Frequency (GHz)"
+        kind: Number
         optional: false
-        description: "Band start frequency in THz (e.g., '191.0')"
-      - name: end_frequency_thz
-        kind: Text
+        description: "Band start frequency in GHz (191000 for 191.0 THz)"
+      - name: end_frequency_ghz
+        label: "End Frequency (GHz)"
+        kind: Number
         optional: false
-        description: "Band end frequency in THz (e.g., '196.1')"
-      - name: start_wavelength_nm
-        kind: Text
+        description: "Band end frequency in GHz (196100 for 196.1 THz)"
+      - name: start_wavelength_pm
+        label: "Start Wavelength (pm)"
+        kind: Number
         optional: true
-        description: "Band start wavelength in nm (e.g., '1530.0')"
-      - name: end_wavelength_nm
-        kind: Text
+        description: "Band start wavelength in picometres, nm x 1000 (1530000 for 1530.0 nm)"
+      - name: end_wavelength_pm
+        label: "End Wavelength (pm)"
+        kind: Number
         optional: true
-        description: "Band end wavelength in nm (e.g., '1565.0')"
+        description: "Band end wavelength in picometres, nm x 1000 (1565000 for 1565.0 nm)"
       - name: computed_name
         kind: Text
         read_only: true
@@ -187,12 +223,14 @@ nodes:
         cardinality: one
         kind: Parent
         optional: false
+        identifier: itu_grid__bands
         description: "Parent ITU grid"
       - name: channels
         peer: DcimDWDMChannel
         cardinality: many
         kind: Component
         optional: true
+        identifier: optical_band__channels
         description: "DWDM channels in this band"
 
   # ============================================================================
@@ -213,7 +251,6 @@ nodes:
     uniqueness_constraints:
       - [band, channel_number__value]
       - [channel_name__value]
-      - [channel_number__value, frequency_thz__value, wavelength_nm__value]
     attributes:
       - name: channel_name
         kind: Text
@@ -231,14 +268,19 @@ nodes:
         kind: Number
         optional: false
         description: "ITU channel number (e.g., 20, 21, 60)"
-      - name: frequency_thz
-        kind: Text
+      # One fact in two notations, both integers so both stay filterable and
+      # sortable. GHz is exact on every ITU grid; picometres keep 1560.61 nm exact
+      # (the Number kind is integer only).
+      - name: frequency_ghz
+        label: "Frequency (GHz)"
+        kind: Number
         optional: false
-        description: "Center frequency in THz (e.g., '192.1')"
-      - name: wavelength_nm
-        kind: Text
+        description: "Centre frequency in GHz (192100 for 192.1 THz)"
+      - name: wavelength_pm
+        label: "Wavelength (pm)"
+        kind: Number
         optional: false
-        description: "Center wavelength in nm (e.g., '1560.61')"
+        description: "Centre wavelength in picometres, nm x 1000 (1560610 for 1560.61 nm)"
       - name: description
         kind: Text
         optional: true
@@ -249,19 +291,44 @@ nodes:
         cardinality: one
         kind: Parent
         optional: false
+        identifier: optical_band__channels
         description: "Parent optical band"
+      # Attribute, not Component: the assignment belongs to the multiplexer (its
+      # Parent is optical_device), not to the channel. As a Component here, deleting
+      # a channel would cascade-delete port assignments on devices, and the node
+      # would have two owners.
       - name: mux_assignments
         peer: DcimMuxChannelAssignment
         cardinality: many
-        kind: Component
+        kind: Attribute
         optional: true
+        identifier: dwdm_channel__mux_assignments
         description: "Mux port assignments for this channel"
       - name: mappings
         peer: DcimChannelMapping
         cardinality: many
         kind: Generic
         optional: true
+        identifier: dwdm_channel__mappings
         description: "Fiber allocations for this channel"
+      # Inverses, so "what is using this channel" is a query rather than a scan of
+      # every service and transponder.
+      - name: services
+        label: "Optical Services"
+        peer: DcimOpticalService
+        cardinality: many
+        kind: Attribute
+        optional: true
+        identifier: dwdm_channel__services
+        description: "Optical services carried on this channel"
+      - name: transponder_modules
+        label: "Transponder Modules"
+        peer: DcimTransponderModule
+        cardinality: many
+        kind: Attribute
+        optional: true
+        identifier: dwdm_channel__transponder_modules
+        description: "Transponder modules tuned to this channel"
 
   # ============================================================================
   # MuxChannelAssignment - Channel to Mux Port Mapping
@@ -284,10 +351,13 @@ nodes:
         kind: Number
         optional: false
         description: "Physical port number on multiplexer (e.g., 1-96)"
-      - name: tx_power_dbm
-        kind: Text
+      # Tenths of a dBm as an integer (the Number kind is integer only), so power
+      # can be compared and sorted. -3.5 dBm is stored as -35.
+      - name: tx_power_ddbm
+        label: "TX Power (0.1 dBm)"
+        kind: Number
         optional: true
-        description: "Configured transmit power in dBm (e.g., '0.0')"
+        description: "Configured transmit power in tenths of a dBm (-35 for -3.5 dBm)"
       - name: status
         kind: Dropdown
         optional: false
@@ -327,6 +397,7 @@ nodes:
         cardinality: one
         kind: Attribute
         optional: false
+        identifier: dwdm_channel__mux_assignments
         description: "DWDM channel assigned to this port"
       - name: optical_device
         peer: DcimOpticalDevice
@@ -380,18 +451,23 @@ nodes:
             description: "Channel has failed"
             color: "#cc0000"
         description: "Allocation status"
-      - name: tx_power_dbm
-        kind: Text
+      # Tenths of a dB / dBm as integers, so measurements can be compared, sorted
+      # and thresholded (the Number kind is integer only).
+      - name: tx_power_ddbm
+        label: "TX Power (0.1 dBm)"
+        kind: Number
         optional: true
-        description: "Measured transmit power in dBm (e.g., '0.5')"
-      - name: rx_power_dbm
-        kind: Text
+        description: "Measured transmit power in tenths of a dBm (5 for 0.5 dBm)"
+      - name: rx_power_ddbm
+        label: "RX Power (0.1 dBm)"
+        kind: Number
         optional: true
-        description: "Measured receive power in dBm (e.g., '-2.3')"
-      - name: osnr_db
-        kind: Text
+        description: "Measured receive power in tenths of a dBm (-23 for -2.3 dBm)"
+      - name: osnr_ddb
+        label: "OSNR (0.1 dB)"
+        kind: Number
         optional: true
-        description: "Optical Signal-to-Noise Ratio in dB (e.g., '25.5')"
+        description: "Optical Signal-to-Noise Ratio in tenths of a dB (255 for 25.5 dB)"
       - name: allocated_date
         kind: DateTime
         optional: true
@@ -409,10 +485,12 @@ nodes:
         optional: true
         description: "Additional fiber mapping details"
     relationships:
+      # Parent, to pair with DcimFiberLink.mappings which is a Component: a mapping
+      # only exists as part of its link, and deleting the link should take it along.
       - name: fiber_link
         peer: DcimFiberLink
         cardinality: one
-        kind: Attribute
+        kind: Parent
         optional: false
         identifier: "fiber_channel_mappings"
         description: "Long-haul fiber link connecting the degrees"
@@ -438,14 +516,8 @@ nodes:
     uniqueness_constraints:
       - [name__value]
     attributes:
-      - name: computed_name
-        kind: Text
-        read_only: true
-        optional: false
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: "{{ name__value }}"
-        description: "Computed name for display"
+      # computed_name is inherited from DcimOpticalDevice, which already templates
+      # it from name__value.
       - name: name
         kind: Text
         optional: false
@@ -486,13 +558,24 @@ nodes:
         optional: true
         identifier: optical_node__transponder_modules
         description: "Transponder modules connected to this optical node (for cross-connects)"
-      - name: links
+      # Inverses of DcimFiberLink.a_end / .z_end. Not Components: a link is shared
+      # by the two nodes it joins, so neither node owns it.
+      - name: links_a
+        label: "Fiber Links (A-End)"
         peer: DcimFiberLink
         cardinality: many
-        kind: Component
+        kind: Attribute
         optional: true
-        identifier: optical_node__links
-        description: "Fiber links connected to this node"
+        identifier: fiberlink__a_end
+        description: "Fiber links that start at this node"
+      - name: links_z
+        label: "Fiber Links (Z-End)"
+        peer: DcimFiberLink
+        cardinality: many
+        kind: Attribute
+        optional: true
+        identifier: fiberlink__z_end
+        description: "Fiber links that end at this node"
 
   # ============================================================================
   # PassiveMultiplexer - Standalone Passive Mux/Demux
@@ -503,22 +586,19 @@ nodes:
     label: "Passive Multiplexer"
     description: "Passive CWDM/DWDM multiplexer (fixed port count, no modules)"
     icon: mdi:resistor-nodes
+    # DcimOpticalDevice is what DcimMuxChannelAssignment.optical_device peers, so
+    # without it a passive mux could not hold the port-to-channel assignments that
+    # are its entire purpose.
     inherit_from:
       - DcimPhysicalDevice
+      - DcimOpticalDevice
     display_label: computed_name__value
     human_friendly_id:
       - name__value
     uniqueness_constraints:
       - [name__value]
     attributes:
-      - name: computed_name
-        kind: Text
-        read_only: true
-        optional: false
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: "{{ name__value }}"
-        description: "Computed name for display"
+      # computed_name is inherited from DcimOpticalDevice.
       - name: name
         kind: Text
         optional: false
@@ -564,16 +644,19 @@ nodes:
         kind: Text
         optional: false
         description: "Unique link identifier (e.g., LINK-001)"
-      # FIXME: Text until float are supported in Number
-      - name: distance_km
-        kind: Text
+      # Metres and tenths of a dB as integers. The Number kind is integer only, so
+      # the unit is scaled rather than the type widened, which keeps both values
+      # filterable ("links longer than 40 km") and sortable.
+      - name: distance_m
+        label: "Distance (m)"
+        kind: Number
         optional: true
-        description: "Physical distance in kilometers (e.g., '920.5')"
-      # FIXME: Text until float are supported in Number
-      - name: attenuation_db
-        kind: Text
+        description: "Physical distance in metres (920500 for 920.5 km)"
+      - name: attenuation_ddb
+        label: "Attenuation (0.1 dB)"
+        kind: Number
         optional: true
-        description: "Total fiber attenuation in dB (e.g., '18.4')"
+        description: "Total fiber attenuation in tenths of a dB (184 for 18.4 dB)"
       - name: status
         kind: Dropdown
         optional: false
@@ -609,15 +692,24 @@ nodes:
         optional: true
         description: "Additional link details"
     relationships:
-      - name: endpoints
+      # A span has exactly two ends, so they are two relationships of cardinality
+      # one rather than an open collection capped at two. That also makes each end
+      # addressable: "links leaving this node" and "links arriving" are separate
+      # queries, and a direction is no longer implied by list order.
+      - name: a_end
         peer: DcimOpticalNode
-        identifier: optical_node__links
-        cardinality: many
-        # Keeping them as Attribute as we want to show both endpoints in link view
+        identifier: fiberlink__a_end
+        cardinality: one
         kind: Attribute
         optional: false
-        max_count: 2
-        description: "Port-level endpoints participating in this link"
+        description: "Optical node at the A end of this link"
+      - name: z_end
+        peer: DcimOpticalNode
+        identifier: fiberlink__z_end
+        cardinality: one
+        kind: Attribute
+        optional: false
+        description: "Optical node at the Z end of this link"
       - name: mappings
         peer: DcimFiberMapping
         cardinality: many
@@ -625,6 +717,23 @@ nodes:
         identifier: "fiber_channel_mappings"
         optional: true
         description: "DWDM channels allocated on this link"
+      # Inverses, so an impact walk can start from the link.
+      - name: amplifier_modules
+        label: "Amplifier Modules"
+        peer: DcimOpticalAmplifierModule
+        cardinality: many
+        kind: Attribute
+        optional: true
+        identifier: "fiber_link__amplifier_modules"
+        description: "Inline amplifiers on this link"
+      - name: roadm_degrees
+        label: "ROADM Degrees"
+        peer: DcimRoadmDegree
+        cardinality: many
+        kind: Attribute
+        optional: true
+        identifier: "fiber_link__roadm_degree"
+        description: "ROADM degrees whose line port faces this link"
 
   # ============================================================================
   # Equipment Layer - Modules and ROADM Degrees
@@ -792,6 +901,15 @@ nodes:
         optional: true
         identifier: "dwdm_channel__transponder_modules"
         description: "DWDM channel currently tuned/configured"
+      # Inverse of DcimOpticalService.transponders.
+      - name: optical_services
+        label: "Optical Services"
+        peer: DcimOpticalService
+        cardinality: many
+        kind: Attribute
+        optional: true
+        identifier: "transponder_module__optical_services"
+        description: "Services terminating on this transponder"
       - name: connected_to_optical_node
         peer: DcimOpticalNode
         cardinality: one
@@ -940,7 +1058,11 @@ nodes:
         kind: Number
         optional: false
         description: "Degree number (1-based, e.g., 1, 2, 3, 4)"
-      # TODO: Should we compute it based on degree_number and degree_type
+      # This one *could* be a Jinja2 computed attribute (Text kind, and both inputs
+      # are attributes on this node, so none of the computed-attribute restrictions
+      # bite). Left as user data on purpose: the port label is vendor naming, not
+      # something the model should dictate, and it is part of a uniqueness
+      # constraint. Decide the naming policy before making it computed.
       - name: line_port
         kind: Text
         optional: false
@@ -1046,7 +1168,10 @@ nodes:
         optional: false
         computed_attribute:
           kind: Jinja2
-          # TODO: should have the degrees, but need computed with Python for that
+          # The degrees are deliberately not in this name: `degrees` has cardinality
+          # many, and a Jinja2 computed attribute cannot reference a many
+          # relationship (verified on 1.10.6). Including them needs a Python
+          # transform, which means shipping a git repository with the schema.
           jinja2_template: "{{ roadm__computed_name__value }}-{{ channel__channel_name__value }}"
         description: "Computed connection ID"
       - name: description
@@ -1173,18 +1298,23 @@ nodes:
             description: "Low-noise amplifier (receive side)"
             color: "#2ecc71"
         description: "Amplifier stage position"
-      - name: gain_db
-        kind: Text
+      # Tenths of a dB / dBm as integers, so amplifiers can be compared and sorted
+      # on gain, output power and noise figure.
+      - name: gain_ddb
+        label: "Gain (0.1 dB)"
+        kind: Number
         optional: true
-        description: "Typical gain in dB (e.g., '20.0', '17.5')"
-      - name: max_output_power_dbm
-        kind: Text
+        description: "Typical gain in tenths of a dB (200 for 20.0 dB, 175 for 17.5 dB)"
+      - name: max_output_power_ddbm
+        label: "Max Output Power (0.1 dBm)"
+        kind: Number
         optional: true
-        description: "Maximum output power in dBm (e.g., '17.0', '23.0')"
-      - name: noise_figure_db
-        kind: Text
+        description: "Maximum output power in tenths of a dBm (170 for 17.0 dBm)"
+      - name: noise_figure_ddb
+        label: "Noise Figure (0.1 dB)"
+        kind: Number
         optional: true
-        description: "Noise figure in dB (e.g., '5.5', '4.8')"
+        description: "Noise figure in tenths of a dB (55 for 5.5 dB)"
       - name: operating_band
         kind: Dropdown
         optional: false
@@ -1316,18 +1446,24 @@ nodes:
         optional: false
         identifier: "dwdm_channel__services"
         description: "DWDM channel used for this service"
+      # Kept as two singular relationships rather than one `paths` collection: that is
+      # what enforces "exactly one primary, at most one backup" in the schema instead
+      # of in a check. kind: Component is reserved for cardinality: many, so these use
+      # on_delete: cascade to keep the same ownership semantics.
       - name: primary_path
         peer: DcimOpticalPath
         cardinality: one
-        kind: Component
+        kind: Attribute
         optional: false
+        on_delete: cascade
         identifier: "optical_service__primary_path"
         description: "Primary optical path for this service"
       - name: backup_path
         peer: DcimOpticalPath
         cardinality: one
-        kind: Component
+        kind: Attribute
         optional: true
+        on_delete: cascade
         identifier: "optical_service__backup_path"
         description: "Backup/protection path for this service"
 
@@ -1366,17 +1502,30 @@ nodes:
             description: "Express bypass path"
             color: "#9c27b0"
         description: "Type of path (primary, backup, express)"
-      # TODO: Computed ?
-      - name: total_distance_km
-        kind: Text
+      # Metres and tenths of a dB as integers, so paths can be ordered by length or
+      # by loss.
+      #
+      # These three are roll-ups of `segments` and cannot be computed attributes,
+      # measured on Infrahub 1.10.6:
+      #   - a computed attribute must be Text or URL, so a Number one is rejected
+      #     outright ("only ['Text', 'URL'] kinds are supported"), for the Jinja2
+      #     and the TransformPython kind alike;
+      #   - a Jinja2 template cannot see a cardinality-many relationship at all
+      #     ("the 'segments' variable is not found within the schema path"), and its
+      #     filter sandbox blocks `map`, so summing is out of reach even as Text.
+      # A Python transform could do the arithmetic, but only over a Text attribute
+      # and only from a git repository, which this library does not ship. Populate
+      # these from a generator or an external script instead.
+      - name: total_distance_m
+        label: "Total Distance (m)"
+        kind: Number
         optional: true
-        description: "Total path distance in kilometers"
-      # TODO: Computed ?
-      - name: total_loss_db
-        kind: Text
+        description: "Total path distance in metres (920500 for 920.5 km)"
+      - name: total_loss_ddb
+        label: "Total Loss (0.1 dB)"
+        kind: Number
         optional: true
-        description: "Total optical loss in dB"
-      # TODO: Computed ?
+        description: "Total optical loss in tenths of a dB (184 for 18.4 dB)"
       - name: hop_count
         kind: Number
         optional: true
@@ -1462,10 +1611,11 @@ nodes:
             description: "Service dropped at this point (Z-end)"
             color: "#ff5722"
         description: "Type of segment"
-      - name: loss_db
-        kind: Text
+      - name: loss_ddb
+        label: "Loss (0.1 dB)"
+        kind: Number
         optional: true
-        description: "Optical loss for this segment in dB"
+        description: "Optical loss for this segment in tenths of a dB (25 for 2.5 dB)"
     relationships:
       - name: path
         peer: DcimOpticalPath
@@ -1474,11 +1624,14 @@ nodes:
         optional: false
         identifier: optical_path__segments
         description: "Parent path containing this segment"
+      # No cascade. It used to be safe because the mapping's side was a mandatory
+      # Parent with cardinality one, i.e. exclusive ownership. Now that a mapping can
+      # be referenced by several segments (a backup path over the same fibre), a
+      # cascade here would delete a mapping that other segments still point at.
       - name: channel_mapping
         peer: DcimChannelMapping
         cardinality: one
         kind: Attribute
-        on_delete: cascade
         optional: true
         identifier: "channel_mapping__path_segments"
         description: "Channel mapping (WSS Connect, Cable Mapping, or Fiber Mapping)"
@@ -1493,3 +1646,13 @@ extensions:
           optional: true
           cardinality: many
           identifier: optical_nodes__physical_device
+    # Inverse of DcimCableMapping.cable: "which channels cross this patch cable".
+    - kind: DcimCable
+      relationships:
+        - name: channel_mappings
+          label: "Channel Mappings"
+          peer: DcimCableMapping
+          kind: Attribute
+          optional: true
+          cardinality: many
+          identifier: "cable__channel_mappings"

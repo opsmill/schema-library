@@ -145,18 +145,27 @@ nodes:
         optional: true
         order_weight: 2000
     relationships:
+      # Identifiers follow the parent__children convention and are namespaced to this
+      # node pair. The bare 'front_interfaces' / 'rear_interfaces' strings are also
+      # used by extensions/patch_panel, and an identifier shared by unrelated node
+      # pairs is a trap for the next person to reuse.
       - name: front_interfaces
         peer: DcimOadmFrontInterface
-        identifier: front_interfaces
+        identifier: optical_multiplexer__front_interfaces
         optional: true
         cardinality: many
         kind: Component
+      # An OADM has exactly one rear (line) interface, so this stays cardinality: one.
+      # kind: Component is reserved for cardinality: many; on a singular child it
+      # blocks ever adding a second one with no useful error. on_delete: cascade keeps
+      # the ownership semantics Component provided.
       - name: rear_interface
         peer: DcimOadmRearInterface
-        identifier: rear_interfaces
+        identifier: optical_multiplexer__rear_interfaces
         optional: true
         cardinality: one
-        kind: Component
+        kind: Attribute
+        on_delete: cascade
 
   - name: OadmFrontInterface
     label: Optical Multiplexer Front Interfaces
@@ -178,12 +187,13 @@ nodes:
       - name: optical_multiplexer
         peer: DcimOpticalMultiplexer
         order_weight: 900
-        identifier: front_interfaces
+        identifier: optical_multiplexer__front_interfaces
         optional: false
         cardinality: one
         kind: Parent
       - name: channels
         peer: DcimWdmChannel
+        identifier: oadm_front_interface__wdm_channel
         order_weight: 1200
         optional: true
         cardinality: many
@@ -209,7 +219,9 @@ nodes:
       - name: optical_multiplexer
         peer: DcimOpticalMultiplexer
         order_weight: 900
-        identifier: rear_interface
+        # Must match the identifier used by DcimOpticalMultiplexer.rear_interface,
+        # otherwise the two sides are separate one-way relationships.
+        identifier: optical_multiplexer__rear_interfaces
         optional: false
         cardinality: one
         kind: Parent
@@ -220,27 +232,52 @@ nodes:
     label: WDM Channel
     icon: game-icons:laser-warning
     order_by:
-      - wdm_type__value
+      - grid__value
       - channel__value
-    display_label: "{{ wdm_type__value }} Channel {{ channel__value }}"
+    display_label: "{{ grid__value }} Channel {{ channel__value }}"
     uniqueness_constraints:
-      # Combination must be unique
-      - [frequency__value, wavelength__value, channel__value, wdm_type__value]
-      # For a given type channel number must be unique
-      - [channel__value, wdm_type__value]
-      # TODO: Maybe add some further validations
+      # A channel number is only unique within a grid: channel 21 on the 100 GHz
+      # grid and channel 21 on the 50 GHz grid are different grid points.
+      # Ordered to match the human_friendly_id so Infrahub does not derive a
+      # second, equivalent constraint.
+      - [grid__value, channel__value]
     human_friendly_id:
-      - wdm_type__value
+      - grid__value
       - channel__value
     attributes:
       - name: channel
         kind: Number
         description: WDM channel number.
+        order_weight: 1000
+      - name: grid
+        kind: Dropdown
+        description: The ITU grid this channel belongs to.
+        order_weight: 1100
+        optional: false
+        default_value: dwdm_100ghz
+        choices:
+          - name: dwdm_100ghz
+            label: DWDM 100 GHz
+            description: G.694.1 100 GHz spacing, anchored at 193.1 THz.
+            color: "#9933cc"
+          - name: dwdm_50ghz
+            label: DWDM 50 GHz
+            description: G.694.1 50 GHz spacing, anchored at 193.1 THz.
+            color: "#b366d9"
+          - name: cwdm
+            label: CWDM
+            description: G.694.2 20 nm spacing, 1271-1611 nm.
+            color: "#0099cc"
+          - name: other
+            label: Other
+            description: Outside the standard grids (single-wavelength optics, band splitters).
+            color: "#b3b3b3"
       - name: wdm_type
         kind: Dropdown
         description: Type of WDM (e.g CWDM. DWDM)
+        deprecation: "Use 'grid' instead, which also distinguishes 100 GHz from 50 GHz DWDM."
         order_weight: 1110
-        optional: false
+        optional: true
         choices:
           - name: cwdm
             label: CWDM (Coarse Wavelength Division Multiplexing)
@@ -250,15 +287,111 @@ nodes:
             label: DWDM (Dense Wavelength Division Multiplexing)
             description: Supports dense wavelengths and amplification for long-distance communication.
             color: "#9933cc"
-        default_value: dwdm
+      - name: band
+        kind: Dropdown
+        description: Optical band this channel falls in.
+        order_weight: 1150
+        optional: true
+        # Choice names match DcimOpticalBand.band_name in
+        # experimental/optical_transport, so the same band means the same string
+        # across the library.
+        choices:
+          - name: o_band
+            label: O-Band
+            description: 1260-1360 nm (original).
+          - name: e_band
+            label: E-Band
+            description: 1360-1460 nm (extended).
+          - name: s_band
+            label: S-Band
+            description: 1460-1530 nm (short).
+          - name: c_band
+            label: C-Band
+            description: 1530-1565 nm (conventional).
+          - name: l_band
+            label: L-Band
+            description: 1565-1625 nm (long).
+      # Frequency and wavelength are the same fact in two notations, both stored as
+      # integers so they stay filterable and sortable. The Number kind is integer
+      # only, so the units are chosen to keep every ITU grid point exact: GHz for
+      # frequency, picometres for wavelength (1560.61 nm -> 1560610 pm).
+      - name: frequency_ghz
+        label: Frequency (GHz)
+        kind: Number
+        optional: true
+        description: "Nominal centre frequency in GHz (channel 21 -> 192100)."
+        order_weight: 1200
+      - name: wavelength_pm
+        label: Wavelength (pm)
+        kind: Number
+        optional: true
+        description: "Nominal centre wavelength in picometres, nm x 1000 (channel 21 -> 1560610)."
+        order_weight: 1300
       - name: wavelength
         label: Wavelength (nm)
-        kind: Text # Text until float possible in Number Kind
+        kind: Text
+        optional: true
+        deprecation: "Use 'wavelength_pm', which is numeric and therefore filterable and sortable."
         description: Wavelength of the channel in nm.
+        order_weight: 1400
       - name: frequency
         label: Frequency (GHz)
-        kind: Text # Text until float possible in Number Kind
+        kind: Text
+        optional: true
+        deprecation: "Use 'frequency_ghz', which is numeric and therefore filterable and sortable."
         description: Frequency of the channel in GHz.
+        order_weight: 1410
+    relationships:
+      # Back-references. Without these, "what is using channel 21" is only
+      # answerable by reading every consumer and filtering outside of Infrahub.
+      - name: front_interfaces
+        label: OADM Front Interfaces
+        peer: DcimOadmFrontInterface
+        identifier: oadm_front_interface__wdm_channel
+        kind: Attribute
+        cardinality: many
+        optional: true
+        order_weight: 2000
+      - name: sfps
+        label: WDM SFPs
+        peer: DcimWdmSFP
+        identifier: wdm_sfp__wdm_channel
+        kind: Attribute
+        cardinality: many
+        optional: true
+        order_weight: 2010
+      - name: interfaces_tx
+        label: Interfaces (TX)
+        peer: InterfacePhysical
+        identifier: interface__tx_wdm_channel
+        kind: Attribute
+        cardinality: many
+        optional: true
+        order_weight: 2020
+      - name: interfaces_rx
+        label: Interfaces (RX)
+        peer: InterfacePhysical
+        identifier: interface__rx_wdm_channel
+        kind: Attribute
+        cardinality: many
+        optional: true
+        order_weight: 2030
+      - name: optical_channels_a_to_z
+        label: Optical Channels (A->Z)
+        peer: DcimOpticalChannel
+        identifier: opticalchannel__channel_a_to_z
+        kind: Attribute
+        cardinality: many
+        optional: true
+        order_weight: 2040
+      - name: optical_channels_z_to_a
+        label: Optical Channels (Z->A)
+        peer: DcimOpticalChannel
+        identifier: opticalchannel__channel_z_to_a
+        kind: Attribute
+        cardinality: many
+        optional: true
+        order_weight: 2050
 
   - name: WdmSFP
     namespace: Dcim
@@ -288,7 +421,202 @@ nodes:
       - name: wdm_channel
         label: WDM Channel
         peer: DcimWdmChannel
+        identifier: wdm_sfp__wdm_channel
         kind: Attribute
         cardinality: one
         optional: false
         order_weight: 1150
+
+  - name: OpticalChannel
+    namespace: Dcim
+    label: Optical Channel
+    description: One wavelength carried end to end over a WDM span.
+    icon: mdi:waves-arrow-right
+    human_friendly_id:
+      - name__value
+    display_label: name__value
+    order_by:
+      - name__value
+    uniqueness_constraints:
+      # Identity is the name. A stronger guard would be the A-end line interface
+      # plus both wavelengths, but Infrahub only allows a uniqueness constraint
+      # over mandatory relationships, and a channel discovered from the field
+      # often has ends or wavelengths still unknown.
+      - [name__value]
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        description: Name of the channel, e.g. SITEA-SITEZ-C21.
+        order_weight: 1000
+      - name: description
+        kind: Text
+        optional: true
+        order_weight: 1100
+      - name: status
+        kind: Dropdown
+        order_weight: 1200
+        default_value: planned
+        choices:
+          - name: planned
+            label: Planned
+            description: Designed but not yet reserved on the span.
+            color: "#ffff7f"
+          - name: reserved
+            label: Reserved
+            description: Wavelength held on the span, not yet carrying traffic.
+            color: "#f9e79f"
+          - name: active
+            label: Active
+            description: Carrying traffic.
+            color: "#7fbf7f"
+          - name: decommissioned
+            label: Decommissioned
+            description: No longer in service, wavelength free to re-use.
+            color: "#bfbfbf"
+    relationships:
+      # One channel is a direction pair. On a dual-fibre span both directions use
+      # the same grid point; on a single-fibre span they are different ones, which
+      # is why this is two relationships and not one.
+      - name: channel_a_to_z
+        label: WDM Channel (A->Z)
+        peer: DcimWdmChannel
+        identifier: opticalchannel__channel_a_to_z
+        kind: Attribute
+        cardinality: one
+        optional: true
+        order_weight: 1300
+      - name: channel_z_to_a
+        label: WDM Channel (Z->A)
+        peer: DcimWdmChannel
+        identifier: opticalchannel__channel_z_to_a
+        kind: Attribute
+        cardinality: one
+        optional: true
+        order_weight: 1310
+      # The client ends: where the channel is handed off, typically a router
+      # interface or an OADM front interface. Peering the DcimEndpoint generic
+      # keeps patch panel ports and circuit endpoints usable here too.
+      - name: a_end
+        label: A-End
+        peer: DcimEndpoint
+        identifier: opticalchannel__a_end
+        kind: Attribute
+        cardinality: one
+        optional: true
+        order_weight: 1400
+      - name: z_end
+        label: Z-End
+        peer: DcimEndpoint
+        identifier: opticalchannel__z_end
+        kind: Attribute
+        cardinality: one
+        optional: true
+        order_weight: 1410
+      # The line ends: the two multiplexer ports the wavelength is multiplexed
+      # onto, i.e. the span the channel actually occupies.
+      - name: a_end_line
+        label: A-End Line
+        peer: DcimEndpoint
+        identifier: opticalchannel__a_end_line
+        kind: Attribute
+        cardinality: one
+        optional: true
+        description: Near-side multiplexer line interface carrying this channel.
+        order_weight: 1500
+      - name: z_end_line
+        label: Z-End Line
+        peer: DcimEndpoint
+        identifier: opticalchannel__z_end_line
+        kind: Attribute
+        cardinality: one
+        optional: true
+        description: Far-side multiplexer line interface carrying this channel.
+        order_weight: 1510
+      # The physical hops crossed. Reference only, no cascade: a cable outlives
+      # any one channel riding it. Hop order is not stored, it is recoverable by
+      # walking the topology from a_end.
+      - name: segments
+        label: Physical Segments
+        peer: DcimCable
+        identifier: opticalchannel__segments
+        kind: Attribute
+        cardinality: many
+        optional: true
+        order_weight: 1600
+
+extensions:
+  nodes:
+    # A WDM interface transmits one wavelength and receives another: a port
+    # labelled Tx20/Rx21 is tx channel 20, rx channel 21, and its far-end mirror
+    # is the inverse. Holding that as two references rather than as part of the
+    # interface name makes "does this optic fit this port" a comparison instead
+    # of string parsing. This applies equally to a fixed filter port and to a
+    # tunable coherent optic, so it belongs on the interface, not on the SFP.
+    - kind: InterfacePhysical
+      relationships:
+        - name: tx_wdm_channel
+          label: TX WDM Channel
+          peer: DcimWdmChannel
+          identifier: interface__tx_wdm_channel
+          kind: Attribute
+          cardinality: one
+          optional: true
+          description: Grid point this interface transmits on.
+          order_weight: 1470
+        - name: rx_wdm_channel
+          label: RX WDM Channel
+          peer: DcimWdmChannel
+          identifier: interface__rx_wdm_channel
+          kind: Attribute
+          cardinality: one
+          optional: true
+          description: Grid point this interface receives on.
+          order_weight: 1480
+    # Inverses of DcimOpticalChannel, split by end, which is what an impact walk
+    # starting from a multiplexer interface needs.
+    - kind: DcimEndpoint
+      relationships:
+        - name: optical_channels_a
+          label: Optical Channels (A-End)
+          peer: DcimOpticalChannel
+          identifier: opticalchannel__a_end
+          kind: Attribute
+          cardinality: many
+          optional: true
+          order_weight: 2100
+        - name: optical_channels_z
+          label: Optical Channels (Z-End)
+          peer: DcimOpticalChannel
+          identifier: opticalchannel__z_end
+          kind: Attribute
+          cardinality: many
+          optional: true
+          order_weight: 2110
+        - name: optical_channels_line_a
+          label: Optical Channels (A-End Line)
+          peer: DcimOpticalChannel
+          identifier: opticalchannel__a_end_line
+          kind: Attribute
+          cardinality: many
+          optional: true
+          order_weight: 2120
+        - name: optical_channels_line_z
+          label: Optical Channels (Z-End Line)
+          peer: DcimOpticalChannel
+          identifier: opticalchannel__z_end_line
+          kind: Attribute
+          cardinality: many
+          optional: true
+          order_weight: 2130
+    # "Which channels does this fibre carry" starts here.
+    - kind: DcimCable
+      relationships:
+        - name: optical_channels
+          label: Optical Channels
+          peer: DcimOpticalChannel
+          identifier: opticalchannel__segments
+          kind: Attribute
+          cardinality: many
+          optional: true
+          order_weight: 2100

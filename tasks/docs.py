@@ -126,8 +126,9 @@ def _generate_home_page_documentation() -> None:
     template = environment.from_string(template_text)
     rendered_file = template.render(toc=toc_content)
 
-    # Write the rendered file to the output location
-    output_file.write_text(rendered_file, encoding="utf-8")
+    # Write the rendered file to the output location. Jinja2 drops the template's
+    # trailing newline, which trips markdownlint MD047 in CI.
+    output_file.write_text(rendered_file.rstrip("\n") + "\n", encoding="utf-8")
     print(f"Docs saved to: {output_file}")
 
 
