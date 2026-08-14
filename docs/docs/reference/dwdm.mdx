@@ -35,7 +35,7 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | front_interfaces | DcimOadmFrontInterface | True | many | Component |
-| rear_interface | DcimOadmRearInterface | True | one | Attribute |
+| rear_interface | DcimOadmRearInterface | True | one | Component |
 
 ### OadmFrontInterface
 
@@ -167,6 +167,7 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 | name |  | Text |  |  |  |
 | description |  | Text | True |  |  |
 | connector_type |  | Dropdown |  |  | FC, LC, LC_PC, LC_UPC, LC_APC, LSH, LSH_PC, LSH_UPC, LSH_APC, LX_5, LX_5_PC, LX_5_UPC, LX_5_APC, MPO, MTRJ, SC, SC_PC, SC_UPC, SC_APC, ST, CS, SN, SMA_905, SMA_906, URM_P2 |
+| optical_function | Role of this port in the optical path. | Dropdown | True |  | line, client, express, expansion, band, monitor, osc, amplifier, otdr |
 
 ## Extensions
 
@@ -310,6 +311,52 @@ generics:
     - name: URM_P2
       label: URM-P2
       description: Specialized fiber optic connector for industrial and harsh environments.
+  - name: optical_function
+    label: Optical Function
+    kind: Dropdown
+    optional: true
+    description: Role of this port in the optical path.
+    order_weight: 1150
+    choices:
+    - name: line
+      label: Line
+      description: 'Aggregate side: the multiplexed signal toward the fiber span (COM,
+        OMS).'
+      color: '#5b9bd5'
+    - name: client
+      label: Client
+      description: One channel or service signal (service, tributary, add or drop
+        port).
+      color: '#7fbf7f'
+    - name: express
+      label: Express
+      description: Channels transiting the node without being added or dropped.
+      color: '#a9dfbf'
+    - name: expansion
+      label: Expansion
+      description: To another filter stage, to extend channel capacity (vendor UG,
+        dUG, eUG, EXP).
+      color: '#d7bde2'
+    - name: band
+      label: Band
+      description: A wavelength band rather than one channel (1310 port, C/L splitter).
+      color: '#f9e79f'
+    - name: monitor
+      label: Monitor
+      description: Tap of the optical signal for measurement, not carrying traffic.
+      color: '#d5d8dc'
+    - name: osc
+      label: Supervisory (OSC)
+      description: Optical supervisory channel of a line system.
+      color: '#f5b7b1'
+    - name: amplifier
+      label: Amplifier
+      description: Input or output of an amplifier stage on active line gear.
+      color: '#f0b27a'
+    - name: otdr
+      label: OTDR
+      description: OTDR test and fiber characterisation injection port.
+      color: '#e59866'
 nodes:
 - name: OpticalMultiplexer
   label: Optical Multiplexer
@@ -322,6 +369,7 @@ nodes:
   order_by:
   - name__value
   display_label: name__value
+  generate_template: true
   inherit_from:
   - DcimPhysicalDevice
   attributes:
@@ -361,8 +409,7 @@ nodes:
     identifier: optical_multiplexer__rear_interfaces
     optional: true
     cardinality: one
-    kind: Attribute
-    on_delete: cascade
+    kind: Component
 - name: OadmFrontInterface
   label: Optical Multiplexer Front Interfaces
   menu_placement: DcimGenericOadmInterface

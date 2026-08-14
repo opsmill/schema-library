@@ -105,6 +105,54 @@ generics:
           # - name: Splice
           #   label: Splice
           #   description: "Permanent fiber connection method where two fiber ends are fused."
+      # Front-vs-rear says client-vs-line, but not the ports that are neither:
+      # pass-through, upgrade to a second filter stage, taps, supervisory, OTDR.
+      # Functional and vendor-agnostic, so it fits passive filters and active line
+      # gear alike. Note some vendors label the upgrade port EXP, while "express" in
+      # standard OADM terminology means pass-through: hence `expansion` vs `express`.
+      - name: optical_function
+        label: Optical Function
+        kind: Dropdown
+        optional: true
+        description: "Role of this port in the optical path."
+        order_weight: 1150
+        choices:
+          - name: line
+            label: Line
+            description: "Aggregate side: the multiplexed signal toward the fiber span (COM, OMS)."
+            color: "#5b9bd5"
+          - name: client
+            label: Client
+            description: "One channel or service signal (service, tributary, add or drop port)."
+            color: "#7fbf7f"
+          - name: express
+            label: Express
+            description: "Channels transiting the node without being added or dropped."
+            color: "#a9dfbf"
+          - name: expansion
+            label: Expansion
+            description: "To another filter stage, to extend channel capacity (vendor UG, dUG, eUG, EXP)."
+            color: "#d7bde2"
+          - name: band
+            label: Band
+            description: "A wavelength band rather than one channel (1310 port, C/L splitter)."
+            color: "#f9e79f"
+          - name: monitor
+            label: Monitor
+            description: "Tap of the optical signal for measurement, not carrying traffic."
+            color: "#d5d8dc"
+          - name: osc
+            label: Supervisory (OSC)
+            description: "Optical supervisory channel of a line system."
+            color: "#f5b7b1"
+          - name: amplifier
+            label: Amplifier
+            description: "Input or output of an amplifier stage on active line gear."
+            color: "#f0b27a"
+          - name: otdr
+            label: OTDR
+            description: "OTDR test and fiber characterisation injection port."
+            color: "#e59866"
 
 nodes:
   - name: OpticalMultiplexer
@@ -118,6 +166,10 @@ nodes:
     order_by:
       - name__value
     display_label: name__value
+    # A mux model is a fixed shape: a 40-channel filter always has the same 40 front
+    # ports, each fixed to its own channel by the card model. Cloning a curated example
+    # beats rebuilding every port by hand.
+    generate_template: true
     inherit_from:
       - DcimPhysicalDevice
     attributes:
@@ -156,16 +208,18 @@ nodes:
         cardinality: many
         kind: Component
       # An OADM has exactly one rear (line) interface, so this stays cardinality: one.
-      # kind: Component is reserved for cardinality: many; on a singular child it
-      # blocks ever adding a second one with no useful error. on_delete: cascade keeps
-      # the ownership semantics Component provided.
+      # Component rather than Attribute + on_delete: cascade, because only Component
+      # children are carried into the object template: as Attribute this pointed at a
+      # real DcimOadmRearInterface, no TemplateDcimOadmRearInterface was generated, and
+      # every mux cloned from a template came out with no line port. Component on a
+      # singular child holds up: a second peer is rejected ("maximum of 1 allowed") and
+      # deleting the mux still takes the rear interface with it.
       - name: rear_interface
         peer: DcimOadmRearInterface
         identifier: optical_multiplexer__rear_interfaces
         optional: true
         cardinality: one
-        kind: Attribute
-        on_delete: cascade
+        kind: Component
 
   - name: OadmFrontInterface
     label: Optical Multiplexer Front Interfaces
