@@ -36,7 +36,6 @@ Next steps:
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name | Name of the interface | Text |  |  |  |
-| mlag_id | Identifier for the MLAG interface | Number |  |  |  |
 | description | A brief description of the interface | Text | True |  |  |
 | status | The status of the interface | Dropdown |  | active | provisioning, free, active, maintenance, disabled, deleted, outage |
 | role | The role of the interface in the network | Dropdown | True |  | server, router |
@@ -171,11 +170,6 @@ nodes:
     kind: Text
     description: Name of the interface
     order_weight: 1000
-  - name: mlag_id
-    label: MLAG ID
-    kind: Number
-    description: Identifier for the MLAG interface
-    order_weight: 1050
   - name: description
     kind: Text
     optional: true

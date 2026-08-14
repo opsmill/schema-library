@@ -50,7 +50,7 @@ This schema extension contains models for implementing detailed security.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| ip_address | InfraIPAddress | False | one | Attribute |
+| ip_address | IpamIPAddress | False | one | Attribute |
 
 ### IPAMIPPrefix
 
@@ -71,7 +71,7 @@ This schema extension contains models for implementing detailed security.
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| ip_prefix | InfraPrefix | False | one | Attribute |
+| ip_prefix | IpamPrefix | False | one | Attribute |
 
 ### IPAddress
 
@@ -272,7 +272,7 @@ This schema extension contains models for implementing detailed security.
 - **Namespace:** Security
 - **Icon:** mdi:firewall
 - **Human Friendly ID:** name__value
-- **Inherit From:** InfraGenericDevice, CoreArtifactTarget, SecurityPolicyAssignment
+- **Inherit From:** DcimGenericDevice, DcimPhysicalDevice, CoreArtifactTarget, SecurityPolicyAssignment
 
 #### Attributes
 
@@ -322,13 +322,13 @@ This schema extension contains models for implementing detailed security.
 - **Label:** Firewall Interface
 - **Namespace:** Security
 - **Icon:** mdi:ethernet
-- **Inherit From:** InfraInterface, InfraEndpoint
+- **Inherit From:** DcimInterface, DcimEndpoint
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| ip_addresses | InfraIPAddress | True | many | Component |
+| ip_addresses | IpamIPAddress | True | many | Component |
 | security_zone | SecurityZone | False | one | Attribute |
 
 ## Generics
@@ -558,7 +558,7 @@ nodes:
     optional: true
   relationships:
   - name: ip_address
-    peer: InfraIPAddress
+    peer: IpamIPAddress
     cardinality: one
     kind: Attribute
     optional: false
@@ -579,7 +579,7 @@ nodes:
     optional: true
   relationships:
   - name: ip_prefix
-    peer: InfraPrefix
+    peer: IpamPrefix
     cardinality: one
     kind: Attribute
     optional: false
@@ -907,14 +907,15 @@ nodes:
 - name: Firewall
   namespace: Security
   inherit_from:
-  - InfraGenericDevice
+  - DcimGenericDevice
+  - DcimPhysicalDevice
   - CoreArtifactTarget
   - SecurityPolicyAssignment
   icon: mdi:firewall
   include_in_menu: true
   human_friendly_id:
   - name__value
-  menu_placement: InfraGenericDevice
+  menu_placement: DcimGenericDevice
   attributes:
   - name: role
     kind: Dropdown
@@ -1034,16 +1035,16 @@ nodes:
 - name: FirewallInterface
   namespace: Security
   label: Firewall Interface
-  menu_placement: InfraGenericDevice
+  menu_placement: DcimGenericDevice
   include_in_menu: false
   icon: mdi:ethernet
   display_label: name__value
   inherit_from:
-  - InfraInterface
-  - InfraEndpoint
+  - DcimInterface
+  - DcimEndpoint
   relationships:
   - name: ip_addresses
-    peer: InfraIPAddress
+    peer: IpamIPAddress
     optional: true
     cardinality: many
     kind: Component

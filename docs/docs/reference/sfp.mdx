@@ -64,7 +64,7 @@ Improvements:
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| interface | DcimInterface | True | one | Attribute |
+| interface | InterfacePhysical | True | one | Attribute |
 | spare_location | LocationHosting | True | one | Attribute |
 | manufacturer | OrganizationManufacturer | True | one | Attribute |
 
@@ -76,7 +76,7 @@ In this context "extensions" refer to modifications or additions to the existing
 
 :::
 
-### DcimInterface
+### InterfacePhysical
 
 #### Relationships
 
@@ -229,11 +229,12 @@ generics:
       color: '#0099cc'
   relationships:
   - name: interface
-    peer: DcimInterface
+    peer: InterfacePhysical
     kind: Attribute
     optional: true
     cardinality: one
     order_weight: 1200
+    identifier: sfp__interface
   - name: spare_location
     peer: LocationHosting
     kind: Attribute
@@ -278,12 +279,13 @@ nodes:
     order_weight: 1150
 extensions:
   nodes:
-  - kind: DcimInterface
+  - kind: InterfacePhysical
     relationships:
     - name: plugged_sfp
       peer: DcimGenericSFP
       cardinality: one
       optional: true
+      identifier: sfp__interface
   - kind: LocationHosting
     relationships:
     - name: spare_sfps
