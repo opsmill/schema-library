@@ -167,6 +167,23 @@ extensions/dwdm:
     convention, and an Optical Channel records one wavelength booked end to end over
     a span, together with the cables it crosses.
   name: DWDM
+  not_covered:
+    - Amplifiers, ROADM degrees, WSS cross-connects and transponders. Optical Multiplexer
+      models passive add/drop filters; `optical_function` can label an amplifier or OSC
+      port, but the amplifier itself is not a node here. See experimental/optical_transport.
+    - Per-model channel maps as catalog data. A fixed filter's channel plan is captured
+      by cloning an Object Template, not by a device-type port list, so "which mux models
+      carry C21?" is not a first-class query.
+    - Optical power budgets, span loss and link engineering.
+  use_cases:
+    - Recording which ITU grid point a channel sits on, in channel, frequency or wavelength
+      notation, so tunable optics configured in any of the three resolve to one shared row.
+    - Booking a wavelength end to end over a span, including the cables it crosses, and
+      telling the two directions apart on single-fibre WDM.
+    - Labelling what each multiplexer port does beyond client-vs-line, including express,
+      expansion, monitor, OSC, amplifier and OTDR ports.
+    - Stamping out a mux model with all of its ports pre-configured, by cloning an Object
+      Template rather than rebuilding every port by hand.
 extensions/firewall_policer:
   dependencies:
     - base
