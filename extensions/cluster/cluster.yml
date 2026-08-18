@@ -51,7 +51,6 @@ generics:
         peer: ComputeGenericUnit
         label: Nodes
         kind: Component
-
         cardinality: many
         identifier: worker_in_cluster
 extensions:

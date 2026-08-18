@@ -57,10 +57,10 @@ nodes:
         peer: IpamRouteTarget
         label: Export Targets
         kind: Attribute
-
         cardinality: many
         optional: true
         identifier: vrf__export
+
   - name: RouteTarget
     namespace: Ipam
     description: Route Target (RFC 4360)
@@ -91,7 +91,6 @@ nodes:
         peer: IpamVRF
         label: Exported by VRFs
         cardinality: many
-
         optional: true
         identifier: vrf__export
 extensions:

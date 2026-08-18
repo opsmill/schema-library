@@ -20,11 +20,11 @@ nodes:
         peer: IpamCVLAN
         label: Customer vlan(s)
         kind: Attribute
-
         cardinality: many
         optional: true
         identifier: vlan__qinq
         direction: outbound
+
   - name: CVLAN
     namespace: Ipam
     description: A VLAN assigned to customer traffic, encapsulated within an S-VLAN.

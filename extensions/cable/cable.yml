@@ -70,7 +70,6 @@ nodes:
             label: CAT8
             description: "Category 8 twisted pair cable."
             color: "#99ccff" # Light Blue
-
           # Fiber Cables (Multi-mode)
           - name: mmf-om1
             label: Multimode Fiber OM1
@@ -92,7 +91,6 @@ nodes:
             label: Multimode Fiber OM5
             description: "Wideband multimode fiber (50/125 µm)."
             color: "#ff9933" # Dark Orange
-
           # Fiber Cables (Single-mode)
           - name: smf-os1
             label: Singlemode Fiber OS1
@@ -102,7 +100,6 @@ nodes:
             label: Singlemode Fiber OS2
             description: "Improved singlemode fiber."
             color: "#ffcc00" # Yellow
-
           # Direct Attach and Active Optical Cables
           - name: dac-passive
             label: Passive DAC
@@ -116,7 +113,6 @@ nodes:
             label: Active Optical Cable
             description: "Active Optical Cable."
             color: "#a0a0a0" # Grey
-
           # Special Cables
           - name: coaxial
             label: Coaxial

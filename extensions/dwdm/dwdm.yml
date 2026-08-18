@@ -109,7 +109,6 @@ generics:
           # - name: Splice
           #   label: Splice
           #   description: "Permanent fiber connection method where two fiber ends are fused."
-
         optional: true
         order_weight: 1100
 nodes:
@@ -161,10 +160,10 @@ nodes:
       - name: rear_interface
         peer: DcimOadmRearInterface
         kind: Component
-
         cardinality: one
         optional: true
         identifier: optical_multiplexer__rear_interface
+
   - name: OadmFrontInterface
     namespace: Dcim
     label: Optical Multiplexer Front Interfaces
@@ -192,11 +191,11 @@ nodes:
       - name: channels
         peer: DcimWdmChannel
         kind: Attribute
-
         cardinality: many
         optional: true
         identifier: oadm_interface__channels
         order_weight: 1200
+
   - name: OadmRearInterface
     namespace: Dcim
     label: Optical Multiplexer Rear Interfaces
@@ -217,11 +216,11 @@ nodes:
       - name: optical_multiplexer
         peer: DcimOpticalMultiplexer
         kind: Parent
-
         cardinality: one
         optional: false
         identifier: optical_multiplexer__rear_interface
         order_weight: 900
+
   - name: WdmChannel
     namespace: Dcim
     description: A WDM channel with its wavelength and frequency.

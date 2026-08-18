@@ -51,9 +51,9 @@ nodes:
       - name: devices
         peer: DcimDevice
         kind: Attribute
-
         cardinality: many
         optional: true
+
   - name: BGPPeerGroup
     namespace: Routing
     description: A BGP Peer Group is used to regroup parameters that are shared across multiple peers
@@ -126,10 +126,10 @@ nodes:
       - name: remote_as
         peer: RoutingAutonomousSystem
         kind: Attribute
-
         cardinality: one
         optional: true
         identifier: bgppeergroup__remote_as
+
   - name: BGPSession
     namespace: Routing
     description: A BGP Session represent a point to point connection between two routers
@@ -219,9 +219,9 @@ nodes:
       - name: peer_session
         peer: RoutingBGPSession
         kind: Attribute
-
         cardinality: one
         optional: true
+
 extensions:
   nodes:
     - kind: DcimGenericDevice

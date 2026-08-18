@@ -66,10 +66,10 @@ nodes:
         peer: RoutingOSPFInterface
         label: OSPF Interfaces
         kind: Component
-
         cardinality: many
         optional: true
         identifier: ospf__ospfinterfaces
+
   - name: OSPFInterface
     namespace: Routing
     description: "Pivot table linking OSPF configuration to an interface."

@@ -41,10 +41,10 @@ nodes:
         peer: LocationHosting
         label: Locations
         kind: Generic
-
         cardinality: many
         optional: true
         identifier: tenant__location
+
 extensions:
   nodes:
     - kind: DcimGenericDevice
@@ -79,7 +79,9 @@ extensions:
         - name: tenant
           peer: TenancyTenant
           kind: Attribute
-
+          cardinality: one
+          optional: true
+          identifier: tenant__location
 # ---------------------------------------------------------------------------
 # Composing with other extensions
 # ---------------------------------------------------------------------------
@@ -115,6 +117,3 @@ extensions:
 #             kind: Generic
 #
 # The same pattern applies to any other optional extension node you want tenancy on.
-          cardinality: one
-          optional: true
-          identifier: tenant__location

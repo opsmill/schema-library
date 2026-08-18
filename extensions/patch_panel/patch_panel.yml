@@ -109,8 +109,8 @@ generics:
           # - name: Splice
           #   label: Splice
           #   description: "Permanent fiber connection method where two fiber ends are fused."
-
         order_weight: 1100
+
 nodes:
   - name: PatchPanel
     namespace: Dcim
@@ -148,10 +148,10 @@ nodes:
       - name: rear_interfaces
         peer: DcimRearPatchPanelInterface
         kind: Component
-
         cardinality: many
         optional: true
         identifier: rear_interfaces
+
   - name: FrontPatchPanelInterface
     namespace: Dcim
     label: Patch Panel Front Interfaces
@@ -179,11 +179,11 @@ nodes:
       - name: patch_panel
         peer: DcimPatchPanel
         kind: Parent
-
         cardinality: one
         optional: false
         identifier: front_interfaces
         order_weight: 900
+
   - name: RearPatchPanelInterface
     namespace: Dcim
     label: Patch Panel Rear Interfaces

@@ -51,10 +51,10 @@ nodes:
         peer: RoutingPIMInterface
         label: PIM Interfaces
         kind: Component
-
         cardinality: many
         optional: true
         identifier: pim__piminterfaces
+
   - name: PIMInterface
     namespace: Routing
     description: "Interface configuration for PIM."

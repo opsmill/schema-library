@@ -93,9 +93,9 @@ nodes:
       - name: organization
         peer: OrganizationGeneric
         kind: Parent
-
         cardinality: one
         optional: false
+
 extensions:
   nodes:
     # Organization Extensions

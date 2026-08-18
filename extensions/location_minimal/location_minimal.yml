@@ -12,23 +12,23 @@ nodes:
     namespace: Location
     label: Region
     icon: carbon:cics-region-target
-
     menu_placement: LocationGeneric
     inherit_from:
       - LocationGeneric
       - IpamPrefixScope
     parent: ""
     children: LocationCountry
+
   - name: Country
     namespace: Location
     label: Country
     icon: gis:search-country
-
     menu_placement: LocationGeneric
     inherit_from:
       - LocationGeneric
     parent: LocationRegion
     children: LocationSite
+
   - name: Site
     namespace: Location
     label: Site

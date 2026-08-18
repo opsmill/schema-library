@@ -41,7 +41,6 @@ extensions:
           label: Export Routing Policies
           kind: Generic
           cardinality: many
-
           identifier: bgppeergroup__export_policies
           description: "The routing-policies used by this instance for export."
     - kind: RoutingBGPSession

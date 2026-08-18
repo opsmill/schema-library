@@ -17,10 +17,10 @@ generics:
         peer: IpamVLANGroup
         label: VLAN Groups
         kind: Attribute
-
         cardinality: many
         optional: true
         identifier: vlan_group__scope
+
   - name: VLAN
     namespace: Generic
     description: A VLAN is isolated layer two domain
@@ -99,8 +99,8 @@ generics:
         cardinality: one
         optional: false
         identifier: vlan_group__vlan
-
         order_weight: 930
+
 nodes:
   - name: VLAN
     namespace: Ipam

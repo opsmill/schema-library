@@ -16,9 +16,9 @@ generics:
       - name: physical_disks
         peer: DcimPhysicalDisk
         kind: Component
-
         cardinality: many
         optional: true
+
 nodes:
   - name: PhysicalDisk
     namespace: Dcim

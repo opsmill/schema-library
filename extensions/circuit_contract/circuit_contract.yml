@@ -63,7 +63,6 @@ nodes:
         cardinality: one
         optional: false
         identifier: circuit__contract
-
         order_weight: 950
 extensions:
   nodes:
