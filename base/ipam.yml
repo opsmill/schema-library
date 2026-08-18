@@ -23,10 +23,10 @@ generics:
       - name: prefixes
         peer: IpamPrefix
         kind: Generic
-
         cardinality: many
         optional: true
         identifier: prefix__prefix_scope
+
 nodes:
   - name: Prefix
     namespace: Ipam

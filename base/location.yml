@@ -35,8 +35,8 @@ generics:
         peer: BuiltinTag
         kind: Attribute
         cardinality: many
-
         optional: true
+
   - name: Hosting
     namespace: Location
     description: Location directly hosting device and services.

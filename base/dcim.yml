@@ -55,7 +55,6 @@ generics:
         cardinality: one
         optional: true
         identifier: device__platform
-
         order_weight: 1250
   - name: PhysicalDevice
     namespace: Dcim
@@ -104,7 +103,6 @@ generics:
         cardinality: one
         optional: false
         identifier: physical_device__location
-
         order_weight: 1500
   - name: Endpoint
     namespace: Dcim
@@ -117,7 +115,6 @@ generics:
         cardinality: one
         optional: true
         identifier: connector__endpoint
-
         order_weight: 1500
   - name: Connector
     namespace: Dcim
@@ -333,7 +330,6 @@ nodes:
         cardinality: one
         optional: false
         identifier: manufacturer__device_type
-
         order_weight: 1250
   - name: Platform
     namespace: Dcim
@@ -369,7 +365,6 @@ nodes:
         kind: Attribute
         cardinality: one
         identifier: manufacturer__platform
-
         order_weight: 1300
   - name: Device
     namespace: Dcim
@@ -435,7 +430,6 @@ nodes:
             label: Tor Switch
             description: Tor switch part of a Fabric.
             color: "#e8e7fd"
-
         optional: true
         order_weight: 1400
   - name: Physical
