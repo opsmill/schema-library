@@ -33,7 +33,7 @@ This schema extension allows you to capture Routing Engine related information l
 - **Icon:** mdi:cpu-64-bit
 - **Uniqueness Constraints:**
     - serial_number__value
-- **Human Friendly ID:** device__name__value, slot__value
+- **Human Friendly ID:** serial_number__value
 - **Inherit From:** DeviceGenericModule
 
 #### Attributes
@@ -78,10 +78,9 @@ nodes:
   uniqueness_constraints:
   - - serial_number__value
   human_friendly_id:
-  - device__name__value
-  - slot__value
+  - serial_number__value
   order_by:
-  - device__name__value
+  - device__serial__value
   - slot__value
   display_label: serial_number__value
   attributes:
