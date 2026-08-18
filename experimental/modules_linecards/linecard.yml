@@ -16,7 +16,7 @@ nodes:
     icon: mdi:poll
     label: "Linecard Type"
     inherit_from:
-      - DeviceGenericModuleType
+      - DcimGenericModuleType
     relationships:
       - name: linecards
         peer: DeviceLinecard
@@ -29,9 +29,9 @@ nodes:
     description: "A Linecard installed in a device, specifying slot, power status, and functionalities."
     label: "Linecard"
     icon: "bi:pci-card"
-    menu_placement: DeviceGenericModule
+    menu_placement: DcimGenericModule
     inherit_from:
-      - DeviceGenericModule
+      - DcimGenericModule
     attributes:
       - name: slot
         kind: Number
