@@ -1,0 +1,78 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/routing_policies_pim.
+# Depends on: base, extensions/routing_policies (abstract RoutingPolicy
+# generic: name/description/policy_type/weight/address_family), and
+# extensions/routing_pim (already loaded with 1 RoutingPIM instance on
+# device nyc1-rtr01 / VRF CUSTOMER-A, plus 2 RoutingPIMInterface members).
+#
+# extensions/routing_policies_pim/routing_policies_pim.yml:
+#   - Defines PolicyPIM (namespace Routing -> kind RoutingPolicyPIM),
+#     inheriting RoutingPolicy with no extra attributes of its own. Live
+#     schema confirms it adds nothing beyond the generic's fields: name
+#     (Text, unique, mandatory), description (Text, optional), policy_type
+#     (Dropdown: import-policy/export-policy/import-export-policy,
+#     mandatory), weight (Number, optional, default 1000), address_family
+#     (Dropdown: ipv4/ipv6/all, optional, default "all"). Its
+#     human_friendly_id is the single field name__value.
+#   - Extends RoutingPIM: removes its plain import_policies/export_policies
+#     Text attributes and adds two relationships instead --
+#     import_routing_policies / export_routing_policies -- both Generic
+#     kind, cardinality many, peer RoutingPolicyPIM (confirmed against the
+#     live schema; identifiers pim__import_policies / pim__export_policies).
+#     These relationships live on RoutingPIM, not on RoutingPolicyPIM, so
+#     wiring a policy to the PIM instance means updating RoutingPIM's
+#     relationship lists below, not adding anything on the policy records
+#     themselves.
+#
+# RoutingPolicyPIM records are created first, then the existing RoutingPIM
+# instance (device nyc1-rtr01, vrf CUSTOMER-A) is upserted with the same
+# mandatory fields it already has (description, status, device, vrf,
+# dr_priority) plus the two new relationship lists pointing at the policies
+# below. Peer RoutingPolicyPIM is a CONCRETE kind with a human_friendly_id
+# (name__value), so a flat list of name strings is enough for these
+# cardinality-many relationships -- no nested kind+data block needed.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingPolicyPIM
+  data:
+    - name: PIM-ALLOW-CUSTOMER-A-SOURCES
+      description: "Permit PIM joins toward known multicast sources in VRF CUSTOMER-A"
+      policy_type: import-policy
+      weight: 100
+      address_family: ipv4
+
+    - name: PIM-ALLOW-CUSTOMER-A-RECEIVERS
+      description: "Permit PIM joins/prunes toward known receiver interfaces in VRF CUSTOMER-A"
+      policy_type: export-policy
+      weight: 100
+      address_family: ipv4
+
+    - name: PIM-DENY-DEFAULT
+      description: "Default deny-all fallback PIM policy applied to both import and export"
+      policy_type: import-export-policy
+      weight: 10
+      address_family: all
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingPIM
+  data:
+    # Upsert of the existing RoutingPIM instance from
+    # extensions/routing_pim's mock data (objects/extensions/routing_pim) --
+    # description/status/device/vrf/dr_priority repeat its existing values
+    # unchanged; import_routing_policies/export_routing_policies are new.
+    - description: "PIM instance for Customer A multicast on nyc1-rtr01"
+      status: active
+      device: nyc1-rtr01
+      vrf: CUSTOMER-A
+      dr_priority: 100
+      import_routing_policies:
+        - PIM-ALLOW-CUSTOMER-A-SOURCES
+      export_routing_policies:
+        - PIM-ALLOW-CUSTOMER-A-RECEIVERS
+        - PIM-DENY-DEFAULT

@@ -1,0 +1,87 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/device_psu_module.
+# Depends on: base, extensions/location_minimal (LocationSite: NYC1),
+# extensions/rack (LocationRack: NYC1-RACK-01, DcimDevice: nyc1-rtr01),
+# extensions/device_module (DcimModuleBay/DcimModule kinds).
+#
+# Module<->ModuleBay is a strict 1:1 relationship, and nyc1-rtr01's existing
+# bays ("slot 1", "slot 2", "fan tray 1") are already occupied by DcimModule
+# instances from extensions/device_module -- so this file creates brand new
+# bays ("PSU slot 1"/"PSU slot 2"/"PSU slot 3") to install the PSU modules
+# into, instead of reusing the existing ones.
+#
+# Order: DcimPSUModuleType -> DcimModuleBay (new PSU bays) -> DcimPSUModule
+# (module_bay/module_type are resolved by human_friendly_id, so the targets
+# must already exist).
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimPSUModuleType
+  data:
+    - name: ASR9001-PSU
+      description: "AC power supply module for the ASR 9001."
+      part_number: "A9K-PSU"
+      manufacturer: Cisco
+      wattage: 3000
+      hotswappable: true
+
+    - name: MX204-PSU
+      description: "AC power supply module for the MX204."
+      part_number: "PSU-MX204"
+      manufacturer: Juniper
+      wattage: 650
+      hotswappable: true
+
+    - name: PowerEdge-PSU
+      description: "Redundant power supply module for the PowerEdge R660."
+      part_number: "PWR-R660"
+      manufacturer: Dell
+      wattage: 800
+      hotswappable: true
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimModuleBay
+  data:
+    # New bays, distinct from the existing "slot 1"/"slot 2"/"fan tray 1"
+    # (already occupied), used below to install the PSU modules.
+    - name: "PSU slot 1"
+      position: 4
+      description: "Primary power supply slot."
+      device: &nyc1_rtr01
+        kind: DcimDevice
+        data:
+          name: nyc1-rtr01
+          location:
+            kind: LocationRack
+            data:
+              name: NYC1-RACK-01
+              site: NYC1
+
+    - name: "PSU slot 2"
+      position: 5
+      description: "Secondary power supply slot."
+      device: *nyc1_rtr01
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimPSUModule
+  data:
+    # `module_bay` (cardinality one, peer DcimModuleBay is concrete) is
+    # referenced by its computed human_friendly_id: "<device> > <bay name>".
+    # `module_type` (cardinality one, peer DcimPSUModuleType is concrete) is
+    # referenced by its plain name. Both bays and types are created above,
+    # in this same file, before this document runs.
+    - module_bay: "nyc1-rtr01 > PSU slot 1"
+      module_type: ASR9001-PSU
+      serial_number: "PSU00112233"
+
+    - module_bay: "nyc1-rtr01 > PSU slot 2"
+      module_type: ASR9001-PSU
+      serial_number: "PSU44556677"

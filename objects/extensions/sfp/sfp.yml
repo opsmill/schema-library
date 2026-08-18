@@ -1,0 +1,103 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/sfp.
+# Depends on: base, extensions/location_minimal (LocationSite: NYC1, SJC1),
+# extensions/rack (LocationRack: NYC1-RACK-01, DcimDevice: nyc1-rtr01 with
+# interface GigabitEthernet0/0/0/0), extensions/organization (OrganizationManufacturer:
+# Cisco, Dell).
+#
+# extensions/dwdm builds on top of extensions/sfp in a later wave -- this file
+# stays self-contained and doesn't assume dwdm data exists.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimDevice
+  data:
+    # Upsert the existing fixture device to add a second physical interface,
+    # needed so the plugged BidiSFP below has a free interface to plug into
+    # (GigabitEthernet0/0/0/0 is already used by the plugged StandardSFP).
+    - name: nyc1-rtr01
+      location:
+        kind: LocationRack
+        data:
+          name: NYC1-RACK-01
+          site: NYC1
+      interfaces:
+        kind: InterfacePhysical
+        data:
+          - name: GigabitEthernet0/0/0/0
+            role: core
+            status: active
+          - name: GigabitEthernet0/0/0/1
+            role: core
+            status: active
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimStandardSFP
+  data:
+    - serial: "SFP-STD-0001"
+      sfp_type: lr
+      form_factor: sfp_plus
+      status: plugged
+      manufacturer: Cisco
+      # `interface` peer (InterfacePhysical) is a concrete kind but has a
+      # composite human_friendly_id ([device__name__value, name__value]), so
+      # the reference is a plain list of the HFID components, not a nested
+      # kind+data block -- this upserts against the existing interface.
+      interface: [nyc1-rtr01, GigabitEthernet0/0/0/0]
+
+    - serial: "SFP-STD-0002"
+      sfp_type: sr
+      form_factor: sfp_plus
+      status: spare
+      manufacturer: Cisco
+      # `spare_location` peer (LocationHosting) is a Generic -- specify the
+      # concrete kind. `spare_location` is cardinality one, so `data` is a
+      # single mapping, not a list. LocationSite's only mandatory field is
+      # `name`, so this is enough to upsert against the existing site.
+      spare_location:
+        kind: LocationSite
+        data:
+          name: NYC1
+
+    - serial: "SFP-STD-0003"
+      sfp_type: t
+      form_factor: sfp
+      status: spare
+      manufacturer: Dell
+      # LocationRack's mandatory fields are `name` and `site`.
+      spare_location:
+        kind: LocationRack
+        data:
+          name: NYC1-RACK-01
+          site: NYC1
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimBidiSFP
+  data:
+    - serial: "SFP-BIDI-0001"
+      sfp_type: zr
+      form_factor: sfp_plus
+      status: plugged
+      wavelength_tx: 1310
+      wavelength_rx: 1550
+      manufacturer: Cisco
+      interface: [nyc1-rtr01, GigabitEthernet0/0/0/1]
+
+    - serial: "SFP-BIDI-0002"
+      sfp_type: zr
+      form_factor: sfp_plus
+      status: spare
+      wavelength_tx: 1550
+      wavelength_rx: 1310
+      manufacturer: Cisco
+      spare_location:
+        kind: LocationSite
+        data:
+          name: SJC1

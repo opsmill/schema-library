@@ -1,0 +1,81 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/routing_bgp_rr.
+# Depends on: extensions/routing_bgp (RoutingBGPPeerGroup: CUST-A-IBGP on
+# nyc1-rtr01, already loaded with data).
+#
+# extensions/routing_bgp_rr/bgp_rr.yml defines RoutingBGPRRCluster
+# (namespace Routing, name BGPRRCluster) with:
+#   - name (unique, mandatory), description (optional)
+#   - cluster_id: cardinality-one, MANDATORY relationship to the concrete
+#     kind IpamIPAddress (Cluster ID represented as a reference to an IP
+#     Address) -- new loopback-style addresses are created below for this,
+#     since only 192.0.2.1/32 already exists (from objects/base/03_ipam.yml)
+#     and reusing it across clusters would be semantically wrong.
+#     IpamIPAddress's human_friendly_id is the two-part
+#     [ip_namespace__name__value, address__value] -- a plain address scalar
+#     is rejected ("HFID does not contain the same number of elements"), so
+#     references use the [default, <address>] YAML list form.
+#   - peer_groups: cardinality-many, optional relationship to the concrete
+#     kind RoutingBGPPeerGroup.
+#
+# It also adds an `extensions: nodes:` block wiring a reciprocal
+# relationship onto RoutingBGPPeerGroup: `rr_cluster` (cardinality one,
+# optional). Confirmed on the live schema that peer_groups (on
+# RoutingBGPRRCluster) and rr_cluster (on RoutingBGPPeerGroup) share the same
+# identifier (routingbgppeergroup__routingbgprrcluster) -- they are the same
+# edge, so setting peer_groups here is sufficient; RoutingBGPPeerGroup does
+# not need to be touched separately.
+#
+# RoutingBGPPeerGroup's human_friendly_id is the two-part
+# [name__value, description__value] -- a YAML list, matching the convention
+# used in objects/extensions/routing_bgp/routing_bgp.yml.
+#
+# Only CUST-A-IBGP (an iBGP peer group) is wired to a cluster below -- route
+# reflection only applies to iBGP sessions, so the two eBGP peer groups
+# (CUST-A-EBGP, TRANSIT-UPSTREAM-EBGP) are intentionally left unwired.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: IpamIPAddress
+  data:
+    - address: 192.0.2.21/32
+      description: "Cluster ID for NYC1-CORE-RR"
+      status: active
+      role: loopback
+    - address: 192.0.2.22/32
+      description: "Cluster ID for NYC1-EDGE-RR"
+      status: active
+      role: loopback
+    - address: 192.0.2.23/32
+      description: "Cluster ID for NYC1-DR-RR"
+      status: active
+      role: loopback
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingBGPRRCluster
+  data:
+    - name: NYC1-CORE-RR
+      description: "Core route reflector cluster for iBGP full-mesh avoidance at NYC1"
+      cluster_id:
+        - default
+        - 192.0.2.21/32
+      peer_groups:
+        - - CUST-A-IBGP
+          - "iBGP peer group for Customer A on nyc1-rtr01"
+
+    - name: NYC1-EDGE-RR
+      description: "Edge route reflector cluster for NYC1 edge routers"
+      cluster_id:
+        - default
+        - 192.0.2.22/32
+
+    - name: NYC1-DR-RR
+      description: "Disaster-recovery route reflector cluster for NYC1"
+      cluster_id:
+        - default
+        - 192.0.2.23/32

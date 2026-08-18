@@ -1,0 +1,68 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/routing_policies_ospf.
+# Depends on: extensions/routing_ospf (RoutingOSPF instance: device
+# nyc1-rtr01, vrf CUST-A, version "ospf", already created with 2
+# RoutingOSPFInterface members).
+#
+# extensions/routing_policies_ospf/routing_policies_ospf.yml defines the
+# concrete PolicyOSPF node (kind RoutingPolicyOSPF, inherits the abstract
+# RoutingPolicy generic from extensions/routing_policies) and extends
+# RoutingOSPF with two many-cardinality Generic relationships
+# (import_routing_policies/export_routing_policies, peer RoutingPolicyOSPF),
+# replacing the plain import_policies/export_policies Text attributes that
+# used to live directly on RoutingOSPF.
+#
+# RoutingPolicyOSPF's human_friendly_id is just [name__value] (inherited
+# from the RoutingPolicy generic), so references to it elsewhere in this
+# file use a plain scalar string.
+#
+# The second document below re-specifies the existing RoutingOSPF instance
+# by its 3-part HFID (device, vrf, version__value -- see
+# extensions/routing_ospf/ospf.yml) together with its other mandatory fields
+# (description, status, device, vrf) repeated verbatim, matching the
+# upsert pattern used in objects/extensions/routing_bgp for
+# RoutingBGPPeerGroup. This upserts the existing record rather than
+# creating a duplicate, and adds import_routing_policies/
+# export_routing_policies -- both cardinality many with a CONCRETE peer
+# (RoutingPolicyOSPF), so they're flat lists of HFID scalars.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingPolicyOSPF
+  data:
+    - name: CUST-A-OSPF-IMPORT
+      description: "Import policy applied to OSPF routes learned in Customer A's VRF on nyc1-rtr01."
+      policy_type: import-policy
+      address_family: ipv4
+      weight: 100
+
+    - name: CUST-A-OSPF-EXPORT
+      description: "Export policy applied to OSPF routes advertised in Customer A's VRF on nyc1-rtr01."
+      policy_type: export-policy
+      address_family: ipv4
+      weight: 100
+
+    - name: OSPF-DEFAULT-METRIC
+      description: "Default metric adjustment policy applied to both imported and exported OSPF routes."
+      policy_type: import-export-policy
+      address_family: all
+      weight: 500
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingOSPF
+  data:
+    - description: "OSPF instance for Customer A VRF on nyc1-rtr01"
+      status: active
+      device: nyc1-rtr01
+      vrf: CUST-A
+      version: ospf
+      import_routing_policies:
+        - CUST-A-OSPF-IMPORT
+      export_routing_policies:
+        - CUST-A-OSPF-EXPORT
+        - OSPF-DEFAULT-METRIC

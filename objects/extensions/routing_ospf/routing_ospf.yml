@@ -1,0 +1,91 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/routing_ospf.
+# Depends on: base, extensions/rack (DcimDevice: nyc1-rtr01, in NYC1-RACK-01),
+# extensions/routing (RoutingProtocol generic: device + vrf + description +
+# status, all mandatory), extensions/routing (IpamVRF: CUST-A).
+#
+# RoutingOSPF inherits RoutingProtocol, so `device` (peer DcimDevice,
+# cardinality one) and `vrf` (peer IpamVRF, cardinality one) are both
+# concrete kinds -- plain human_friendly_id scalars are used. RoutingOSPF
+# overrides human_friendly_id to [device__name__value, vrf__name__value,
+# version__value] (see extensions/routing_ospf/ospf.yml), so references to
+# it elsewhere in this file use a 3-part HFID list.
+#
+# Two fresh interfaces (GigabitEthernet0/0/0/5 and /6) are added on
+# nyc1-rtr01 in the first document below, distinct from the interfaces
+# already claimed by other extensions (GigabitEthernet0/0/0/0-4, TenGigE
+# 0/0/0/1-2, Bundle-Ether1, HundredGigE0/0/0/1 + breakout children).
+#
+# RoutingOSPF.ospf_interfaces is a Component relationship of cardinality
+# many with a CONCRETE peer (RoutingOSPFInterface), so it's nested as
+# {data: [...]} (kind omitted). Each nested RoutingOSPFInterface repeats its
+# own mandatory `ospf` field (Parent relationship, cardinality one, concrete
+# peer RoutingOSPF) even though it's already nested under that OSPF
+# instance -- same pattern as extensions/vrrp's vrrp_interfaces/vrrp_group.
+# `interface` (cardinality one, GENERIC peer InterfaceLayer3) requires a
+# nested {kind, data} block -- InterfaceLayer3 itself has no human_friendly_id
+# defined (only its concrete implementers do), so a plain HFID scalar/list
+# fails with "Unable to lookup node by HFID, schema 'InterfaceLayer3' does
+# not have a HFID defined." The nested block repeats InterfacePhysical's own
+# mandatory fields (name + device) and upserts against the interfaces
+# created in the first document above.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimDevice
+  data:
+    - name: nyc1-rtr01
+      device_type: ASR9001
+      platform: Cisco IOS-XR
+      location:
+        kind: LocationRack
+        data:
+          name: NYC1-RACK-01
+          site: NYC1
+      interfaces:
+        - kind: InterfacePhysical
+          data:
+            name: GigabitEthernet0/0/0/5
+            status: active
+            role: core
+        - kind: InterfacePhysical
+          data:
+            name: GigabitEthernet0/0/0/6
+            status: active
+            role: core
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingOSPF
+  data:
+    - description: "OSPF instance for Customer A VRF on nyc1-rtr01"
+      status: active
+      device: nyc1-rtr01
+      vrf: CUST-A
+      version: ospf
+      reference_bandwidth: 1000
+      ospf_interfaces:
+        data:
+          - description: "OSPF core-facing interface for Customer A on nyc1-rtr01"
+            area: "0.0.0.0"
+            mode: normal
+            ospf: ["nyc1-rtr01", "CUST-A", "ospf"]
+            interface:
+              kind: InterfacePhysical
+              data:
+                name: GigabitEthernet0/0/0/5
+                device: nyc1-rtr01
+
+          - description: "OSPF passive management interface for Customer A on nyc1-rtr01"
+            area: "0.0.0.0"
+            mode: passive
+            ospf: ["nyc1-rtr01", "CUST-A", "ospf"]
+            interface:
+              kind: InterfacePhysical
+              data:
+                name: GigabitEthernet0/0/0/6
+                device: nyc1-rtr01

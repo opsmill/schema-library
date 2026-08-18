@@ -1,0 +1,148 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/routing_pim.
+# Depends on: base, extensions/rack (DcimDevice: nyc1-rtr01, in NYC1-RACK-01),
+# extensions/routing (abstract RoutingProtocol generic: device + vrf +
+# description + status, all mandatory, inherited by RoutingPIM), and
+# extensions/vrf (IpamVRF: CUSTOMER-A, CUSTOMER-B).
+#
+# NOTE: the live schema for RoutingPIM (as loaded on the target Infrahub
+# instance) differs slightly from extensions/routing_pim/pim.yml as currently
+# checked into this branch: import_policies/export_policies are not plain
+# Text attributes there -- they are optional many-cardinality relationships
+# (import_routing_policies/export_routing_policies, peer RoutingPolicyPIM, a
+# Generic with no mock fixtures of its own yet) -- so they're omitted below
+# rather than guessed at.
+#
+# extensions/routing_pim/pim.yml defines two concrete kinds:
+#   - RoutingPIM (namespace Routing, name PIM): inherits RoutingProtocol, adds
+#     dr_priority (optional) plus rp_address (optional, peer IpamIPAddress)
+#     and pim_interfaces (Component, cardinality many, peer
+#     RoutingPIMInterface, identifier pim__piminterfaces). Its
+#     human_friendly_id is the 2-part [device__name__value,
+#     vrf__name__value] -- NOT the raw device/vrf attributes -- so
+#     references to an existing RoutingPIM elsewhere use
+#     [device_name, vrf_name].
+#   - RoutingPIMInterface (namespace Routing, name PIMInterface): description
+#     (unique, mandatory), pim_mode (Dropdown: sparse/dense/bidirectional,
+#     mandatory -- no `optional: true` on it in the schema),
+#     hello_interval/dr_priority (optional, defaulted). Relationships: pim
+#     (Parent, cardinality one, concrete peer RoutingPIM, identifier
+#     pim__piminterfaces, mandatory) and interface (Attribute, cardinality
+#     one, GENERIC peer InterfaceLayer3, mandatory). Its human_friendly_id is
+#     the single field description__value; uniqueness_constraints is
+#     [pim, interface].
+#
+# GigabitEthernet0/0/0/0 through /4 are already used by other extensions'
+# mock data (rack, cable, vrrp, sfp, dwdm) -- new interfaces
+# (GigabitEthernet0/0/0/5 and /0/0/0/6) are added below instead of
+# double-using an occupied one. They are created first, as a Component
+# relationship on the existing nyc1-rtr01 device (this upserts the device and
+# adds the two interfaces without touching /0 through /4).
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimDevice
+  data:
+    - name: nyc1-rtr01
+      status: active
+      role: edge
+      device_type: ASR9001
+      platform: Cisco IOS-XR
+      position: 40
+      rack_face: front
+      location:
+        kind: LocationRack
+        data:
+          name: NYC1-RACK-01
+          site: NYC1
+      interfaces:
+        kind: InterfacePhysical
+        data:
+          - name: GigabitEthernet0/0/0/5
+            description: "PIM-enabled interface toward Customer A multicast source"
+            role: core
+            status: active
+          - name: GigabitEthernet0/0/0/6
+            description: "PIM-enabled interface toward Customer A multicast receivers"
+            role: core
+            status: active
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingPIM
+  data:
+    # `device` (cardinality one, peer DcimDevice) and `vrf` (cardinality one,
+    # peer IpamVRF) are both concrete kinds, so plain human_friendly_id
+    # scalars are used, same as extensions/routing's RoutingBGPPeerGroup
+    # mock data. These two relationships plus `description` and `status` are
+    # the mandatory fields inherited from RoutingProtocol.
+    - description: "PIM instance for Customer A multicast on nyc1-rtr01"
+      status: active
+      device: nyc1-rtr01
+      vrf: CUSTOMER-A
+      dr_priority: 100
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingPIMInterface
+  data:
+    # `pim` is cardinality one with a CONCRETE peer (RoutingPIM), whose
+    # human_friendly_id is the 2-part [device__name__value, vrf__name__value]
+    # -- so the reference below is the list [nyc1-rtr01, CUSTOMER-A],
+    # matching the RoutingPIM instance created above.
+    #
+    # `interface` is cardinality one with a GENERIC peer (InterfaceLayer3).
+    # Unlike a concrete peer, a Generic has no human_friendly_id of its own,
+    # so a plain scalar/list HFID can't be resolved against it ("Unable to
+    # lookup node by HFID, schema 'InterfaceLayer3' does not have a HFID
+    # defined") even though GigabitEthernet0/0/0/5 and /6 already exist -- a
+    # nested {kind: InterfacePhysical, data: {...}} block is required, and
+    # per interface_breakout/vrrp's mock data it must repeat every mandatory
+    # field down the chain (InterfacePhysical: name, device; DcimDevice:
+    # name, location; LocationRack: name, site -- site's peer LocationSite is
+    # CONCRETE, so a plain HFID string is enough there), not just enough to
+    # identify the interface. This upserts against the interfaces created
+    # above rather than duplicating them.
+    - description: "PIM interface on GigabitEthernet0/0/0/5 (nyc1-rtr01, Customer A)"
+      pim_mode: sparse
+      hello_interval: 30
+      dr_priority: 100
+      pim: ["nyc1-rtr01", "CUSTOMER-A"]
+      interface:
+        kind: InterfacePhysical
+        data:
+          name: GigabitEthernet0/0/0/5
+          device:
+            kind: DcimDevice
+            data:
+              name: nyc1-rtr01
+              location:
+                kind: LocationRack
+                data:
+                  name: NYC1-RACK-01
+                  site: NYC1
+
+    - description: "PIM interface on GigabitEthernet0/0/0/6 (nyc1-rtr01, Customer A)"
+      pim_mode: sparse
+      hello_interval: 30
+      dr_priority: 90
+      pim: ["nyc1-rtr01", "CUSTOMER-A"]
+      interface:
+        kind: InterfacePhysical
+        data:
+          name: GigabitEthernet0/0/0/6
+          device:
+            kind: DcimDevice
+            data:
+              name: nyc1-rtr01
+              location:
+                kind: LocationRack
+                data:
+                  name: NYC1-RACK-01
+                  site: NYC1

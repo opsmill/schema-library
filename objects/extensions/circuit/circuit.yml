@@ -1,0 +1,117 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/circuit.
+# Depends on: base.
+#
+# NOTE: this file also creates the minimal LocationSite (from
+# extensions/location_minimal) and OrganizationProvider (from base) fixtures
+# it needs. If those extensions' own object files have already loaded the
+# same records (e.g. NYC1, SJC1, Lumen, Colt), this upserts/matches them
+# instead of duplicating -- see rule in AGENTS notes about repeating
+# mandatory fields for an existing target.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: LocationRegion
+  data:
+    - name: Americas
+      description: North & South America.
+      children:
+        kind: LocationCountry
+        data:
+          - name: United States
+            children:
+              kind: LocationSite
+              data:
+                - name: NYC1
+                  status: active
+                  facility: Equinix NY5
+                  physical_address: "755 Secaucus Rd, Secaucus, NJ 07094"
+                  timezone: America/New_York
+                - name: SJC1
+                  status: active
+                  facility: Equinix SV1
+                  physical_address: "2001 Ryan Ave, San Jose, CA 95131"
+                  timezone: America/Los_Angeles
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OrganizationProvider
+  data:
+    - name: Lumen
+      description: Lumen Technologies, circuit provider.
+    - name: Colt
+      description: Colt Technology Services, circuit provider.
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimCircuit
+  data:
+    - circuit_id: "LUMEN-00123"
+      description: "NYC1 to SJC1 backbone link"
+      commit_rate: 10000000
+      circuit_type: point_to_point
+      status: active
+      provider: Lumen
+      # DcimCircuit.endpoints is a Component (cardinality many) -- data is a
+      # list. Each endpoint's `name` is a read_only computed attribute, so it
+      # is never set here.
+      endpoints:
+        kind: DcimCircuitEndpoint
+        data:
+          - side: a
+            status: active
+            description: "NYC1 hand-off"
+            # location is cardinality one, peer LocationHosting (a Generic),
+            # so it needs a nested kind+data block naming the concrete kind.
+            # LocationSite's only mandatory field is `name`; this upserts
+            # against the site created above.
+            location:
+              kind: LocationSite
+              data:
+                name: NYC1
+          - side: z
+            status: active
+            description: "SJC1 hand-off"
+            location:
+              kind: LocationSite
+              data:
+                name: SJC1
+
+    - circuit_id: "COLT-00456"
+      description: "NYC1 internet access circuit"
+      commit_rate: 1000000
+      circuit_type: internet_access
+      status: active
+      provider: Colt
+      endpoints:
+        kind: DcimCircuitEndpoint
+        data:
+          - side: a
+            status: active
+            description: "NYC1 hand-off"
+            location:
+              kind: LocationSite
+              data:
+                name: NYC1
+
+    - circuit_id: "LUMEN-00789"
+      description: "SJC1 dark fiber segment"
+      circuit_type: dark_fiber
+      status: provisioning
+      provider: Lumen
+      endpoints:
+        kind: DcimCircuitEndpoint
+        data:
+          - side: a
+            status: provisioning
+            description: "SJC1 hand-off"
+            location:
+              kind: LocationSite
+              data:
+                name: SJC1

@@ -1,0 +1,49 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/routing.
+# Depends on: base (DcimDevice: nyc1-rtr01, from extensions/rack).
+#
+# extensions/routing/routing.yml defines only the abstract RoutingProtocol
+# generic (device + vrf + description + status, all mandatory) -- it has no
+# concrete node of its own, so nothing of kind "RoutingProtocol" can be
+# created directly. RoutingBGPPeerGroup (from extensions/routing_bgp) is used
+# below purely to exercise/prove the generic's mandatory-field contract with
+# a real instance attached to nyc1-rtr01. Later waves building
+# routing_bgp/routing_ospf/routing_pim/routing_aggregate own the "real"
+# object files for their concrete kinds and may add to or ignore this data.
+#
+# extensions/vrf is being built in parallel and its data may not exist yet,
+# so the IpamVRF instance below is created inline rather than assumed.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: IpamVRF
+  data:
+    - name: CUST-A
+      description: VRF for Customer A routed services.
+      vrf_rd: "65000:100"
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingBGPPeerGroup
+  data:
+    # `device` (cardinality one, peer DcimDevice) and `vrf` (cardinality one,
+    # peer IpamVRF) are both concrete kinds, so plain human_friendly_id
+    # scalars are used. These two relationships plus `description` and
+    # `status` are the mandatory fields inherited from RoutingProtocol.
+    - name: CUST-A-EBGP
+      description: "eBGP peer group for Customer A on nyc1-rtr01"
+      status: active
+      address_family: ipv4
+      device: nyc1-rtr01
+      vrf: CUST-A
+
+    - name: CUST-A-IBGP
+      description: "iBGP peer group for Customer A on nyc1-rtr01"
+      status: active
+      address_family: ipv4
+      device: nyc1-rtr01
+      vrf: CUST-A

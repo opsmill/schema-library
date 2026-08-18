@@ -1,0 +1,29 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/location_minimal.
+# Depends on: base.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: LocationRegion
+  data:
+    - name: Americas
+      description: North & South America.
+      children:
+        kind: LocationCountry
+        data:
+          - name: United States
+            children:
+              kind: LocationSite
+              data:
+                - name: NYC1
+                  status: active
+                  facility: Equinix NY5
+                  physical_address: "755 Secaucus Rd, Secaucus, NJ 07094"
+                  timezone: America/New_York
+                - name: SJC1
+                  status: active
+                  facility: Equinix SV1
+                  physical_address: "2001 Ryan Ave, San Jose, CA 95131"
+                  timezone: America/Los_Angeles

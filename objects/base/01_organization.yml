@@ -1,0 +1,27 @@
+# ---------------------------------------------------------------------------
+# Mock data for base/organization.yml.
+# Depends on: (none) -- safe to load first.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OrganizationManufacturer
+  data:
+    - name: Cisco
+      description: Cisco Systems, Inc.
+    - name: Juniper
+      description: Juniper Networks, Inc.
+    - name: Dell
+      description: Dell Technologies Inc.
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OrganizationProvider
+  data:
+    - name: Lumen
+      description: Lumen Technologies -- transit and dark fiber provider.
+    - name: Colt
+      description: Colt Technology Services -- transit and cross connects.

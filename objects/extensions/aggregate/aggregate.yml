@@ -1,0 +1,42 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/aggregate.
+# Depends on: base only.
+# IpamAggregate inherits BuiltinIPPrefix; its only mandatory attribute is
+# `prefix` (an IPNetwork). `ip_namespace` is optional and defaults to the
+# built-in "default" namespace when omitted. OrganizationRIR is a concrete
+# node (inherits the OrganizationGeneric generic), so it's referenced as a
+# plain scalar human_friendly_id (name__value) from the `rir` relationship,
+# which is cardinality one with a concrete peer.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OrganizationRIR
+  data:
+    - name: ARIN
+      description: American Registry for Internet Numbers.
+    - name: RIPE NCC
+      description: Réseau IP Européens Network Coordination Centre.
+    - name: Private (RFC 1918)
+      description: Internal registry for RFC 1918 / RFC 4193 private address space.
+      is_private: true
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: IpamAggregate
+  data:
+    - prefix: "10.0.0.0/8"
+      rir: "Private (RFC 1918)"
+      description: Private address space aggregate (RFC 1918).
+      date_added: "2020-01-01T00:00:00Z"
+    - prefix: "192.0.0.0/8"
+      rir: ARIN
+      description: Legacy Class C space aggregate.
+      date_added: "2015-06-01T00:00:00Z"
+    - prefix: "2001:db8::/32"
+      rir: RIPE NCC
+      description: Documentation IPv6 aggregate block.
+      date_added: "2018-03-15T00:00:00Z"

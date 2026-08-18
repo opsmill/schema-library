@@ -1,0 +1,170 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/routing_bgp.
+# Depends on: base (DcimDevice: nyc1-rtr01, nyc1-rtr02), extensions/routing
+# (RoutingBGPPeerGroup: CUST-A-EBGP, CUST-A-IBGP on nyc1-rtr01 / VRF CUST-A --
+# created there purely to demonstrate the RoutingProtocol generic's contract).
+#
+# This file owns RoutingAutonomousSystem, RoutingBGPPeerGroup, and
+# RoutingBGPSession for real: it adds RoutingAutonomousSystem records, wires
+# local_as/remote_as onto the two peer groups already created by
+# extensions/routing (matched by their name+description human_friendly_id,
+# so this upserts rather than duplicates -- their mandatory fields
+# description/status/device/vrf are repeated verbatim to match), adds one
+# more peer group for an upstream transit uplink, and adds RoutingBGPSession
+# records tying it all together.
+#
+# organization (RoutingAutonomousSystem) and location are cardinality-one
+# relationships to Generic peers (OrganizationGeneric / LocationGeneric).
+# Per convention, a plain human_friendly_id scalar is tried first since the
+# target records already exist (OrganizationProvider "Acme Networks"/"Lumen"
+# from base, TenancyTenant "Globex Corp" from extensions/tenancy, LocationSite
+# "NYC1" from extensions/location_minimal).
+#
+# RoutingBGPSession's human_friendly_id is just `description__value` (the
+# live schema resolves this from the RoutingProtocol generic's unique
+# `description` attribute -- RoutingBGPSession declares no HFID of its own).
+# local_as/remote_as on peer groups and sessions reference
+# RoutingAutonomousSystem, whose HFID is the two-part [asn, name] -- a YAML
+# list. peer_group on RoutingBGPSession references RoutingBGPPeerGroup, whose
+# HFID is the two-part [name, description] -- also a YAML list.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: IpamVRF
+  data:
+    - name: TRANSIT-VRF
+      description: Routing table for upstream transit peering on nyc1-rtr02.
+      vrf_rd: "65000:0"
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingAutonomousSystem
+  data:
+    - asn: 65000
+      name: NYC1-BACKBONE-AS
+      description: "Our own backbone AS, announced from nyc1-rtr01 and nyc1-rtr02."
+      organization: "Acme Networks"
+      location: "NYC1"
+      devices:
+        - nyc1-rtr01
+        - nyc1-rtr02
+
+    - asn: 65001
+      name: CUSTOMER-A-AS
+      description: "Customer A's autonomous system, peered via the CUST-A BGP peer groups."
+      organization: "Globex Corp"
+
+    - asn: 65002
+      name: TRANSIT-PROVIDER-AS
+      description: "Upstream transit provider autonomous system."
+      organization: "Lumen"
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingBGPPeerGroup
+  data:
+    # These two already exist (created by extensions/routing/routing.yml as
+    # a demo of the RoutingProtocol contract). Matching on name+description
+    # upserts them instead of creating duplicates; mandatory fields
+    # (description/status/device/vrf) are repeated verbatim, and local_as/
+    # remote_as are added on top.
+    - name: CUST-A-EBGP
+      description: "eBGP peer group for Customer A on nyc1-rtr01"
+      status: active
+      address_family: ipv4
+      device: nyc1-rtr01
+      vrf: CUST-A
+      local_as:
+        - "65000"
+        - NYC1-BACKBONE-AS
+      remote_as:
+        - "65001"
+        - CUSTOMER-A-AS
+
+    - name: CUST-A-IBGP
+      description: "iBGP peer group for Customer A on nyc1-rtr01"
+      status: active
+      address_family: ipv4
+      device: nyc1-rtr01
+      vrf: CUST-A
+      local_as:
+        - "65000"
+        - NYC1-BACKBONE-AS
+      remote_as:
+        - "65000"
+        - NYC1-BACKBONE-AS
+
+    - name: TRANSIT-UPSTREAM-EBGP
+      description: "eBGP peer group for upstream transit provider on nyc1-rtr02"
+      status: active
+      address_family: ipv4
+      device: nyc1-rtr02
+      vrf: TRANSIT-VRF
+      local_as:
+        - "65000"
+        - NYC1-BACKBONE-AS
+      remote_as:
+        - "65002"
+        - TRANSIT-PROVIDER-AS
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingBGPSession
+  data:
+    - description: "eBGP session to Customer A via CUST-A-EBGP on nyc1-rtr01"
+      status: active
+      session_type: external
+      role: peering
+      local_pref: 100
+      device: nyc1-rtr01
+      vrf: CUST-A
+      local_as:
+        - "65000"
+        - NYC1-BACKBONE-AS
+      remote_as:
+        - "65001"
+        - CUSTOMER-A-AS
+      peer_group:
+        - CUST-A-EBGP
+        - "eBGP peer group for Customer A on nyc1-rtr01"
+
+    - description: "iBGP session to Customer A via CUST-A-IBGP on nyc1-rtr01"
+      status: active
+      session_type: internal
+      role: backbone
+      device: nyc1-rtr01
+      vrf: CUST-A
+      local_as:
+        - "65000"
+        - NYC1-BACKBONE-AS
+      remote_as:
+        - "65000"
+        - NYC1-BACKBONE-AS
+      peer_group:
+        - CUST-A-IBGP
+        - "iBGP peer group for Customer A on nyc1-rtr01"
+
+    - description: "eBGP session to upstream transit provider via TRANSIT-UPSTREAM-EBGP on nyc1-rtr02"
+      status: active
+      session_type: external
+      role: upstream
+      local_pref: 50
+      device: nyc1-rtr02
+      vrf: TRANSIT-VRF
+      local_as:
+        - "65000"
+        - NYC1-BACKBONE-AS
+      remote_as:
+        - "65002"
+        - TRANSIT-PROVIDER-AS
+      peer_group:
+        - TRANSIT-UPSTREAM-EBGP
+        - "eBGP peer group for upstream transit provider on nyc1-rtr02"

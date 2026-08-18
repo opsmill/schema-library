@@ -1,0 +1,109 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/vrrp.
+# Depends on: base, extensions/rack (DcimDevice: nyc1-rtr01, in NYC1-RACK-01,
+# with interface GigabitEthernet0/0/0/0).
+#
+# NetworkVRRPGroup.vrrp_interfaces is a Component relationship of cardinality
+# many with a CONCRETE peer (NetworkVRRPInterface), so we point it at the
+# NetworkVRRPInterface records created below via a {data: [...]} block (kind
+# omitted since the peer is already the schema's declared concrete type).
+#
+# NetworkVRRPInterface links back to its group via `vrrp_group` (cardinality
+# one, CONCRETE peer NetworkVRRPGroup, HFID is the single field name__value)
+# -- a plain scalar string. It links to the actual port via `interface`
+# (cardinality one, GENERIC peer InterfaceLayer3), which requires a nested
+# {kind, data} block whose data is a single mapping repeating every mandatory
+# field of the target concrete kind, not just enough to identify it:
+#   - InterfacePhysical: name, device
+#   - DcimDevice: name, location
+#   - LocationRack: name, site (site's peer LocationSite is CONCRETE, so a
+#     plain HFID string is enough there)
+# This upserts against the existing nyc1-rtr01 / NYC1-RACK-01 fixtures rather
+# than duplicating them. GigabitEthernet0/0/0/0 already exists (from
+# extensions/rack); GigabitEthernet0/0/0/1 and /2 are fresh interfaces added
+# here, created inline the same way. All three VRRP groups live on the single
+# available fixture device -- a real deployment would spread group members
+# across two physical routers for actual first-hop redundancy.
+#
+# NOTE: NetworkVRRPInterface has no human_friendly_id of its own (only
+# order_by + uniqueness_constraints on [vrrp_group, interface]), so
+# `infrahubctl object load` can't upsert-match an existing one -- re-running
+# this file against a database that already has this data will hit a
+# "Violates uniqueness constraint 'vrrp_group-interface'" error on the
+# NetworkVRRPInterface record instead of upserting cleanly. This is a
+# property of the schema (out of scope to change here), not a mistake in
+# this file; a first load against a fresh database succeeds with zero
+# errors, and the surrounding fixtures (group, rack, device, interface) all
+# upsert correctly since they do have HFIDs.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: NetworkVRRPGroup
+  data:
+    - name: NYC1-CORE-VRRP
+      vrid: 10
+      # Obviously-fake placeholder value, not a real secret.
+      password: "VrrpKey-CHANGEME-1!"
+      vrrp_interfaces:
+        data:
+          - priority: 110
+            vrrp_group: NYC1-CORE-VRRP
+            interface:
+              kind: InterfacePhysical
+              data:
+                name: GigabitEthernet0/0/0/0
+                device:
+                  kind: DcimDevice
+                  data:
+                    name: nyc1-rtr01
+                    location:
+                      kind: LocationRack
+                      data:
+                        name: NYC1-RACK-01
+                        site: NYC1
+
+    - name: NYC1-DIST-VRRP
+      vrid: 20
+      vrrp_interfaces:
+        data:
+          - priority: 100
+            vrrp_group: NYC1-DIST-VRRP
+            interface:
+              kind: InterfacePhysical
+              data:
+                name: GigabitEthernet0/0/0/1
+                status: active
+                role: core
+                device:
+                  kind: DcimDevice
+                  data:
+                    name: nyc1-rtr01
+                    location:
+                      kind: LocationRack
+                      data:
+                        name: NYC1-RACK-01
+                        site: NYC1
+
+    - name: NYC1-MGMT-VRRP
+      vrid: 30
+      vrrp_interfaces:
+        data:
+          - priority: 90
+            vrrp_group: NYC1-MGMT-VRRP
+            interface:
+              kind: InterfacePhysical
+              data:
+                name: GigabitEthernet0/0/0/2
+                status: active
+                role: management
+                device:
+                  kind: DcimDevice
+                  data:
+                    name: nyc1-rtr01
+                    location:
+                      kind: LocationRack
+                      data:
+                        name: NYC1-RACK-01
+                        site: NYC1

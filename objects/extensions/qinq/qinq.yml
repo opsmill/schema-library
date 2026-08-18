@@ -1,0 +1,45 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/qinq.
+# Depends on: base, extensions/location_minimal, extensions/vlan
+# (IpamVLANGroup: NYC1-VLANs).
+# IpamSVLAN and IpamCVLAN both inherit from GenericVLAN, so each needs its own
+# vlan_id/vlan_group. IpamCVLAN's `name` attribute is a read-only computed
+# attribute (Jinja2 from svlan + vlan_id), so it is never set here.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: IpamSVLAN
+  data:
+    - name: NYC1-SVLAN-3001
+      description: Supplier VLAN carrying customer traffic for tenant A at NYC1.
+      vlan_id: 3001
+      status: active
+      vlan_group: NYC1-VLANs
+    - name: NYC1-SVLAN-3002
+      description: Supplier VLAN carrying customer traffic for tenant B at NYC1.
+      vlan_id: 3002
+      status: active
+      vlan_group: NYC1-VLANs
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: IpamCVLAN
+  data:
+    # `name` is read-only/computed (svlan name + vlan_id) -- do not set it.
+    - vlan_id: 101
+      status: active
+      vlan_group: NYC1-VLANs
+      # IpamSVLAN is a concrete kind -- plain human_friendly_id scalar.
+      svlan: NYC1-SVLAN-3001
+    - vlan_id: 102
+      status: active
+      vlan_group: NYC1-VLANs
+      svlan: NYC1-SVLAN-3001
+    - vlan_id: 103
+      status: active
+      vlan_group: NYC1-VLANs
+      svlan: NYC1-SVLAN-3002

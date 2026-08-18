@@ -1,0 +1,53 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/routing_policies_aggregate.
+# Depends on: extensions/routing_policies (RoutingPolicy generic),
+# extensions/routing_aggregate (RoutingAggregateRoute, DcimDevice nyc1-rtr01).
+#
+# RoutingPolicyAggregate inherits RoutingPolicy: name (Text, unique, the
+# human_friendly_id), description (Text, optional), policy_type (Dropdown:
+# import-policy / export-policy / import-export-policy), weight (Number,
+# default 1000), address_family (Dropdown: ipv4 / ipv6 / all, default all).
+#
+# The `extensions: nodes:` block in
+# extensions/routing_policies_aggregate/routing_policies_aggregate.yml that
+# would add real import_routing_policies / export_routing_policies
+# relationships onto RoutingAggregateRoute is commented out in the schema
+# file and is NOT active on the live instance -- confirmed against the live
+# schema, RoutingAggregateRoute only has plain import_policies /
+# export_policies Text attributes, no relationship to RoutingPolicyAggregate.
+#
+# So there is no relationship to wire here. Instead, "wiring" is done the
+# same way the existing extensions/routing_aggregate mock data already does
+# it: by free-text convention. The first RoutingAggregateRoute record
+# ("Aggregate summary route for Customer A allocated block on nyc1-rtr01",
+# loaded by objects/extensions/routing_aggregate) already sets
+# import_policies: "CUST-A-EXPORT-SUMMARY" as a plain string. The first
+# RoutingPolicyAggregate record below is named to match that existing
+# free-text value, so the two line up conceptually even though there is no
+# actual graph edge between them.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingPolicyAggregate
+  data:
+    - name: "CUST-A-EXPORT-SUMMARY"
+      description: >-
+        Export policy controlling advertisement of the Customer A summary
+        aggregate route. Referenced by name from the
+        RoutingAggregateRoute.import_policies free-text field on nyc1-rtr01.
+      policy_type: "export-policy"
+      weight: 500
+      address_family: "ipv4"
+
+    - name: "CUST-B-DISCARD-EXPORT"
+      description: "Export policy suppressing advertisement of the discarded Customer B subnet aggregate."
+      policy_type: "export-policy"
+      weight: 200
+      address_family: "ipv4"
+
+    - name: "MGMT-DEFAULT-IMPORT"
+      description: "Import policy accepting the default route learned on management-VRF aggregates."
+      policy_type: "import-policy"
+      address_family: "all"

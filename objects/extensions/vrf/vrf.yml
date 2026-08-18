@@ -1,0 +1,48 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/vrf.
+# Depends on: base. Standalone otherwise -- IpamVRF has no device/location
+# relationship, so these records don't need any other extension's fixtures.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: IpamRouteTarget
+  data:
+    - name: "65000:100"
+      description: Shared services route target, imported by multiple customer VRFs.
+    - name: "65000:200"
+      description: Customer B dedicated route target.
+    - name: "65000:300"
+      description: Unused spare route target, reserved for future allocation.
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: IpamVRF
+  data:
+    - name: CUSTOMER-A
+      vrf_rd: "65000:100"
+      description: Customer A dedicated VRF.
+      enforce_unique: true
+      # import_rt/export_rt are cardinality many with a CONCRETE peer
+      # (IpamRouteTarget), so a flat list of human_friendly_id strings is
+      # enough -- no nested kind/data block needed.
+      import_rt:
+        - "65000:100"
+      export_rt:
+        - "65000:100"
+    - name: CUSTOMER-B
+      vrf_rd: "65000:200"
+      description: Customer B VRF, also imports the shared services route target.
+      enforce_unique: true
+      import_rt:
+        - "65000:100"
+        - "65000:200"
+      export_rt:
+        - "65000:200"
+    - name: MGMT-VRF
+      vrf_rd: "65000:999"
+      description: Out-of-band management VRF, isolated with no route targets.
+      enforce_unique: true
