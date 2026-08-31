@@ -21,6 +21,9 @@ generics:
         kind: Text
         optional: true
         order_weight: 2000
+      # NOTE: this choice list is duplicated in extensions/dwdm and the two must be
+      # kept in sync. Infrahub cannot share a choice list across extension files without a
+      # shared generic in a common ancestor, which is a base-tier change.
       - name: connector_type
         kind: Dropdown
         choices:
@@ -99,16 +102,15 @@ generics:
           - name: URM_P2
             label: URM-P2
             description: "Specialized fiber optic connector for industrial and harsh environments."
-          # FIXME: Commenting out otherwise I'm facing a Text attribute length should be less than 4096 characters.
-          # - name: URM_P4
-          #   label: URM-P4
-          #   description: "Similar to URM-P2 but designed for higher performance."
-          # - name: URM_P8
-          #   label: URM-P8
-          #   description: "Enhanced version of URM connectors with higher protection."
-          # - name: Splice
-          #   label: Splice
-          #   description: "Permanent fiber connection method where two fiber ends are fused."
+          - name: URM_P4
+            label: URM-P4
+            description: "Similar to URM-P2 but designed for higher performance."
+          - name: URM_P8
+            label: URM-P8
+            description: "Enhanced version of URM connectors with higher protection."
+          - name: Splice
+            label: Splice
+            description: "Permanent fiber connection method where two fiber ends are fused."
         order_weight: 1100
 
 nodes:
