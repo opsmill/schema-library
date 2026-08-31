@@ -134,7 +134,7 @@ spec:
       form_factor: sfp_plus
       status: plugged
       wdm_type: dwdm
-      serial: "SFP-WDM-0001"
+      serial_number: "SFP-WDM-0001"
       manufacturer: Cisco
       # `interface` peer (InterfacePhysical) is a CONCRETE kind with a
       # composite human_friendly_id ([device__name__value, name__value]).
@@ -148,7 +148,7 @@ spec:
       form_factor: sfp_plus
       status: spare
       wdm_type: dwdm
-      serial: "SFP-WDM-0002"
+      serial_number: "SFP-WDM-0002"
       manufacturer: Cisco
       spare_location:
         kind: LocationSite
@@ -160,7 +160,7 @@ spec:
       form_factor: qsfp28
       status: spare
       wdm_type: cwdm
-      serial: "SFP-WDM-0003"
+      serial_number: "SFP-WDM-0003"
       manufacturer: Cisco
       spare_location:
         kind: LocationRack

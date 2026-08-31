@@ -55,7 +55,7 @@ nodes:
     inherit_from:
       - OrganizationGeneric
     attributes:
-      - name: is_private
+      - name: private
         kind: Boolean
         label: Private
         default_value: false

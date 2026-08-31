@@ -25,21 +25,21 @@ spec:
       part_number: "A9K-PSU"
       manufacturer: Cisco
       wattage: 3000
-      hotswappable: true
+      hot_swappable: true
 
     - name: MX204-PSU
       description: "AC power supply module for the MX204."
       part_number: "PSU-MX204"
       manufacturer: Juniper
       wattage: 650
-      hotswappable: true
+      hot_swappable: true
 
     - name: PowerEdge-PSU
       description: "Redundant power supply module for the PowerEdge R660."
       part_number: "PWR-R660"
       manufacturer: Dell
       wattage: 800
-      hotswappable: true
+      hot_swappable: true
 
 ---
 apiVersion: infrahub.app/v1

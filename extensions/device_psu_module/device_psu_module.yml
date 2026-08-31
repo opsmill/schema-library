@@ -50,7 +50,7 @@ nodes:
         optional: true
         description: "Wattage in watts."
         order_weight: 1300
-      - name: hotswappable
+      - name: hot_swappable
         kind: Boolean
         label: Hot-Swappable
         default_value: false

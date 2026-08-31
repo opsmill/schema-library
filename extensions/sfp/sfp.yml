@@ -16,7 +16,7 @@ generics:
     include_in_menu: true
     display_label: "{{ form_factor__value }} {{ sfp_type__value }}"
     attributes:
-      - name: serial
+      - name: serial_number
         kind: Text
         optional: true
         order_weight: 1400
