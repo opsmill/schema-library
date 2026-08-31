@@ -58,8 +58,8 @@ nodes:
           - name: decommissioning
             label: Decommissioning
             color: "#ff9800"
-          - name: retired
-            label: Retired
+          - name: deprecated
+            label: Deprecated
             color: "#6c757d"
         optional: false
         order_weight: 1250

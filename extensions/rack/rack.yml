@@ -56,7 +56,7 @@ nodes:
             description: Rack is being phased out and emptied.
             color: "#ff9800"
           - name: deprecated
-            label: Retired
+            label: Deprecated
             description: Rack has been removed from service.
             color: "#6c757d"
         optional: false
