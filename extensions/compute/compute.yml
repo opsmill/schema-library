@@ -11,7 +11,8 @@ generics:
   - name: GenericUnit
     namespace: Compute
     description: A generic unit that can compute (e.g. server, vm ...).
-    include_in_menu: false
+    label: Compute
+    include_in_menu: true
 
   - name: HostVirtualMachine
     namespace: Virtualization
@@ -31,7 +32,7 @@ nodes:
     description: A physical server with fixed resources and specific hardware characteristics.
     label: Physical Server
     icon: mdi:server
-    menu_placement: DcimDevice
+    menu_placement: ComputeGenericUnit
     inherit_from:
       - ComputeGenericUnit
       - DcimGenericDevice
@@ -67,6 +68,7 @@ nodes:
     description: A virtual machine hosted on a server or a cluster.
     label: Virtual Machine
     icon: carbon:virtual-machine
+    menu_placement: ComputeGenericUnit
     include_in_menu: true
     inherit_from:
       - ComputeGenericUnit

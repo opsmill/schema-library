@@ -13,7 +13,7 @@ nodes:
     description: A cluster hosting virtual machines.
     label: Hosting Cluster
     icon: mdi:dots-hexagon
-    menu_placement: VirtualizationVirtualMachine
+    menu_placement: ComputeGenericUnit
     inherit_from:
       - ClusterGeneric
       - VirtualizationHostVirtualMachine # Means we can get VM running on this one
