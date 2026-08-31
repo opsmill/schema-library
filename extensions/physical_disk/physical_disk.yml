@@ -13,8 +13,15 @@ generics:
     description: Generic that hold relationship toward physical disks. To apply on device that can have physical disks.
     include_in_menu: false
     attributes:
-      - name: name # Here so HFIDs and computed names can resolve, see DcimPhysicalDevice.name
+      # Here so HFIDs and computed names can resolve, see DcimPhysicalDevice.name.
+      # unique is required because DcimPhysicalDisk.human_friendly_id walks
+      # device__name__value, and Infrahub only accepts a peer attribute combination that is
+      # unique. Every device kind this generic is meant to be applied to already inherits
+      # DcimGenericDevice, which declares name unique, so nothing changes for them;
+      # allow_override lets an implementer restate the attribute either way.
+      - name: name
         kind: Text
+        unique: true
         allow_override: any
         optional: false
         order_weight: 1000
