@@ -9,10 +9,12 @@ version: "1.0"
 
 nodes:
   - name: Tenant
-    namespace: Tenancy
+    namespace: Organization
     description: A tenant is the owner of the corresponding devices, addressing, and locations.
+    label: Tenant
     icon: mdi:domain
     include_in_menu: true
+    menu_placement: OrganizationGeneric
     inherit_from:
       - OrganizationGeneric
     relationships:
@@ -36,7 +38,7 @@ nodes:
         kind: Generic
         cardinality: many
         optional: true
-        identifier: tenant__ipaddress
+        identifier: tenant__ip_address
       - name: locations
         peer: LocationHosting
         label: Locations
@@ -50,7 +52,7 @@ extensions:
     - kind: DcimGenericDevice
       relationships:
         - name: tenant
-          peer: TenancyTenant
+          peer: OrganizationTenant
           kind: Attribute
           cardinality: one
           optional: true
@@ -59,7 +61,7 @@ extensions:
     - kind: IpamPrefix
       relationships:
         - name: tenant
-          peer: TenancyTenant
+          peer: OrganizationTenant
           kind: Attribute
           cardinality: one
           optional: true
@@ -68,16 +70,16 @@ extensions:
     - kind: IpamIPAddress
       relationships:
         - name: tenant
-          peer: TenancyTenant
+          peer: OrganizationTenant
           kind: Attribute
           cardinality: one
           optional: true
-          identifier: tenant__ipaddress
+          identifier: tenant__ip_address
           order_weight: 1300
     - kind: LocationHosting
       relationships:
         - name: tenant
-          peer: TenancyTenant
+          peer: OrganizationTenant
           kind: Attribute
           cardinality: one
           optional: true
@@ -102,12 +104,12 @@ extensions:
 #       - kind: DcimCircuit
 #         relationships:
 #           - name: tenant
-#             peer: TenancyTenant
+#             peer: OrganizationTenant
 #             identifier: tenant__circuit
 #             optional: true
 #             cardinality: one
 #             kind: Attribute
-#       - kind: TenancyTenant
+#       - kind: OrganizationTenant
 #         relationships:
 #           - name: circuits
 #             peer: DcimCircuit

@@ -17,7 +17,7 @@
 # relationships to Generic peers (OrganizationGeneric / LocationGeneric).
 # Per convention, a plain human_friendly_id scalar is tried first since the
 # target records already exist (OrganizationProvider "Acme Networks"/"Lumen"
-# from base, TenancyTenant "Globex Corp" from extensions/tenancy, LocationSite
+# from base, OrganizationTenant "Globex Corp" from extensions/tenancy, LocationSite
 # "NYC1" from extensions/location_minimal).
 #
 # RoutingBGPSession's human_friendly_id is just `description__value` (the
