@@ -187,6 +187,7 @@ nodes:
         kind: Component
         cardinality: many
         optional: true
+        on_delete: no-action # a session outlives its IXP connection; it is owned by its device
         identifier: ixpconn__bgpsessions
         description: "BGP sessions established over this IXP connection"
         order_weight: 1450
