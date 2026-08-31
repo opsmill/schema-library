@@ -86,7 +86,7 @@ nodes:
           - name: backbone
             label: Backbone
             description: Core network infrastructure prefixes.
-            color: "#AEC6CF"
+            color: "#9678B6"
         optional: true
         order_weight: 1200
     relationships:
