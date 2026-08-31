@@ -156,6 +156,7 @@ nodes:
     attributes:
       - name: name
         kind: Text
+        unique: true
         order_weight: 1000
       - name: client_description
         kind: Text
@@ -163,14 +164,15 @@ nodes:
         optional: true
         order_weight: 1100
     relationships:
-      - name: ip_address
+      - name: ip_addresses
         peer: IpamIPAddress
-        label: IP Address
+        label: IP Addresses
         kind: Attribute
         cardinality: many
         description: Authorized SNMP client address.
         order_weight: 1150
-      - name: community
+      - name: communities
         peer: SnmpCommunity
+        kind: Attribute
         cardinality: many
         order_weight: 1200
