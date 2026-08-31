@@ -122,7 +122,8 @@ def _generate_home_page_documentation() -> None:
     template_text = template_file.read_text(encoding="utf-8")
 
     # Render the template
-    environment = jinja2.Environment(trim_blocks=True)
+    # keep_trailing_newline keeps the template's final newline, which markdownlint (MD047) requires.
+    environment = jinja2.Environment(trim_blocks=True, keep_trailing_newline=True)
     template = environment.from_string(template_text)
     rendered_file = template.render(toc=toc_content)
 
