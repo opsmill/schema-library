@@ -124,12 +124,11 @@ generics:
         optional: true
         identifier: connector__endpoint
         order_weight: 1600
+  # connected_endpoints is kind Attribute so both ends render inline on the connector form.
+  # A high-fan-out connector kind should override the relationship back to Generic.
   - name: Connector
     namespace: Dcim
-    description: >-
-      Generic Connector to link two endpoints together. The endpoints are kind Attribute so both
-      ends render inline on the connector form; a high-fan-out connector kind should override the
-      relationship back to Generic.
+    description: Generic Connector to link two endpoints together.
     include_in_menu: false
     relationships:
       - name: connected_endpoints

@@ -33,8 +33,9 @@ nodes:
       - name: enforce_unique
         kind: Boolean
         label: Enforce Unique
-        description: Declares the intent that prefixes and addresses be unique within this VRF.
-          Infrahub does not enforce this; consume it from a check or a generator.
+        description: >-
+          Declares the intent that prefixes and addresses be unique in this VRF. Infrahub does
+          not enforce it; use a check or generator.
         default_value: true
         optional: true
         order_weight: 1200

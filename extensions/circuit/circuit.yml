@@ -99,12 +99,13 @@ nodes:
         identifier: circuit__endpoint
         order_weight: 1600
 
+  # The description field carries the provider-side reference for the termination,
+  # for example a patch panel position or a cross-connect ID.
   - name: CircuitEndpoint
     namespace: Dcim
     description: >-
       One of the two terminations (A or Z) of a circuit, at the location where the provider hands
-      the circuit off. Use the description field for the provider-side reference (patch panel
-      position, cross-connect ID).
+      the circuit off.
     label: Circuit Endpoint
     icon: mdi:ethernet
     include_in_menu: true

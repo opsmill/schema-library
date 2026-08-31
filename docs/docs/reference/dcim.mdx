@@ -152,7 +152,7 @@ Basic DCIM schema to capture devices, racks, interfaces, and related information
 
 ### Connector
 
-- **Description:** Generic Connector to link two endpoints together. The endpoints are kind Attribute so both ends render inline on the connector form; a high-fan-out connector kind should override the relationship back to Generic.
+- **Description:** Generic Connector to link two endpoints together.
 - **Namespace:** Dcim
 
 #### Relationships
@@ -343,9 +343,7 @@ generics:
     order_weight: 1600
 - name: Connector
   namespace: Dcim
-  description: Generic Connector to link two endpoints together. The endpoints are
-    kind Attribute so both ends render inline on the connector form; a high-fan-out
-    connector kind should override the relationship back to Generic.
+  description: Generic Connector to link two endpoints together.
   include_in_menu: false
   relationships:
   - name: connected_endpoints
