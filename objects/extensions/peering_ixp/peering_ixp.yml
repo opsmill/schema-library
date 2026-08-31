@@ -18,7 +18,8 @@
 # string. import_policies/export_policies (cardinality many, peer
 # RoutingPolicyBGP -- concrete, HFID name__value) and bgp_communities
 # (cardinality many, peer RoutingBGPCommunity -- concrete, HFID name__value)
-# are flat lists of HFID scalars.
+# are lists of HFIDs, and an HFID is always a list of its parts -- so each
+# single-part entry is itself a one-element list, not a bare string.
 #
 # PeeringIXPConnection's human_friendly_id is also just `name__value`.
 # internet_exchange_point (Parent, cardinality one, mandatory) references
@@ -47,11 +48,11 @@ spec:
         - "65000"
         - NYC1-BACKBONE-AS
       import_policies:
-        - CUST-A-IMPORT-PREFER-CUSTOMER
+        - [CUST-A-IMPORT-PREFER-CUSTOMER]
       export_policies:
-        - CUST-A-EXPORT-DEFAULT-ROUTE
+        - [CUST-A-EXPORT-DEFAULT-ROUTE]
       bgp_communities:
-        - NO-EXPORT
+        - [NO-EXPORT]
 
     - name: SJC1-IX
       description: "San Jose area internet exchange point serving the SJC1 site."

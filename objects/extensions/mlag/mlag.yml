@@ -23,10 +23,11 @@
 # extensions/rack nests InterfacePhysical under DcimDevice.interfaces.
 #
 # peer_links (peer InterfaceLag, concrete kind, cardinality many) and peers
-# (peer DcimDevice, concrete kind, cardinality many) both use flat lists of
-# human_friendly_id refs -- InterfaceLag's HFID is a 2-part
-# [device__name__value, name__value] list, DcimDevice's HFID is just
-# name__value.
+# (peer DcimDevice, concrete kind, cardinality many) are both lists of
+# human_friendly_id refs, and every HFID is itself a list of its parts:
+# InterfaceLag's is the 2-part [device__name__value, name__value], DcimDevice's
+# is the 1-part [name__value]. A bare string there is read as a node ID, so the
+# single-part HFID is wrapped in a list too.
 # ---------------------------------------------------------------------------
 ---
 apiVersion: infrahub.app/v1
@@ -120,8 +121,8 @@ spec:
     - domain_id: "NYC1-MLAG-01"
       reload_delay: 300
       peers:
-        - "nyc1-rtr01"
-        - "nyc1-rtr02"
+        - ["nyc1-rtr01"]
+        - ["nyc1-rtr02"]
       peer_links:
         - ["nyc1-rtr01", "Bundle-Ether1"]
         - ["nyc1-rtr02", "Bundle-Ether1"]

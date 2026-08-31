@@ -29,8 +29,10 @@
 # mandatory fields it already has (description, status, device, vrf,
 # dr_priority) plus the two new relationship lists pointing at the policies
 # below. Peer RoutingPolicyPIM is a CONCRETE kind with a human_friendly_id
-# (name__value), so a flat list of name strings is enough for these
-# cardinality-many relationships -- no nested kind+data block needed.
+# (name__value), so these cardinality-many relationships take a list of HFIDs
+# and need no nested kind+data block. An HFID is always a list of its parts, so
+# each single-part entry is a one-element list; a bare string is read as a
+# node ID instead.
 # ---------------------------------------------------------------------------
 ---
 apiVersion: infrahub.app/v1
@@ -72,7 +74,7 @@ spec:
       vrf: CUSTOMER-A
       dr_priority: 100
       import_routing_policies:
-        - PIM-ALLOW-CUSTOMER-A-SOURCES
+        - [PIM-ALLOW-CUSTOMER-A-SOURCES]
       export_routing_policies:
-        - PIM-ALLOW-CUSTOMER-A-RECEIVERS
-        - PIM-DENY-DEFAULT
+        - [PIM-ALLOW-CUSTOMER-A-RECEIVERS]
+        - [PIM-DENY-DEFAULT]

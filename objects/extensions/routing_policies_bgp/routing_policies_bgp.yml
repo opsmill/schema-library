@@ -15,8 +15,10 @@
 # the RoutingPolicy generic), so it's referenced as a plain scalar string.
 #
 # import_routing_policies / export_routing_policies are cardinality-many
-# relationships whose peer (RoutingPolicyBGP) is a concrete kind, so they use
-# a flat list of HFID scalars rather than the nested kind+data form.
+# relationships whose peer (RoutingPolicyBGP) is a concrete kind, so they take
+# a list of HFIDs rather than the nested kind+data form. An HFID is always a
+# list of its parts, so each single-part entry is a one-element list -- a bare
+# string there is read as a node ID.
 #
 # The RoutingBGPPeerGroup/RoutingBGPSession upserts below repeat only their
 # mandatory fields (per convention -- see objects/extensions/routing_bgp for
@@ -64,9 +66,9 @@ spec:
       device: nyc1-rtr01
       vrf: CUST-A
       import_routing_policies:
-        - CUST-A-IMPORT-PREFER-CUSTOMER
+        - [CUST-A-IMPORT-PREFER-CUSTOMER]
       export_routing_policies:
-        - CUST-A-EXPORT-DEFAULT-ROUTE
+        - [CUST-A-EXPORT-DEFAULT-ROUTE]
 
 ---
 apiVersion: infrahub.app/v1
@@ -80,4 +82,4 @@ spec:
       role: upstream
       vrf: TRANSIT-VRF
       export_routing_policies:
-        - TRANSIT-EXPORT-NO-CUSTOMER-ROUTES
+        - [TRANSIT-EXPORT-NO-CUSTOMER-ROUTES]

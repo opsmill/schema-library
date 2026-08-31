@@ -49,10 +49,11 @@ spec:
       technology: vmware
       status: active
       # `locations` is cardinality many (a cluster can span locations), and
-      # LocationGeneric is a Generic -- a flat list of HFID strings works
-      # against the existing LocationSite.
+      # LocationGeneric is a Generic -- each entry is a human_friendly_id, and
+      # an HFID is always a list of its parts, so the single-part site name is
+      # wrapped in a list. A bare string there is read as a node ID.
       locations:
-        - SJC1
+        - [SJC1]
       # `nodes` is cardinality many, and ComputeGenericUnit is a Generic --
       # a flat list of HFID strings is not enough (the peer schema can't be
       # resolved), so specify the concrete kind with a list of upsert specs.
@@ -74,7 +75,7 @@ spec:
       technology: kvm
       status: active
       locations:
-        - NYC1
+        - [NYC1]
       nodes:
         kind: ComputePhysicalServer
         data:

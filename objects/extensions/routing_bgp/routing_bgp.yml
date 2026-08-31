@@ -50,8 +50,8 @@ spec:
       organization: "Acme Networks"
       location: "NYC1"
       devices:
-        - nyc1-rtr01
-        - nyc1-rtr02
+        - ["nyc1-rtr01"]
+        - ["nyc1-rtr02"]
 
     - asn: 65001
       name: CUSTOMER-A-AS

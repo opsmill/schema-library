@@ -24,7 +24,9 @@
 # RoutingBGPPeerGroup. This upserts the existing record rather than
 # creating a duplicate, and adds import_routing_policies/
 # export_routing_policies -- both cardinality many with a CONCRETE peer
-# (RoutingPolicyOSPF), so they're flat lists of HFID scalars.
+# (RoutingPolicyOSPF), so they're lists of HFIDs. An HFID is always a list of
+# its parts, so each single-part entry is a one-element list; a bare string
+# there is read as a node ID.
 # ---------------------------------------------------------------------------
 ---
 apiVersion: infrahub.app/v1
@@ -62,7 +64,7 @@ spec:
       vrf: CUST-A
       version: ospf
       import_routing_policies:
-        - CUST-A-OSPF-IMPORT
+        - [CUST-A-OSPF-IMPORT]
       export_routing_policies:
-        - CUST-A-OSPF-EXPORT
-        - OSPF-DEFAULT-METRIC
+        - [CUST-A-OSPF-EXPORT]
+        - [OSPF-DEFAULT-METRIC]
