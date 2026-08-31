@@ -1,17 +1,43 @@
 # ---------------------------------------------------------------------------
 # Mock data for extensions/circuit.
-# Depends on: base, extensions/location_minimal (LocationSite: NYC1, SJC1).
+# Self-sufficient: it creates every record it references, so it can be loaded
+# on its own on top of base + any extension that provides a concrete
+# LocationSite (extensions/location_minimal or extensions/location_site).
 #
-# The sites the endpoints hand off at are owned by
-# objects/extensions/location_minimal, which builds them under the Americas ->
-# United States hierarchy. They are referenced here by human_friendly_id only:
-# restating that tree would re-upsert a hierarchical root, which fails.
+# DcimCircuitEndpoint.location is mandatory and its peer LocationHosting is a
+# base generic that base itself never implements, so the endpoints need a Site
+# to exist. The sites are created below with their name only, deliberately
+# without a parent: extensions/location_site has no tier above Site, and
+# extensions/location_minimal puts them under Americas -> United States, so
+# restating either tree here would tie this file to one of the two mutually
+# exclusive location extensions. Restating location_minimal's tree is not an
+# option anyway, since re-upserting the hierarchy root fails with "Not
+# supported to assign a value to parent for LocationRegion".
+#
+# ORDER: load this file BEFORE your location fixture. In the .metadata.yml
+# resolver order that is what happens (circuit sorts ahead of
+# location_minimal), and location_minimal's fuller definition then adopts NYC1
+# and SJC1 into its hierarchy. Loading it the other way round leaves the two
+# sites without a parent, because `infrahubctl object load` sends an explicit
+# null for every optional cardinality-one relationship a document omits -- see
+# the note at the top of objects/extensions/mlag/mlag.yml.
 #
 # NOTE: this file also creates the OrganizationProvider (from base) fixtures it
 # needs. If base's own object file has already loaded the same records (Lumen,
 # Colt), this upserts/matches them instead of duplicating -- see rule in AGENTS
 # notes about repeating mandatory fields for an existing target.
 # ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: LocationSite
+  data:
+    - name: NYC1
+      description: "Circuit hand-off site, New York metro."
+    - name: SJC1
+      description: "Circuit hand-off site, San Jose metro."
+
 ---
 apiVersion: infrahub.app/v1
 kind: Object
