@@ -17,14 +17,17 @@ nodes:
     inherit_from:
       - LocationHosting
     human_friendly_id:
+      - site__name__value
       - name__value
     order_by:
       - name__value
     display_label: name__value
+    uniqueness_constraints:
+      - [site, name__value]
     attributes:
       - name: name
         kind: Text
-        unique: true
+        unique: false
         optional: false
         order_weight: 1000
       - name: facility_id
@@ -78,7 +81,7 @@ nodes:
     relationships:
       - name: site
         peer: LocationSite
-        kind: Attribute
+        kind: Parent
         cardinality: one
         optional: false
         identifier: site__racks
