@@ -16,6 +16,8 @@ nodes:
     menu_placement: DcimDevice
     inherit_from:
       - DcimConnector
+    human_friendly_id:
+      - label__value
     order_by:
       - label__value
     display_label: label__value
@@ -217,7 +219,8 @@ nodes:
         order_weight: 1300
       - name: label
         kind: Text
-        optional: true
+        unique: true
+        optional: false
         order_weight: 1200
       # As we can't put float in Number "forcing" length in cm
       - name: length
