@@ -16,6 +16,7 @@ generics:
       - name: name # Here so HFIDs and computed names can resolve, see DcimPhysicalDevice.name
         kind: Text
         allow_override: any
+        optional: false
         order_weight: 1000
     relationships:
       - name: physical_disks
@@ -85,6 +86,7 @@ nodes:
             label: Disposed
             description: The disk has been securely erased and disposed of.
             color: "#dc3545"
+        optional: false
         description: Lifecycle status of the hardware component.
         order_weight: 1200
       - name: size

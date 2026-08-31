@@ -37,6 +37,7 @@ generics:
             label: Deleted
             description: "Configuration has been deleted."
             color: "#FAD7A0" # pastel orange
+        optional: false
         description: "Status of the Protocol Configuration."
         order_weight: 1200
     relationships:

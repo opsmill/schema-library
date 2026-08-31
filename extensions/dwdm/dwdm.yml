@@ -17,6 +17,7 @@ generics:
     attributes:
       - name: name
         kind: Text
+        optional: false
         order_weight: 1000
       - name: description
         kind: Text
@@ -133,6 +134,7 @@ nodes:
       - name: name
         kind: Text
         unique: true
+        optional: false
         order_weight: 1000
       - name: wdm_type
         kind: Dropdown
@@ -249,6 +251,7 @@ nodes:
     attributes:
       - name: channel
         kind: Number
+        optional: false
         description: WDM channel number.
         order_weight: 1000
       - name: wdm_type
@@ -269,11 +272,13 @@ nodes:
       - name: wavelength
         kind: Text # Text until float possible in Number Kind
         label: Wavelength (nm)
+        optional: false
         description: Wavelength of the channel in nm.
         order_weight: 1200
       - name: frequency
         kind: Text # Text until float possible in Number Kind
         label: Frequency (GHz)
+        optional: false
         description: Frequency of the channel in GHz.
         order_weight: 1300
 

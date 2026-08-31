@@ -68,6 +68,7 @@ generics:
       - name: name
         kind: Text
         unique: true
+        optional: false
         description: "Name of the module type."
         order_weight: 1000
       - name: description
@@ -119,6 +120,7 @@ nodes:
         order_weight: 800
       - name: name
         kind: Text
+        optional: false
         description: "Name of the bay, e.g. 'slot 1' or 'psu 1'."
         order_weight: 1000
       - name: position

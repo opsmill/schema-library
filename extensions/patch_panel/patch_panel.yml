@@ -17,6 +17,7 @@ generics:
     attributes:
       - name: name
         kind: Text
+        optional: false
         order_weight: 1000
       - name: description
         kind: Text
@@ -112,6 +113,7 @@ generics:
           - name: splice
             label: Splice
             description: "Permanent fiber connection method where two fiber ends are fused."
+        optional: false
         order_weight: 1200
 
 nodes:
@@ -131,6 +133,7 @@ nodes:
       - name: name
         kind: Text
         unique: true # TODO: maybe combine location / name
+        optional: false
         order_weight: 1000
       - name: module_capacity
         kind: Number

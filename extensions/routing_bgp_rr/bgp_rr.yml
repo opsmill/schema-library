@@ -21,6 +21,7 @@ nodes:
       - name: name
         kind: Text
         unique: true
+        optional: false
         description: "Name of the Route Reflector Cluster"
         order_weight: 1000
       - name: description
@@ -54,4 +55,5 @@ extensions:
           label: "RR Cluster"
           kind: Attribute
           cardinality: one
+          optional: true
           order_weight: 1700

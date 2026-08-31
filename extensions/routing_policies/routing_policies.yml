@@ -46,6 +46,7 @@ generics:
             label: Import + Export
             description: "Policy for both incoming and outgoing routes."
             color: "#E6E6FA" # lavender
+        optional: false
         description: "The type of routing policy which specifies the direction of route advertisement."
         order_weight: 1200
       - name: weight
@@ -70,5 +71,6 @@ generics:
             label: All
             description: "Policy applies to both IPv4 and IPv6 addresses."
             color: "#E6E6FA" # lavender
+        optional: false
         description: "The address family for the routing policy indicating the type of IP address."
         order_weight: 1150

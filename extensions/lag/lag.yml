@@ -16,10 +16,12 @@ generics:
     attributes:
       - name: name
         kind: Text
+        optional: false
         description: "Name of the interface"
         order_weight: 1000
       - name: bundle_number
         kind: Number
+        optional: false
         description: "Bundle number for the aggregated interface"
         order_weight: 1250
     relationships:
@@ -29,6 +31,7 @@ generics:
         kind: Attribute
         cardinality: many
         identifier: interface__bundle
+        optional: true
         description: "Physical Interfaces that are members of this aggregate"
         order_weight: 1800
 
@@ -56,6 +59,7 @@ nodes:
           - name: fast
             label: Fast
             color: "#E6E6FA" # lavender
+        optional: false
         description: "LACP rate for the aggregated interface"
         order_weight: 1850
       - name: lacp_mode
@@ -72,6 +76,7 @@ nodes:
           - name: disabled
             label: Disabled
             color: "#E6E6FA" # lavender
+        optional: false
         description: "LACP mode for the aggregated interface"
         order_weight: 1900
     relationships:
@@ -83,6 +88,7 @@ nodes:
         cardinality: many
         identifier: interface__bundle
         common_parent: device
+        optional: true
         description: "Physical Interfaces that are members of this aggregate"
         order_weight: 1800
 

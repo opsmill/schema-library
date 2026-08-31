@@ -26,6 +26,7 @@ nodes:
     attributes:
       - name: identifier
         kind: Text
+        optional: false
         order_weight: 1000
       - name: description
         kind: Text

@@ -59,6 +59,7 @@ nodes:
         kind: Boolean
         label: Private
         default_value: false
+        optional: false
         description: Indicates this RIR manages private (RFC 1918 / RFC 4193) address space.
         order_weight: 1300
     relationships:

@@ -46,6 +46,7 @@ nodes:
             label: OSPFv3
             description: "Open Shortest Path First version 3."
             color: "#E6E6FA" # lavender
+        optional: false
         description: "Version of the OSPF protocol."
         order_weight: 1300
       - name: import_policies
@@ -114,6 +115,7 @@ nodes:
             label: Peer-to-Peer
             description: "OSPF peer-to-peer interface mode."
             color: "#E6E6FA" # lavender
+        optional: false
         description: "Mode of the OSPF interface."
         order_weight: 1300
       - name: authentication_key
@@ -134,6 +136,7 @@ nodes:
         order_weight: 1225
       - name: area
         kind: Text
+        optional: false
         description: "OSPF area associated with the interface."
         order_weight: 1200
     relationships:

@@ -25,11 +25,13 @@ nodes:
       - name: name
         kind: Text
         unique: true
+        optional: false
         description: "Name of the Autonomous System"
         order_weight: 1000
       - name: asn
         kind: Number
         unique: true
+        optional: false
         description: "Autonomous System Number"
         order_weight: 1050
       - name: description
@@ -117,6 +119,7 @@ nodes:
             label: IPv6
             description: "Policy applies to IPv6 addresses."
             color: "#E6E6FA" # lavender
+        optional: false
         description: "The address family for the routing policy indicating the type of IP address."
         order_weight: 1250
     relationships:
@@ -163,6 +166,7 @@ nodes:
           - name: internal
             label: Internal
             description: "Session established with a router in the same autonomous system."
+        optional: false
         description: "Type of BGP Session"
         order_weight: 1250
       - name: role
@@ -180,6 +184,7 @@ nodes:
             label: Peering
             description: "Connect with other networks via IX."
             color: "#E6E6FA" # lavender
+        optional: false
         description: "Role of the BGP Session"
         order_weight: 1300
       - name: local_pref

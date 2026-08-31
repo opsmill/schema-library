@@ -21,6 +21,7 @@ nodes:
       - name: name
         kind: Text
         unique: true
+        optional: false
         description: "Name of the Internet Exchange"
         order_weight: 1000
       - name: description
@@ -40,6 +41,7 @@ nodes:
             label: Disabled
             description: "Internet Exchange is not operational"
             color: "#b0bec5"
+        optional: false
         order_weight: 1200
     relationships:
       - name: connections
@@ -105,6 +107,7 @@ nodes:
       - name: name
         kind: Text
         unique: true
+        optional: false
         description: "Name of the IXP Connection"
         order_weight: 1000
       - name: description
@@ -162,6 +165,7 @@ nodes:
         kind: Attribute
         cardinality: one
         identifier: ixpconn__ipv6_address
+        optional: true
         description: "IPv6 address assigned to the connection"
         order_weight: 1400
       - name: ipv4_address
@@ -170,6 +174,7 @@ nodes:
         kind: Attribute
         cardinality: one
         identifier: ixpconn__ipv4_address
+        optional: true
         description: "IPv4 address assigned to the connection"
         order_weight: 1375
       - name: internet_exchange_point
@@ -184,6 +189,7 @@ nodes:
         peer: DcimDevice
         kind: Attribute
         cardinality: one
+        optional: true
         description: "The router this IXP connection is connected to"
         order_weight: 1500
       - name: bgp_sessions
@@ -200,6 +206,7 @@ nodes:
         peer: BuiltinTag
         kind: Attribute
         cardinality: many
+        optional: true
         order_weight: 2000
 
 extensions:

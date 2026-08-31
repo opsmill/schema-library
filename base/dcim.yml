@@ -23,6 +23,7 @@ generics:
       - name: name
         kind: Text
         unique: true
+        optional: false
         order_weight: 1000
       - name: description
         kind: Text
@@ -70,6 +71,7 @@ generics:
         kind: Text
         unique: true
         allow_override: any
+        optional: false
         order_weight: 1000
       - name: position
         kind: Number
@@ -157,6 +159,7 @@ generics:
     attributes:
       - name: name
         kind: Text
+        optional: false
         description: "Name of the interface"
         order_weight: 1000
       - name: description
@@ -164,6 +167,8 @@ generics:
         optional: true
         description: "A brief description of the interface"
         order_weight: 1100
+      # NOTE: Infrahub 1.11 treats attributes with a default_value as optional at runtime;
+      # optional: false documents intent.
       - name: status
         kind: Dropdown
         default_value: "active"
@@ -313,6 +318,7 @@ nodes:
       - name: name
         kind: Text
         unique: true
+        optional: false
         order_weight: 1000
       - name: description
         kind: Text
@@ -333,6 +339,7 @@ nodes:
         kind: Boolean
         label: Full Depth
         default_value: true
+        optional: false
         order_weight: 1500
       - name: weight
         kind: Number
@@ -363,6 +370,7 @@ nodes:
       - name: name
         kind: Text
         unique: true
+        optional: false
         order_weight: 1000
       - name: description
         kind: Text
@@ -381,6 +389,7 @@ nodes:
         kind: Attribute
         cardinality: one
         identifier: manufacturer__platform
+        optional: true
         order_weight: 1300
   - name: Device
     namespace: Dcim
@@ -477,5 +486,6 @@ nodes:
         kind: Attribute
         cardinality: one
         identifier: "sub__interface"
+        optional: true
         description: "Parent interface to which this sub-interface belongs"
         order_weight: 1600

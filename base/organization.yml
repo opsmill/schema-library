@@ -23,6 +23,7 @@ generics:
       - name: name
         kind: Text
         unique: true
+        optional: false
         order_weight: 1000
       - name: description
         kind: Text

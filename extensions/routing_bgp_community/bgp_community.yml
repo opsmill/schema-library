@@ -22,6 +22,7 @@ nodes:
       - name: name
         kind: Text
         unique: true
+        optional: false
         description: "The name of the BGP community."
         order_weight: 1000
       - name: description
@@ -32,6 +33,7 @@ nodes:
       - name: community
         kind: Text
         unique: true
+        optional: false
         description: "The value of the BGP community (RFC1997, RFC4360, RFC8092)."
         order_weight: 1200
     relationships:
@@ -40,6 +42,7 @@ nodes:
         label: Routing Policies
         kind: Generic
         cardinality: many
+        optional: true
         description: "The BGP Policies using this BGP Community."
         order_weight: 1300
       - name: tags

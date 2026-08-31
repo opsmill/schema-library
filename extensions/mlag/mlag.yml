@@ -26,12 +26,14 @@ generics:
         kind: Text
         label: "MLAG Domain ID"
         unique: true # TODO: This one could be a mess to make unique...
+        optional: false
         description: "Identifier for the MLAG domain"
         order_weight: 1000
       - name: reload_delay
         kind: Number
         label: "Reload Delay"
         default_value: 300
+        optional: false
         description: "Time in seconds to wait before bringing up the MLAG after a reload"
         order_weight: 1650
     relationships:
@@ -40,6 +42,7 @@ generics:
         label: "Peer Links"
         kind: Attribute
         cardinality: many
+        optional: true
         description: "LAG interfaces used as peer-links between the MLAG peers"
         order_weight: 1500
         # Depending on the use-case this could be optional or not
@@ -55,6 +58,7 @@ generics:
         label: "MLAG Interface(s)"
         kind: Component
         cardinality: many
+        optional: true
         description: "Bundle interfaces that are spread across all devices in this MLAG domain."
         order_weight: 1550
 
@@ -78,6 +82,7 @@ nodes:
     attributes:
       - name: name
         kind: Text
+        optional: false
         description: "Name of the interface"
         order_weight: 1000
       - name: description
@@ -117,6 +122,7 @@ nodes:
             label: Outage
             description: "Interface is currently experiencing an outage."
             color: "#F4CCCC" # pastel red
+        optional: false
         description: "The status of the interface"
         order_weight: 1200
       - name: role

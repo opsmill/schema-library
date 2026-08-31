@@ -35,6 +35,7 @@ extensions:
           kind: Generic
           cardinality: many
           identifier: bgppeergroup__import_policies
+          optional: true
           description: "The routing-policies used by this instance for import."
           order_weight: 1750
         - name: export_routing_policies
@@ -43,6 +44,7 @@ extensions:
           kind: Generic
           cardinality: many
           identifier: bgppeergroup__export_policies
+          optional: true
           description: "The routing-policies used by this instance for export."
           order_weight: 1800
     - kind: RoutingBGPSession
@@ -60,6 +62,7 @@ extensions:
           kind: Generic
           cardinality: many
           identifier: bgpsession__import_policies
+          optional: true
           description: "The routing-policies used by this instance for import."
           order_weight: 1850
         - name: export_routing_policies
@@ -68,5 +71,6 @@ extensions:
           kind: Generic
           cardinality: many
           identifier: bgpsession__export_policies
+          optional: true
           description: "The routing-policies used by this instance for export."
           order_weight: 1900

@@ -35,6 +35,7 @@ extensions:
           kind: Generic
           cardinality: many
           identifier: ospf__import_policies
+          optional: true
           description: "The routing-policies used by this instance for import."
           order_weight: 1600
         - name: export_routing_policies
@@ -43,5 +44,6 @@ extensions:
           kind: Generic
           cardinality: many
           identifier: ospf__export_policies
+          optional: true
           description: "The routing-policies used by this instance for export."
           order_weight: 1650

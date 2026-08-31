@@ -47,6 +47,7 @@ nodes:
           - name: public_cloud
             label: Public Cloud
             color: "#888888"
+        optional: false
         description: Underlying virtualisation or clustering technology.
         order_weight: 1300
       - name: status
