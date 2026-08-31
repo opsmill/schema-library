@@ -19,9 +19,9 @@ spec:
   kind: OrganizationProvider
   data:
     - name: Lumen
-      description: Lumen Technologies, circuit provider.
+      description: Lumen Technologies -- transit and dark fiber provider.
     - name: Colt
-      description: Colt Technology Services, circuit provider.
+      description: Colt Technology Services -- transit and cross connects.
 
 ---
 apiVersion: infrahub.app/v1
