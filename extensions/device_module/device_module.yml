@@ -119,9 +119,12 @@ nodes:
         description: "Name of the bay, e.g. 'slot 1' or 'psu 1'."
         order_weight: 1000
       - name: position
-        kind: Text
+        kind: Number
         optional: true
-        description: "Position identifier, substituted into a module's token."
+        parameters:
+          min_value: 1
+        description: "Numeric position of the bay within the device (e.g. slot 1, 2, 3)."
+        order_weight: 1050
       - name: description
         kind: Text
         optional: true
