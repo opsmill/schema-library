@@ -47,7 +47,10 @@ nodes:
     attributes:
       - name: wattage
         kind: Number
+        label: Wattage (W)
         optional: true
+        parameters:
+          min_value: 1
         description: "Wattage in watts."
         order_weight: 1300
       - name: hot_swappable
