@@ -35,7 +35,7 @@ nodes:
         cardinality: one
         kind: Attribute
       - name: circuit_endpoints
-        peer: CircuitEndpoint
+        peer: DcimCircuitEndpoint
         optional: true
         cardinality: many
         kind: Component
@@ -48,7 +48,7 @@ extensions:
           peer: CircuitService
           cardinality: many
           optional: true
-    - kind: CircuitEndpoint
+    - kind: DcimCircuitEndpoint
       relationships:
         - name: circuit_service
           peer: CircuitService
