@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -61,7 +61,11 @@ generics:
     description: Generic holding attributes and relationships relevant for physical device.
     include_in_menu: false
     attributes:
-      - name: name # Here for computed attribute
+      # Duplicated from DcimGenericDevice because generics cannot inherit generics.
+      # DcimModuleBay.computed_name (extensions/device_module) renders
+      # {{ device__name__value }} against peer DcimPhysicalDevice, so name must resolve here.
+      # allow_override lets DcimPatchPanel and DcimOpticalMultiplexer restate it.
+      - name: name
         kind: Text
         unique: true
         allow_override: any
@@ -118,7 +122,10 @@ generics:
         order_weight: 1500
   - name: Connector
     namespace: Dcim
-    description: Generic Connector to link two endpoints together.
+    description: >-
+      Generic Connector to link two endpoints together. The endpoints are kind Attribute so both
+      ends render inline on the connector form; a high-fan-out connector kind should override the
+      relationship back to Generic.
     include_in_menu: false
     relationships:
       - name: connected_endpoints
@@ -460,7 +467,8 @@ nodes:
       - DcimInterface
       - InterfaceLayer2
       - InterfaceLayer3
-      # - InterfaceHasSubInterface # Depending if you want your virtual interfaces to have sub interface
+      # Uncomment if your virtual interfaces should be able to carry sub-interfaces.
+      # - InterfaceHasSubInterface
     relationships:
       - name: parent_interface
         peer: InterfaceHasSubInterface

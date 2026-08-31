@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -93,7 +93,10 @@ nodes:
 
   - name: CircuitEndpoint
     namespace: Dcim
-    description: A circuit endpoint, could be a position in a MMR...
+    description: >-
+      One of the two terminations (A or Z) of a circuit, at the location where the provider hands
+      the circuit off. Use the description field for the provider-side reference (patch panel
+      position, cross-connect ID).
     label: Circuit Endpoint
     icon: mdi:ethernet
     menu_placement: DcimCircuit

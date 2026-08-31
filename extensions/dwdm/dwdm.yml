@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -10,6 +10,7 @@ version: "1.0"
 generics:
   - name: GenericOadmInterface
     namespace: Dcim
+    description: Generic interface of an optical add-drop multiplexer, front or rear.
     label: Optical Multiplexer Interfaces
     icon: mdi:ethernet
     menu_placement: DcimOpticalMultiplexer
@@ -146,7 +147,7 @@ nodes:
             description: Supports dense wavelengths and amplification for long-distance communication.
             color: "#9933cc"
         optional: false
-        description: Type of WDM (e.g CWDM. DWDM)
+        description: Type of WDM technology (e.g. CWDM, DWDM)
         order_weight: 1100
       - name: description
         kind: Text
@@ -168,6 +169,7 @@ nodes:
 
   - name: OadmFrontInterface
     namespace: Dcim
+    description: Client-side interface of an optical add-drop multiplexer, carrying a single channel.
     label: Optical Multiplexer Front Interfaces
     menu_placement: DcimGenericOadmInterface
     inherit_from:
@@ -200,6 +202,7 @@ nodes:
 
   - name: OadmRearInterface
     namespace: Dcim
+    description: Line-side interface of an optical add-drop multiplexer, carrying the multiplexed signal.
     label: Optical Multiplexer Rear Interfaces
     menu_placement: DcimGenericOadmInterface
     inherit_from:
@@ -259,7 +262,7 @@ nodes:
             description: Supports dense wavelengths and amplification for long-distance communication.
             color: "#9933cc"
         optional: false
-        description: Type of WDM (e.g CWDM. DWDM)
+        description: Type of WDM technology (e.g. CWDM, DWDM)
         order_weight: 1100
       - name: wavelength
         kind: Text # Text until float possible in Number Kind
@@ -294,7 +297,7 @@ nodes:
             description: Supports dense wavelengths and amplification for long-distance communication.
             color: "#9933cc"
         optional: false
-        description: Type of WDM (e.g CWDM. DWDM)
+        description: Type of WDM technology (e.g. CWDM, DWDM)
         order_weight: 1100
     relationships:
       - name: wdm_channel

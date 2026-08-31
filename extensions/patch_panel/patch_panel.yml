@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -10,6 +10,7 @@ version: "1.0"
 generics:
   - name: GenericPatchPanelInterface
     namespace: Dcim
+    description: Generic interface of a patch panel, front or rear.
     label: Patch Panel Interfaces
     icon: mdi:ethernet
     menu_placement: DcimPatchPanel
@@ -156,6 +157,7 @@ nodes:
 
   - name: FrontPatchPanelInterface
     namespace: Dcim
+    description: Front interface of a patch panel, where equipment is patched in.
     label: Patch Panel Front Interfaces
     menu_placement: DcimGenericPatchPanelInterface
     inherit_from:
@@ -188,6 +190,7 @@ nodes:
 
   - name: RearPatchPanelInterface
     namespace: Dcim
+    description: Rear interface of a patch panel, terminating the permanent cabling.
     label: Patch Panel Rear Interfaces
     menu_placement: DcimGenericPatchPanelInterface
     inherit_from:

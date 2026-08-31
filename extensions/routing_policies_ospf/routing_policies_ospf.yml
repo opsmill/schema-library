@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -10,13 +10,13 @@ version: "1.0"
 nodes:
   - name: PolicyOSPF
     namespace: Routing
-    description: A routing policiers for OSPF
+    description: A routing policy for OSPF.
     label: OSPF Routing Policies
     icon: carbon:deployment-policy
     include_in_menu: false
     inherit_from:
       - "RoutingPolicy"
-    # TODO: extend if need
+    # Add attributes here if this policy flavour needs more than the generic RoutingPolicy provides.
 
 extensions:
   nodes:

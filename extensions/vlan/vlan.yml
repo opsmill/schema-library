@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -10,7 +10,7 @@ version: "1.0"
 generics:
   - name: GenericVLAN
     namespace: Ipam
-    description: A VLAN is isolated layer two domain
+    description: A VLAN is an isolated layer two domain.
     label: VLAN
     icon: mdi:lan-pending
     human_friendly_id:
@@ -89,6 +89,7 @@ generics:
 nodes:
   - name: VLAN
     namespace: Ipam
+    description: A plain VLAN, with no QinQ role of its own.
     label: VLAN
     include_in_menu: false
     inherit_from:

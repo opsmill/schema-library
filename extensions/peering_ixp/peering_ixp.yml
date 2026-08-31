@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -61,7 +61,7 @@ nodes:
         cardinality: many
         optional: true
         identifier: ixp__import_bgppolicies
-        description: "Import routing policies applied to the session"
+        description: "Import routing policies applied to every session on this internet exchange point"
       - name: export_policies
         peer: RoutingPolicyBGP
         label: Export Routing Policies
@@ -69,14 +69,14 @@ nodes:
         cardinality: many
         optional: true
         identifier: ixp__export_bgppolicies
-        description: "Export routing policies applied to the session"
+        description: "Export routing policies applied to every session on this internet exchange point"
       - name: bgp_communities
         peer: RoutingBGPCommunity
         label: "BGP Communities"
         kind: Generic
         cardinality: many
         optional: true
-        description: "BGP communities associated with the session"
+        description: "BGP communities associated with this internet exchange point"
       - name: tags
         peer: BuiltinTag
         kind: Attribute

@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -10,7 +10,7 @@ version: "1.0"
 nodes:
   - name: VRF
     namespace: Ipam
-    description: A VRF is isolated layer three domain
+    description: A VRF is an isolated layer three domain.
     label: VRF
     icon: mdi:router
     human_friendly_id:
@@ -30,6 +30,8 @@ nodes:
       - name: enforce_unique
         kind: Boolean
         label: Enforce Unique
+        description: Declares the intent that prefixes and addresses be unique within this VRF.
+          Infrahub does not enforce this; consume it from a check or a generator.
         default_value: true
         optional: true
         order_weight: 1100
@@ -38,8 +40,8 @@ nodes:
         optional: true
         order_weight: 1200
     relationships:
-      # TODO: Perhaps add namespace here at some point?
-      # Perhaps would make sense to have multiple flavors of namespace?
+      # Uncomment to pin each VRF to its own IP namespace; the library leaves VRFs
+      # namespace-agnostic by default.
       # - name: namespace
       #   peer: BuiltinIPNamespace
       #   identifier: vrf__namespace

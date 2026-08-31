@@ -170,8 +170,9 @@ experimental/firewall_policer:
   dependencies:
     - base
   description:
-    This schema extension contains models for VMs. You might consider Cluster
-    or/and Hypervisor extension to go with!
+    This schema extension contains models for traffic policers and the classes
+    and rules that reference them, so you can describe rate limiting alongside
+    the interfaces it is applied to.
   name: Firewall Policer
 extensions/hosting_cluster:
   dependencies:
@@ -301,8 +302,8 @@ extensions/qinq:
     - base
     - extensions/vlan
   description:
-    This schema extension brings extensions to VLAN model in order to support
-    QinQ.
+    This schema extension adds the Service VLAN and Customer VLAN nodes needed
+    to model QinQ on top of the VLAN extension.
   name: QinQ
 extensions/routing:
   dependencies:
@@ -417,8 +418,8 @@ extensions/snmp:
     - base
   description:
     This schema extension contains models for SNMP Communities and SNMP
-    Clients. As you can see this extension is not linked to Tenancy or Device, as
-    you could decide to link the Community to different models based on your use case.
+    Clients. A community links to the devices it is configured on; any further
+    wiring, to a tenant for instance, is left to you.
   name: SNMP
 extensions/tenancy:
   dependencies:

@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 
@@ -158,8 +158,8 @@ nodes:
       - name: device
         peer: DcimPhysicalDevice
         label: Device
-        # DcimGenericDevice (not DcimPhysicalDevice) so `name` is resolvable in computed_name above -
-        # PhysicalDevice itself carries no identifying attribute.
+        # Peer is DcimPhysicalDevice; base/dcim.yml adds `name` to that generic so
+        # `device__name__value` resolves in computed_name above.
         kind: Parent
         cardinality: one
         optional: false
