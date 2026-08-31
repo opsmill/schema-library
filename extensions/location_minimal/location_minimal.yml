@@ -7,6 +7,7 @@
 # ---------------------------------------------------------------------------
 version: "1.0"
 
+# Defines Location.Site. Mutually exclusive with extensions/location_site, load one, not both.
 nodes:
   - name: Region
     namespace: Location

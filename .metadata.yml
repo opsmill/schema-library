@@ -54,9 +54,12 @@ experimental/optical_transport:
 experimental/location_extended:
   dependencies:
     - base
-  description:
-    This schema extension is the most detailed when it comes to location,
-    you'll find all the layers you can think of.
+  exclusive_with:
+    - extensions/rack
+  description: >-
+    This schema extension is the most detailed when it comes to location, you'll find all the
+    layers you can think of. It defines its own hierarchical Location.Rack, incompatible with
+    the flat one extensions/rack defines, so load one or the other, not both.
   name: Location Extended
 experimental/modules_linecards:
   dependencies:
@@ -199,13 +202,22 @@ extensions/lag:
 extensions/location_minimal:
   dependencies:
     - base
-  description:
-    This schema extension is minimal but will provide you with basic items
-    to store location related data.
+  exclusive_with:
+    - extensions/location_site
+  description: >-
+    This schema extension is minimal but will provide you with basic items to store location
+    related data, as a Region -> Country -> Site hierarchy. It defines the same Location.Site
+    node as extensions/location_site, so load one or the other, not both. Note that
+    LocationGeneric.name is unique across every location kind, so a name used at one tier
+    cannot be reused at another; a single-country deployment therefore enters the hierarchy at
+    Country (with Region as the national node) rather than duplicating a country under several
+    regions.
   name: Location Minimal
 extensions/location_site:
   dependencies:
     - base
+  exclusive_with:
+    - extensions/location_minimal
   description: >-
     This schema extension introduces a standalone Location.Site node (with facility,
     physical address, timezone, and status). It defines the same Site node as
@@ -273,13 +285,16 @@ extensions/rack:
   dependencies:
     - base
     - extensions/location_site
+  exclusive_with:
+    - experimental/location_extended
   description: >-
     This schema extension introduces a Rack model representing a physical equipment
     rack installed at a site. Racks can be placed at a LocationSite and can host devices
     and other equipment. LocationRack needs a Location.Site: extensions/location_site is
     declared above as the smallest provider, but extensions/location_minimal provides the
     same node as part of its hierarchy and satisfies the rack equally, load whichever
-    suits, never both.
+    suits, never both. LocationRack is also defined, hierarchically and incompatibly, by
+    experimental/location_extended, so load one or the other, not both.
   name: Rack
 extensions/qinq:
   dependencies:
