@@ -33,20 +33,21 @@ nodes:
         order_weight: 1300
       - name: status
         kind: Dropdown
+        default_value: planned
         choices:
           - name: connected
             label: Connected
             description: "Fully operational and currently in connected"
-            color: "#7fbf7f"
+            color: "#00d25b"
           - name: planned
             label: Planned
             description: "In the process of being set up"
-            color: "#ffff7f"
+            color: "#2196f3"
           - name: reserved
             label: Reserved
             description: "Fully connected and reserved for a future use"
-            color: "#9090de"
-        optional: true
+            color: "#4d90fe"
+        optional: false
         order_weight: 1200
     relationships:
       - name: location
