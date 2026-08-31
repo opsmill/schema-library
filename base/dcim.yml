@@ -212,6 +212,13 @@ generics:
         optional: true
         description: "The role of the interface in the network"
         order_weight: 1250
+      - name: mtu
+        kind: Number
+        label: MTU
+        default_value: 1500
+        optional: true
+        description: "Maximum transmission unit, in bytes (IP payload, not frame size)."
+        order_weight: 1300
     relationships:
       - name: device
         peer: DcimGenericDevice
@@ -443,12 +450,6 @@ nodes:
       - InterfaceLayer3
       - DcimEndpoint
       - InterfaceHasSubInterface
-    attributes:
-      - name: mtu
-        kind: Number
-        label: MTU
-        default_value: 1500
-        order_weight: 1300
 
   - name: Virtual
     namespace: Interface
