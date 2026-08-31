@@ -18,13 +18,16 @@ generics:
       - computed_name__value
     display_label: computed_name__value
     attributes:
-      # Overriten at node level
       - name: computed_name
         kind: Text
         unique: true
         read_only: true
         optional: false
         allow_override: any
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "{{ module_bay__computed_name__value }}"
+        description: "Name computed from the module bay; concrete module kinds may refine it."
         order_weight: 1000
       - name: serial_number
         kind: Text
