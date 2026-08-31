@@ -14,7 +14,9 @@ nodes:
     label: S-VLAN
     include_in_menu: false
     inherit_from:
-      - GenericVLAN
+      - IpamGenericVLAN
+    uniqueness_constraints:
+      - [vlan_id__value, vlan_group]
     relationships:
       - name: cvlan
         peer: IpamCVLAN
@@ -31,7 +33,7 @@ nodes:
     label: C-VLAN
     include_in_menu: false
     inherit_from:
-      - GenericVLAN
+      - IpamGenericVLAN
     human_friendly_id:
       - svlan__name__value
       - vlan_id__value
