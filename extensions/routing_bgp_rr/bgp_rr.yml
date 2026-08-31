@@ -43,6 +43,7 @@ nodes:
         kind: Generic
         cardinality: many
         optional: true
+        order_weight: 1300
 
 extensions:
   nodes:
@@ -53,4 +54,4 @@ extensions:
           label: "RR Cluster"
           kind: Attribute
           cardinality: one
-          order_weight: 1600
+          order_weight: 1700

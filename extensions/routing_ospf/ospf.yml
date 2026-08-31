@@ -33,7 +33,7 @@ nodes:
         default_value: 1000
         optional: true
         description: "Reference bandwidth for OSPF instance (in Mbps)."
-        order_weight: 1150
+        order_weight: 1350
       - name: version
         kind: Dropdown
         default_value: ospf
@@ -47,21 +47,22 @@ nodes:
             description: "Open Shortest Path First version 3."
             color: "#E6E6FA" # lavender
         description: "Version of the OSPF protocol."
-        order_weight: 1100
+        order_weight: 1300
       - name: import_policies
         kind: Text
         optional: true
-        order_weight: 1300
+        order_weight: 1450
       - name: export_policies
         kind: Text
         optional: true
-        order_weight: 1350
+        order_weight: 1500
     relationships:
       - name: router_id
         peer: IpamIPAddress
         kind: Attribute
         cardinality: one
         optional: true
+        order_weight: 1400
       - name: ospf_interfaces
         peer: RoutingOSPFInterface
         label: OSPF Interfaces
@@ -69,6 +70,7 @@ nodes:
         cardinality: many
         optional: true
         identifier: ospf__ospfinterfaces
+        order_weight: 1550
 
   - name: OSPFInterface
     namespace: Routing
@@ -90,7 +92,7 @@ nodes:
         unique: true
         optional: false
         description: "Description of the OSPF interface."
-        order_weight: 1500
+        order_weight: 1100
       - name: metric
         kind: Number
         optional: true
@@ -142,10 +144,10 @@ nodes:
         cardinality: one
         optional: false
         identifier: ospf__ospfinterfaces
-        order_weight: 1100
+        order_weight: 900
       - name: interface
         peer: InterfaceLayer3
         kind: Attribute
         cardinality: one
         optional: false
-        order_weight: 1200
+        order_weight: 1500

@@ -98,6 +98,7 @@ nodes:
         kind: Parent
         cardinality: one
         optional: false
+        order_weight: 900
 
 extensions:
   nodes:
@@ -109,3 +110,4 @@ extensions:
           kind: Component
           cardinality: many
           description: "List of Accounts under this organization"
+          order_weight: 1600

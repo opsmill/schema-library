@@ -25,6 +25,7 @@ generics:
         cardinality: many
         optional: true
         identifier: host__virtual_machine
+        order_weight: 1450
 
 nodes:
   - name: PhysicalServer
@@ -61,7 +62,7 @@ nodes:
             description: Temporarily taken out of service.
             color: "#9e9e9e"
         optional: false
-        order_weight: 1100
+        order_weight: 1200
 
   - name: VirtualMachine
     namespace: Virtualization
@@ -85,22 +86,22 @@ nodes:
             color: "#bf7fbf"
         optional: true
         description: Role of the virtual machine.
-        order_weight: 1400
+        order_weight: 1300
       - name: vcpu
         kind: Number
         optional: true
         description: Number of CPU cores assigned to the VM.
-        order_weight: 1900
+        order_weight: 1400
       - name: memory
         kind: Number
         optional: true
         description: Amount of memory (in GB) assigned to the VM.
-        order_weight: 1900
+        order_weight: 1450
       - name: disk
         kind: Number
         optional: true
         description: Disk space (in GB) assigned to the VM.
-        order_weight: 1900
+        order_weight: 1500
     relationships:
       - name: host
         peer: VirtualizationHostVirtualMachine
@@ -108,4 +109,4 @@ nodes:
         cardinality: one
         optional: false
         identifier: host__virtual_machine
-        order_weight: 1500
+        order_weight: 1350

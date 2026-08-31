@@ -26,6 +26,7 @@ nodes:
         optional: true
         identifier: vlan__qinq
         direction: outbound
+        order_weight: 1600
 
   - name: CVLAN
     namespace: Ipam
@@ -48,6 +49,7 @@ nodes:
           kind: Jinja2
           jinja2_template: "{{ svlan__name__value }}-{{ vlan_id__value }}"
         optional: true
+        order_weight: 1000
     relationships:
       - name: svlan
         peer: IpamSVLAN
@@ -57,3 +59,4 @@ nodes:
         optional: false
         identifier: vlan__qinq
         direction: inbound
+        order_weight: 1600

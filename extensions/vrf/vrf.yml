@@ -23,10 +23,12 @@ nodes:
         kind: Text
         unique: true
         optional: false
+        order_weight: 1000
       - name: vrf_rd
         kind: Text
         label: Route Distinguisher
         optional: true
+        order_weight: 1050
       - name: enforce_unique
         kind: Boolean
         label: Enforce Unique
@@ -34,11 +36,11 @@ nodes:
           Infrahub does not enforce this; consume it from a check or a generator.
         default_value: true
         optional: true
-        order_weight: 1100
+        order_weight: 1200
       - name: description
         kind: Text
         optional: true
-        order_weight: 1200
+        order_weight: 1100
     relationships:
       # Uncomment to pin each VRF to its own IP namespace; the library leaves VRFs
       # namespace-agnostic by default.
@@ -55,6 +57,7 @@ nodes:
         cardinality: many
         optional: true
         identifier: vrf__import
+        order_weight: 1300
       - name: export_rt
         peer: IpamRouteTarget
         label: Export Targets
@@ -62,6 +65,7 @@ nodes:
         cardinality: many
         optional: true
         identifier: vrf__export
+        order_weight: 1350
 
   - name: RouteTarget
     namespace: Ipam
@@ -79,9 +83,11 @@ nodes:
       - name: name
         kind: Text
         unique: true
+        order_weight: 1000
       - name: description
         kind: Text
         optional: true
+        order_weight: 1100
     relationships:
       - name: import_vrf
         peer: IpamVRF
@@ -90,6 +96,7 @@ nodes:
         cardinality: many
         optional: true
         identifier: vrf__import
+        order_weight: 1300
       - name: export_vrf
         peer: IpamVRF
         kind: Generic
@@ -97,6 +104,7 @@ nodes:
         cardinality: many
         optional: true
         identifier: vrf__export
+        order_weight: 1350
 extensions:
   nodes:
     - kind: IpamPrefix

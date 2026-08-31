@@ -47,6 +47,7 @@ nodes:
         cardinality: one
         optional: true
         description: "Rendezvous Point (RP) address for PIM."
+        order_weight: 1400
       - name: pim_interfaces
         peer: RoutingPIMInterface
         label: PIM Interfaces
@@ -54,6 +55,7 @@ nodes:
         cardinality: many
         optional: true
         identifier: pim__piminterfaces
+        order_weight: 1450
 
   - name: PIMInterface
     namespace: Routing
@@ -113,6 +115,7 @@ nodes:
         cardinality: one
         optional: false
         identifier: pim__piminterfaces
+        order_weight: 900
       - name: interface
         peer: InterfaceLayer3
         kind: Attribute

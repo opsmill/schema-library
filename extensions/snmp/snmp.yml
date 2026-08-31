@@ -32,6 +32,7 @@ generics:
         peer: SnmpClient
         kind: Component
         cardinality: many
+        order_weight: 1900
       - name: devices
         peer: DcimGenericDevice
         label: Devices
@@ -40,7 +41,7 @@ generics:
         optional: true
         identifier: snmp_community__device
         description: Devices this community is configured on.
-        order_weight: 1200
+        order_weight: 1800
 
 nodes:
   # --------------------  Snmp Community --------------------

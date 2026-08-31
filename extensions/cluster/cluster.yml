@@ -27,6 +27,7 @@ generics:
       - name: description
         kind: Text
         optional: true
+        order_weight: 1100
     relationships:
       - name: locations
         peer: LocationGeneric
@@ -53,6 +54,7 @@ generics:
         kind: Component
         cardinality: many
         identifier: worker_in_cluster
+        order_weight: 1500
 extensions:
   nodes:
     - kind: ComputeGenericUnit
@@ -65,6 +67,7 @@ extensions:
           optional: true
           identifier: worker_in_cluster
           description: This device is a worker node of the specified cluster.
+          order_weight: 1900
     - kind: LocationGeneric
       relationships:
         - name: clusters
@@ -74,3 +77,4 @@ extensions:
           cardinality: many
           optional: true
           description: All clusters available on that location.
+          order_weight: 1650

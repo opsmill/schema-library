@@ -83,7 +83,7 @@ generics:
             description: Decommissioned might be broken or not used anymore.
             color: "#ffd27f"
         optional: false
-        order_weight: 1300
+        order_weight: 1200
       - name: form_factor
         kind: Dropdown
         choices:
@@ -136,7 +136,7 @@ generics:
         cardinality: one
         optional: true
         identifier: sfp__interface
-        order_weight: 1200
+        order_weight: 1300
       - name: spare_location
         peer: LocationHosting
         kind: Attribute
@@ -192,6 +192,7 @@ extensions:
           cardinality: one
           optional: true
           identifier: sfp__interface
+          order_weight: 1700
     - kind: LocationHosting
       relationships:
         - name: spare_sfps
@@ -199,6 +200,7 @@ extensions:
           kind: Generic
           cardinality: many
           optional: true
+          order_weight: 1750
     - kind: OrganizationManufacturer
       relationships:
         - name: sfps
@@ -207,3 +209,4 @@ extensions:
           label: SFPs
           cardinality: many
           optional: true
+          order_weight: 1500

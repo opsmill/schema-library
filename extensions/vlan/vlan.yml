@@ -21,13 +21,14 @@ generics:
     attributes:
       - name: name
         kind: Text
-        order_weight: 910
+        order_weight: 1000
       - name: description
         kind: Text
         optional: true
+        order_weight: 1100
       - name: vlan_id
         kind: Number
-        order_weight: 900
+        order_weight: 1050
       - name: status
         kind: Dropdown
         default_value: active
@@ -53,7 +54,7 @@ generics:
             description: No longer in use and scheduled for removal.
             color: "#e04040"
         optional: false
-        order_weight: 920
+        order_weight: 1200
       - name: role
         kind: Dropdown
         choices:
@@ -70,6 +71,7 @@ generics:
             description: Segments designed for end-user access and activities.
             color: "#a0b78d"
         optional: true
+        order_weight: 1300
     relationships:
       - name: prefixes
         peer: IpamPrefix
@@ -77,6 +79,7 @@ generics:
         cardinality: many
         optional: true
         identifier: vlan__prefix
+        order_weight: 1500
       - name: vlan_group
         peer: IpamVLANGroup
         label: VLAN Group
@@ -84,7 +87,7 @@ generics:
         cardinality: one
         optional: false
         identifier: vlan_group__vlan
-        order_weight: 930
+        order_weight: 1400
 
 nodes:
   - name: VLAN
@@ -114,6 +117,7 @@ nodes:
       - name: description
         kind: Text
         optional: true
+        order_weight: 1100
     relationships:
       - name: scope
         peer: IpamVLANGroupScope
@@ -128,6 +132,7 @@ nodes:
         cardinality: many
         optional: true
         identifier: vlan_group__vlan
+        order_weight: 1500
 
 extensions:
   nodes:
@@ -140,6 +145,7 @@ extensions:
           cardinality: many
           optional: true
           identifier: vlan_group__scope
+          order_weight: 1600
     - kind: IpamPrefix
       relationships:
         - name: vlan
@@ -148,7 +154,7 @@ extensions:
           cardinality: one
           optional: true
           identifier: vlan__prefix
-          order_weight: 1400
+          order_weight: 1450
     - kind: InterfaceLayer2
       relationships:
         - name: untagged_vlan
@@ -158,6 +164,7 @@ extensions:
           cardinality: one
           optional: true
           identifier: interface_l2__untagged_vlan
+          order_weight: 1500
         - name: tagged_vlan
           peer: IpamGenericVLAN
           label: Tagged VLANs
@@ -165,3 +172,4 @@ extensions:
           cardinality: many
           optional: true
           identifier: interface_l2__tagged_vlan
+          order_weight: 1550

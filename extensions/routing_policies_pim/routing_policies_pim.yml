@@ -36,6 +36,7 @@ extensions:
           cardinality: many
           identifier: pim__import_policies
           description: "The routing-policies used by this instance for import."
+          order_weight: 1500
         - name: export_routing_policies
           peer: RoutingPolicyPIM
           label: Export Routing Policies
@@ -43,3 +44,4 @@ extensions:
           cardinality: many
           identifier: pim__export_policies
           description: "The routing-policies used by this instance for export."
+          order_weight: 1550

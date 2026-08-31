@@ -27,7 +27,7 @@ generics:
       - name: description
         kind: Text
         optional: true
-        order_weight: 2000
+        order_weight: 1100
     relationships:
       - name: interfaces
         peer: DcimInterface
@@ -35,6 +35,7 @@ generics:
         cardinality: many
         optional: true
         identifier: device__interface
+        order_weight: 1650
       - name: tags
         peer: BuiltinTag
         kind: Attribute
@@ -69,16 +70,17 @@ generics:
         kind: Text
         unique: true
         allow_override: any
+        order_weight: 1000
       - name: position
         kind: Number
         label: Position (U)
         optional: true
         description: Lowest unit.
-        order_weight: 1500
+        order_weight: 1550
       - name: serial_number
         kind: Text
         optional: true
-        order_weight: 1500
+        order_weight: 1400
       - name: rack_face
         kind: Dropdown
         label: Rack Face
@@ -92,14 +94,14 @@ generics:
             description: Device mounted on the rear face of the rack.
         optional: false
         description: On which face of the rack the device is mounted.
-        order_weight: 1515
+        order_weight: 1600
     relationships:
       - name: device_type
         peer: DcimDeviceType
         kind: Attribute
         cardinality: one
         optional: true
-        order_weight: 1200
+        order_weight: 1150
       - name: location
         peer: LocationHosting
         label: Location
@@ -119,7 +121,7 @@ generics:
         cardinality: one
         optional: true
         identifier: connector__endpoint
-        order_weight: 1500
+        order_weight: 1600
   - name: Connector
     namespace: Dcim
     description: >-
@@ -218,14 +220,14 @@ generics:
             color: "#B2D4E6"
         optional: true
         description: "The role of the interface in the network"
-        order_weight: 1250
+        order_weight: 1300
       - name: mtu
         kind: Number
         label: MTU
         default_value: 1500
         optional: true
         description: "Maximum transmission unit, in bytes (IP payload, not frame size)."
-        order_weight: 1300
+        order_weight: 1350
     relationships:
       - name: device
         peer: DcimGenericDevice
@@ -233,7 +235,7 @@ generics:
         cardinality: one
         optional: false
         identifier: device__interface
-        order_weight: 1025
+        order_weight: 900
 
   - name: Layer2
     namespace: Interface
@@ -261,7 +263,7 @@ generics:
             description: "Trunk all mode"
         optional: true
         description: "Layer 2 mode of the interface"
-        order_weight: 1500
+        order_weight: 1450
 
   - name: Layer3
     namespace: Interface
@@ -365,7 +367,7 @@ nodes:
       - name: description
         kind: Text
         optional: true
-        order_weight: 1200
+        order_weight: 1100
     relationships:
       - name: devices
         peer: DcimGenericDevice
@@ -416,7 +418,7 @@ nodes:
             description: No longer in use and scheduled for removal.
             color: "#e04040"
         optional: false
-        order_weight: 1100
+        order_weight: 1200
       - name: role
         kind: Dropdown
         choices:
@@ -445,7 +447,7 @@ nodes:
             description: Tor switch part of a Fabric.
             color: "#e8e7fd"
         optional: true
-        order_weight: 1400
+        order_weight: 1300
   - name: Physical
     namespace: Interface
     description: "Physical network port on a device"
@@ -476,3 +478,4 @@ nodes:
         cardinality: one
         identifier: "sub__interface"
         description: "Parent interface to which this sub-interface belongs"
+        order_weight: 1600

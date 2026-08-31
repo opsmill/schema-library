@@ -33,11 +33,11 @@ generics:
         kind: Text
         optional: true
         description: "Serial number of the module, if known."
-        order_weight: 1100
+        order_weight: 1400
       - name: description
         kind: Text
         optional: true
-        order_weight: 1200
+        order_weight: 1100
     relationships:
       - name: module_bay
         peer: DcimModuleBay
@@ -136,7 +136,7 @@ nodes:
         kind: Dropdown
         optional: true
         description: "The role of the module bay, indicating the type of module it is intended to receive."
-        order_weight: 1150
+        order_weight: 1300
         choices:
           - name: supervisor
             label: Supervisor
@@ -223,3 +223,4 @@ extensions:
           optional: true
           identifier: device__module_bays
           description: "Module bays available on this device."
+          order_weight: 1750

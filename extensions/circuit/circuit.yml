@@ -23,14 +23,16 @@ nodes:
       - name: circuit_id
         kind: Text
         unique: true
+        order_weight: 1000
       - name: description
         kind: Text
         optional: true
+        order_weight: 1100
       - name: commit_rate
         kind: Number
         label: Commit Rate (Kbps)
         optional: true
-        order_weight: 1100
+        order_weight: 1400
       - name: circuit_type
         kind: Dropdown
         choices:
@@ -56,6 +58,7 @@ nodes:
             color: "#7f00ff"
         optional: true
         description: Specifies the type of circuit.
+        order_weight: 1300
       - name: status
         kind: Dropdown
         default_value: active
@@ -77,6 +80,7 @@ nodes:
             description: Temporarily taken out of service.
             color: "#9e9e9e"
         optional: false
+        order_weight: 1200
     relationships:
       - name: provider
         peer: OrganizationProvider
@@ -84,12 +88,14 @@ nodes:
         cardinality: one
         optional: false
         identifier: circuit__provider
+        order_weight: 1500
       - name: endpoints
         peer: DcimCircuitEndpoint
         kind: Component
         cardinality: many
         optional: true
         identifier: circuit__endpoint
+        order_weight: 1600
 
   - name: CircuitEndpoint
     namespace: Dcim
@@ -152,9 +158,11 @@ nodes:
             description: Temporarily taken out of service.
             color: "#9e9e9e"
         optional: false
+        order_weight: 1200
       - name: description
         kind: Text
         optional: true
+        order_weight: 1100
     relationships:
       - name: circuit
         peer: DcimCircuit
@@ -181,6 +189,7 @@ extensions:
           cardinality: many
           optional: true
           identifier: circuit__provider
+          order_weight: 1300
     - kind: LocationHosting
       relationships:
         - name: circuit_endpoints
@@ -189,3 +198,4 @@ extensions:
           cardinality: many
           optional: true
           identifier: circuit_endpoint__location
+          order_weight: 1700

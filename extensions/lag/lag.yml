@@ -21,7 +21,7 @@ generics:
       - name: bundle_number
         kind: Number
         description: "Bundle number for the aggregated interface"
-        order_weight: 1100
+        order_weight: 1250
     relationships:
       - name: bundle_members
         peer: InterfacePhysical
@@ -57,7 +57,7 @@ nodes:
             label: Fast
             color: "#E6E6FA" # lavender
         description: "LACP rate for the aggregated interface"
-        order_weight: 1700
+        order_weight: 1850
       - name: lacp_mode
         kind: Dropdown
         label: LACP Mode
@@ -73,7 +73,7 @@ nodes:
             label: Disabled
             color: "#E6E6FA" # lavender
         description: "LACP mode for the aggregated interface"
-        order_weight: 1750
+        order_weight: 1900
     relationships:
       # Redefine the relationship here to add the common_parent constraint
       - name: bundle_members
@@ -98,4 +98,4 @@ extensions:
           optional: true
           identifier: interface__bundle
           description: "Interface Bundle using this Physical Interface"
-          order_weight: 1800
+          order_weight: 1950

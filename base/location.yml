@@ -25,17 +25,18 @@ generics:
         kind: Text
         unique: true
         optional: false
-        order_weight: 900
+        order_weight: 1000
       - name: description
         kind: Text
         optional: true
-        order_weight: 1200
+        order_weight: 1100
     relationships:
       - name: tags
         peer: BuiltinTag
         kind: Attribute
         cardinality: many
         optional: true
+        order_weight: 2000
 
   - name: Hosting
     namespace: Location
@@ -61,3 +62,4 @@ generics:
         cardinality: many
         optional: true
         identifier: physical_device__location
+        order_weight: 1500

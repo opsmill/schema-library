@@ -27,7 +27,7 @@ generics:
         label: "MLAG Domain ID"
         unique: true # TODO: This one could be a mess to make unique...
         description: "Identifier for the MLAG domain"
-        order_weight: 900
+        order_weight: 1000
       - name: reload_delay
         kind: Number
         label: "Reload Delay"
@@ -56,7 +56,7 @@ generics:
         kind: Component
         cardinality: many
         description: "Bundle interfaces that are spread across all devices in this MLAG domain."
-        order_weight: 1500
+        order_weight: 1550
 
 nodes:
   - name: Interface
@@ -132,7 +132,7 @@ nodes:
             color: "#B2D4E6" # pastel sky blue
         optional: true
         description: "The role of the interface in the network"
-        order_weight: 1250
+        order_weight: 1300
     relationships:
       - name: mlag_domain
         peer: GenericMlagDomain
@@ -141,7 +141,7 @@ nodes:
         cardinality: one
         optional: false
         description: "MLAG Domain this MLAG Interface belongs to"
-        order_weight: 1750
+        order_weight: 900
 
   # Placeholder node implementation of MLAG domain
   - name: Domain
@@ -174,7 +174,7 @@ extensions:
           cardinality: one
           optional: true
           description: "MLAG Domain this LAG is used as peer link"
-          order_weight: 1800
+          order_weight: 1950
     - kind: DcimDevice
       relationships:
         - name: mlag_domain
@@ -185,4 +185,4 @@ extensions:
           optional: true
           identifier: device__mlag_domain
           description: "MLAG Domain this device belongs to"
-          order_weight: 1800
+          order_weight: 1900

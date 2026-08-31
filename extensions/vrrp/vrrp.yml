@@ -106,7 +106,7 @@ extensions:
           kind: Component
           cardinality: one
           description: VRRP Interface Configuration
-          order_weight: 1500
+          order_weight: 1650
     - kind: IpamIPAddress
       relationships:
         - name: vrrp
@@ -115,4 +115,4 @@ extensions:
           kind: Attribute
           cardinality: one
           description: Part of VRRP Group
-          order_weight: 1600
+          order_weight: 1700

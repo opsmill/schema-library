@@ -30,6 +30,7 @@ generics:
         cardinality: many
         optional: true
         identifier: prefix__prefix_scope
+        order_weight: 1550
 
 nodes:
   - name: Prefix
@@ -63,11 +64,11 @@ nodes:
             label: Deprecated
             color: "#e04040"
         optional: false
-        order_weight: 1100
+        order_weight: 1200
       - name: description
         kind: Text
         optional: true
-        order_weight: 1150
+        order_weight: 1100
       - name: role
         kind: Dropdown
         choices:
@@ -92,7 +93,7 @@ nodes:
             description: Core network infrastructure prefixes.
             color: "#9678B6"
         optional: true
-        order_weight: 1200
+        order_weight: 1300
     relationships:
       - name: scope
         peer: IpamPrefixScope
@@ -100,7 +101,7 @@ nodes:
         cardinality: one
         optional: true
         identifier: prefix__prefix_scope
-        order_weight: 1300
+        order_weight: 1500
 
   - name: IPAddress
     namespace: Ipam
@@ -122,7 +123,7 @@ nodes:
       - name: description
         kind: Text
         optional: true
-        order_weight: 1050
+        order_weight: 1100
       - name: status
         kind: Dropdown
         default_value: active
@@ -137,7 +138,7 @@ nodes:
             label: Deprecated
             color: "#e04040"
         optional: false
-        order_weight: 1100
+        order_weight: 1200
       - name: role
         kind: Dropdown
         choices:
@@ -151,13 +152,13 @@ nodes:
             label: Anycast
             color: "#FDFD96"
         optional: true
-        order_weight: 1150
+        order_weight: 1300
       - name: fqdn
         kind: Text
         label: FQDN
         regex: (?=^.{1,253}$)(^(((?!-)[a-zA-Z0-9-]{1,63}(?<!-))|((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63})$)
         optional: true
-        order_weight: 1200
+        order_weight: 1400
         # https://stackoverflow.com/questions/11809631/fully-qualified-domain-name-validation
     relationships:
       - name: primary_of
@@ -167,10 +168,11 @@ nodes:
         cardinality: many
         optional: true
         identifier: device__primary_address
-        order_weight: 1250
+        order_weight: 1500
       - name: interface
         peer: InterfaceLayer3
         kind: Attribute
         cardinality: one
         optional: true
         identifier: ip_address__interface
+        order_weight: 1600

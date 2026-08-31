@@ -21,7 +21,7 @@ generics:
       - name: description
         kind: Text
         optional: true
-        order_weight: 2000
+        order_weight: 1100
       # NOTE: this choice list is duplicated in extensions/dwdm and the two must be
       # kept in sync. Infrahub cannot share a choice list across extension files without a
       # shared generic in a common ancestor, which is a base-tier change.
@@ -112,7 +112,7 @@ generics:
           - name: splice
             label: Splice
             description: "Permanent fiber connection method where two fiber ends are fused."
-        order_weight: 1100
+        order_weight: 1200
 
 nodes:
   - name: PatchPanel
@@ -137,10 +137,11 @@ nodes:
         label: Module Capacity
         optional: true
         description: The maximum number of modules that can be housed within this patch panel.
+        order_weight: 1300
       - name: description
         kind: Text
         optional: true
-        order_weight: 2000
+        order_weight: 1100
     relationships:
       - name: front_interfaces
         peer: DcimFrontPatchPanelInterface
@@ -148,12 +149,14 @@ nodes:
         cardinality: many
         optional: true
         identifier: patch_panel__front_interfaces
+        order_weight: 1350
       - name: rear_interfaces
         peer: DcimRearPatchPanelInterface
         kind: Component
         cardinality: many
         optional: true
         identifier: patch_panel__rear_interfaces
+        order_weight: 1450
 
   - name: FrontPatchPanelInterface
     namespace: Dcim
@@ -179,7 +182,7 @@ nodes:
         kind: Attribute
         cardinality: one
         optional: true
-        order_weight: 1200
+        order_weight: 1300
       - name: patch_panel
         peer: DcimPatchPanel
         kind: Parent
@@ -212,7 +215,7 @@ nodes:
         kind: Attribute
         cardinality: many
         optional: true
-        order_weight: 1200
+        order_weight: 1300
       - name: patch_panel
         peer: DcimPatchPanel
         kind: Parent

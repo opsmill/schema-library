@@ -35,7 +35,7 @@ nodes:
             description: In the process of being set up
             color: "#2196f3"
         optional: false
-        order_weight: 1000
+        order_weight: 1200
       - name: cable_type
         kind: Dropdown
         choices:
@@ -221,7 +221,7 @@ nodes:
         kind: Text
         unique: true
         optional: false
-        order_weight: 1200
+        order_weight: 1000
       # As we can't put float in Number "forcing" length in cm
       - name: length
         kind: Number

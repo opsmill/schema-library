@@ -38,18 +38,18 @@ generics:
             description: "Configuration has been deleted."
             color: "#FAD7A0" # pastel orange
         description: "Status of the Protocol Configuration."
-        order_weight: 1150
+        order_weight: 1200
     relationships:
       - name: device
         peer: DcimDevice
         kind: Parent
         cardinality: one
         optional: false
-        order_weight: 1050
+        order_weight: 900
       - name: vrf
         peer: IpamVRF
         label: VRF
         kind: Attribute
         cardinality: one
         optional: false
-        order_weight: 1075
+        order_weight: 1050
