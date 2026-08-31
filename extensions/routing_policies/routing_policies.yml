@@ -34,15 +34,15 @@ generics:
         kind: Dropdown
         label: Type
         choices:
-          - name: import-policy
+          - name: import_policy
             label: Import
             description: "Policy for incoming routes."
             color: "#E6E6FA" # lavender
-          - name: export-policy
+          - name: export_policy
             label: Export
             description: "Policy for outgoing routes."
             color: "#E6E6FA" # lavender
-          - name: import-export-policy
+          - name: import_export_policy
             label: Import + Export
             description: "Policy for both incoming and outgoing routes."
             color: "#E6E6FA" # lavender

@@ -74,7 +74,7 @@ nodes:
           - name: active
             label: Active
             description: The disk is currently in use within the infrastructure.
-            color: "#28a745"
+            color: "#00d25b"
           - name: decommissioned
             label: Decommissioned
             description: The disk is retired from active use but still stored for potential reuse or auditing.

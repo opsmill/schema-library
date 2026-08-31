@@ -34,13 +34,13 @@ spec:
   data:
     - name: CUST-A-IMPORT-PREFER-CUSTOMER
       description: "Import routes learned from Customer A, setting local preference for backbone selection."
-      policy_type: import-policy
+      policy_type: import_policy
       weight: 100
       address_family: ipv4
 
     - name: CUST-A-EXPORT-DEFAULT-ROUTE
       description: "Export a default route and backbone summaries to Customer A."
-      policy_type: export-policy
+      policy_type: export_policy
       weight: 100
       address_family: ipv4
 
@@ -48,7 +48,7 @@ spec:
       description: >-
         Export only our own backbone prefixes to the upstream transit
         provider, filtering out customer routes.
-      policy_type: export-policy
+      policy_type: export_policy
       weight: 500
       address_family: all
 

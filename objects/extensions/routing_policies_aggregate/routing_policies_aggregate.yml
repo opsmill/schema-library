@@ -5,7 +5,7 @@
 #
 # RoutingPolicyAggregate inherits RoutingPolicy: name (Text, unique, the
 # human_friendly_id), description (Text, optional), policy_type (Dropdown:
-# import-policy / export-policy / import-export-policy), weight (Number,
+# import_policy / export_policy / import_export_policy), weight (Number,
 # default 1000), address_family (Dropdown: ipv4 / ipv6 / all, default all).
 #
 # The `extensions: nodes:` block in
@@ -37,17 +37,17 @@ spec:
         Export policy controlling advertisement of the Customer A summary
         aggregate route. Referenced by name from the
         RoutingAggregateRoute.import_policies free-text field on nyc1-rtr01.
-      policy_type: "export-policy"
+      policy_type: "export_policy"
       weight: 500
       address_family: "ipv4"
 
     - name: "CUST-B-DISCARD-EXPORT"
       description: "Export policy suppressing advertisement of the discarded Customer B subnet aggregate."
-      policy_type: "export-policy"
+      policy_type: "export_policy"
       weight: 200
       address_family: "ipv4"
 
     - name: "MGMT-DEFAULT-IMPORT"
       description: "Import policy accepting the default route learned on management-VRF aggregates."
-      policy_type: "import-policy"
+      policy_type: "import_policy"
       address_family: "all"

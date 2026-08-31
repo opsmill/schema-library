@@ -32,14 +32,14 @@ spec:
       auth_password: AuthPass123!
       privacy_protocol: aes
       privacy_password: PrivPass123!
-      security_level: authPriv
+      security_level: auth_priv
     - name: readonly-v3
       description: SNMPv3 user with authentication only, no privacy.
       username: svc-readonly
       auth_protocol: md5
       auth_password: ReadOnlyAuth1
       privacy_protocol: none
-      security_level: authNoPriv
+      security_level: auth_no_priv
 
 ---
 apiVersion: infrahub.app/v1
@@ -58,7 +58,7 @@ spec:
             username: svc-monitoring
             auth_protocol: sha
             privacy_protocol: aes
-            security_level: authPriv
+            security_level: auth_priv
     - name: legacy-monitor-01
       client_description: Legacy monitoring host polling via SNMPv2c.
       communities:

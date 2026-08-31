@@ -34,19 +34,19 @@ spec:
   data:
     - name: CUST-A-OSPF-IMPORT
       description: "Import policy applied to OSPF routes learned in Customer A's VRF on nyc1-rtr01."
-      policy_type: import-policy
+      policy_type: import_policy
       address_family: ipv4
       weight: 100
 
     - name: CUST-A-OSPF-EXPORT
       description: "Export policy applied to OSPF routes advertised in Customer A's VRF on nyc1-rtr01."
-      policy_type: export-policy
+      policy_type: export_policy
       address_family: ipv4
       weight: 100
 
     - name: OSPF-DEFAULT-METRIC
       description: "Default metric adjustment policy applied to both imported and exported OSPF routes."
-      policy_type: import-export-policy
+      policy_type: import_export_policy
       address_family: all
       weight: 500
 

@@ -35,12 +35,15 @@ nodes:
         kind: Dropdown
         choices:
           - name: admin
+            label: Admin
             description: "All rights on device."
             color: "#E6E6FA" # lavender
           - name: operator
+            label: Operator
             description: "Operator right on configuration."
             color: "#E6E6FA" # lavender
-          - name: read-only
+          - name: read_only
+            label: Read Only
             description: "Read only right on configuration."
             color: "#E6E6FA" # lavender
         optional: false

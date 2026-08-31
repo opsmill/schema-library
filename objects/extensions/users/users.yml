@@ -31,7 +31,7 @@ spec:
     - name: Auditors
       description: Read-only access for compliance and auditing.
       idle_timeout: 3600
-      permissions: read-only
+      permissions: read_only
 
 ---
 apiVersion: infrahub.app/v1

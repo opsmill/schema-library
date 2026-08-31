@@ -78,8 +78,10 @@ nodes:
         kind: Dropdown
         choices:
           - name: application
+            label: Application
             color: "#7f7fff"
           - name: storage
+            label: Storage
             color: "#bf7fbf"
         optional: true
         description: Role of the virtual machine.

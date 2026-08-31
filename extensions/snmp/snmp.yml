@@ -131,13 +131,13 @@ nodes:
         kind: Dropdown
         label: Security Level
         choices:
-          - name: noAuthNoPriv
+          - name: no_auth_no_priv
             label: NoAuthNoPriv
             description: No authentication and no privacy.
-          - name: authNoPriv
+          - name: auth_no_priv
             label: AuthNoPriv
             description: Authentication but no privacy.
-          - name: authPriv
+          - name: auth_priv
             label: AuthPriv
             description: Both authentication and privacy.
         order_weight: 1200

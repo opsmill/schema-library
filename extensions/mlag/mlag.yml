@@ -100,7 +100,7 @@ nodes:
           - name: active
             label: Active
             description: "Interface is active and operational."
-            color: "#A9CCE3" # pastel blue
+            color: "#00d25b"
           - name: maintenance
             label: Maintenance
             description: "Interface is under maintenance."

@@ -28,7 +28,7 @@ generics:
           - name: active
             label: Active
             description: "Configuration is active and operational."
-            color: "#A9CCE3" # pastel blue
+            color: "#00d25b"
           - name: disabled
             label: Disabled
             description: "Configuration has been disabled."
