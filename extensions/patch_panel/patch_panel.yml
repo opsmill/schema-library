@@ -13,6 +13,7 @@ generics:
     description: Generic interface of a patch panel, front or rear.
     label: Patch Panel Interfaces
     icon: mdi:ethernet
+    include_in_menu: true
     menu_placement: DcimPatchPanel
     attributes:
       - name: name
@@ -122,6 +123,7 @@ nodes:
     description: A Patch Panel used for managing network cable connections in a data center or telecom setup.
     label: Patch Panel
     icon: ic:round-device-hub
+    include_in_menu: true
     inherit_from:
       - DcimPhysicalDevice
     human_friendly_id:
@@ -165,6 +167,7 @@ nodes:
     namespace: Dcim
     description: Front interface of a patch panel, where equipment is patched in.
     label: Patch Panel Front Interfaces
+    include_in_menu: true
     menu_placement: DcimGenericPatchPanelInterface
     inherit_from:
       - DcimEndpoint
@@ -198,6 +201,7 @@ nodes:
     namespace: Dcim
     description: Rear interface of a patch panel, terminating the permanent cabling.
     label: Patch Panel Rear Interfaces
+    include_in_menu: true
     menu_placement: DcimGenericPatchPanelInterface
     inherit_from:
       - DcimEndpoint

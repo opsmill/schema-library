@@ -13,6 +13,7 @@ nodes:
     description: Cross-connect between different endpoints within a datacenter.
     label: Cross-Connect
     icon: streamline:arrow-crossover-right-solid
+    include_in_menu: true
     inherit_from:
       - DcimConnector
     human_friendly_id:

@@ -14,6 +14,7 @@ nodes:
     description: A Circuit represent service operated by a provider.
     label: Circuit
     icon: mdi:cable-data
+    include_in_menu: true
     human_friendly_id:
       - circuit_id__value
     order_by:
@@ -106,6 +107,7 @@ nodes:
       position, cross-connect ID).
     label: Circuit Endpoint
     icon: mdi:ethernet
+    include_in_menu: true
     menu_placement: DcimCircuit
     inherit_from:
       - DcimEndpoint

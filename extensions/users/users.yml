@@ -13,6 +13,7 @@ nodes:
     description: "User Group"
     label: "User Groups"
     icon: "iconoir:group"
+    include_in_menu: true
     human_friendly_id:
       - "name__value"
     order_by:
@@ -56,6 +57,7 @@ nodes:
     description: "User login and authentication"
     label: "User Account"
     icon: "mdi:account-key"
+    include_in_menu: true
     human_friendly_id:
       - "name__value"
     order_by:

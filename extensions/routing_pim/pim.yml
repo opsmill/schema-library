@@ -13,7 +13,8 @@ nodes:
     description: "Protocol Independent Multicast (PIM) instance on a Virtual Router."
     label: "PIM"
     icon: "mdi:network-outline"
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: RoutingProtocol
     inherit_from:
       - "RoutingProtocol"
     human_friendly_id:
@@ -62,7 +63,8 @@ nodes:
     description: "Interface configuration for PIM."
     label: "PIM Interface"
     icon: "mdi:ethernet"
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: RoutingPIM
     human_friendly_id:
       - "description__value"
     order_by:

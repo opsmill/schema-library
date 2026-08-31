@@ -13,7 +13,8 @@ nodes:
     description: "OSPF (Open Shortest Path First) instance on a Virtual Router."
     label: "OSPF"
     icon: "mdi:network-outline"
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: RoutingProtocol
     inherit_from:
       - "RoutingProtocol"
     human_friendly_id:
@@ -78,7 +79,8 @@ nodes:
     description: "Pivot table linking OSPF configuration to an interface."
     label: "OSPF Interface"
     icon: "mdi:ethernet"
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: RoutingOSPF
     human_friendly_id:
       - "description__value"
     order_by:

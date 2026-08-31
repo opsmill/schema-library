@@ -13,6 +13,7 @@ generics:
     description: A VLAN is an isolated layer two domain.
     label: VLAN
     icon: mdi:lan-pending
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
@@ -107,6 +108,7 @@ nodes:
     description: A VLAN group scopes VLANs to a domain (site, rack, etc.).
     label: VLAN Group
     icon: mdi:domain-switch
+    include_in_menu: true
     menu_placement: IpamGenericVLAN
     human_friendly_id:
       - name__value

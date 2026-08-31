@@ -11,9 +11,9 @@ generics:
   - name: Protocol
     namespace: Routing
     description: "Generic protocol model for routing protocols"
-    label: "Protocol"
+    label: "Routing Protocol"
     icon: "carbon:router"
-    include_in_menu: false
+    include_in_menu: true
     attributes:
       # TODO: Should be computed later
       - name: description

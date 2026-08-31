@@ -156,6 +156,7 @@ nodes:
     description: Standard SFP module for various types (e.g., LR, SR, T).
     label: Standard SFP
     icon: mdi:gpu
+    include_in_menu: true
     menu_placement: DcimGenericSFP
     inherit_from:
       - DcimGenericSFP
@@ -165,6 +166,7 @@ nodes:
     description: "Bidirectional SFP supporting two wavelengths for single-fiber operation."
     label: Bidirectional SFP
     icon: lineicons:arrow-both-direction-vertical-1
+    include_in_menu: true
     menu_placement: DcimGenericSFP
     inherit_from:
       - DcimGenericSFP

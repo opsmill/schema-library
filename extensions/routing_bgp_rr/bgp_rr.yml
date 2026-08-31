@@ -13,7 +13,8 @@ nodes:
     description: "A Route Reflector (RR) Cluster used for grouping internal peers"
     label: "Route Reflector Cluster"
     icon: "mdi:router-network"
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: RoutingBGPSession
     human_friendly_id:
       - name__value
     display_label: name__value

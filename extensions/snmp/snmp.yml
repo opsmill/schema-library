@@ -13,6 +13,7 @@ generics:
     description: Generic model for SNMP community configurations.
     label: SNMP Community
     icon: iconoir:community
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
@@ -52,6 +53,7 @@ nodes:
     description: SNMP v1/v2c community configuration.
     label: SNMP v1/v2c
     icon: iconoir:community
+    include_in_menu: true
     menu_placement: SnmpCommunity
     inherit_from:
       - SnmpCommunity
@@ -82,6 +84,7 @@ nodes:
     description: SNMP version 3 configuration with enhanced security.
     label: SNMP v3
     icon: iconoir:community
+    include_in_menu: true
     menu_placement: SnmpCommunity
     inherit_from:
       - SnmpCommunity
@@ -156,6 +159,7 @@ nodes:
     description: Represents an SNMP client that interacts with SNMP Community.
     label: SNMP Client
     icon: ph:user-list-light
+    include_in_menu: true
     menu_placement: SnmpCommunity
     human_friendly_id:
       - name__value

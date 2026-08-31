@@ -32,6 +32,7 @@ nodes:
     description: Physical Disk
     label: Physical Disk
     icon: carbon:vmdk-disk
+    include_in_menu: true
     human_friendly_id:
       - device__name__value
       - name__value

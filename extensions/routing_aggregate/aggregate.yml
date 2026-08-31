@@ -13,7 +13,8 @@ nodes:
     description: "Aggregate Protocol with action and BGP communities"
     label: "Aggregate Routes"
     icon: "grommet-icons:aggregate"
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: RoutingProtocol
     inherit_from:
       - "RoutingProtocol"
     attributes:

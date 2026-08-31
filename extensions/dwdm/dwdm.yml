@@ -13,6 +13,7 @@ generics:
     description: Generic interface of an optical add-drop multiplexer, front or rear.
     label: Optical Multiplexer Interfaces
     icon: mdi:ethernet
+    include_in_menu: true
     menu_placement: DcimOpticalMultiplexer
     attributes:
       - name: name
@@ -123,6 +124,7 @@ nodes:
       (Wavelength Division Multiplexing) technologies.
     label: Optical Multiplexer
     icon: mdi:transit-connection-variant
+    include_in_menu: true
     inherit_from:
       - DcimPhysicalDevice
     human_friendly_id:
@@ -175,6 +177,7 @@ nodes:
     namespace: Dcim
     description: Client-side interface of an optical add-drop multiplexer, carrying a single channel.
     label: Optical Multiplexer Front Interfaces
+    include_in_menu: true
     menu_placement: DcimGenericOadmInterface
     inherit_from:
       - DcimEndpoint
@@ -208,6 +211,7 @@ nodes:
     namespace: Dcim
     description: Line-side interface of an optical add-drop multiplexer, carrying the multiplexed signal.
     label: Optical Multiplexer Rear Interfaces
+    include_in_menu: true
     menu_placement: DcimGenericOadmInterface
     inherit_from:
       - DcimEndpoint
@@ -235,6 +239,7 @@ nodes:
     description: A WDM channel with its wavelength and frequency.
     label: WDM Channel
     icon: game-icons:laser-warning
+    include_in_menu: true
     human_friendly_id:
       - wdm_type__value
       - channel__value
@@ -287,6 +292,7 @@ nodes:
     description: SFP with configuration for Wavelength Division Multiplexing.
     label: WDM SFP
     icon: mdi:laser-pointer
+    include_in_menu: true
     menu_placement: DcimGenericSFP
     inherit_from:
       - DcimGenericSFP

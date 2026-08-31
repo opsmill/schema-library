@@ -13,6 +13,7 @@ nodes:
     description: An Autonomous System (AS) is a set of Internet routable IP prefixes belonging to a network
     label: Autonomous System
     icon: mdi:bank-circle-outline
+    include_in_menu: true
     menu_placement: RoutingBGPSession
     human_friendly_id:
       - "asn__value"
@@ -64,6 +65,7 @@ nodes:
     description: A BGP Peer Group is used to regroup parameters that are shared across multiple peers
     label: BGP Peer Group
     icon: mdi:view-grid-plus-outline
+    include_in_menu: true
     menu_placement: RoutingBGPSession
     inherit_from:
       - "RoutingProtocol"
@@ -143,6 +145,7 @@ nodes:
     description: A BGP Session represent a point to point connection between two routers
     label: BGP Session
     icon: mdi:router
+    include_in_menu: true
     inherit_from:
       - "RoutingProtocol"
     order_by:

@@ -13,7 +13,8 @@ nodes:
     description: A routing policy for PIM.
     label: PIM Routing Policies
     icon: carbon:deployment-policy
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: RoutingPolicy
     inherit_from:
       - "RoutingPolicy"
     # Add attributes here if this policy flavour needs more than the generic RoutingPolicy provides.

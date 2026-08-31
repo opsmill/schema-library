@@ -13,6 +13,7 @@ nodes:
     description: VRRP Group configuration
     label: VRRP Group
     icon: fluent:virtual-network-20-filled
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
@@ -66,6 +67,7 @@ nodes:
     description: VRRP Interface configuration
     label: VRRP Interface
     icon: carbon:interface-usage
+    include_in_menu: true
     menu_placement: NetworkVRRPGroup
     order_by:
       - priority__value

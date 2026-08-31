@@ -13,6 +13,7 @@ nodes:
     description: Physical cable connecting two endpoints
     label: Cable
     icon: mdi:cable-data
+    include_in_menu: true
     menu_placement: DcimDevice
     inherit_from:
       - DcimConnector

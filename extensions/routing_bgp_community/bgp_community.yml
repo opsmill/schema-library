@@ -13,6 +13,7 @@ nodes:
     description: "Defines a BGP community."
     label: "BGP Community"
     icon: iconoir:community
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:

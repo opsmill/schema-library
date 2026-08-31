@@ -14,7 +14,7 @@ nodes:
     label: Aggregate
     icon: mdi:ip-network
     include_in_menu: true
-    menu_placement: OrganizationRIR
+    menu_placement: BuiltinIPAM
     inherit_from:
       - BuiltinIPPrefix
     human_friendly_id:
@@ -52,6 +52,7 @@ nodes:
     label: RIR
     icon: mdi:certificate
     include_in_menu: true
+    menu_placement: OrganizationGeneric
     inherit_from:
       - OrganizationGeneric
     attributes:

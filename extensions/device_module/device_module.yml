@@ -14,6 +14,7 @@ generics:
     description: "A generic module, such as a Linecard or Routing Engine, installed in a module bay."
     label: "Module"
     icon: mdi:expansion-card
+    include_in_menu: true
     human_friendly_id:
       - computed_name__value
     display_label: computed_name__value
@@ -55,6 +56,7 @@ generics:
     description: "A generic module type, with common specifications like part number and manufacturer."
     label: "Module Type"
     icon: mdi:database-cog
+    include_in_menu: true
     menu_placement: DcimGenericModule
     human_friendly_id:
       - name__value
@@ -98,6 +100,7 @@ nodes:
     description: "A physical bay on a device that can receive a module."
     label: "Module Bay"
     icon: mdi:tray
+    include_in_menu: true
     menu_placement: DcimDevice
     human_friendly_id:
       - computed_name__value

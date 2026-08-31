@@ -33,6 +33,7 @@ nodes:
     description: A physical server with fixed resources and specific hardware characteristics.
     label: Physical Server
     icon: mdi:server
+    include_in_menu: true
     menu_placement: ComputeGenericUnit
     inherit_from:
       - ComputeGenericUnit

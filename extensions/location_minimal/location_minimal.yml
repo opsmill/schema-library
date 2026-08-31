@@ -14,6 +14,7 @@ nodes:
     description: A geographical region grouping countries and sites.
     label: Region
     icon: carbon:cics-region-target
+    include_in_menu: true
     menu_placement: LocationGeneric
     inherit_from:
       - LocationGeneric
@@ -26,6 +27,7 @@ nodes:
     description: A country, sitting between a region and the sites it contains.
     label: Country
     icon: gis:search-country
+    include_in_menu: true
     menu_placement: LocationGeneric
     inherit_from:
       - LocationGeneric
@@ -37,6 +39,7 @@ nodes:
     description: A physical location hosting equipment, such as a data center or an office.
     label: Site
     icon: ri:building-line
+    include_in_menu: true
     menu_placement: LocationGeneric
     inherit_from:
       - LocationGeneric

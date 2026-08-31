@@ -307,6 +307,7 @@ nodes:
     description: A model of device
     label: Device Type
     icon: mdi:poll
+    include_in_menu: true
     menu_placement: DcimDevice
     human_friendly_id:
       - name__value
@@ -359,6 +360,7 @@ nodes:
     description: A Platform represent the type of software running on a device.
     label: Platform
     icon: mdi:application-cog-outline
+    include_in_menu: true
     menu_placement: DcimDevice
     human_friendly_id:
       - name__value
@@ -396,6 +398,7 @@ nodes:
     description: A configurable network device including routers, switches...
     label: Network Device
     icon: clarity:network-switch-solid
+    include_in_menu: true
     inherit_from:
       - CoreArtifactTarget
       - DcimGenericDevice

@@ -12,6 +12,7 @@ nodes:
     description: A contract document associated with a circuit service, including terms, costs, and validity period.
     label: Circuit Contract
     icon: mdi:file-sign
+    include_in_menu: true
     menu_placement: DcimCircuit
     inherit_from:
       - CoreFileObject

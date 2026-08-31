@@ -13,6 +13,7 @@ nodes:
     description: A cluster hosting virtual machines.
     label: Hosting Cluster
     icon: mdi:dots-hexagon
+    include_in_menu: true
     menu_placement: ComputeGenericUnit
     inherit_from:
       - ClusterGeneric

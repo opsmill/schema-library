@@ -11,8 +11,9 @@ generics:
   - name: Policy
     namespace: Routing
     description: "Policy defining the rules for routing traffic in a network."
+    label: "Routing Policy"
     icon: carbon:deployment-policy
-    include_in_menu: false
+    include_in_menu: true
     human_friendly_id:
       - "name__value"
     order_by:
