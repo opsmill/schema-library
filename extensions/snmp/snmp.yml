@@ -21,6 +21,7 @@ generics:
     attributes:
       - name: name
         kind: Text
+        unique: true
         order_weight: 1000
       - name: description
         kind: Text
@@ -32,10 +33,12 @@ generics:
         kind: Component
         cardinality: many
       - name: devices
-        peer: DcimDevice
+        peer: DcimGenericDevice
         label: Devices
         kind: Attribute
         cardinality: many
+        optional: true
+        identifier: snmp_community__device
         description: Devices this community is configured on.
         order_weight: 1200
 
