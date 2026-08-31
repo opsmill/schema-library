@@ -30,7 +30,7 @@ nodes:
         unique: false
         optional: false
         order_weight: 1000
-      - name: facility_id
+      - name: facility
         kind: Text
         optional: true
         order_weight: 1100
