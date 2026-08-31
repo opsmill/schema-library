@@ -23,10 +23,10 @@ This schema extension contains models for account management.
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
+| name |  | Text | False |  |  |
 | description |  | Text | True |  |  |
-| idle_timeout |  | Number |  |  |  |
-| permissions |  | Dropdown | False |  | admin, operator, read-only |
+| idle_timeout |  | Number | False |  |  |
+| permissions |  | Dropdown | False |  | admin, operator, read_only |
 
 ### Account
 
@@ -40,11 +40,11 @@ This schema extension contains models for account management.
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name | The login username | Text |  |  |  |
+| name | The login username | Text | False |  |  |
 | full_name | Full name of the account | Text | True |  |  |
 | ssh_key | SSH key for secure access | Password | True |  |  |
 | password | Password for login (alternative to SSH key) | Password | True |  |  |
-| mfa_enabled | Whether multi-factor authentication is enabled | Boolean |  | False |  |
+| mfa_enabled | Whether multi-factor authentication is enabled | Boolean | False | False |  |
 
 #### Relationships
 
@@ -67,7 +67,7 @@ In this context "extensions" refer to modifications or additions to the existing
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| accounts | UserAccount |  | many | Component |
+| accounts | UserAccount | True | many | Component |
 
 ## Code
 
@@ -79,55 +79,63 @@ nodes:
   description: User Group
   label: User Groups
   icon: iconoir:group
-  display_label: name__value
-  order_by:
-  - name__value
+  include_in_menu: true
   human_friendly_id:
   - name__value
+  order_by:
+  - name__value
+  display_label: name__value
   attributes:
   - name: name
     kind: Text
-    order_weight: 1000
     unique: true
+    optional: false
+    order_weight: 1000
   - name: description
     kind: Text
     optional: true
     order_weight: 1100
   - name: idle_timeout
-    label: Idle Timeout (s)
     kind: Number
+    label: Idle Timeout (s)
+    optional: false
     order_weight: 1300
   - name: permissions
     kind: Dropdown
-    optional: false
     choices:
     - name: admin
+      label: Admin
       description: All rights on device.
       color: '#E6E6FA'
     - name: operator
+      label: Operator
       description: Operator right on configuration.
       color: '#E6E6FA'
-    - name: read-only
+    - name: read_only
+      label: Read Only
       description: Read only right on configuration.
       color: '#E6E6FA'
+    optional: false
     order_weight: 1200
 - name: Account
   namespace: User
   description: User login and authentication
   label: User Account
   icon: mdi:account-key
-  display_label: name__value
-  order_by:
-  - name__value
+  include_in_menu: true
   human_friendly_id:
   - name__value
+  order_by:
+  - name__value
+  display_label: name__value
   attributes:
   - name: name
-    label: Username
     kind: Text
+    label: Username
+    unique: true
+    optional: false
     description: The login username
     order_weight: 1000
-    unique: true
   - name: full_name
     kind: Text
     optional: true
@@ -146,28 +154,32 @@ nodes:
   - name: mfa_enabled
     kind: Boolean
     default_value: false
+    optional: false
     description: Whether multi-factor authentication is enabled
     order_weight: 1500
   relationships:
   - name: user_group
     peer: UserGroup
+    kind: Attribute
     cardinality: one
     optional: false
-    kind: Attribute
     order_weight: 1200
   - name: organization
     peer: OrganizationGeneric
-    optional: false
-    cardinality: one
     kind: Parent
+    cardinality: one
+    optional: false
+    order_weight: 900
 extensions:
   nodes:
   - kind: OrganizationGeneric
     relationships:
     - name: accounts
-      kind: Component
       peer: UserAccount
-      description: List of Accounts under this organization
+      kind: Component
       cardinality: many
+      optional: true
+      description: List of Accounts under this organization
+      order_weight: 1600
 
 ```

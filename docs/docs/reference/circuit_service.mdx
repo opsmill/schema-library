@@ -36,7 +36,7 @@ For example you have a MPLS network supported by a provider connecting multiple 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | provider | OrganizationProvider | False | one | Attribute |
-| circuit_endpoints | CircuitEndpoint | True | many | Component |
+| circuit_endpoints | DcimCircuitEndpoint | True | many | Component |
 
 ## Extensions
 
@@ -54,7 +54,7 @@ In this context "extensions" refer to modifications or additions to the existing
 | ---- | ---- | -------- | ----------- | ---- |
 | circuit_services | CircuitService | True | many |  |
 
-### CircuitEndpoint
+### DcimCircuitEndpoint
 
 #### Relationships
 
@@ -96,7 +96,7 @@ nodes:
     cardinality: one
     kind: Attribute
   - name: circuit_endpoints
-    peer: CircuitEndpoint
+    peer: DcimCircuitEndpoint
     optional: true
     cardinality: many
     kind: Component
@@ -108,7 +108,7 @@ extensions:
       peer: CircuitService
       cardinality: many
       optional: true
-  - kind: CircuitEndpoint
+  - kind: DcimCircuitEndpoint
     relationships:
     - name: circuit_service
       peer: CircuitService

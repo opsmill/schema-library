@@ -2,7 +2,7 @@
 title: QinQ
 ---
 
-This schema extension brings extensions to VLAN model in order to support QinQ.
+This schema extension adds the Service VLAN and Customer VLAN nodes needed to model QinQ on top of the VLAN extension.
 
 ## Details
 
@@ -17,7 +17,9 @@ This schema extension brings extensions to VLAN model in order to support QinQ.
 - **Label:** S-VLAN
 - **Description:** A VLAN used to encapsulate multiple CVLANs.
 - **Namespace:** Ipam
-- **Inherit From:** GenericVLAN
+- **Uniqueness Constraints:**
+    - vlan_id__value, vlan_group
+- **Inherit From:** IpamGenericVLAN
 
 #### Relationships
 
@@ -31,9 +33,9 @@ This schema extension brings extensions to VLAN model in order to support QinQ.
 - **Description:** A VLAN assigned to customer traffic, encapsulated within an S-VLAN.
 - **Namespace:** Ipam
 - **Uniqueness Constraints:**
-    - vlan_id__value, svlan
+    - svlan, vlan_id__value
 - **Human Friendly ID:** svlan__name__value, vlan_id__value
-- **Inherit From:** GenericVLAN
+- **Inherit From:** IpamGenericVLAN
 
 #### Attributes
 
@@ -54,50 +56,56 @@ version: '1.0'
 nodes:
 - name: SVLAN
   namespace: Ipam
-  label: S-VLAN
   description: A VLAN used to encapsulate multiple CVLANs.
+  label: S-VLAN
   include_in_menu: false
   inherit_from:
-  - GenericVLAN
+  - IpamGenericVLAN
+  uniqueness_constraints:
+  - - vlan_id__value
+    - vlan_group
   relationships:
   - name: cvlan
-    label: Customer vlan(s)
     peer: IpamCVLAN
-    optional: true
-    direction: outbound
-    identifier: vlan__qinq
-    cardinality: many
+    label: Customer vlan(s)
     kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: vlan__qinq
+    direction: outbound
+    order_weight: 1600
 - name: CVLAN
   namespace: Ipam
-  label: C-VLAN
   description: A VLAN assigned to customer traffic, encapsulated within an S-VLAN.
+  label: C-VLAN
   include_in_menu: false
-  display_label: '{{ svlan__name__value }}-{{ vlan_id__value }}'
+  inherit_from:
+  - IpamGenericVLAN
   human_friendly_id:
   - svlan__name__value
   - vlan_id__value
+  display_label: '{{ svlan__name__value }}-{{ vlan_id__value }}'
   uniqueness_constraints:
-  - - vlan_id__value
-    - svlan
-  inherit_from:
-  - GenericVLAN
+  - - svlan
+    - vlan_id__value
   attributes:
   - name: name
     kind: Text
-    optional: true
     read_only: true
     computed_attribute:
       kind: Jinja2
       jinja2_template: '{{ svlan__name__value }}-{{ vlan_id__value }}'
+    optional: true
+    order_weight: 1000
   relationships:
   - name: svlan
-    label: Supplier vlan
     peer: IpamSVLAN
-    optional: false
-    direction: inbound
-    identifier: vlan__qinq
-    cardinality: one
+    label: Supplier vlan
     kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: vlan__qinq
+    direction: inbound
+    order_weight: 1600
 
 ```

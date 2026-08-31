@@ -2,7 +2,7 @@
 title: Location Minimal
 ---
 
-This schema extension is minimal but will provide you with basic items to store location related data.
+This schema extension is minimal but will provide you with basic items to store location related data, as a Region -> Country -> Site hierarchy. It defines the same Location.Site node as extensions/location_site, so load one or the other, not both. Note that LocationGeneric.name is unique across every location kind, so a name used at one tier cannot be reused at another; a single-country deployment therefore enters the hierarchy at Country (with Region as the national node) rather than duplicating a country under several regions.
 
 ## Details
 
@@ -14,6 +14,7 @@ This schema extension is minimal but will provide you with basic items to store 
 ### Region
 
 - **Label:** Region
+- **Description:** A geographical region grouping countries and sites.
 - **Namespace:** Location
 - **Icon:** carbon:cics-region-target
 - **Inherit From:** LocationGeneric, IpamPrefixScope
@@ -21,6 +22,7 @@ This schema extension is minimal but will provide you with basic items to store 
 ### Country
 
 - **Label:** Country
+- **Description:** A country, sitting between a region and the sites it contains.
 - **Namespace:** Location
 - **Icon:** gis:search-country
 - **Inherit From:** LocationGeneric
@@ -28,6 +30,7 @@ This schema extension is minimal but will provide you with basic items to store 
 ### Site
 
 - **Label:** Site
+- **Description:** A physical location hosting equipment, such as a data center or an office.
 - **Namespace:** Location
 - **Icon:** ri:building-line
 - **Inherit From:** LocationGeneric, LocationHosting, IpamPrefixScope, IpamVLANGroupScope
@@ -36,7 +39,7 @@ This schema extension is minimal but will provide you with basic items to store 
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| status |  | Dropdown | False | active | active, planned, staging, decommissioning, retired |
+| status |  | Dropdown | False | active | active, planned, staging, decommissioning, deprecated |
 | facility |  | Text | True |  |  |
 | physical_address |  | Text | True |  |  |
 | timezone |  | Text | True |  |  |
@@ -48,41 +51,46 @@ version: '1.0'
 nodes:
 - name: Region
   namespace: Location
+  description: A geographical region grouping countries and sites.
   label: Region
+  icon: carbon:cics-region-target
+  include_in_menu: true
+  menu_placement: LocationGeneric
   inherit_from:
   - LocationGeneric
   - IpamPrefixScope
-  menu_placement: LocationGeneric
   parent: ''
   children: LocationCountry
-  icon: carbon:cics-region-target
 - name: Country
   namespace: Location
+  description: A country, sitting between a region and the sites it contains.
   label: Country
+  icon: gis:search-country
+  include_in_menu: true
+  menu_placement: LocationGeneric
   inherit_from:
   - LocationGeneric
-  menu_placement: LocationGeneric
   parent: LocationRegion
   children: LocationSite
-  icon: gis:search-country
 - name: Site
   namespace: Location
+  description: A physical location hosting equipment, such as a data center or an
+    office.
   label: Site
+  icon: ri:building-line
+  include_in_menu: true
+  menu_placement: LocationGeneric
   inherit_from:
   - LocationGeneric
   - LocationHosting
   - IpamPrefixScope
   - IpamVLANGroupScope
-  menu_placement: LocationGeneric
-  display_label: name__value
   parent: LocationCountry
-  icon: ri:building-line
+  display_label: name__value
   attributes:
   - name: status
     kind: Dropdown
-    optional: false
     default_value: active
-    order_weight: 1250
     choices:
     - name: active
       label: Active
@@ -96,19 +104,21 @@ nodes:
     - name: decommissioning
       label: Decommissioning
       color: '#ff9800'
-    - name: retired
-      label: Retired
+    - name: deprecated
+      label: Deprecated
       color: '#6c757d'
+    optional: false
+    order_weight: 1200
   - name: facility
     kind: Text
     unique: false
     optional: true
-    order_weight: 1100
+    order_weight: 1150
   - name: physical_address
     kind: Text
     unique: false
     optional: true
-    order_weight: 1500
+    order_weight: 1400
   - name: timezone
     kind: Text
     optional: true

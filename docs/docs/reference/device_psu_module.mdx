@@ -45,7 +45,7 @@ This schema extension adds a PSU (Power Supply Unit) flavor on top of the generi
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | wattage | Wattage in watts. | Number | True |  |  |
-| hotswappable | Whether the PSU can be replaced without powering down the device. | Boolean | False | False |  |
+| hot_swappable | Whether the PSU can be replaced without powering down the device. | Boolean | False | False |  |
 
 ## Code
 
@@ -63,21 +63,21 @@ nodes:
   attributes:
   - name: computed_name
     kind: Text
-    read_only: true
-    optional: false
     unique: true
+    read_only: true
     computed_attribute:
       kind: Jinja2
       jinja2_template: '{{ module_bay__computed_name__value }} ({{ module_type__name__value
         }})'
+    optional: false
     description: Name computed from the module bay and module type.
     order_weight: 1000
   relationships:
   - name: module_type
     peer: DcimPSUModuleType
-    optional: false
-    cardinality: one
     kind: Attribute
+    cardinality: one
+    optional: false
     order_weight: 950
 - name: PSUModuleType
   namespace: Dcim
@@ -90,16 +90,19 @@ nodes:
   - DcimGenericModuleType
   attributes:
   - name: wattage
-    description: Wattage in watts.
     kind: Number
+    label: Wattage (W)
     optional: true
+    parameters:
+      min_value: 1
+    description: Wattage in watts.
     order_weight: 1300
-  - name: hotswappable
-    label: Hot-Swappable
-    description: Whether the PSU can be replaced without powering down the device.
+  - name: hot_swappable
     kind: Boolean
-    optional: false
+    label: Hot-Swappable
     default_value: false
+    optional: false
+    description: Whether the PSU can be replaced without powering down the device.
     order_weight: 1350
 
 ```

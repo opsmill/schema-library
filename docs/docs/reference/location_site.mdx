@@ -14,6 +14,7 @@ This schema extension introduces a standalone Location.Site node (with facility,
 ### Site
 
 - **Label:** Site
+- **Description:** A physical location hosting equipment, such as a data center or an office.
 - **Namespace:** Location
 - **Icon:** ri:building-line
 - **Inherit From:** LocationGeneric, LocationHosting, IpamPrefixScope, IpamVLANGroupScope
@@ -22,7 +23,7 @@ This schema extension introduces a standalone Location.Site node (with facility,
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| status |  | Dropdown | False | active | active, planned, staging, decommissioning, retired |
+| status |  | Dropdown | False | active | active, planned, staging, decommissioning, deprecated |
 | facility |  | Text | True |  |  |
 | physical_address |  | Text | True |  |  |
 | timezone |  | Text | True |  |  |
@@ -34,21 +35,22 @@ version: '1.0'
 nodes:
 - name: Site
   namespace: Location
+  description: A physical location hosting equipment, such as a data center or an
+    office.
   label: Site
+  icon: ri:building-line
+  include_in_menu: true
+  menu_placement: LocationGeneric
   inherit_from:
   - LocationGeneric
   - LocationHosting
   - IpamPrefixScope
   - IpamVLANGroupScope
-  menu_placement: LocationGeneric
   display_label: name__value
-  icon: ri:building-line
   attributes:
   - name: status
     kind: Dropdown
-    optional: false
     default_value: active
-    order_weight: 1250
     choices:
     - name: active
       label: Active
@@ -62,19 +64,21 @@ nodes:
     - name: decommissioning
       label: Decommissioning
       color: '#ff9800'
-    - name: retired
-      label: Retired
+    - name: deprecated
+      label: Deprecated
       color: '#6c757d'
+    optional: false
+    order_weight: 1200
   - name: facility
     kind: Text
     unique: false
     optional: true
-    order_weight: 1100
+    order_weight: 1150
   - name: physical_address
     kind: Text
     unique: false
     optional: true
-    order_weight: 1500
+    order_weight: 1400
   - name: timezone
     kind: Text
     optional: true

@@ -17,6 +17,8 @@ This schema extension contains models to capture IP aggregates assigned by a Reg
 - **Description:** An aggregate is a top-level IPv4 or IPv6 prefix assigned by a RIR.
 - **Namespace:** Ipam
 - **Icon:** mdi:ip-network
+- **Uniqueness Constraints:**
+    - prefix__value
 - **Human Friendly ID:** prefix__value
 - **Inherit From:** BuiltinIPPrefix
 
@@ -45,7 +47,7 @@ This schema extension contains models to capture IP aggregates assigned by a Reg
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| is_private | Indicates this RIR manages private (RFC 1918 / RFC 4193) address space. | Boolean |  | False |  |
+| private | Indicates this RIR manages private (RFC 1918 / RFC 4193) address space. | Boolean | False | False |  |
 
 #### Relationships
 
@@ -63,33 +65,35 @@ nodes:
   description: An aggregate is a top-level IPv4 or IPv6 prefix assigned by a RIR.
   label: Aggregate
   icon: mdi:ip-network
-  menu_placement: OrganizationRIR
   include_in_menu: true
+  menu_placement: BuiltinIPAM
+  inherit_from:
+  - BuiltinIPPrefix
+  human_friendly_id:
+  - prefix__value
   order_by:
   - prefix__value
   display_label: prefix__value
-  human_friendly_id:
-  - prefix__value
-  inherit_from:
-  - BuiltinIPPrefix
+  uniqueness_constraints:
+  - - prefix__value
   attributes:
   - name: description
     kind: Text
     optional: true
     order_weight: 1100
   - name: date_added
-    label: Date Added
     kind: DateTime
+    label: Date Added
     optional: true
     order_weight: 1200
   relationships:
   - name: rir
-    label: RIR
     peer: OrganizationRIR
-    identifier: aggregate__rir
-    optional: false
-    cardinality: one
+    label: RIR
     kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: aggregate__rir
     order_weight: 1000
 - name: RIR
   namespace: Organization
@@ -98,23 +102,25 @@ nodes:
   label: RIR
   icon: mdi:certificate
   include_in_menu: true
+  menu_placement: OrganizationGeneric
   inherit_from:
   - OrganizationGeneric
   attributes:
-  - name: is_private
+  - name: private
+    kind: Boolean
     label: Private
+    default_value: false
+    optional: false
     description: Indicates this RIR manages private (RFC 1918 / RFC 4193) address
       space.
-    kind: Boolean
-    default_value: false
     order_weight: 1300
   relationships:
   - name: aggregates
     peer: IpamAggregate
-    identifier: aggregate__rir
-    optional: true
-    cardinality: many
     kind: Generic
+    cardinality: many
+    optional: true
+    identifier: aggregate__rir
     order_weight: 1400
 
 ```

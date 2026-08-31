@@ -8,7 +8,6 @@ This schema inherits the `RoutingPolicy` schema and removes `import_policies` an
 
 - **Dependencies:**
     - [base](dcim)
-    - [extensions/routing](routing)
     - [extensions/routing_policies](routing_policies)
     - [extensions/routing_pim](routing_pim)
 
@@ -17,7 +16,7 @@ This schema inherits the `RoutingPolicy` schema and removes `import_policies` an
 ### PolicyPIM
 
 - **Label:** PIM Routing Policies
-- **Description:** A routing policiers for PIM
+- **Description:** A routing policy for PIM.
 - **Namespace:** Routing
 - **Icon:** carbon:deployment-policy
 - **Inherit From:** RoutingPolicy
@@ -43,8 +42,8 @@ In this context "extensions" refer to modifications or additions to the existing
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| import_routing_policies | RoutingPolicyPIM |  | many | Generic |
-| export_routing_policies | RoutingPolicyPIM |  | many | Generic |
+| import_routing_policies | RoutingPolicyPIM | True | many | Generic |
+| export_routing_policies | RoutingPolicyPIM | True | many | Generic |
 
 ## Code
 
@@ -53,10 +52,11 @@ version: '1.0'
 nodes:
 - name: PolicyPIM
   namespace: Routing
-  description: A routing policiers for PIM
+  description: A routing policy for PIM.
   label: PIM Routing Policies
   icon: carbon:deployment-policy
-  include_in_menu: false
+  include_in_menu: true
+  menu_placement: RoutingPolicy
   inherit_from:
   - RoutingPolicy
 extensions:
@@ -71,18 +71,22 @@ extensions:
       state: absent
     relationships:
     - name: import_routing_policies
+      peer: RoutingPolicyPIM
       label: Import Routing Policies
-      peer: RoutingPolicyPIM
+      kind: Generic
+      cardinality: many
       identifier: pim__import_policies
+      optional: true
       description: The routing-policies used by this instance for import.
-      kind: Generic
-      cardinality: many
+      order_weight: 1500
     - name: export_routing_policies
-      label: Export Routing Policies
       peer: RoutingPolicyPIM
-      identifier: pim__export_policies
-      description: The routing-policies used by this instance for export.
+      label: Export Routing Policies
       kind: Generic
       cardinality: many
+      identifier: pim__export_policies
+      optional: true
+      description: The routing-policies used by this instance for export.
+      order_weight: 1550
 
 ```

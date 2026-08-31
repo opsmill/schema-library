@@ -13,7 +13,7 @@ Basic Location schema to capture locations, sites, and related information.
 ### Generic
 
 - **Label:** Location
-- **Description:** Generic Location, could be a country, city ...
+- **Description:** A location in the estate, such as a region, a country or a site.
 - **Namespace:** Location
 - **Icon:** mingcute:location-line
 - **Human Friendly ID:** name__value
@@ -41,7 +41,7 @@ Basic Location schema to capture locations, sites, and related information.
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
+| name |  | Text | False |  |  |
 
 #### Relationships
 
@@ -56,7 +56,7 @@ version: '1.0'
 generics:
 - name: Generic
   namespace: Location
-  description: Generic Location, could be a country, city ...
+  description: A location in the estate, such as a region, a country or a site.
   label: Location
   icon: mingcute:location-line
   include_in_menu: true
@@ -71,33 +71,41 @@ generics:
     kind: Text
     unique: true
     optional: false
-    order_weight: 900
+    order_weight: 1000
   - name: description
     kind: Text
     optional: true
-    order_weight: 1200
+    order_weight: 1100
   relationships:
   - name: tags
     peer: BuiltinTag
     kind: Attribute
-    optional: true
     cardinality: many
+    optional: true
+    order_weight: 2000
 - name: Hosting
   namespace: Location
   description: Location directly hosting device and services.
   include_in_menu: false
   human_friendly_id:
   - name__value
+  order_by:
+  - name__value
+  display_label: name__value
   attributes:
   - name: name
     kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
   relationships:
   - name: devices
-    label: Devices
     peer: DcimPhysicalDevice
+    label: Devices
+    kind: Generic
     cardinality: many
     optional: true
-    kind: Generic
     identifier: physical_device__location
+    order_weight: 1500
 
 ```
