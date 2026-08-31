@@ -187,7 +187,7 @@ nodes:
             label: Peering
             description: "Connect with other networks via IX."
             color: "#E6E6FA" # lavender
-        optional: false
+        optional: true
         description: "Role of the BGP Session"
         order_weight: 1300
       - name: local_pref
