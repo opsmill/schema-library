@@ -12,6 +12,10 @@ generics:
     namespace: Dcim
     description: Generic that hold relationship toward physical disks. To apply on device that can have physical disks.
     include_in_menu: false
+    attributes:
+      - name: name # Here so HFIDs and computed names can resolve, see DcimPhysicalDevice.name
+        kind: Text
+        allow_override: any
     relationships:
       - name: physical_disks
         peer: DcimPhysicalDisk
@@ -26,6 +30,7 @@ nodes:
     label: Physical Disk
     icon: carbon:vmdk-disk
     human_friendly_id:
+      - device__name__value
       - name__value
     order_by:
       - name__value
