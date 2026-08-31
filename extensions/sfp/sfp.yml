@@ -188,6 +188,7 @@ extensions:
       relationships:
         - name: plugged_sfp
           peer: DcimGenericSFP
+          kind: Generic
           cardinality: one
           optional: true
           identifier: sfp__interface
@@ -195,12 +196,14 @@ extensions:
       relationships:
         - name: spare_sfps
           peer: DcimGenericSFP
+          kind: Generic
           cardinality: many
           optional: true
     - kind: OrganizationManufacturer
       relationships:
         - name: sfps
           peer: DcimGenericSFP
+          kind: Generic
           label: SFPs
           cardinality: many
           optional: true

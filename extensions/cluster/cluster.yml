@@ -59,6 +59,7 @@ extensions:
       relationships:
         - name: worker_in_cluster
           peer: ClusterGenericComputeUnitNodes
+          kind: Generic
           label: Worker in cluster
           cardinality: one
           optional: true

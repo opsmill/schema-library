@@ -177,6 +177,7 @@ extensions:
       relationships:
         - name: circuits
           peer: DcimCircuit
+          kind: Generic
           cardinality: many
           optional: true
           identifier: circuit__provider
@@ -184,6 +185,7 @@ extensions:
       relationships:
         - name: circuit_endpoints
           peer: DcimCircuitEndpoint
+          kind: Generic
           cardinality: many
           optional: true
           identifier: circuit_endpoint__location

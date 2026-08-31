@@ -85,12 +85,14 @@ nodes:
     relationships:
       - name: import_vrf
         peer: IpamVRF
+        kind: Generic
         label: Imported by VRFs
         cardinality: many
         optional: true
         identifier: vrf__import
       - name: export_vrf
         peer: IpamVRF
+        kind: Generic
         label: Exported by VRFs
         cardinality: many
         optional: true

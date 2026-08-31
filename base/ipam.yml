@@ -170,6 +170,7 @@ nodes:
         order_weight: 1250
       - name: interface
         peer: InterfaceLayer3
+        kind: Attribute
         cardinality: one
         optional: true
         identifier: ip_address__interface
