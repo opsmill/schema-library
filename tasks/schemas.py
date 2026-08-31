@@ -126,11 +126,10 @@ def load_all_schemas(context: Context) -> None:
     print("All good! ✨")
 
 
-# TEMPORARY DEMO TASK - load IPAM + DCIM
 @task
 def load_demo_ipam_dcim(context: Context) -> None:
     """[DEMO] Load IPAM + DCIM base schemas and a handful of common extensions."""
-    schemas_to_load = [
+    schemas_to_load = {
         "base",
         "extensions/aggregate",
         "extensions/cable",
@@ -144,6 +143,11 @@ def load_demo_ipam_dcim(context: Context) -> None:
         "extensions/qinq",
         "extensions/rack",
         "extensions/vrf",
-    ]
-    for path in schemas_to_load:
+    }
+
+    # `.metadata.yml` is the normative dependency graph, so the demo order comes from it
+    metadata = _load_yaml_metadata()
+    load_order = _resolve_load_order(*_build_dependency_graph(metadata))
+
+    for path in (p for p in load_order if p in schemas_to_load):
         _load_extension(context, Path(path))
