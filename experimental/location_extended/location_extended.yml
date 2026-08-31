@@ -114,7 +114,7 @@ nodes:
     label: Rack
     display_label: name__value
     human_friendly_id:
-      - shortname__value
+      - name__value
     parent: "LocationSuite"
     children: ""
     icon: "clarity:rack-server-line"
