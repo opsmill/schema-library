@@ -17,6 +17,7 @@ nodes:
     inherit_from:
       - "RoutingPolicy"
     # TODO: extend if need
+# Uncommenting this block also requires adding extensions/routing_aggregate back to .metadata.yml.
 # extensions:
 #   nodes:
 # - kind: RoutingAggregate
