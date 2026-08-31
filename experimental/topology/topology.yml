@@ -49,7 +49,7 @@ generics:
         optional: true
         cardinality: many
       - name: ip_addresses
-        peer: InfraIPAddress
+        peer: IpamIPAddress
         optional: true
         cardinality: many
         kind: Component
@@ -404,13 +404,13 @@ nodes:
         kind: Parent
         optional: false
       - name: vlan
-        peer: InfraVLAN
+        peer: IpamVLAN
         optional: true
         cardinality: one
         kind: Component
         order_weight: 1500
       - name: prefix
-        peer: InfraPrefix
+        peer: IpamPrefix
         optional: true
         cardinality: one
         kind: Component
