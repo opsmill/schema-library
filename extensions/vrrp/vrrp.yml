@@ -112,7 +112,7 @@ extensions:
         - name: vrrp
           peer: NetworkVRRPGroup
           label: VRRP Group
-          kind: Component
+          kind: Attribute
           cardinality: one
           description: Part of VRRP Group
           order_weight: 1600
