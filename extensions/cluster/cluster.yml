@@ -28,9 +28,9 @@ generics:
         kind: Text
         optional: true
     relationships:
-      - name: location
+      - name: locations
         peer: LocationGeneric
-        label: Location
+        label: Locations
         kind: Attribute
         cardinality: many
         optional: false

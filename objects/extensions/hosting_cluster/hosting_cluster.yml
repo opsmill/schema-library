@@ -48,10 +48,10 @@ spec:
       description: VMware vSphere cluster at SJC1 built from physical servers.
       technology: vmware
       status: active
-      # `location` is cardinality many (a cluster can span locations), and
+      # `locations` is cardinality many (a cluster can span locations), and
       # LocationGeneric is a Generic -- a flat list of HFID strings works
       # against the existing LocationSite.
-      location:
+      locations:
         - SJC1
       # `nodes` is cardinality many, and ComputeGenericUnit is a Generic --
       # a flat list of HFID strings is not enough (the peer schema can't be
@@ -73,7 +73,7 @@ spec:
       description: KVM/QEMU cluster at NYC1 built from physical servers.
       technology: kvm
       status: active
-      location:
+      locations:
         - NYC1
       nodes:
         kind: ComputePhysicalServer
