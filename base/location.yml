@@ -44,9 +44,15 @@ generics:
     # This is only owning relationships toward various assets that could be found on those locations
     human_friendly_id:
       - name__value
+    order_by:
+      - name__value
+    display_label: name__value
     attributes:
       - name: name
         kind: Text
+        unique: true
+        optional: false
+        order_weight: 1000
     relationships:
       - name: devices
         peer: DcimPhysicalDevice
