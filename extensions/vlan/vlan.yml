@@ -8,19 +8,6 @@
 version: "1.0"
 
 generics:
-  - name: VLANGroupScope
-    namespace: Ipam
-    description: Mixin for objects that can scope a VLAN group (e.g. Region, Site, Rack).
-    include_in_menu: false
-    relationships:
-      - name: vlan_groups
-        peer: IpamVLANGroup
-        label: VLAN Groups
-        kind: Attribute
-        cardinality: many
-        optional: true
-        identifier: vlan_group__scope
-
   - name: VLAN
     namespace: Generic
     description: A VLAN is isolated layer two domain
@@ -143,6 +130,15 @@ nodes:
 
 extensions:
   nodes:
+    - kind: IpamVLANGroupScope
+      relationships:
+        - name: vlan_groups
+          peer: IpamVLANGroup
+          label: VLAN Groups
+          kind: Attribute
+          cardinality: many
+          optional: true
+          identifier: vlan_group__scope
     - kind: IpamPrefix
       relationships:
         - name: vlan
