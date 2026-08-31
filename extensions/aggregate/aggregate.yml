@@ -22,6 +22,8 @@ nodes:
     order_by:
       - prefix__value
     display_label: prefix__value
+    uniqueness_constraints:
+      - [prefix__value]
     attributes:
       - name: description
         kind: Text
