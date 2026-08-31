@@ -146,13 +146,13 @@ nodes:
         kind: Component
         cardinality: many
         optional: true
-        identifier: front_interfaces
+        identifier: patch_panel__front_interfaces
       - name: rear_interfaces
         peer: DcimRearPatchPanelInterface
         kind: Component
         cardinality: many
         optional: true
-        identifier: rear_interfaces
+        identifier: patch_panel__rear_interfaces
 
   - name: FrontPatchPanelInterface
     namespace: Dcim
@@ -183,7 +183,7 @@ nodes:
         kind: Parent
         cardinality: one
         optional: false
-        identifier: front_interfaces
+        identifier: patch_panel__front_interfaces
         order_weight: 900
 
   - name: RearPatchPanelInterface
@@ -215,5 +215,5 @@ nodes:
         kind: Parent
         cardinality: one
         optional: false
-        identifier: rear_interfaces
+        identifier: patch_panel__rear_interfaces
         order_weight: 900
