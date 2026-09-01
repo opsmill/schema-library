@@ -13,13 +13,11 @@ TEST_EXPERIMENTAL = os.getenv("TEST_EXPERIMENTAL", None)
 
 def _load_extension(context: Context, path: Path) -> None:
     # Make sure it's a dir
-    # TODO: here if in extensions folder we have a dir without schema it will fail
     if os.path.isdir(path):
         print("#" * 80)
         print(f"🏗️  Loading `{path}`")
 
         # Load extensions
-        # TODO: Maybe improve what we return here...
         context.run(f"infrahubctl schema load {path}")
         print("#" * 80)
 

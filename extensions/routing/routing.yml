@@ -15,7 +15,6 @@ generics:
     icon: "carbon:router"
     include_in_menu: true
     attributes:
-      # TODO: Should be computed later
       - name: description
         kind: Text
         unique: true

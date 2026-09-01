@@ -59,7 +59,7 @@ def _generate_schema_reference_content(schema_key: str, schema_metadata: dict) -
     if "dependencies" in schema_metadata:
         for dep in schema_metadata["dependencies"]:
             if dep == "base":
-                link = "dcim"  # TODO: This is a hack, should be improved ... maybe merging all base references
+                link = "dcim"
             else:
                 link = dep.split("/")[1]
             schema_data["dependencies"].append({"name": dep, "link": link})
