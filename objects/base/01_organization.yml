@@ -21,6 +21,8 @@ kind: Object
 spec:
   kind: OrganizationProvider
   data:
+    - name: Acme Networks
+      description: Acme Networks -- the operator this mock data belongs to.
     - name: Lumen
       description: Lumen Technologies -- transit and dark fiber provider.
     - name: Colt
