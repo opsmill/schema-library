@@ -430,11 +430,6 @@ extensions/tenancy:
     `tenancy.yml` for an example of how to extend tenancy onto optional extension
     nodes such as `DcimCircuit`.
   name: Tenancy
-extensions/users:
-  dependencies:
-    - base
-  description: This schema extension contains models for account management.
-  name: Users
 extensions/vlan:
   dependencies:
     - base
