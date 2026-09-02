@@ -218,10 +218,12 @@ nodes:
             color: "#111111"
         optional: true
         order_weight: 1300
+      # Optional so a cable can be recorded before anyone labels it in the field, unique
+      # so a labelled cable still resolves through the human_friendly_id.
       - name: label
         kind: Text
         unique: true
-        optional: false
+        optional: true
         order_weight: 1000
       # As we can't put float in Number "forcing" length in cm
       - name: length
