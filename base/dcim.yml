@@ -166,8 +166,6 @@ generics:
         optional: true
         description: "A brief description of the interface"
         order_weight: 1100
-      # NOTE: Infrahub 1.11 treats attributes with a default_value as optional at runtime;
-      # optional: false documents intent.
       - name: status
         kind: Dropdown
         default_value: "active"
