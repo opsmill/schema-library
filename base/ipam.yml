@@ -14,8 +14,9 @@ generics:
   - name: VLANGroupScope
     namespace: Ipam
     label: VLAN Group Scope
-    description: Mixin for objects that can scope a VLAN group (e.g. Region, Site). The
-      reverse relationship is added by extensions/vlan.
+    description: >-
+      Mixin for objects that can scope a VLAN group (e.g. Region, Site). The reverse
+      relationship is added by extensions/vlan.
     include_in_menu: false
 
   - name: PrefixScope

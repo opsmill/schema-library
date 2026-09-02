@@ -119,7 +119,7 @@ generics:
 nodes:
   - name: OpticalMultiplexer
     namespace: Dcim
-    description: |
+    description: >-
       An OADM (Optical Add Drop Multiplexer) supporting various WDM
       (Wavelength Division Multiplexing) technologies.
     label: Optical Multiplexer
