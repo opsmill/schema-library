@@ -85,10 +85,6 @@ nodes:
             label: Customer
             description: Prefixes assigned to customers.
             color: "#77DD77"
-          - name: supernet
-            label: Supernet
-            description: Aggregate covering multiple sub-prefixes.
-            color: "#CDB4DB"
           - name: backbone
             label: Backbone
             description: Core network infrastructure prefixes.
