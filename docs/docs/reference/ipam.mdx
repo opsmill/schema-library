@@ -17,7 +17,7 @@ Basic IPAM schema to capture IP addresses, subnets, and related information.
 - **Namespace:** Ipam
 - **Icon:** mdi:ip-network
 - **Uniqueness Constraints:**
-    - ip_namespace, prefix__value
+    - prefix__value, ip_namespace
 - **Human Friendly ID:** ip_namespace__name__value, prefix__value
 - **Inherit From:** BuiltinIPPrefix
 
@@ -27,7 +27,7 @@ Basic IPAM schema to capture IP addresses, subnets, and related information.
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | status |  | Dropdown | False | active | active, reserved, deprecated |
 | description |  | Text | True |  |  |
-| role |  | Dropdown | True |  | management, link, customer, supernet, backbone |
+| role |  | Dropdown | True |  | management, link, customer, backbone |
 
 #### Relationships
 
@@ -42,7 +42,7 @@ Basic IPAM schema to capture IP addresses, subnets, and related information.
 - **Namespace:** Ipam
 - **Icon:** mdi:ip
 - **Uniqueness Constraints:**
-    - ip_namespace, address__value
+    - address__value, ip_namespace
 - **Human Friendly ID:** ip_namespace__name__value, address__value
 - **Inherit From:** BuiltinIPAddress
 
@@ -122,8 +122,8 @@ nodes:
   - prefix__value
   display_label: prefix__value
   uniqueness_constraints:
-  - - ip_namespace
-    - prefix__value
+  - - prefix__value
+    - ip_namespace
   attributes:
   - name: status
     kind: Dropdown
@@ -159,10 +159,6 @@ nodes:
       label: Customer
       description: Prefixes assigned to customers.
       color: '#77DD77'
-    - name: supernet
-      label: Supernet
-      description: Aggregate covering multiple sub-prefixes.
-      color: '#CDB4DB'
     - name: backbone
       label: Backbone
       description: Core network infrastructure prefixes.
@@ -192,8 +188,8 @@ nodes:
   - address__value
   display_label: address__value
   uniqueness_constraints:
-  - - ip_namespace
-    - address__value
+  - - address__value
+    - ip_namespace
   attributes:
   - name: description
     kind: Text

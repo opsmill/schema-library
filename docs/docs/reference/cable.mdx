@@ -27,7 +27,7 @@ This schema extension contains a basic Cable model allowing you to connect two e
 | status |  | Dropdown | False | connected | connected, planned |
 | cable_type |  | Dropdown | True |  | cat3, cat5, cat5e, cat6, cat6a, cat7, cat7a, cat8, mmf_om1, mmf_om2, mmf_om3, mmf_om4, mmf_om5, smf_os1, smf_os2, dac_passive, dac_active, aoc, coaxial, mrj21_trunk, power, usb |
 | color |  | Dropdown | True |  | dark_red, red, pink, rose, fuchsia, purple, dark_purple, indigo, blue, light_blue, cyan, teal, aqua, dark_green, green, light_green, lime, yellow, amber, orange, dark_orange, brown, light_grey, grey, dark_grey, black |
-| label |  | Text | False |  |  |
+| label |  | Text | True |  |  |
 | length |  | Number | True |  |  |
 
 ## Code
@@ -243,7 +243,7 @@ nodes:
   - name: label
     kind: Text
     unique: true
-    optional: false
+    optional: true
     order_weight: 1000
   - name: length
     kind: Number

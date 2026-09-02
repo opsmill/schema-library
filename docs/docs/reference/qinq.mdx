@@ -33,7 +33,7 @@ This schema extension adds the Service VLAN and Customer VLAN nodes needed to mo
 - **Description:** A VLAN assigned to customer traffic, encapsulated within an S-VLAN.
 - **Namespace:** Ipam
 - **Uniqueness Constraints:**
-    - svlan, vlan_id__value
+    - vlan_id__value, svlan
 - **Human Friendly ID:** svlan__name__value, vlan_id__value
 - **Inherit From:** IpamGenericVLAN
 
@@ -86,8 +86,8 @@ nodes:
   - vlan_id__value
   display_label: '{{ svlan__name__value }}-{{ vlan_id__value }}'
   uniqueness_constraints:
-  - - svlan
-    - vlan_id__value
+  - - vlan_id__value
+    - svlan
   attributes:
   - name: name
     kind: Text

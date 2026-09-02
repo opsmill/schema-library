@@ -18,7 +18,7 @@ This extension contains schema to capture Cross Connect. You can see it as "a ca
 - **Namespace:** Dcim
 - **Icon:** streamline:arrow-crossover-right-solid
 - **Uniqueness Constraints:**
-    - provider, identifier__value
+    - identifier__value, provider
 - **Human Friendly ID:** provider__name__value, identifier__value
 - **Inherit From:** DcimConnector
 
@@ -57,8 +57,8 @@ nodes:
   - provider__name__value
   display_label: '{{ identifier__value }} (Provider: {{ provider__name__value }})'
   uniqueness_constraints:
-  - - provider
-    - identifier__value
+  - - identifier__value
+    - provider
   attributes:
   - name: identifier
     kind: Text
