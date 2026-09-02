@@ -40,7 +40,7 @@ nodes:
       - vlan_id__value
     display_label: "{{ svlan__name__value }}-{{ vlan_id__value }}"
     uniqueness_constraints:
-      - [svlan, vlan_id__value]
+      - [vlan_id__value, svlan]
     attributes:
       - name: name
         kind: Text
