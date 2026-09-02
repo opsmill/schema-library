@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -11,11 +11,10 @@ generics:
   - name: Protocol
     namespace: Routing
     description: "Generic protocol model for routing protocols"
-    label: "Protocol"
+    label: "Routing Protocol"
     icon: "carbon:router"
-    include_in_menu: false
+    include_in_menu: true
     attributes:
-      # TODO: Should be computed later
       - name: description
         kind: Text
         unique: true
@@ -28,7 +27,7 @@ generics:
           - name: active
             label: Active
             description: "Configuration is active and operational."
-            color: "#A9CCE3" # pastel blue
+            color: "#00d25b"
           - name: disabled
             label: Disabled
             description: "Configuration has been disabled."
@@ -37,19 +36,20 @@ generics:
             label: Deleted
             description: "Configuration has been deleted."
             color: "#FAD7A0" # pastel orange
+        optional: false
         description: "Status of the Protocol Configuration."
-        order_weight: 1150
+        order_weight: 1200
     relationships:
       - name: device
         peer: DcimDevice
         kind: Parent
         cardinality: one
         optional: false
-        order_weight: 1050
+        order_weight: 900
       - name: vrf
         peer: IpamVRF
         label: VRF
         kind: Attribute
         cardinality: one
         optional: false
-        order_weight: 1075
+        order_weight: 1050

@@ -2,17 +2,19 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
 
 nodes:
   - name: Tenant
-    namespace: Tenancy
+    namespace: Organization
     description: A tenant is the owner of the corresponding devices, addressing, and locations.
+    label: Tenant
     icon: mdi:domain
     include_in_menu: true
+    menu_placement: OrganizationGeneric
     inherit_from:
       - OrganizationGeneric
     relationships:
@@ -23,6 +25,7 @@ nodes:
         cardinality: many
         optional: true
         identifier: tenant__device
+        order_weight: 1300
       - name: prefixes
         peer: IpamPrefix
         label: Prefixes
@@ -30,13 +33,15 @@ nodes:
         cardinality: many
         optional: true
         identifier: tenant__prefix
+        order_weight: 1350
       - name: addresses
         peer: IpamIPAddress
         label: Addresses
         kind: Generic
         cardinality: many
         optional: true
-        identifier: tenant__ipaddress
+        identifier: tenant__ip_address
+        order_weight: 1400
       - name: locations
         peer: LocationHosting
         label: Locations
@@ -44,22 +49,23 @@ nodes:
         cardinality: many
         optional: true
         identifier: tenant__location
+        order_weight: 1450
 
 extensions:
   nodes:
     - kind: DcimGenericDevice
       relationships:
         - name: tenant
-          peer: TenancyTenant
+          peer: OrganizationTenant
           kind: Attribute
           cardinality: one
           optional: true
           identifier: tenant__device
-          order_weight: 1800
+          order_weight: 1850
     - kind: IpamPrefix
       relationships:
         - name: tenant
-          peer: TenancyTenant
+          peer: OrganizationTenant
           kind: Attribute
           cardinality: one
           optional: true
@@ -68,16 +74,16 @@ extensions:
     - kind: IpamIPAddress
       relationships:
         - name: tenant
-          peer: TenancyTenant
+          peer: OrganizationTenant
           kind: Attribute
           cardinality: one
           optional: true
-          identifier: tenant__ipaddress
-          order_weight: 1300
+          identifier: tenant__ip_address
+          order_weight: 1350
     - kind: LocationHosting
       relationships:
         - name: tenant
-          peer: TenancyTenant
+          peer: OrganizationTenant
           kind: Attribute
           cardinality: one
           optional: true
@@ -102,12 +108,12 @@ extensions:
 #       - kind: DcimCircuit
 #         relationships:
 #           - name: tenant
-#             peer: TenancyTenant
+#             peer: OrganizationTenant
 #             identifier: tenant__circuit
 #             optional: true
 #             cardinality: one
 #             kind: Attribute
-#       - kind: TenancyTenant
+#       - kind: OrganizationTenant
 #         relationships:
 #           - name: circuits
 #             peer: DcimCircuit
@@ -117,3 +123,4 @@ extensions:
 #             kind: Generic
 #
 # The same pattern applies to any other optional extension node you want tenancy on.
+          order_weight: 1800

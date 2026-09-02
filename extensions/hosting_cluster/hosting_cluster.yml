@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -13,7 +13,8 @@ nodes:
     description: A cluster hosting virtual machines.
     label: Hosting Cluster
     icon: mdi:dots-hexagon
-    menu_placement: VirtualizationVirtualMachine
+    include_in_menu: true
+    menu_placement: ComputeGenericUnit
     inherit_from:
       - ClusterGeneric
       - VirtualizationHostVirtualMachine # Means we can get VM running on this one
@@ -47,8 +48,9 @@ nodes:
           - name: public_cloud
             label: Public Cloud
             color: "#888888"
+        optional: false
         description: Underlying virtualisation or clustering technology.
-        order_weight: 1200
+        order_weight: 1300
       - name: status
         kind: Dropdown
         default_value: active
@@ -70,4 +72,4 @@ nodes:
             description: Temporarily taken out of service.
             color: "#9e9e9e"
         optional: false
-        order_weight: 1300
+        order_weight: 1200

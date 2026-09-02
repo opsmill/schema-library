@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -12,12 +12,26 @@ generics:
     namespace: Dcim
     description: Generic that hold relationship toward physical disks. To apply on device that can have physical disks.
     include_in_menu: false
+    attributes:
+      # Here so HFIDs and computed names can resolve, see DcimPhysicalDevice.name.
+      # unique is required because DcimPhysicalDisk.human_friendly_id walks
+      # device__name__value, and Infrahub only accepts a peer attribute combination that is
+      # unique. Every device kind this generic is meant to be applied to already inherits
+      # DcimGenericDevice, which declares name unique, so nothing changes for them;
+      # allow_override lets an implementer restate the attribute either way.
+      - name: name
+        kind: Text
+        unique: true
+        allow_override: any
+        optional: false
+        order_weight: 1000
     relationships:
       - name: physical_disks
         peer: DcimPhysicalDisk
         kind: Component
         cardinality: many
         optional: true
+        order_weight: 1950
 
 nodes:
   - name: PhysicalDisk
@@ -25,7 +39,9 @@ nodes:
     description: Physical Disk
     label: Physical Disk
     icon: carbon:vmdk-disk
+    include_in_menu: true
     human_friendly_id:
+      - device__name__value
       - name__value
     order_by:
       - name__value
@@ -36,7 +52,7 @@ nodes:
       - name: name
         kind: Text
         optional: false
-        order_weight: 900
+        order_weight: 1000
       - name: disk_type
         kind: Dropdown
         choices:
@@ -58,7 +74,7 @@ nodes:
             color: "#ffcc80"
         optional: true
         description: Specifies the type of disk
-        order_weight: 950
+        order_weight: 1300
       - name: status
         kind: Dropdown
         choices:
@@ -69,7 +85,7 @@ nodes:
           - name: active
             label: Active
             description: The disk is currently in use within the infrastructure.
-            color: "#28a745"
+            color: "#00d25b"
           - name: decommissioned
             label: Decommissioned
             description: The disk is retired from active use but still stored for potential reuse or auditing.
@@ -78,28 +94,30 @@ nodes:
             label: Disposed
             description: The disk has been securely erased and disposed of.
             color: "#dc3545"
+        optional: false
         description: Lifecycle status of the hardware component.
+        order_weight: 1200
       - name: size
         kind: Number
         label: Size (GB)
         optional: false
         description: Disk capacity (in GB).
-        order_weight: 1000
+        order_weight: 1400
       - name: serial_number
         kind: Text
         unique: true
         optional: true
         description: Serial number of the disk
-        order_weight: 1100
+        order_weight: 1450
       - name: description
         kind: Text
         unique: false
         optional: true
-        order_weight: 1500
+        order_weight: 1100
     relationships:
       - name: device
         peer: DcimDeviceWithPhysicalDisks
         kind: Parent
         cardinality: one
         optional: false
-        order_weight: 800
+        order_weight: 900

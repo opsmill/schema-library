@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -16,7 +16,7 @@ generics:
     include_in_menu: true
     display_label: "{{ form_factor__value }} {{ sfp_type__value }}"
     attributes:
-      - name: serial
+      - name: serial_number
         kind: Text
         optional: true
         order_weight: 1400
@@ -83,7 +83,7 @@ generics:
             description: Decommissioned might be broken or not used anymore.
             color: "#ffd27f"
         optional: false
-        order_weight: 1300
+        order_weight: 1200
       - name: form_factor
         kind: Dropdown
         choices:
@@ -136,7 +136,7 @@ generics:
         cardinality: one
         optional: true
         identifier: sfp__interface
-        order_weight: 1200
+        order_weight: 1300
       - name: spare_location
         peer: LocationHosting
         kind: Attribute
@@ -156,6 +156,7 @@ nodes:
     description: Standard SFP module for various types (e.g., LR, SR, T).
     label: Standard SFP
     icon: mdi:gpu
+    include_in_menu: true
     menu_placement: DcimGenericSFP
     inherit_from:
       - DcimGenericSFP
@@ -165,6 +166,7 @@ nodes:
     description: "Bidirectional SFP supporting two wavelengths for single-fiber operation."
     label: Bidirectional SFP
     icon: lineicons:arrow-both-direction-vertical-1
+    include_in_menu: true
     menu_placement: DcimGenericSFP
     inherit_from:
       - DcimGenericSFP
@@ -188,19 +190,25 @@ extensions:
       relationships:
         - name: plugged_sfp
           peer: DcimGenericSFP
+          kind: Generic
           cardinality: one
           optional: true
           identifier: sfp__interface
+          order_weight: 1700
     - kind: LocationHosting
       relationships:
         - name: spare_sfps
           peer: DcimGenericSFP
+          kind: Generic
           cardinality: many
           optional: true
+          order_weight: 1750
     - kind: OrganizationManufacturer
       relationships:
         - name: sfps
           peer: DcimGenericSFP
+          kind: Generic
           label: SFPs
           cardinality: many
           optional: true
+          order_weight: 1500

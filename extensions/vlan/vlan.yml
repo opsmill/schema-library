@@ -2,47 +2,36 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
 
 generics:
-  - name: VLANGroupScope
+  - name: GenericVLAN
     namespace: Ipam
-    description: Mixin for objects that can scope a VLAN group (e.g. Region, Site, Rack).
-    include_in_menu: false
-    relationships:
-      - name: vlan_groups
-        peer: IpamVLANGroup
-        label: VLAN Groups
-        kind: Attribute
-        cardinality: many
-        optional: true
-        identifier: vlan_group__scope
-
-  - name: VLAN
-    namespace: Generic
-    description: A VLAN is isolated layer two domain
+    description: A VLAN is an isolated layer two domain.
     label: VLAN
     icon: mdi:lan-pending
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
       - name__value
     display_label: name__value
-    uniqueness_constraints:
-      - [vlan_id__value, vlan_group]
     attributes:
       - name: name
         kind: Text
-        order_weight: 910
+        optional: false
+        order_weight: 1000
       - name: description
         kind: Text
         optional: true
+        order_weight: 1100
       - name: vlan_id
         kind: Number
-        order_weight: 900
+        optional: false
+        order_weight: 1050
       - name: status
         kind: Dropdown
         default_value: active
@@ -68,7 +57,7 @@ generics:
             description: No longer in use and scheduled for removal.
             color: "#e04040"
         optional: false
-        order_weight: 920
+        order_weight: 1200
       - name: role
         kind: Dropdown
         choices:
@@ -85,6 +74,7 @@ generics:
             description: Segments designed for end-user access and activities.
             color: "#a0b78d"
         optional: true
+        order_weight: 1300
     relationships:
       - name: prefixes
         peer: IpamPrefix
@@ -92,6 +82,7 @@ generics:
         cardinality: many
         optional: true
         identifier: vlan__prefix
+        order_weight: 1500
       - name: vlan_group
         peer: IpamVLANGroup
         label: VLAN Group
@@ -99,32 +90,39 @@ generics:
         cardinality: one
         optional: false
         identifier: vlan_group__vlan
-        order_weight: 930
+        order_weight: 1400
 
 nodes:
   - name: VLAN
     namespace: Ipam
+    description: A plain VLAN, with no QinQ role of its own.
     label: VLAN
     include_in_menu: false
     inherit_from:
-      - GenericVLAN
+      - IpamGenericVLAN
+    uniqueness_constraints:
+      - [vlan_id__value, vlan_group]
 
   - name: VLANGroup
     namespace: Ipam
     description: A VLAN group scopes VLANs to a domain (site, rack, etc.).
     label: VLAN Group
     icon: mdi:domain-switch
-    menu_placement: GenericVLAN
+    include_in_menu: true
+    menu_placement: IpamGenericVLAN
     human_friendly_id:
       - name__value
     display_label: name__value
     attributes:
       - name: name
         kind: Text
+        unique: true
+        optional: false
         order_weight: 1000
       - name: description
         kind: Text
         optional: true
+        order_weight: 1100
     relationships:
       - name: scope
         peer: IpamVLANGroupScope
@@ -134,36 +132,49 @@ nodes:
         identifier: vlan_group__scope
         order_weight: 900
       - name: vlans
-        peer: GenericVLAN
+        peer: IpamGenericVLAN
         kind: Component
         cardinality: many
         optional: true
         identifier: vlan_group__vlan
+        order_weight: 1500
 
 extensions:
   nodes:
+    - kind: IpamVLANGroupScope
+      relationships:
+        - name: vlan_groups
+          peer: IpamVLANGroup
+          label: VLAN Groups
+          kind: Attribute
+          cardinality: many
+          optional: true
+          identifier: vlan_group__scope
+          order_weight: 1600
     - kind: IpamPrefix
       relationships:
         - name: vlan
-          peer: GenericVLAN
+          peer: IpamGenericVLAN
           kind: Attribute
           cardinality: one
           optional: true
           identifier: vlan__prefix
-          order_weight: 1400
+          order_weight: 1450
     - kind: InterfaceLayer2
       relationships:
         - name: untagged_vlan
-          peer: GenericVLAN
+          peer: IpamGenericVLAN
           label: Untagged VLAN
           kind: Generic
           cardinality: one
           optional: true
           identifier: interface_l2__untagged_vlan
+          order_weight: 1500
         - name: tagged_vlan
-          peer: GenericVLAN
+          peer: IpamGenericVLAN
           label: Tagged VLANs
           kind: Generic
           cardinality: many
           optional: true
           identifier: interface_l2__tagged_vlan
+          order_weight: 1550

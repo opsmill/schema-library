@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -22,15 +22,17 @@ generics:
       - name: name
         kind: Text
         unique: true
+        optional: false
         description: Name of the cluster.
         order_weight: 1000
       - name: description
         kind: Text
         optional: true
+        order_weight: 1100
     relationships:
-      - name: location
+      - name: locations
         peer: LocationGeneric
-        label: Location
+        label: Locations
         kind: Attribute
         cardinality: many
         optional: false
@@ -53,17 +55,21 @@ generics:
         kind: Component
         cardinality: many
         identifier: worker_in_cluster
+        optional: true
+        order_weight: 1500
 extensions:
   nodes:
     - kind: ComputeGenericUnit
       relationships:
         - name: worker_in_cluster
           peer: ClusterGenericComputeUnitNodes
+          kind: Generic
           label: Worker in cluster
           cardinality: one
           optional: true
           identifier: worker_in_cluster
           description: This device is a worker node of the specified cluster.
+          order_weight: 1900
     - kind: LocationGeneric
       relationships:
         - name: clusters
@@ -73,3 +79,4 @@ extensions:
           cardinality: many
           optional: true
           description: All clusters available on that location.
+          order_weight: 1650

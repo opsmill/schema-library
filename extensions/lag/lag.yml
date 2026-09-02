@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -10,17 +10,20 @@ version: "1.0"
 generics:
   - name: InterfaceBundle
     namespace: Generic
+    description: Generic holding the members of an interface bundle such as a LAG.
     label: Generic Interface Bundle
     include_in_menu: false
     attributes:
       - name: name
         kind: Text
+        optional: false
         description: "Name of the interface"
         order_weight: 1000
       - name: bundle_number
         kind: Number
+        optional: false
         description: "Bundle number for the aggregated interface"
-        order_weight: 1100
+        order_weight: 1250
     relationships:
       - name: bundle_members
         peer: InterfacePhysical
@@ -28,6 +31,7 @@ generics:
         kind: Attribute
         cardinality: many
         identifier: interface__bundle
+        optional: true
         description: "Physical Interfaces that are members of this aggregate"
         order_weight: 1800
 
@@ -55,8 +59,9 @@ nodes:
           - name: fast
             label: Fast
             color: "#E6E6FA" # lavender
+        optional: false
         description: "LACP rate for the aggregated interface"
-        order_weight: 1700
+        order_weight: 1850
       - name: lacp_mode
         kind: Dropdown
         label: LACP Mode
@@ -71,10 +76,11 @@ nodes:
           - name: disabled
             label: Disabled
             color: "#E6E6FA" # lavender
+        optional: false
         description: "LACP mode for the aggregated interface"
-        order_weight: 1750
+        order_weight: 1900
     relationships:
-      # Redifine the relationship here to add common_parent constraint
+      # Redefine the relationship here to add the common_parent constraint
       - name: bundle_members
         peer: InterfacePhysical
         label: "Member(s)"
@@ -82,6 +88,7 @@ nodes:
         cardinality: many
         identifier: interface__bundle
         common_parent: device
+        optional: true
         description: "Physical Interfaces that are members of this aggregate"
         order_weight: 1800
 
@@ -97,4 +104,4 @@ extensions:
           optional: true
           identifier: interface__bundle
           description: "Interface Bundle using this Physical Interface"
-          order_weight: 1800
+          order_weight: 1950

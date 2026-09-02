@@ -25,9 +25,9 @@ Basic IPAM schema to capture IP addresses, subnets, and related information.
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| status |  | Dropdown | False | active | active, deprecated, reserved |
+| status |  | Dropdown | False | active | active, reserved, deprecated |
 | description |  | Text | True |  |  |
-| role |  | Dropdown | True |  | management, link, customer, supernet, backbone |
+| role |  | Dropdown | True |  | management, link, customer, backbone |
 
 #### Relationships
 
@@ -60,17 +60,20 @@ Basic IPAM schema to capture IP addresses, subnets, and related information.
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | primary_of | DcimGenericDevice | True | many | Attribute |
-| interface | InterfaceLayer3 | True | one |  |
+| interface | InterfaceLayer3 | True | one | Attribute |
 
 ## Generics
 
 ### VLANGroupScope
 
+- **Label:** VLAN Group Scope
+- **Description:** Mixin for objects that can scope a VLAN group (e.g. Region, Site). The reverse relationship is added by extensions/vlan.
 - **Namespace:** Ipam
 
 ### PrefixScope
 
-- **Description:** Mixin for objects that can scope IP prefixes (e.g. Region, Site, VRF).
+- **Label:** Prefix Scope
+- **Description:** Mixin for objects that can scope IP prefixes (e.g. Region, Site).
 - **Namespace:** Ipam
 
 #### Relationships
@@ -86,60 +89,63 @@ version: '1.0'
 generics:
 - name: VLANGroupScope
   namespace: Ipam
+  label: VLAN Group Scope
+  description: Mixin for objects that can scope a VLAN group (e.g. Region, Site).
+    The reverse relationship is added by extensions/vlan.
   include_in_menu: false
 - name: PrefixScope
   namespace: Ipam
-  description: Mixin for objects that can scope IP prefixes (e.g. Region, Site, VRF).
+  label: Prefix Scope
+  description: Mixin for objects that can scope IP prefixes (e.g. Region, Site).
   include_in_menu: false
   relationships:
   - name: prefixes
     peer: IpamPrefix
-    identifier: prefix__prefix_scope
+    kind: Generic
     cardinality: many
     optional: true
-    kind: Generic
+    identifier: prefix__prefix_scope
+    order_weight: 1550
 nodes:
 - name: Prefix
   namespace: Ipam
   description: IPv4 or IPv6 network (with mask)
-  include_in_menu: false
-  icon: mdi:ip-network
   label: Prefix
-  order_by:
-  - prefix__value
-  display_label: prefix__value
+  icon: mdi:ip-network
+  include_in_menu: false
   inherit_from:
   - BuiltinIPPrefix
-  uniqueness_constraints:
-  - - prefix__value
-    - ip_namespace
   human_friendly_id:
   - ip_namespace__name__value
   - prefix__value
+  order_by:
+  - prefix__value
+  display_label: prefix__value
+  uniqueness_constraints:
+  - - prefix__value
+    - ip_namespace
   attributes:
   - name: status
     kind: Dropdown
-    optional: false
     default_value: active
-    order_weight: 1100
     choices:
     - name: active
       label: Active
       color: '#00d25b'
-    - name: deprecated
-      label: Deprecated
-      color: '#e04040'
     - name: reserved
       label: Reserved
       color: '#4d90fe'
+    - name: deprecated
+      label: Deprecated
+      color: '#e04040'
+    optional: false
+    order_weight: 1200
   - name: description
     kind: Text
     optional: true
-    order_weight: 1150
+    order_weight: 1100
   - name: role
     kind: Dropdown
-    optional: true
-    order_weight: 1200
     choices:
     - name: management
       label: Management
@@ -153,49 +159,45 @@ nodes:
       label: Customer
       description: Prefixes assigned to customers.
       color: '#77DD77'
-    - name: supernet
-      label: Supernet
-      description: Aggregate covering multiple sub-prefixes.
-      color: '#CDB4DB'
     - name: backbone
       label: Backbone
       description: Core network infrastructure prefixes.
-      color: '#AEC6CF'
+      color: '#9678B6'
+    optional: true
+    order_weight: 1300
   relationships:
   - name: scope
     peer: IpamPrefixScope
+    kind: Attribute
+    cardinality: one
     optional: true
     identifier: prefix__prefix_scope
-    cardinality: one
-    kind: Attribute
-    order_weight: 1300
+    order_weight: 1500
 - name: IPAddress
   namespace: Ipam
   description: IP Address
-  include_in_menu: false
   label: IP Address
   icon: mdi:ip
-  order_by:
-  - address__value
-  display_label: address__value
+  include_in_menu: false
   inherit_from:
   - BuiltinIPAddress
-  uniqueness_constraints:
-  - - address__value
-    - ip_namespace
   human_friendly_id:
   - ip_namespace__name__value
   - address__value
+  order_by:
+  - address__value
+  display_label: address__value
+  uniqueness_constraints:
+  - - address__value
+    - ip_namespace
   attributes:
   - name: description
     kind: Text
     optional: true
-    order_weight: 1050
+    order_weight: 1100
   - name: status
     kind: Dropdown
-    optional: false
     default_value: active
-    order_weight: 1100
     choices:
     - name: active
       label: Active
@@ -206,10 +208,10 @@ nodes:
     - name: deprecated
       label: Deprecated
       color: '#e04040'
+    optional: false
+    order_weight: 1200
   - name: role
     kind: Dropdown
-    optional: true
-    order_weight: 1150
     choices:
     - name: loopback
       label: Loopback
@@ -220,25 +222,29 @@ nodes:
     - name: anycast
       label: Anycast
       color: '#FDFD96'
-  - name: fqdn
-    label: FQDN
-    kind: Text
     optional: true
-    order_weight: 1200
+    order_weight: 1300
+  - name: fqdn
+    kind: Text
+    label: FQDN
     regex: (?=^.{1,253}$)(^(((?!-)[a-zA-Z0-9-]{1,63}(?<!-))|((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63})$)
+    optional: true
+    order_weight: 1400
   relationships:
   - name: primary_of
-    label: Primary Address Of
     peer: DcimGenericDevice
-    identifier: device__primary_address
-    optional: true
-    cardinality: many
+    label: Primary Address Of
     kind: Attribute
-    order_weight: 1250
+    cardinality: many
+    optional: true
+    identifier: device__primary_address
+    order_weight: 1500
   - name: interface
     peer: InterfaceLayer3
-    optional: true
+    kind: Attribute
     cardinality: one
+    optional: true
     identifier: ip_address__interface
+    order_weight: 1600
 
 ```

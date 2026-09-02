@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -15,6 +15,7 @@ generics:
   # and add the necessary relationships/attributes to it following MlagDomain node example below
   - name: MlagDomain
     namespace: Generic
+    description: Generic holding the peer links and interfaces shared by the members of an MLAG domain.
     label: MLAG Domain
     include_in_menu: false
     human_friendly_id:
@@ -25,12 +26,14 @@ generics:
         kind: Text
         label: "MLAG Domain ID"
         unique: true # TODO: This one could be a mess to make unique...
+        optional: false
         description: "Identifier for the MLAG domain"
-        order_weight: 900
+        order_weight: 1000
       - name: reload_delay
         kind: Number
         label: "Reload Delay"
         default_value: 300
+        optional: false
         description: "Time in seconds to wait before bringing up the MLAG after a reload"
         order_weight: 1650
     relationships:
@@ -39,6 +42,7 @@ generics:
         label: "Peer Links"
         kind: Attribute
         cardinality: many
+        optional: true
         description: "LAG interfaces used as peer-links between the MLAG peers"
         order_weight: 1500
         # Depending on the use-case this could be optional or not
@@ -54,8 +58,9 @@ generics:
         label: "MLAG Interface(s)"
         kind: Component
         cardinality: many
+        optional: true
         description: "Bundle interfaces that are spread across all devices in this MLAG domain."
-        order_weight: 1500
+        order_weight: 1550
 
 nodes:
   - name: Interface
@@ -77,6 +82,7 @@ nodes:
     attributes:
       - name: name
         kind: Text
+        optional: false
         description: "Name of the interface"
         order_weight: 1000
       - name: description
@@ -99,7 +105,7 @@ nodes:
           - name: active
             label: Active
             description: "Interface is active and operational."
-            color: "#A9CCE3" # pastel blue
+            color: "#00d25b"
           - name: maintenance
             label: Maintenance
             description: "Interface is under maintenance."
@@ -116,6 +122,7 @@ nodes:
             label: Outage
             description: "Interface is currently experiencing an outage."
             color: "#F4CCCC" # pastel red
+        optional: false
         description: "The status of the interface"
         order_weight: 1200
       - name: role
@@ -131,7 +138,7 @@ nodes:
             color: "#B2D4E6" # pastel sky blue
         optional: true
         description: "The role of the interface in the network"
-        order_weight: 1250
+        order_weight: 1300
     relationships:
       - name: mlag_domain
         peer: GenericMlagDomain
@@ -140,7 +147,7 @@ nodes:
         cardinality: one
         optional: false
         description: "MLAG Domain this MLAG Interface belongs to"
-        order_weight: 1750
+        order_weight: 900
 
   # Placeholder node implementation of MLAG domain
   - name: Domain
@@ -148,6 +155,7 @@ nodes:
     description: "MLAG (Multi-Chassis Link Aggregation Group) Domain"
     label: MLAG Domain
     icon: mingcute:cloud-line
+    include_in_menu: true
     inherit_from:
       - GenericMlagDomain
     relationships:
@@ -173,7 +181,7 @@ extensions:
           cardinality: one
           optional: true
           description: "MLAG Domain this LAG is used as peer link"
-          order_weight: 1800
+          order_weight: 1950
     - kind: DcimDevice
       relationships:
         - name: mlag_domain
@@ -184,4 +192,4 @@ extensions:
           optional: true
           identifier: device__mlag_domain
           description: "MLAG Domain this device belongs to"
-          order_weight: 1800
+          order_weight: 1900

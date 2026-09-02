@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -11,7 +11,8 @@ generics:
   - name: GenericUnit
     namespace: Compute
     description: A generic unit that can compute (e.g. server, vm ...).
-    include_in_menu: false
+    label: Compute
+    include_in_menu: true
 
   - name: HostVirtualMachine
     namespace: Virtualization
@@ -24,6 +25,7 @@ generics:
         cardinality: many
         optional: true
         identifier: host__virtual_machine
+        order_weight: 1450
 
 nodes:
   - name: PhysicalServer
@@ -31,7 +33,8 @@ nodes:
     description: A physical server with fixed resources and specific hardware characteristics.
     label: Physical Server
     icon: mdi:server
-    menu_placement: DcimDevice
+    include_in_menu: true
+    menu_placement: ComputeGenericUnit
     inherit_from:
       - ComputeGenericUnit
       - DcimGenericDevice
@@ -60,13 +63,14 @@ nodes:
             description: Temporarily taken out of service.
             color: "#9e9e9e"
         optional: false
-        order_weight: 1100
+        order_weight: 1200
 
   - name: VirtualMachine
     namespace: Virtualization
     description: A virtual machine hosted on a server or a cluster.
     label: Virtual Machine
     icon: carbon:virtual-machine
+    menu_placement: ComputeGenericUnit
     include_in_menu: true
     inherit_from:
       - ComputeGenericUnit
@@ -76,27 +80,29 @@ nodes:
         kind: Dropdown
         choices:
           - name: application
+            label: Application
             color: "#7f7fff"
           - name: storage
+            label: Storage
             color: "#bf7fbf"
         optional: true
         description: Role of the virtual machine.
-        order_weight: 1400
+        order_weight: 1300
       - name: vcpu
         kind: Number
         optional: true
         description: Number of CPU cores assigned to the VM.
-        order_weight: 1900
+        order_weight: 1400
       - name: memory
         kind: Number
         optional: true
         description: Amount of memory (in GB) assigned to the VM.
-        order_weight: 1900
+        order_weight: 1450
       - name: disk
         kind: Number
         optional: true
         description: Disk space (in GB) assigned to the VM.
-        order_weight: 1900
+        order_weight: 1500
     relationships:
       - name: host
         peer: VirtualizationHostVirtualMachine
@@ -104,4 +110,4 @@ nodes:
         cardinality: one
         optional: false
         identifier: host__virtual_machine
-        order_weight: 1500
+        order_weight: 1350

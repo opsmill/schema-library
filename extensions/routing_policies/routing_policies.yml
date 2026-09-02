@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -11,8 +11,9 @@ generics:
   - name: Policy
     namespace: Routing
     description: "Policy defining the rules for routing traffic in a network."
+    label: "Routing Policy"
     icon: carbon:deployment-policy
-    include_in_menu: false
+    include_in_menu: true
     human_friendly_id:
       - "name__value"
     order_by:
@@ -34,18 +35,19 @@ generics:
         kind: Dropdown
         label: Type
         choices:
-          - name: import-policy
+          - name: import_policy
             label: Import
             description: "Policy for incoming routes."
             color: "#E6E6FA" # lavender
-          - name: export-policy
+          - name: export_policy
             label: Export
             description: "Policy for outgoing routes."
             color: "#E6E6FA" # lavender
-          - name: import-export-policy
+          - name: import_export_policy
             label: Import + Export
             description: "Policy for both incoming and outgoing routes."
             color: "#E6E6FA" # lavender
+        optional: false
         description: "The type of routing policy which specifies the direction of route advertisement."
         order_weight: 1200
       - name: weight
@@ -70,5 +72,6 @@ generics:
             label: All
             description: "Policy applies to both IPv4 and IPv6 addresses."
             color: "#E6E6FA" # lavender
+        optional: false
         description: "The address family for the routing policy indicating the type of IP address."
         order_weight: 1150

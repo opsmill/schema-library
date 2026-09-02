@@ -2,7 +2,7 @@
 # Mock data for extensions/qinq.
 # Depends on: base, extensions/location_minimal, extensions/vlan
 # (IpamVLANGroup: NYC1-VLANs).
-# IpamSVLAN and IpamCVLAN both inherit from GenericVLAN, so each needs its own
+# IpamSVLAN and IpamCVLAN both inherit from IpamGenericVLAN, so each needs its own
 # vlan_id/vlan_group. IpamCVLAN's `name` attribute is a read-only computed
 # attribute (Jinja2 from svlan + vlan_id), so it is never set here.
 # ---------------------------------------------------------------------------

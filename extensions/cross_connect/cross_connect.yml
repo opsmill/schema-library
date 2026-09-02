@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -13,6 +13,7 @@ nodes:
     description: Cross-connect between different endpoints within a datacenter.
     label: Cross-Connect
     icon: streamline:arrow-crossover-right-solid
+    include_in_menu: true
     inherit_from:
       - DcimConnector
     human_friendly_id:
@@ -26,27 +27,29 @@ nodes:
     attributes:
       - name: identifier
         kind: Text
-        order_weight: 900
+        optional: false
+        order_weight: 1000
       - name: description
         kind: Text
         optional: true
-        order_weight: 1300
+        order_weight: 1100
       - name: status
         kind: Dropdown
+        default_value: planned
         choices:
           - name: connected
             label: Connected
-            description: "Fully operational and currently in connected"
-            color: "#7fbf7f"
+            description: "Fully operational and currently connected"
+            color: "#00d25b"
           - name: planned
             label: Planned
             description: "In the process of being set up"
-            color: "#ffff7f"
+            color: "#2196f3"
           - name: reserved
             label: Reserved
             description: "Fully connected and reserved for a future use"
-            color: "#9090de"
-        optional: true
+            color: "#4d90fe"
+        optional: false
         order_weight: 1200
     relationships:
       - name: location
@@ -55,10 +58,10 @@ nodes:
         kind: Attribute
         cardinality: one
         optional: false
-        order_weight: 1100
+        order_weight: 1400
       - name: provider
         peer: OrganizationProvider
         kind: Attribute
         cardinality: one
         optional: false
-        order_weight: 1000
+        order_weight: 1300

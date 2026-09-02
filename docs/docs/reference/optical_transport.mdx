@@ -261,7 +261,7 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| computed_name | Computed module name (e.g., ABC123-TPD-1/1) | Text | False |  |  |
+| computed_name | Computed module name (e.g., dc1-leaf1 > slot 1-TPD-1/1) | Text | False |  |  |
 | slot_number | Slot number in chassis (e.g., '1/1', '1/2', '2/1') | Text | False |  |  |
 | capacity_gbps | Line rate capacity in Gbps (e.g., 100, 200, 400) | Number | False |  |  |
 | modulation_format | Modulation format for optical transmission | Dropdown | False |  | dp_qpsk, dp_16qam, dp_8qam, dp_64qam |
@@ -290,7 +290,7 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| computed_name | Computed module name (e.g., ABC123-MUX-1/3) | Text | False |  |  |
+| computed_name | Computed module name (e.g., dc1-leaf1 > slot 1-MUX-1/3) | Text | False |  |  |
 | slot_number | Slot number in chassis (e.g., '1/3', '1/4', '2/3') | Text | False |  |  |
 | mux_type | Type of multiplexer technology | Dropdown | False |  | passive_mux, passive_demux, oadm, roadm, wss |
 | channel_capacity | Number of supported DWDM channels (e.g., 40, 80, 96) | Number | False |  |  |
@@ -399,7 +399,7 @@ Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| computed_name | Computed module name (e.g., ABC123-AMP-1/5) | Text | False |  |  |
+| computed_name | Computed module name (e.g., dc1-leaf1 > slot 1-AMP-1/5) | Text | False |  |  |
 | slot_number | Slot number in chassis (e.g., '1/5', '1/6', '2/5') | Text | False |  |  |
 | amplifier_type | Type of optical amplifier | Dropdown | False |  | edfa, raman, soa, vgc, hybrid |
 | stage | Amplifier stage position | Dropdown | False |  | booster, inline, preamplifier |
@@ -1195,9 +1195,9 @@ nodes:
     optional: false
     computed_attribute:
       kind: Jinja2
-      jinja2_template: '{{ module_bay__device__serial__value }}-TPD-{{ slot_number__value
+      jinja2_template: '{{ module_bay__computed_name__value }}-TPD-{{ slot_number__value
         }}'
-    description: Computed module name (e.g., ABC123-TPD-1/1)
+    description: Computed module name (e.g., dc1-leaf1 > slot 1-TPD-1/1)
   - name: slot_number
     kind: Text
     optional: false
@@ -1307,9 +1307,9 @@ nodes:
     optional: false
     computed_attribute:
       kind: Jinja2
-      jinja2_template: '{{ module_bay__device__serial__value }}-MUX-{{ slot_number__value
+      jinja2_template: '{{ module_bay__computed_name__value }}-MUX-{{ slot_number__value
         }}'
-    description: Computed module name (e.g., ABC123-MUX-1/3)
+    description: Computed module name (e.g., dc1-leaf1 > slot 1-MUX-1/3)
   - name: slot_number
     kind: Text
     optional: false
@@ -1598,9 +1598,9 @@ nodes:
     optional: false
     computed_attribute:
       kind: Jinja2
-      jinja2_template: '{{ module_bay__device__serial__value }}-AMP-{{ slot_number__value
+      jinja2_template: '{{ module_bay__computed_name__value }}-AMP-{{ slot_number__value
         }}'
-    description: Computed module name (e.g., ABC123-AMP-1/5)
+    description: Computed module name (e.g., dc1-leaf1 > slot 1-AMP-1/5)
   - name: slot_number
     kind: Text
     optional: false

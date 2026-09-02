@@ -8,7 +8,7 @@ This schema extension adds the BGP Communities models.
 
 - **Dependencies:**
     - [base](dcim)
-    - [extensions/routing](routing)
+    - [extensions/routing_policies](routing_policies)
 
 ## Nodes
 
@@ -24,15 +24,15 @@ This schema extension adds the BGP Communities models.
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name | The name of the BGP community. | Text |  |  |  |
+| name | The name of the BGP community. | Text | False |  |  |
 | description | An optional description of the BGP community. | Text | True |  |  |
-| community | The value of the BGP community (RFC1997, RFC4360, RFC8092). | Text |  |  |  |
+| community | The value of the BGP community (RFC1997, RFC4360, RFC8092). | Text | False |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| routing_policy | RoutingPolicy |  | many | Generic |
+| routing_policy | RoutingPolicy | True | many | Generic |
 | tags | BuiltinTag | True | many | Attribute |
 
 ## Code
@@ -42,9 +42,10 @@ version: '1.0'
 nodes:
 - name: BGPCommunity
   namespace: Routing
-  icon: iconoir:community
-  label: BGP Community
   description: Defines a BGP community.
+  label: BGP Community
+  icon: iconoir:community
+  include_in_menu: true
   human_friendly_id:
   - name__value
   order_by:
@@ -53,31 +54,35 @@ nodes:
   attributes:
   - name: name
     kind: Text
+    unique: true
+    optional: false
     description: The name of the BGP community.
     order_weight: 1000
-    unique: true
   - name: description
     kind: Text
-    description: An optional description of the BGP community.
     optional: true
+    description: An optional description of the BGP community.
     order_weight: 1100
   - name: community
     kind: Text
+    unique: true
+    optional: false
     description: The value of the BGP community (RFC1997, RFC4360, RFC8092).
     order_weight: 1200
-    unique: true
   relationships:
   - name: routing_policy
-    label: Routing Policies
     peer: RoutingPolicy
-    description: The BGP Policies using this BGP Community.
+    label: Routing Policies
     kind: Generic
     cardinality: many
+    optional: true
+    description: The BGP Policies using this BGP Community.
+    order_weight: 1300
   - name: tags
     peer: BuiltinTag
     kind: Attribute
-    optional: true
     cardinality: many
-    order_weight: 3000
+    optional: true
+    order_weight: 2000
 
 ```

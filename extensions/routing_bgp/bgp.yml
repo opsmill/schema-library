@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -13,6 +13,7 @@ nodes:
     description: An Autonomous System (AS) is a set of Internet routable IP prefixes belonging to a network
     label: Autonomous System
     icon: mdi:bank-circle-outline
+    include_in_menu: true
     menu_placement: RoutingBGPSession
     human_friendly_id:
       - "asn__value"
@@ -25,11 +26,13 @@ nodes:
       - name: name
         kind: Text
         unique: true
+        optional: false
         description: "Name of the Autonomous System"
         order_weight: 1000
       - name: asn
         kind: Number
         unique: true
+        optional: false
         description: "Autonomous System Number"
         order_weight: 1050
       - name: description
@@ -43,22 +46,26 @@ nodes:
         kind: Attribute
         cardinality: one
         optional: false
+        order_weight: 1200
       - name: location
         peer: LocationGeneric
         kind: Attribute
         cardinality: one
         optional: true
+        order_weight: 1300
       - name: devices
         peer: DcimDevice
         kind: Attribute
         cardinality: many
         optional: true
+        order_weight: 1400
 
   - name: BGPPeerGroup
     namespace: Routing
     description: A BGP Peer Group is used to regroup parameters that are shared across multiple peers
     label: BGP Peer Group
     icon: mdi:view-grid-plus-outline
+    include_in_menu: true
     menu_placement: RoutingBGPSession
     inherit_from:
       - "RoutingProtocol"
@@ -114,8 +121,9 @@ nodes:
             label: IPv6
             description: "Policy applies to IPv6 addresses."
             color: "#E6E6FA" # lavender
+        optional: false
         description: "The address family for the routing policy indicating the type of IP address."
-        order_weight: 1150
+        order_weight: 1250
     relationships:
       - name: local_as
         peer: RoutingAutonomousSystem
@@ -123,18 +131,21 @@ nodes:
         cardinality: one
         optional: true
         identifier: bgppeergroup__local_as
+        order_weight: 1550
       - name: remote_as
         peer: RoutingAutonomousSystem
         kind: Attribute
         cardinality: one
         optional: true
         identifier: bgppeergroup__remote_as
+        order_weight: 1600
 
   - name: BGPSession
     namespace: Routing
     description: A BGP Session represent a point to point connection between two routers
     label: BGP Session
     icon: mdi:router
+    include_in_menu: true
     inherit_from:
       - "RoutingProtocol"
     order_by:
@@ -144,9 +155,11 @@ nodes:
       - name: import_policies
         kind: Text
         optional: true
+        order_weight: 1700
       - name: export_policies
         kind: Text
         optional: true
+        order_weight: 1750
       - name: session_type
         kind: Dropdown
         choices:
@@ -156,8 +169,9 @@ nodes:
           - name: internal
             label: Internal
             description: "Session established with a router in the same autonomous system."
+        optional: false
         description: "Type of BGP Session"
-        order_weight: 1200
+        order_weight: 1250
       - name: role
         kind: Dropdown
         choices:
@@ -173,15 +187,16 @@ nodes:
             label: Peering
             description: "Connect with other networks via IX."
             color: "#E6E6FA" # lavender
+        optional: true
         description: "Role of the BGP Session"
-        order_weight: 1600
+        order_weight: 1300
       - name: local_pref
         kind: Number
         parameters:
           min_value: 0
         optional: true
         description: "Force Local Pref for this BGP Peer Session."
-        order_weight: 1450
+        order_weight: 1650
     relationships:
       - name: local_as
         peer: RoutingAutonomousSystem
@@ -189,38 +204,46 @@ nodes:
         cardinality: one
         optional: true
         identifier: bgpsession__local_as
+        order_weight: 1350
       - name: remote_as
         peer: RoutingAutonomousSystem
         kind: Attribute
         cardinality: one
         optional: true
         identifier: bgpsession__remote_as
+        order_weight: 1400
       - name: local_ip
         peer: IpamIPAddress
         kind: Attribute
         cardinality: one
         optional: true
         identifier: bgpsession__local_ip
+        order_weight: 1450
       - name: remote_ip
         peer: IpamIPAddress
         kind: Attribute
         cardinality: one
         optional: true
         identifier: bgpsession__remote_ip
+        order_weight: 1500
       - name: device
         peer: DcimDevice
+        kind: Generic
         cardinality: one
         optional: true
+        order_weight: 900
       - name: peer_group
         peer: RoutingBGPPeerGroup
         kind: Attribute
         cardinality: one
         optional: true
+        order_weight: 1550
       - name: peer_session
         peer: RoutingBGPSession
         kind: Attribute
         cardinality: one
         optional: true
+        order_weight: 1600
 
 extensions:
   nodes:
@@ -231,12 +254,13 @@ extensions:
           kind: Attribute
           cardinality: one
           optional: true
-          order_weight: 1600
+          order_weight: 1800
     - kind: OrganizationGeneric
       relationships:
         - name: asn
           peer: RoutingAutonomousSystem
           label: Autonomous System
+          kind: Generic
           cardinality: many
           optional: true
-          order_weight: 2000
+          order_weight: 1700

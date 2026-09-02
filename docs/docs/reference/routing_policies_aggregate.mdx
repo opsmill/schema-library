@@ -8,16 +8,14 @@ This extension is using the Routing Policies extensions and the Routing Aggregat
 
 - **Dependencies:**
     - [base](dcim)
-    - [extensions/routing](routing)
     - [extensions/routing_policies](routing_policies)
-    - [extensions/routing_aggregate](routing_aggregate)
 
 ## Nodes
 
 ### PolicyAggregate
 
 - **Label:** Aggregate Routing Policies
-- **Description:** A routing policiers for Aggregate
+- **Description:** A routing policy for Aggregate.
 - **Namespace:** Routing
 - **Icon:** carbon:deployment-policy
 - **Inherit From:** RoutingPolicy
@@ -29,10 +27,11 @@ version: '1.0'
 nodes:
 - name: PolicyAggregate
   namespace: Routing
-  description: A routing policiers for Aggregate
+  description: A routing policy for Aggregate.
   label: Aggregate Routing Policies
   icon: carbon:deployment-policy
-  include_in_menu: false
+  include_in_menu: true
+  menu_placement: RoutingPolicy
   inherit_from:
   - RoutingPolicy
 

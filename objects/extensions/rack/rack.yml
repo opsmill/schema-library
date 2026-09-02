@@ -12,7 +12,7 @@ spec:
       site: NYC1
       status: active
       height: 42
-      facility_id: "R101"
+      facility: "R101"
 
 ---
 apiVersion: infrahub.app/v1

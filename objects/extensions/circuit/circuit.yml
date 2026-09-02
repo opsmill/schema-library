@@ -1,39 +1,42 @@
 # ---------------------------------------------------------------------------
 # Mock data for extensions/circuit.
-# Depends on: base.
+# Self-sufficient: it creates every record it references, so it can be loaded
+# on its own on top of base + any extension that provides a concrete
+# LocationSite (extensions/location_minimal or extensions/location_site).
 #
-# NOTE: this file also creates the minimal LocationSite (from
-# extensions/location_minimal) and OrganizationProvider (from base) fixtures
-# it needs. If those extensions' own object files have already loaded the
-# same records (e.g. NYC1, SJC1, Lumen, Colt), this upserts/matches them
-# instead of duplicating -- see rule in AGENTS notes about repeating
-# mandatory fields for an existing target.
+# DcimCircuitEndpoint.location is mandatory and its peer LocationHosting is a
+# base generic that base itself never implements, so the endpoints need a Site
+# to exist. The sites are created below with their name only, deliberately
+# without a parent: extensions/location_site has no tier above Site, and
+# extensions/location_minimal puts them under Americas -> United States, so
+# restating either tree here would tie this file to one of the two mutually
+# exclusive location extensions. Restating location_minimal's tree is not an
+# option anyway, since re-upserting the hierarchy root fails with "Not
+# supported to assign a value to parent for LocationRegion".
+#
+# ORDER: load this file BEFORE your location fixture. In the .metadata.yml
+# resolver order that is what happens (circuit sorts ahead of
+# location_minimal), and location_minimal's fuller definition then adopts NYC1
+# and SJC1 into its hierarchy. Loading it the other way round leaves the two
+# sites without a parent, because `infrahubctl object load` sends an explicit
+# null for every optional cardinality-one relationship a document omits -- see
+# the note at the top of objects/extensions/mlag/mlag.yml.
+#
+# NOTE: this file also creates the OrganizationProvider (from base) fixtures it
+# needs. If base's own object file has already loaded the same records (Lumen,
+# Colt), this upserts/matches them instead of duplicating -- see rule in AGENTS
+# notes about repeating mandatory fields for an existing target.
 # ---------------------------------------------------------------------------
 ---
 apiVersion: infrahub.app/v1
 kind: Object
 spec:
-  kind: LocationRegion
+  kind: LocationSite
   data:
-    - name: Americas
-      description: North & South America.
-      children:
-        kind: LocationCountry
-        data:
-          - name: United States
-            children:
-              kind: LocationSite
-              data:
-                - name: NYC1
-                  status: active
-                  facility: Equinix NY5
-                  physical_address: "755 Secaucus Rd, Secaucus, NJ 07094"
-                  timezone: America/New_York
-                - name: SJC1
-                  status: active
-                  facility: Equinix SV1
-                  physical_address: "2001 Ryan Ave, San Jose, CA 95131"
-                  timezone: America/Los_Angeles
+    - name: NYC1
+      description: "Circuit hand-off site, New York metro."
+    - name: SJC1
+      description: "Circuit hand-off site, San Jose metro."
 
 ---
 apiVersion: infrahub.app/v1
@@ -42,9 +45,9 @@ spec:
   kind: OrganizationProvider
   data:
     - name: Lumen
-      description: Lumen Technologies, circuit provider.
+      description: Lumen Technologies -- transit and dark fiber provider.
     - name: Colt
-      description: Colt Technology Services, circuit provider.
+      description: Colt Technology Services -- transit and cross connects.
 
 ---
 apiVersion: infrahub.app/v1
@@ -67,21 +70,14 @@ spec:
           - side: a
             status: active
             description: "NYC1 hand-off"
-            # location is cardinality one, peer LocationHosting (a Generic),
-            # so it needs a nested kind+data block naming the concrete kind.
-            # LocationSite's only mandatory field is `name`; this upserts
-            # against the site created above.
-            location:
-              kind: LocationSite
-              data:
-                name: NYC1
+            # location is cardinality one, peer LocationHosting (a Generic)
+            # whose human_friendly_id is the single field name__value, so the
+            # already-created site is referenced by that scalar.
+            location: NYC1
           - side: z
             status: active
             description: "SJC1 hand-off"
-            location:
-              kind: LocationSite
-              data:
-                name: SJC1
+            location: SJC1
 
     - circuit_id: "COLT-00456"
       description: "NYC1 internet access circuit"
@@ -95,10 +91,7 @@ spec:
           - side: a
             status: active
             description: "NYC1 hand-off"
-            location:
-              kind: LocationSite
-              data:
-                name: NYC1
+            location: NYC1
 
     - circuit_id: "LUMEN-00789"
       description: "SJC1 dark fiber segment"
@@ -111,7 +104,4 @@ spec:
           - side: a
             status: provisioning
             description: "SJC1 hand-off"
-            location:
-              kind: LocationSite
-              data:
-                name: SJC1
+            location: SJC1

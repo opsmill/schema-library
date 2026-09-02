@@ -8,6 +8,7 @@ A schema for defining and managing network topology, strategies, and services.
 
 - **Dependencies:**
     - [base](dcim)
+    - [extensions/vlan](vlan)
 
 ## Nodes
 
@@ -191,8 +192,8 @@ A schema for defining and managing network topology, strategies, and services.
 | ---- | ---- | -------- | ----------- | ---- |
 | identifier | TopologyNetworkServiceIdentifier | False | one | Attribute |
 | topology | TopologyTopology | False | one | Parent |
-| vlan | InfraVLAN | True | one | Component |
-| prefix | InfraPrefix | True | one | Component |
+| vlan | IpamVLAN | True | one | Component |
+| prefix | IpamPrefix | True | one | Component |
 
 ## Generics
 
@@ -216,7 +217,7 @@ A schema for defining and managing network topology, strategies, and services.
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | location | LocationGeneric | True | many |  |
-| ip_addresses | InfraIPAddress | True | many | Component |
+| ip_addresses | IpamIPAddress | True | many | Component |
 
 ### GenericElement
 
@@ -333,7 +334,7 @@ generics:
     optional: true
     cardinality: many
   - name: ip_addresses
-    peer: InfraIPAddress
+    peer: IpamIPAddress
     optional: true
     cardinality: many
     kind: Component
@@ -690,13 +691,13 @@ nodes:
     kind: Parent
     optional: false
   - name: vlan
-    peer: InfraVLAN
+    peer: IpamVLAN
     optional: true
     cardinality: one
     kind: Component
     order_weight: 1500
   - name: prefix
-    peer: InfraPrefix
+    peer: IpamPrefix
     optional: true
     cardinality: one
     kind: Component

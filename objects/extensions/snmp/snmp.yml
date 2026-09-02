@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------
 # Mock data for extensions/snmp.
 # Standalone extension -- no fixture dependencies. The `devices` relationship
-# on SnmpCommunity (-> DcimDevice) and `ip_address` on SnmpClient
+# on SnmpCommunity (-> DcimGenericDevice) and `ip_addresses` on SnmpClient
 # (-> IpamIPAddress) are optional and intentionally left unset here.
 # ---------------------------------------------------------------------------
 ---
@@ -32,14 +32,14 @@ spec:
       auth_password: AuthPass123!
       privacy_protocol: aes
       privacy_password: PrivPass123!
-      security_level: authPriv
+      security_level: auth_priv
     - name: readonly-v3
       description: SNMPv3 user with authentication only, no privacy.
       username: svc-readonly
       auth_protocol: md5
       auth_password: ReadOnlyAuth1
       privacy_protocol: none
-      security_level: authNoPriv
+      security_level: auth_no_priv
 
 ---
 apiVersion: infrahub.app/v1
@@ -49,19 +49,19 @@ spec:
   data:
     - name: nms-poller-01
       client_description: Primary NMS polling server.
-      # SnmpCommunity is a Generic -- specify the concrete kind. `community` is
+      # SnmpCommunity is a Generic -- specify the concrete kind. `communities` is
       # cardinality many, so `data` is a list under the single kind mapping.
-      community:
+      communities:
         kind: SnmpCommunityV3
         data:
           - name: monitoring-v3
             username: svc-monitoring
             auth_protocol: sha
             privacy_protocol: aes
-            security_level: authPriv
+            security_level: auth_priv
     - name: legacy-monitor-01
       client_description: Legacy monitoring host polling via SNMPv2c.
-      community:
+      communities:
         kind: SnmpCommunityV2
         data:
           - name: public-ro
@@ -69,7 +69,7 @@ spec:
             access: read_only
     - name: netops-workstation
       client_description: NetOps engineer workstation with read-write access.
-      community:
+      communities:
         kind: SnmpCommunityV2
         data:
           - name: private-rw

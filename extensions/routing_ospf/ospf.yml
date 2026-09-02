@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -13,7 +13,8 @@ nodes:
     description: "OSPF (Open Shortest Path First) instance on a Virtual Router."
     label: "OSPF"
     icon: "mdi:network-outline"
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: RoutingProtocol
     inherit_from:
       - "RoutingProtocol"
     human_friendly_id:
@@ -33,7 +34,7 @@ nodes:
         default_value: 1000
         optional: true
         description: "Reference bandwidth for OSPF instance (in Mbps)."
-        order_weight: 1150
+        order_weight: 1350
       - name: version
         kind: Dropdown
         default_value: ospf
@@ -46,22 +47,24 @@ nodes:
             label: OSPFv3
             description: "Open Shortest Path First version 3."
             color: "#E6E6FA" # lavender
+        optional: false
         description: "Version of the OSPF protocol."
-        order_weight: 1100
+        order_weight: 1300
       - name: import_policies
         kind: Text
         optional: true
-        order_weight: 1300
+        order_weight: 1450
       - name: export_policies
         kind: Text
         optional: true
-        order_weight: 1350
+        order_weight: 1500
     relationships:
       - name: router_id
         peer: IpamIPAddress
         kind: Attribute
         cardinality: one
         optional: true
+        order_weight: 1400
       - name: ospf_interfaces
         peer: RoutingOSPFInterface
         label: OSPF Interfaces
@@ -69,13 +72,15 @@ nodes:
         cardinality: many
         optional: true
         identifier: ospf__ospfinterfaces
+        order_weight: 1550
 
   - name: OSPFInterface
     namespace: Routing
     description: "Pivot table linking OSPF configuration to an interface."
     label: "OSPF Interface"
     icon: "mdi:ethernet"
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: RoutingOSPF
     human_friendly_id:
       - "description__value"
     order_by:
@@ -90,7 +95,7 @@ nodes:
         unique: true
         optional: false
         description: "Description of the OSPF interface."
-        order_weight: 1500
+        order_weight: 1100
       - name: metric
         kind: Number
         optional: true
@@ -112,6 +117,7 @@ nodes:
             label: Peer-to-Peer
             description: "OSPF peer-to-peer interface mode."
             color: "#E6E6FA" # lavender
+        optional: false
         description: "Mode of the OSPF interface."
         order_weight: 1300
       - name: authentication_key
@@ -132,6 +138,7 @@ nodes:
         order_weight: 1225
       - name: area
         kind: Text
+        optional: false
         description: "OSPF area associated with the interface."
         order_weight: 1200
     relationships:
@@ -142,10 +149,10 @@ nodes:
         cardinality: one
         optional: false
         identifier: ospf__ospfinterfaces
-        order_weight: 1100
+        order_weight: 900
       - name: interface
         peer: InterfaceLayer3
         kind: Attribute
         cardinality: one
         optional: false
-        order_weight: 1200
+        order_weight: 1500

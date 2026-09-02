@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -13,7 +13,8 @@ nodes:
     description: "Aggregate Protocol with action and BGP communities"
     label: "Aggregate Routes"
     icon: "grommet-icons:aggregate"
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: RoutingProtocol
     inherit_from:
       - "RoutingProtocol"
     attributes:
@@ -22,18 +23,19 @@ nodes:
         label: Discard
         default_value: false
         optional: true
-        order_weight: 1275
+        order_weight: 1350
       - name: import_policies
         kind: Text
         optional: true
-        order_weight: 1300
+        order_weight: 1400
       - name: export_policies
         kind: Text
         optional: true
-        order_weight: 1350
+        order_weight: 1450
     relationships:
       - name: destination
         peer: IpamPrefix
         kind: Attribute
-        description: "Destination network for the static route."
-        order_weight: 1200
+        optional: true
+        description: "Destination network aggregated by this route."
+        order_weight: 1300

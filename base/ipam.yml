@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -13,11 +13,16 @@ generics:
   # them without requiring users to modify their schema manually.
   - name: VLANGroupScope
     namespace: Ipam
+    label: VLAN Group Scope
+    description: >-
+      Mixin for objects that can scope a VLAN group (e.g. Region, Site). The reverse
+      relationship is added by extensions/vlan.
     include_in_menu: false
 
   - name: PrefixScope
     namespace: Ipam
-    description: Mixin for objects that can scope IP prefixes (e.g. Region, Site, VRF).
+    label: Prefix Scope
+    description: Mixin for objects that can scope IP prefixes (e.g. Region, Site).
     include_in_menu: false
     relationships:
       - name: prefixes
@@ -26,6 +31,7 @@ generics:
         cardinality: many
         optional: true
         identifier: prefix__prefix_scope
+        order_weight: 1550
 
 nodes:
   - name: Prefix
@@ -52,18 +58,18 @@ nodes:
           - name: active
             label: Active
             color: "#00d25b"
-          - name: deprecated
-            label: Deprecated
-            color: "#e04040"
           - name: reserved
             label: Reserved
             color: "#4d90fe"
+          - name: deprecated
+            label: Deprecated
+            color: "#e04040"
         optional: false
-        order_weight: 1100
+        order_weight: 1200
       - name: description
         kind: Text
         optional: true
-        order_weight: 1150
+        order_weight: 1100
       - name: role
         kind: Dropdown
         choices:
@@ -79,16 +85,12 @@ nodes:
             label: Customer
             description: Prefixes assigned to customers.
             color: "#77DD77"
-          - name: supernet
-            label: Supernet
-            description: Aggregate covering multiple sub-prefixes.
-            color: "#CDB4DB"
           - name: backbone
             label: Backbone
             description: Core network infrastructure prefixes.
-            color: "#AEC6CF"
+            color: "#9678B6"
         optional: true
-        order_weight: 1200
+        order_weight: 1300
     relationships:
       - name: scope
         peer: IpamPrefixScope
@@ -96,7 +98,7 @@ nodes:
         cardinality: one
         optional: true
         identifier: prefix__prefix_scope
-        order_weight: 1300
+        order_weight: 1500
 
   - name: IPAddress
     namespace: Ipam
@@ -118,7 +120,7 @@ nodes:
       - name: description
         kind: Text
         optional: true
-        order_weight: 1050
+        order_weight: 1100
       - name: status
         kind: Dropdown
         default_value: active
@@ -133,7 +135,7 @@ nodes:
             label: Deprecated
             color: "#e04040"
         optional: false
-        order_weight: 1100
+        order_weight: 1200
       - name: role
         kind: Dropdown
         choices:
@@ -147,13 +149,13 @@ nodes:
             label: Anycast
             color: "#FDFD96"
         optional: true
-        order_weight: 1150
+        order_weight: 1300
       - name: fqdn
         kind: Text
         label: FQDN
         regex: (?=^.{1,253}$)(^(((?!-)[a-zA-Z0-9-]{1,63}(?<!-))|((?!-)[a-zA-Z0-9-]{1,63}(?<!-)\.)+[a-zA-Z]{2,63})$)
         optional: true
-        order_weight: 1200
+        order_weight: 1400
         # https://stackoverflow.com/questions/11809631/fully-qualified-domain-name-validation
     relationships:
       - name: primary_of
@@ -163,9 +165,11 @@ nodes:
         cardinality: many
         optional: true
         identifier: device__primary_address
-        order_weight: 1250
+        order_weight: 1500
       - name: interface
         peer: InterfaceLayer3
+        kind: Attribute
         cardinality: one
         optional: true
         identifier: ip_address__interface
+        order_weight: 1600

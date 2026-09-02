@@ -27,21 +27,22 @@ spec:
       description: Customer A dedicated VRF.
       enforce_unique: true
       # import_rt/export_rt are cardinality many with a CONCRETE peer
-      # (IpamRouteTarget), so a flat list of human_friendly_id strings is
-      # enough -- no nested kind/data block needed.
+      # (IpamRouteTarget). Every entry is a human_friendly_id, and an HFID is
+      # always a list of its parts: a bare string is read as a node ID, so even
+      # a single-part HFID is wrapped in a list of its own.
       import_rt:
-        - "65000:100"
+        - ["65000:100"]
       export_rt:
-        - "65000:100"
+        - ["65000:100"]
     - name: CUSTOMER-B
       vrf_rd: "65000:200"
       description: Customer B VRF, also imports the shared services route target.
       enforce_unique: true
       import_rt:
-        - "65000:100"
-        - "65000:200"
+        - ["65000:100"]
+        - ["65000:200"]
       export_rt:
-        - "65000:200"
+        - ["65000:200"]
     - name: MGMT-VRF
       vrf_rd: "65000:999"
       description: Out-of-band management VRF, isolated with no route targets.

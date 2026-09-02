@@ -20,7 +20,7 @@ spec:
       description: Réseau IP Européens Network Coordination Centre.
     - name: Private (RFC 1918)
       description: Internal registry for RFC 1918 / RFC 4193 private address space.
-      is_private: true
+      private: true
 
 ---
 apiVersion: infrahub.app/v1

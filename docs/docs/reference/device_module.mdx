@@ -21,7 +21,6 @@ NOTE: This extension ships a standard Module/ModuleType node pair ready to use, 
 - **Icon:** mdi:tray
 - **Uniqueness Constraints:**
     - device, name__value
-    - device, position__value
 - **Human Friendly ID:** computed_name__value
 
 #### Attributes
@@ -29,9 +28,10 @@ NOTE: This extension ships a standard Module/ModuleType node pair ready to use, 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | computed_name | Name computed from the device and bay name. | Text | False |  |  |
-| name | Name of the bay, e.g. 'slot 1' or 'psu 1'. | Text |  |  |  |
-| position | Numeric position of the bay within the device, used for ordering (e.g. slot 1, 2, 3...). | Number | False |  |  |
+| name | Name of the bay, e.g. 'slot 1' or 'psu 1'. | Text | False |  |  |
+| position | Numeric position of the bay within the device (e.g. slot 1, 2, 3). | Number | True |  |  |
 | description |  | Text | True |  |  |
+| role | The role of the module bay, indicating the type of module it is intended to receive. | Dropdown | True |  | supervisor, line_card, power_supply, fan |
 
 #### Relationships
 
@@ -82,9 +82,10 @@ NOTE: This extension ships a standard Module/ModuleType node pair ready to use, 
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| computed_name |  | Text | False |  |  |
+| computed_name | Name computed from the module bay; concrete module kinds may refine it. | Text | False |  |  |
 | serial_number | Serial number of the module, if known. | Text | True |  |  |
 | description |  | Text | True |  |  |
+| status | Operational status of the module. | Dropdown | False | active | provisioning, active, maintenance, failed, rma |
 
 #### Relationships
 
@@ -106,7 +107,7 @@ NOTE: This extension ships a standard Module/ModuleType node pair ready to use, 
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name | Name of the module type. | Text |  |  |  |
+| name | Name of the module type. | Text | False |  |  |
 | description | Description of the module type. | Text | True |  |  |
 | part_number | Part number of the module. | Text | True |  |  |
 
@@ -143,34 +144,67 @@ generics:
     a module bay.
   label: Module
   icon: mdi:expansion-card
+  include_in_menu: true
   human_friendly_id:
   - computed_name__value
   display_label: computed_name__value
   attributes:
   - name: computed_name
     kind: Text
+    unique: true
     read_only: true
     optional: false
-    unique: true
     allow_override: any
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ module_bay__computed_name__value }}'
+    description: Name computed from the module bay; concrete module kinds may refine
+      it.
     order_weight: 1000
   - name: serial_number
     kind: Text
     optional: true
     description: Serial number of the module, if known.
-    order_weight: 1100
+    order_weight: 1400
   - name: description
     kind: Text
     optional: true
+    order_weight: 1100
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: provisioning
+      label: Provisioning
+      description: Module is being installed and provisioned.
+      color: '#f0ad4e'
+    - name: active
+      label: Active
+      description: Module is installed and operational.
+      color: '#00d25b'
+    - name: maintenance
+      label: Maintenance
+      description: Module is under maintenance.
+      color: '#ff9800'
+    - name: failed
+      label: Failed
+      description: Module is still installed but is not operational.
+      color: '#e04040'
+    - name: rma
+      label: RMA
+      description: Module has failed and is being returned to the manufacturer.
+      color: '#6c757d'
+    optional: false
+    description: Operational status of the module.
     order_weight: 1200
   relationships:
   - name: module_bay
-    label: Module Bay
     peer: DcimModuleBay
-    identifier: module_bay__module
-    optional: false
-    cardinality: one
+    label: Module Bay
     kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: module_bay__module
     order_weight: 900
 - name: GenericModuleType
   namespace: Dcim
@@ -178,20 +212,22 @@ generics:
     and manufacturer.
   label: Module Type
   icon: mdi:database-cog
+  include_in_menu: true
   menu_placement: DcimGenericModule
-  display_label: name__value
-  uniqueness_constraints:
-  - - name__value
-    - manufacturer
   human_friendly_id:
   - name__value
   order_by:
   - manufacturer__name__value
   - name__value
+  display_label: name__value
+  uniqueness_constraints:
+  - - name__value
+    - manufacturer
   attributes:
   - name: name
     kind: Text
     unique: true
+    optional: false
     description: Name of the module type.
     order_weight: 1000
   - name: description
@@ -200,18 +236,18 @@ generics:
     description: Description of the module type.
     order_weight: 1100
   - name: part_number
-    label: Part Number
     kind: Text
+    label: Part Number
     optional: true
     description: Part number of the module.
     order_weight: 1200
   relationships:
   - name: manufacturer
     peer: OrganizationManufacturer
-    identifier: manufacturer__moduletype
+    kind: Attribute
     cardinality: one
     optional: false
-    kind: Attribute
+    identifier: manufacturer__moduletype
     description: Manufacturer of the module type.
     order_weight: 1250
 nodes:
@@ -220,61 +256,83 @@ nodes:
   description: A physical bay on a device that can receive a module.
   label: Module Bay
   icon: mdi:tray
+  include_in_menu: true
   menu_placement: DcimDevice
   human_friendly_id:
   - computed_name__value
-  display_label: computed_name__value
   order_by:
   - device__name__value
   - name__value
+  display_label: computed_name__value
   uniqueness_constraints:
   - - device
     - name__value
-  - - device
-    - position__value
   attributes:
   - name: computed_name
     kind: Text
-    read_only: true
-    optional: false
     unique: true
+    read_only: true
     computed_attribute:
       kind: Jinja2
       jinja2_template: '{{ device__name__value }} > {{ name__value }}'
+    optional: false
     description: Name computed from the device and bay name.
     order_weight: 800
   - name: name
     kind: Text
+    optional: false
     description: Name of the bay, e.g. 'slot 1' or 'psu 1'.
     order_weight: 1000
   - name: position
     kind: Number
-    description: Numeric position of the bay within the device, used for ordering
-      (e.g. slot 1, 2, 3...).
-    optional: false
+    optional: true
     parameters:
       min_value: 1
+    description: Numeric position of the bay within the device (e.g. slot 1, 2, 3).
     order_weight: 1050
   - name: description
     kind: Text
     optional: true
     order_weight: 1100
+  - name: role
+    kind: Dropdown
+    optional: true
+    description: The role of the module bay, indicating the type of module it is intended
+      to receive.
+    order_weight: 1300
+    choices:
+    - name: supervisor
+      label: Supervisor
+      description: Bay intended for a supervisor / routing engine module.
+      color: '#A9CCE3'
+    - name: line_card
+      label: Line Card
+      description: Bay intended for a line card module.
+      color: '#B4E0DC'
+    - name: power_supply
+      label: Power Supply
+      description: Bay intended for a power supply module.
+      color: '#E3DAC9'
+    - name: fan
+      label: Fan
+      description: Bay intended for a fan module.
+      color: '#D2B4DE'
   relationships:
   - name: device
-    label: Device
     peer: DcimPhysicalDevice
-    identifier: device__module_bays
-    optional: false
-    cardinality: one
+    label: Device
     kind: Parent
+    cardinality: one
+    optional: false
+    identifier: device__module_bays
     order_weight: 900
   - name: installed_module
-    label: Installed Module
     peer: DcimGenericModule
-    identifier: module_bay__module
-    optional: true
-    cardinality: one
+    label: Installed Module
     kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: module_bay__module
     order_weight: 1200
 - name: Module
   namespace: Dcim
@@ -287,21 +345,21 @@ nodes:
   attributes:
   - name: computed_name
     kind: Text
-    read_only: true
-    optional: false
     unique: true
+    read_only: true
     computed_attribute:
       kind: Jinja2
       jinja2_template: '{{ module_bay__computed_name__value }} ({{ module_type__name__value
         }})'
+    optional: false
     description: Name computed from the module bay and module type.
     order_weight: 1000
   relationships:
   - name: module_type
     peer: DcimModuleType
-    optional: false
-    cardinality: one
     kind: Attribute
+    cardinality: one
+    optional: false
     order_weight: 950
 - name: ModuleType
   namespace: Dcim
@@ -316,12 +374,13 @@ extensions:
   - kind: DcimPhysicalDevice
     relationships:
     - name: module_bays
-      label: Module Bays
       peer: DcimModuleBay
-      identifier: device__module_bays
-      cardinality: many
+      label: Module Bays
       kind: Component
+      cardinality: many
       optional: true
+      identifier: device__module_bays
       description: Module bays available on this device.
+      order_weight: 1750
 
 ```

@@ -10,7 +10,7 @@
 #     inheriting RoutingPolicy with no extra attributes of its own. Live
 #     schema confirms it adds nothing beyond the generic's fields: name
 #     (Text, unique, mandatory), description (Text, optional), policy_type
-#     (Dropdown: import-policy/export-policy/import-export-policy,
+#     (Dropdown: import_policy/export_policy/import_export_policy,
 #     mandatory), weight (Number, optional, default 1000), address_family
 #     (Dropdown: ipv4/ipv6/all, optional, default "all"). Its
 #     human_friendly_id is the single field name__value.
@@ -29,8 +29,10 @@
 # mandatory fields it already has (description, status, device, vrf,
 # dr_priority) plus the two new relationship lists pointing at the policies
 # below. Peer RoutingPolicyPIM is a CONCRETE kind with a human_friendly_id
-# (name__value), so a flat list of name strings is enough for these
-# cardinality-many relationships -- no nested kind+data block needed.
+# (name__value), so these cardinality-many relationships take a list of HFIDs
+# and need no nested kind+data block. An HFID is always a list of its parts, so
+# each single-part entry is a one-element list; a bare string is read as a
+# node ID instead.
 # ---------------------------------------------------------------------------
 ---
 apiVersion: infrahub.app/v1
@@ -40,19 +42,19 @@ spec:
   data:
     - name: PIM-ALLOW-CUSTOMER-A-SOURCES
       description: "Permit PIM joins toward known multicast sources in VRF CUSTOMER-A"
-      policy_type: import-policy
+      policy_type: import_policy
       weight: 100
       address_family: ipv4
 
     - name: PIM-ALLOW-CUSTOMER-A-RECEIVERS
       description: "Permit PIM joins/prunes toward known receiver interfaces in VRF CUSTOMER-A"
-      policy_type: export-policy
+      policy_type: export_policy
       weight: 100
       address_family: ipv4
 
     - name: PIM-DENY-DEFAULT
       description: "Default deny-all fallback PIM policy applied to both import and export"
-      policy_type: import-export-policy
+      policy_type: import_export_policy
       weight: 10
       address_family: all
 
@@ -72,7 +74,7 @@ spec:
       vrf: CUSTOMER-A
       dr_priority: 100
       import_routing_policies:
-        - PIM-ALLOW-CUSTOMER-A-SOURCES
+        - [PIM-ALLOW-CUSTOMER-A-SOURCES]
       export_routing_policies:
-        - PIM-ALLOW-CUSTOMER-A-RECEIVERS
-        - PIM-DENY-DEFAULT
+        - [PIM-ALLOW-CUSTOMER-A-RECEIVERS]
+        - [PIM-DENY-DEFAULT]

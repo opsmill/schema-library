@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 
@@ -47,10 +47,13 @@ nodes:
     attributes:
       - name: wattage
         kind: Number
+        label: Wattage (W)
         optional: true
+        parameters:
+          min_value: 1
         description: "Wattage in watts."
         order_weight: 1300
-      - name: hotswappable
+      - name: hot_swappable
         kind: Boolean
         label: Hot-Swappable
         default_value: false

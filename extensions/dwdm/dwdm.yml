@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -10,115 +10,121 @@ version: "1.0"
 generics:
   - name: GenericOadmInterface
     namespace: Dcim
+    description: Generic interface of an optical add-drop multiplexer, front or rear.
     label: Optical Multiplexer Interfaces
     icon: mdi:ethernet
+    include_in_menu: true
     menu_placement: DcimOpticalMultiplexer
     attributes:
       - name: name
         kind: Text
+        optional: false
         order_weight: 1000
       - name: description
         kind: Text
         optional: true
-        order_weight: 2000
+        order_weight: 1100
+      # NOTE: this choice list is duplicated in extensions/patch_panel and the two must be
+      # kept in sync. Infrahub cannot share a choice list across extension files without a
+      # shared generic in a common ancestor, which is a base-tier change.
       - name: connector_type
         kind: Dropdown
         choices:
-          - name: FC
+          - name: fc
             label: FC
             description: "Standardized fiber optic connector used primarily in datacom and telecom applications."
-          - name: LC
+          - name: lc
             label: LC
             description: "Compact fiber optic connector with a push-pull mechanism."
-          - name: LC_PC
+          - name: lc_pc
             label: LC/PC
             description: "Polished LC connector providing physical contact (PC)."
-          - name: LC_UPC
+          - name: lc_upc
             label: LC/UPC
             description: "Ultra-Physical Contact (UPC) variant of the LC connector with enhanced polish."
-          - name: LC_APC
+          - name: lc_apc
             label: LC/APC
             description: "Angled Physical Contact (APC) version of the LC connector with a slanted fiber end-face."
-          - name: LSH
+          - name: lsh
             label: LSH
             description: "European fiber optic connector offering high durability."
-          - name: LSH_PC
+          - name: lsh_pc
             label: LSH/PC
             description: "Physical Contact version of LSH with standard polish."
-          - name: LSH_UPC
+          - name: lsh_upc
             label: LSH/UPC
             description: "Ultra-Physical Contact variant of LSH, minimizing return loss with a superior polish."
-          - name: LSH_APC
+          - name: lsh_apc
             label: LSH/APC
             description: "Angled Physical Contact version of LSH, designed to reduce back reflections."
-          - name: LX_5
+          - name: lx_5
             label: LX.5
             description: "Miniaturized fiber optic connector similar to LC but with an additional shutter mechanism."
-          - name: LX_5_PC
+          - name: lx_5_pc
             label: LX.5/PC
             description: "Physical Contact version of LX.5."
-          - name: LX_5_UPC
+          - name: lx_5_upc
             label: LX.5/UPC
             description: "Ultra-Physical Contact variant of LX.5."
-          - name: LX_5_APC
+          - name: lx_5_apc
             label: LX.5/APC
             description: "Angled Physical Contact version of LX.5."
-          - name: MPO
+          - name: mpo
             label: MPO
             description: "Multi-fiber Push-On connector typically used in data centers for high-speed applications."
-          - name: MTRJ
+          - name: mtrj
             label: MTRJ
             description: "Male-to-female fiber optic connector with two fibers."
-          - name: SC
+          - name: sc
             label: SC
             description: "Square fiber optic connector with push-pull lock."
-          - name: SC_PC
+          - name: sc_pc
             label: SC/PC
             description: "Physical Contact SC connector with a polished end-face."
-          - name: SC_UPC
+          - name: sc_upc
             label: SC/UPC
             description: "Ultra-Physical Contact variant of SC."
-          - name: SC_APC
+          - name: sc_apc
             label: SC/APC
             description: "Angled Physical Contact version of SC."
-          - name: ST
+          - name: st
             label: ST
             description: "Bayonet-style fiber optic connector primarily used in industrial and military applications."
-          - name: CS
+          - name: cs
             label: CS
             description: "Compact connector with a high-density duplex configuration."
-          - name: SN
+          - name: sn
             label: SN
             description: "Small-form connector with dual fibers."
-          - name: SMA_905
+          - name: sma_905
             label: SMA 905
             description: "Stainless steel fiber optic connector."
-          - name: SMA_906
+          - name: sma_906
             label: SMA 906
             description: "Variant of SMA 905 with similar durability, frequently used in high-vibration settings."
-          - name: URM_P2
+          - name: urm_p2
             label: URM-P2
             description: "Specialized fiber optic connector for industrial and harsh environments."
-          # FIXME: Commenting out otherwise I'm facing a Text attribute length should be less than 4096 characters.
-          # - name: URM_P4
-          #   label: URM-P4
-          #   description: "Similar to URM-P2 but designed for higher performance."
-          # - name: URM_P8
-          #   label: URM-P8
-          #   description: "Enhanced version of URM connectors with higher protection."
-          # - name: Splice
-          #   label: Splice
-          #   description: "Permanent fiber connection method where two fiber ends are fused."
-        optional: true
-        order_weight: 1100
+          - name: urm_p4
+            label: URM-P4
+            description: "Similar to URM-P2 but designed for higher performance."
+          - name: urm_p8
+            label: URM-P8
+            description: "Enhanced version of URM connectors with higher protection."
+          - name: splice
+            label: Splice
+            description: "Permanent fiber connection method where two fiber ends are fused."
+        optional: false
+        order_weight: 1200
 nodes:
   - name: OpticalMultiplexer
     namespace: Dcim
-    description: |
+    description: >-
       An OADM (Optical Add Drop Multiplexer) supporting various WDM
       (Wavelength Division Multiplexing) technologies.
     label: Optical Multiplexer
     icon: mdi:transit-connection-variant
+    include_in_menu: true
     inherit_from:
       - DcimPhysicalDevice
     human_friendly_id:
@@ -130,6 +136,7 @@ nodes:
       - name: name
         kind: Text
         unique: true
+        optional: false
         order_weight: 1000
       - name: wdm_type
         kind: Dropdown
@@ -144,12 +151,12 @@ nodes:
             description: Supports dense wavelengths and amplification for long-distance communication.
             color: "#9933cc"
         optional: false
-        description: Type of WDM (e.g CWDM. DWDM)
-        order_weight: 1100
+        description: Type of WDM technology (e.g. CWDM, DWDM)
+        order_weight: 1300
       - name: description
         kind: Text
         optional: true
-        order_weight: 2000
+        order_weight: 1100
     relationships:
       - name: front_interfaces
         peer: DcimOadmFrontInterface
@@ -157,16 +164,20 @@ nodes:
         cardinality: many
         optional: true
         identifier: optical_multiplexer__front_interfaces
+        order_weight: 1350
       - name: rear_interface
         peer: DcimOadmRearInterface
         kind: Component
         cardinality: one
         optional: true
         identifier: optical_multiplexer__rear_interface
+        order_weight: 1450
 
   - name: OadmFrontInterface
     namespace: Dcim
+    description: Client-side interface of an optical add-drop multiplexer, carrying a single channel.
     label: Optical Multiplexer Front Interfaces
+    include_in_menu: true
     menu_placement: DcimGenericOadmInterface
     inherit_from:
       - DcimEndpoint
@@ -194,11 +205,13 @@ nodes:
         cardinality: many
         optional: true
         identifier: oadm_interface__channels
-        order_weight: 1200
+        order_weight: 1300
 
   - name: OadmRearInterface
     namespace: Dcim
+    description: Line-side interface of an optical add-drop multiplexer, carrying the multiplexed signal.
     label: Optical Multiplexer Rear Interfaces
+    include_in_menu: true
     menu_placement: DcimGenericOadmInterface
     inherit_from:
       - DcimEndpoint
@@ -226,6 +239,7 @@ nodes:
     description: A WDM channel with its wavelength and frequency.
     label: WDM Channel
     icon: game-icons:laser-warning
+    include_in_menu: true
     human_friendly_id:
       - wdm_type__value
       - channel__value
@@ -242,6 +256,7 @@ nodes:
     attributes:
       - name: channel
         kind: Number
+        optional: false
         description: WDM channel number.
         order_weight: 1000
       - name: wdm_type
@@ -257,16 +272,18 @@ nodes:
             description: Supports dense wavelengths and amplification for long-distance communication.
             color: "#9933cc"
         optional: false
-        description: Type of WDM (e.g CWDM. DWDM)
+        description: Type of WDM technology (e.g. CWDM, DWDM)
         order_weight: 1100
       - name: wavelength
         kind: Text # Text until float possible in Number Kind
         label: Wavelength (nm)
+        optional: false
         description: Wavelength of the channel in nm.
         order_weight: 1200
       - name: frequency
         kind: Text # Text until float possible in Number Kind
         label: Frequency (GHz)
+        optional: false
         description: Frequency of the channel in GHz.
         order_weight: 1300
 
@@ -275,6 +292,7 @@ nodes:
     description: SFP with configuration for Wavelength Division Multiplexing.
     label: WDM SFP
     icon: mdi:laser-pointer
+    include_in_menu: true
     menu_placement: DcimGenericSFP
     inherit_from:
       - DcimGenericSFP
@@ -292,8 +310,8 @@ nodes:
             description: Supports dense wavelengths and amplification for long-distance communication.
             color: "#9933cc"
         optional: false
-        description: Type of WDM (e.g CWDM. DWDM)
-        order_weight: 1100
+        description: Type of WDM technology (e.g. CWDM, DWDM)
+        order_weight: 1150
     relationships:
       - name: wdm_channel
         peer: DcimWdmChannel
@@ -302,4 +320,4 @@ nodes:
         cardinality: one
         optional: false
         identifier: wdm_sfp__channel
-        order_weight: 1150
+        order_weight: 1250

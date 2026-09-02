@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -23,11 +23,12 @@ generics:
       - name: name
         kind: Text
         unique: true
+        optional: false
         order_weight: 1000
       - name: description
         kind: Text
         optional: true
-        order_weight: 2000
+        order_weight: 1100
     relationships:
       - name: interfaces
         peer: DcimInterface
@@ -35,6 +36,7 @@ generics:
         cardinality: many
         optional: true
         identifier: device__interface
+        order_weight: 1650
       - name: tags
         peer: BuiltinTag
         kind: Attribute
@@ -61,20 +63,26 @@ generics:
     description: Generic holding attributes and relationships relevant for physical device.
     include_in_menu: false
     attributes:
-      - name: name # Here for computed attribute
+      # Duplicated from DcimGenericDevice because generics cannot inherit generics.
+      # DcimModuleBay.computed_name (extensions/device_module) renders
+      # {{ device__name__value }} against peer DcimPhysicalDevice, so name must resolve here.
+      # allow_override lets DcimPatchPanel and DcimOpticalMultiplexer restate it.
+      - name: name
         kind: Text
         unique: true
         allow_override: any
+        optional: false
+        order_weight: 1000
       - name: position
         kind: Number
         label: Position (U)
         optional: true
         description: Lowest unit.
-        order_weight: 1500
-      - name: serial
+        order_weight: 1550
+      - name: serial_number
         kind: Text
         optional: true
-        order_weight: 1500
+        order_weight: 1400
       - name: rack_face
         kind: Dropdown
         label: Rack Face
@@ -88,14 +96,14 @@ generics:
             description: Device mounted on the rear face of the rack.
         optional: false
         description: On which face of the rack the device is mounted.
-        order_weight: 1515
+        order_weight: 1600
     relationships:
       - name: device_type
         peer: DcimDeviceType
         kind: Attribute
         cardinality: one
         optional: true
-        order_weight: 1200
+        order_weight: 1150
       - name: location
         peer: LocationHosting
         label: Location
@@ -115,7 +123,9 @@ generics:
         cardinality: one
         optional: true
         identifier: connector__endpoint
-        order_weight: 1500
+        order_weight: 1600
+  # connected_endpoints is kind Attribute so both ends render inline on the connector form.
+  # A high-fan-out connector kind should override the relationship back to Generic.
   - name: Connector
     namespace: Dcim
     description: Generic Connector to link two endpoints together.
@@ -148,6 +158,7 @@ generics:
     attributes:
       - name: name
         kind: Text
+        optional: false
         description: "Name of the interface"
         order_weight: 1000
       - name: description
@@ -211,7 +222,14 @@ generics:
             color: "#B2D4E6"
         optional: true
         description: "The role of the interface in the network"
-        order_weight: 1250
+        order_weight: 1300
+      - name: mtu
+        kind: Number
+        label: MTU
+        default_value: 1500
+        optional: true
+        description: "Maximum transmission unit, in bytes (IP payload, not frame size)."
+        order_weight: 1350
     relationships:
       - name: device
         peer: DcimGenericDevice
@@ -219,7 +237,7 @@ generics:
         cardinality: one
         optional: false
         identifier: device__interface
-        order_weight: 1025
+        order_weight: 900
 
   - name: Layer2
     namespace: Interface
@@ -247,7 +265,7 @@ generics:
             description: "Trunk all mode"
         optional: true
         description: "Layer 2 mode of the interface"
-        order_weight: 1500
+        order_weight: 1450
 
   - name: Layer3
     namespace: Interface
@@ -286,6 +304,7 @@ nodes:
     description: A model of device
     label: Device Type
     icon: mdi:poll
+    include_in_menu: true
     menu_placement: DcimDevice
     human_friendly_id:
       - name__value
@@ -297,6 +316,7 @@ nodes:
       - name: name
         kind: Text
         unique: true
+        optional: false
         order_weight: 1000
       - name: description
         kind: Text
@@ -317,6 +337,7 @@ nodes:
         kind: Boolean
         label: Full Depth
         default_value: true
+        optional: false
         order_weight: 1500
       - name: weight
         kind: Number
@@ -336,6 +357,7 @@ nodes:
     description: A Platform represent the type of software running on a device.
     label: Platform
     icon: mdi:application-cog-outline
+    include_in_menu: true
     menu_placement: DcimDevice
     human_friendly_id:
       - name__value
@@ -347,11 +369,12 @@ nodes:
       - name: name
         kind: Text
         unique: true
+        optional: false
         order_weight: 1000
       - name: description
         kind: Text
         optional: true
-        order_weight: 1200
+        order_weight: 1100
     relationships:
       - name: devices
         peer: DcimGenericDevice
@@ -365,12 +388,14 @@ nodes:
         kind: Attribute
         cardinality: one
         identifier: manufacturer__platform
+        optional: true
         order_weight: 1300
   - name: Device
     namespace: Dcim
     description: A configurable network device including routers, switches...
     label: Network Device
     icon: clarity:network-switch-solid
+    include_in_menu: true
     inherit_from:
       - CoreArtifactTarget
       - DcimGenericDevice
@@ -402,7 +427,7 @@ nodes:
             description: No longer in use and scheduled for removal.
             color: "#e04040"
         optional: false
-        order_weight: 1100
+        order_weight: 1200
       - name: role
         kind: Dropdown
         choices:
@@ -431,7 +456,7 @@ nodes:
             description: Tor switch part of a Fabric.
             color: "#e8e7fd"
         optional: true
-        order_weight: 1400
+        order_weight: 1300
   - name: Physical
     namespace: Interface
     description: "Physical network port on a device"
@@ -443,12 +468,6 @@ nodes:
       - InterfaceLayer3
       - DcimEndpoint
       - InterfaceHasSubInterface
-    attributes:
-      - name: mtu
-        kind: Number
-        label: MTU
-        default_value: 1500
-        order_weight: 1300
 
   - name: Virtual
     namespace: Interface
@@ -459,11 +478,14 @@ nodes:
       - DcimInterface
       - InterfaceLayer2
       - InterfaceLayer3
-      # - InterfaceHasSubInterface # Depending if you want your virtual interfaces to have sub interface
+      # Uncomment if your virtual interfaces should be able to carry sub-interfaces.
+      # - InterfaceHasSubInterface
     relationships:
       - name: parent_interface
         peer: InterfaceHasSubInterface
         kind: Attribute
         cardinality: one
         identifier: "sub__interface"
+        optional: true
         description: "Parent interface to which this sub-interface belongs"
+        order_weight: 1600

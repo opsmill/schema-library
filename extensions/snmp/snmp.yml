@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -13,6 +13,7 @@ generics:
     description: Generic model for SNMP community configurations.
     label: SNMP Community
     icon: iconoir:community
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
@@ -21,6 +22,8 @@ generics:
     attributes:
       - name: name
         kind: Text
+        unique: true
+        optional: false
         order_weight: 1000
       - name: description
         kind: Text
@@ -31,13 +34,17 @@ generics:
         peer: SnmpClient
         kind: Component
         cardinality: many
+        optional: true
+        order_weight: 1900
       - name: devices
-        peer: DcimDevice
+        peer: DcimGenericDevice
         label: Devices
         kind: Attribute
         cardinality: many
+        optional: true
+        identifier: snmp_community__device
         description: Devices this community is configured on.
-        order_weight: 1200
+        order_weight: 1800
 
 nodes:
   # --------------------  Snmp Community --------------------
@@ -46,6 +53,7 @@ nodes:
     description: SNMP v1/v2c community configuration.
     label: SNMP v1/v2c
     icon: iconoir:community
+    include_in_menu: true
     menu_placement: SnmpCommunity
     inherit_from:
       - SnmpCommunity
@@ -57,6 +65,7 @@ nodes:
     attributes:
       - name: community_string
         kind: Password
+        optional: false
         order_weight: 1300
       - name: access
         kind: Dropdown
@@ -67,6 +76,7 @@ nodes:
           - name: read_write
             label: Read-Write
             description: Read-write access.
+        optional: false
         order_weight: 1200
 
   - name: CommunityV3
@@ -74,6 +84,7 @@ nodes:
     description: SNMP version 3 configuration with enhanced security.
     label: SNMP v3
     icon: iconoir:community
+    include_in_menu: true
     menu_placement: SnmpCommunity
     inherit_from:
       - SnmpCommunity
@@ -85,6 +96,7 @@ nodes:
     attributes:
       - name: username
         kind: Text
+        optional: false
         order_weight: 1300
       - name: auth_protocol
         kind: Dropdown
@@ -99,6 +111,7 @@ nodes:
           - name: sha
             label: SHA
             description: SHA authentication.
+        optional: false
         order_weight: 1400
       - name: auth_password
         kind: Password
@@ -118,6 +131,7 @@ nodes:
           - name: aes
             label: AES
             description: AES encryption.
+        optional: false
         order_weight: 1600
       - name: privacy_password
         kind: Password
@@ -128,15 +142,16 @@ nodes:
         kind: Dropdown
         label: Security Level
         choices:
-          - name: noAuthNoPriv
+          - name: no_auth_no_priv
             label: NoAuthNoPriv
             description: No authentication and no privacy.
-          - name: authNoPriv
+          - name: auth_no_priv
             label: AuthNoPriv
             description: Authentication but no privacy.
-          - name: authPriv
+          - name: auth_priv
             label: AuthPriv
             description: Both authentication and privacy.
+        optional: false
         order_weight: 1200
 
   - name: Client
@@ -144,6 +159,7 @@ nodes:
     description: Represents an SNMP client that interacts with SNMP Community.
     label: SNMP Client
     icon: ph:user-list-light
+    include_in_menu: true
     menu_placement: SnmpCommunity
     human_friendly_id:
       - name__value
@@ -153,6 +169,8 @@ nodes:
     attributes:
       - name: name
         kind: Text
+        unique: true
+        optional: false
         order_weight: 1000
       - name: client_description
         kind: Text
@@ -160,14 +178,17 @@ nodes:
         optional: true
         order_weight: 1100
     relationships:
-      - name: ip_address
+      - name: ip_addresses
         peer: IpamIPAddress
-        label: IP Address
+        label: IP Addresses
         kind: Attribute
         cardinality: many
+        optional: true
         description: Authorized SNMP client address.
         order_weight: 1150
-      - name: community
+      - name: communities
         peer: SnmpCommunity
+        kind: Attribute
         cardinality: many
+        optional: true
         order_weight: 1200

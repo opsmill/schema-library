@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -14,7 +14,9 @@ nodes:
     label: S-VLAN
     include_in_menu: false
     inherit_from:
-      - GenericVLAN
+      - IpamGenericVLAN
+    uniqueness_constraints:
+      - [vlan_id__value, vlan_group]
     relationships:
       - name: cvlan
         peer: IpamCVLAN
@@ -24,6 +26,7 @@ nodes:
         optional: true
         identifier: vlan__qinq
         direction: outbound
+        order_weight: 1600
 
   - name: CVLAN
     namespace: Ipam
@@ -31,7 +34,7 @@ nodes:
     label: C-VLAN
     include_in_menu: false
     inherit_from:
-      - GenericVLAN
+      - IpamGenericVLAN
     human_friendly_id:
       - svlan__name__value
       - vlan_id__value
@@ -46,6 +49,7 @@ nodes:
           kind: Jinja2
           jinja2_template: "{{ svlan__name__value }}-{{ vlan_id__value }}"
         optional: true
+        order_weight: 1000
     relationships:
       - name: svlan
         peer: IpamSVLAN
@@ -55,3 +59,4 @@ nodes:
         optional: false
         identifier: vlan__qinq
         direction: inbound
+        order_weight: 1600

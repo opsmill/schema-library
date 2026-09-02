@@ -1,20 +1,46 @@
 # ---------------------------------------------------------------------------
 # Mock data for extensions/mlag.
-# Depends on: base, extensions/lag (DcimDevice: nyc1-rtr01, in NYC1-RACK-01,
-# with interfaces TenGigE0/0/0/1 and /2 bundled into InterfaceLag
-# "Bundle-Ether1").
+# Depends on: base, extensions/lag (InterfaceLag, GenericInterfaceBundle),
+# extensions/location_minimal (LocationSite: NYC1), extensions/rack
+# (LocationRack: NYC1-RACK-01).
+#
+# UPSERT RULE FOR EVERY FILE UNDER objects/ -- documented once, here.
+#
+# `infrahubctl object load` builds each record from scratch and saves it with
+# allow_upsert, and infrahub-sdk fills in every optional cardinality-one
+# relationship the document leaves out with an explicit null. Re-declaring a
+# node another file has already linked therefore CLEARS those links. Where the
+# link is guarded by a constraint the load fails outright, as here:
+#
+#   ['DcimDeviceUpsert'] Node <id> has 0 peers for device__mlag_domain,
+#   no fewer than 2 allowed
+#
+# MlagDomain.peers is min_count/max_count 2 and shares the identifier
+# device__mlag_domain with the optional DcimDevice.mlag_domain added by this
+# extension, so ANY later document that re-upserts a member device without
+# restating mlag_domain breaks the domain. Restating it is not an option
+# either: it would make objects/extensions/rack (and four other files) depend
+# on this extension's schema, inverting the layering.
+#
+# So a fixture that owns a relationship owns its endpoints too. This file
+# creates, and is the only file anywhere under objects/ that ever saves,
+# nyc1-rtr02 and nyc1-rtr03. It deliberately does not build the domain on
+# nyc1-rtr01: objects/extensions/rack, device_psu_module, dwdm, routing_ospf
+# and routing_pim all re-upsert that device after this file has run.
+# objects/extensions/routing_bgp and peering_ixp only reference nyc1-rtr02 by
+# human_friendly_id, which does not save it and so is safe.
 #
 # A MlagDomain regroups exactly 2 devices (peers, min_count/max_count = 2)
-# built over LAG interfaces used as peer-links. So we add a second device,
-# nyc1-rtr02, in the same rack/site, with its own pair of physical interfaces
-# bundled into its own "Bundle-Ether1" LAG -- mirroring nyc1-rtr01's peer-link
-# LAG. Both LAGs then become the domain's peer_links.
+# built over LAG interfaces used as peer-links, so both peers are created here
+# in the same rack/site, each with its own pair of physical interfaces bundled
+# into its own "Bundle-Ether1" LAG. Both LAGs then become the domain's
+# peer_links.
 #
 # MlagInterface inherits GenericInterfaceBundle (bundle_members, cardinality
 # many, peer InterfacePhysical) but NOT DcimInterface -- it has no single
 # "device" of its own. Instead it is "spread across devices in the domain"
-# by bundling physical interfaces that live on different peer devices. We
-# add TenGigE0/0/0/3 and /4 on both devices to serve as those members.
+# by bundling physical interfaces that live on different peer devices.
+# TenGigE0/0/0/3 and /4 on both devices serve as those members.
 #
 # MlagInterface.mlag_domain is a Parent relationship (mandatory, cardinality
 # one) paired with MlagDomain.mlag_interfaces (Component, cardinality many),
@@ -23,10 +49,11 @@
 # extensions/rack nests InterfacePhysical under DcimDevice.interfaces.
 #
 # peer_links (peer InterfaceLag, concrete kind, cardinality many) and peers
-# (peer DcimDevice, concrete kind, cardinality many) both use flat lists of
-# human_friendly_id refs -- InterfaceLag's HFID is a 2-part
-# [device__name__value, name__value] list, DcimDevice's HFID is just
-# name__value.
+# (peer DcimDevice, concrete kind, cardinality many) are both lists of
+# human_friendly_id refs, and every HFID is itself a list of its parts:
+# InterfaceLag's is the 2-part [device__name__value, name__value], DcimDevice's
+# is the 1-part [name__value]. A bare string there is read as a node ID, so the
+# single-part HFID is wrapped in a list too.
 # ---------------------------------------------------------------------------
 ---
 apiVersion: infrahub.app/v1
@@ -34,37 +61,8 @@ kind: Object
 spec:
   kind: DcimDevice
   data:
-    # Upsert against the existing nyc1-rtr01 (created by extensions/rack,
-    # extended by extensions/lag) -- add the two physical interfaces that
-    # will become MLAG interface members toward downstream access switches.
-    - name: nyc1-rtr01
-      device_type: ASR9001
-      platform: Cisco IOS-XR
-      location:
-        kind: LocationRack
-        data:
-          name: NYC1-RACK-01
-          site: NYC1
-      interfaces:
-        - kind: InterfacePhysical
-          data:
-            name: TenGigE0/0/0/3
-            status: active
-            role: core
-        - kind: InterfacePhysical
-          data:
-            name: TenGigE0/0/0/4
-            status: active
-            role: core
-
----
-apiVersion: infrahub.app/v1
-kind: Object
-spec:
-  kind: DcimDevice
-  data:
-    # Second peer of the MLAG domain -- same rack/site as nyc1-rtr01, with a
-    # mirrored peer-link LAG and its own pair of MLAG-facing interfaces.
+    # First peer of the MLAG domain, with a peer-link LAG over
+    # TenGigE0/0/0/1-2 and a pair of MLAG-facing interfaces on /3 and /4.
     - name: nyc1-rtr02
       status: active
       role: edge
@@ -72,7 +70,7 @@ spec:
       platform: Cisco IOS-XR
       position: 41
       rack_face: front
-      location:
+      location: &nyc1_rack_01
         kind: LocationRack
         data:
           name: NYC1-RACK-01
@@ -101,7 +99,7 @@ spec:
         - kind: InterfaceLag
           data:
             name: Bundle-Ether1
-            description: MLAG peer-link toward nyc1-rtr01.
+            description: MLAG peer-link toward nyc1-rtr03.
             status: active
             role: core
             bundle_number: 1
@@ -110,6 +108,52 @@ spec:
             bundle_members:
               - ["nyc1-rtr02", "TenGigE0/0/0/1"]
               - ["nyc1-rtr02", "TenGigE0/0/0/2"]
+
+    # Second peer of the MLAG domain -- same rack/site as nyc1-rtr02, with a
+    # mirrored peer-link LAG and its own pair of MLAG-facing interfaces. Both
+    # peers live in one document so the LocationRack anchor above can be
+    # reused: a YAML anchor does not cross a `---` document boundary.
+    - name: nyc1-rtr03
+      status: active
+      role: edge
+      device_type: ASR9001
+      platform: Cisco IOS-XR
+      position: 42
+      rack_face: front
+      location: *nyc1_rack_01
+      interfaces:
+        - kind: InterfacePhysical
+          data:
+            name: TenGigE0/0/0/1
+            status: active
+            role: core
+        - kind: InterfacePhysical
+          data:
+            name: TenGigE0/0/0/2
+            status: active
+            role: core
+        - kind: InterfacePhysical
+          data:
+            name: TenGigE0/0/0/3
+            status: active
+            role: core
+        - kind: InterfacePhysical
+          data:
+            name: TenGigE0/0/0/4
+            status: active
+            role: core
+        - kind: InterfaceLag
+          data:
+            name: Bundle-Ether1
+            description: MLAG peer-link toward nyc1-rtr02.
+            status: active
+            role: core
+            bundle_number: 1
+            lacp_mode: active
+            lacp_rate: fast
+            bundle_members:
+              - ["nyc1-rtr03", "TenGigE0/0/0/1"]
+              - ["nyc1-rtr03", "TenGigE0/0/0/2"]
 
 ---
 apiVersion: infrahub.app/v1
@@ -120,11 +164,11 @@ spec:
     - domain_id: "NYC1-MLAG-01"
       reload_delay: 300
       peers:
-        - "nyc1-rtr01"
-        - "nyc1-rtr02"
+        - ["nyc1-rtr02"]
+        - ["nyc1-rtr03"]
       peer_links:
-        - ["nyc1-rtr01", "Bundle-Ether1"]
         - ["nyc1-rtr02", "Bundle-Ether1"]
+        - ["nyc1-rtr03", "Bundle-Ether1"]
       mlag_interfaces:
         kind: MlagInterface
         data:
@@ -134,13 +178,13 @@ spec:
             role: router
             bundle_number: 100
             bundle_members:
-              - ["nyc1-rtr01", "TenGigE0/0/0/3"]
               - ["nyc1-rtr02", "TenGigE0/0/0/3"]
+              - ["nyc1-rtr03", "TenGigE0/0/0/3"]
           - name: Bundle-Ether101
             description: MLAG port-channel toward nyc1-acc-sw02.
             status: active
             role: router
             bundle_number: 101
             bundle_members:
-              - ["nyc1-rtr01", "TenGigE0/0/0/4"]
               - ["nyc1-rtr02", "TenGigE0/0/0/4"]
+              - ["nyc1-rtr03", "TenGigE0/0/0/4"]

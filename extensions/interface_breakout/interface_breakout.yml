@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -16,6 +16,7 @@ extensions:
           default_value: false
           optional: false
           description: "Indicates if the port supports breakout capability"
+          order_weight: 1800
       relationships:
         - name: breakout_child_interfaces
           peer: InterfacePhysical
@@ -26,7 +27,7 @@ extensions:
           identifier: "physical__breakout"
           direction: outbound
           description: "Interfaces resulting from the breakout"
-          order_weight: 1650
+          order_weight: 1850
         - name: breakout_parent_interface
           peer: InterfacePhysical
           label: "Breakout parent interface"
@@ -36,4 +37,4 @@ extensions:
           identifier: "physical__breakout"
           direction: inbound
           description: "Interface from which breakout is created"
-          order_weight: 1700
+          order_weight: 1900

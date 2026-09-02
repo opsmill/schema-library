@@ -1,7 +1,6 @@
 # ---------------------------------------------------------------------------
 # Mock data for extensions/vrrp.
-# Depends on: base, extensions/rack (DcimDevice: nyc1-rtr01, in NYC1-RACK-01,
-# with interface GigabitEthernet0/0/0/0).
+# Depends on: base, extensions/rack (DcimDevice: nyc1-rtr01, in NYC1-RACK-01).
 #
 # NetworkVRRPGroup.vrrp_interfaces is a Component relationship of cardinality
 # many with a CONCRETE peer (NetworkVRRPInterface), so we point it at the
@@ -19,11 +18,19 @@
 #   - LocationRack: name, site (site's peer LocationSite is CONCRETE, so a
 #     plain HFID string is enough there)
 # This upserts against the existing nyc1-rtr01 / NYC1-RACK-01 fixtures rather
-# than duplicating them. GigabitEthernet0/0/0/0 already exists (from
-# extensions/rack); GigabitEthernet0/0/0/1 and /2 are fresh interfaces added
-# here, created inline the same way. All three VRRP groups live on the single
-# available fixture device -- a real deployment would spread group members
-# across two physical routers for actual first-hop redundancy.
+# than duplicating them. GigabitEthernet0/0/0/1, /2 and /3 are fresh
+# interfaces added here, created inline the same way. All three VRRP groups
+# live on the single available fixture device -- a real deployment would
+# spread group members across two physical routers for actual first-hop
+# redundancy.
+#
+# The groups deliberately stay off GigabitEthernet0/0/0/0. That interface
+# belongs to objects/extensions/rack, which re-declares it after this file has
+# run, and a re-declaration clears the optional cardinality-one
+# InterfaceLayer3.vrrp link this file created -- the load then fails with
+# "['InterfacePhysicalUpsert'] Node <id> has -1 peers for
+# interfacelayer3__networkvrrpinterface, no fewer than 1 allowed". See the
+# upsert rule at the top of objects/extensions/mlag/mlag.yml.
 #
 # NOTE: NetworkVRRPInterface has no human_friendly_id of its own (only
 # order_by + uniqueness_constraints on [vrrp_group, interface]), so
@@ -53,7 +60,9 @@ spec:
             interface:
               kind: InterfacePhysical
               data:
-                name: GigabitEthernet0/0/0/0
+                name: GigabitEthernet0/0/0/3
+                status: active
+                role: core
                 device:
                   kind: DcimDevice
                   data:

@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
@@ -13,7 +13,8 @@ nodes:
     description: "Protocol Independent Multicast (PIM) instance on a Virtual Router."
     label: "PIM"
     icon: "mdi:network-outline"
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: RoutingProtocol
     inherit_from:
       - "RoutingProtocol"
     human_friendly_id:
@@ -47,6 +48,7 @@ nodes:
         cardinality: one
         optional: true
         description: "Rendezvous Point (RP) address for PIM."
+        order_weight: 1400
       - name: pim_interfaces
         peer: RoutingPIMInterface
         label: PIM Interfaces
@@ -54,13 +56,15 @@ nodes:
         cardinality: many
         optional: true
         identifier: pim__piminterfaces
+        order_weight: 1450
 
   - name: PIMInterface
     namespace: Routing
     description: "Interface configuration for PIM."
     label: "PIM Interface"
     icon: "mdi:ethernet"
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: RoutingPIM
     human_friendly_id:
       - "description__value"
     order_by:
@@ -74,7 +78,7 @@ nodes:
         kind: Text
         unique: true
         optional: false
-        description: "Description of the OSPF interface."
+        description: "Description of the PIM interface."
         order_weight: 1100
       - name: pim_mode
         kind: Dropdown
@@ -91,6 +95,7 @@ nodes:
             label: Bidirectional Mode
             description: "Bidirectional PIM for efficient traffic forwarding."
             color: "#E6E6FA" # lavender
+        optional: false
         description: "PIM mode used for multicast routing on this interface."
         order_weight: 1150
       - name: hello_interval
@@ -113,6 +118,7 @@ nodes:
         cardinality: one
         optional: false
         identifier: pim__piminterfaces
+        order_weight: 900
       - name: interface
         peer: InterfaceLayer3
         kind: Attribute

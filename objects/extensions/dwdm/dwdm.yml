@@ -59,7 +59,7 @@ spec:
         kind: DcimOadmFrontInterface
         data:
           - name: "CH1"
-            connector_type: LC
+            connector_type: lc
             # `channels` peer (DcimWdmChannel) is a CONCRETE kind whose
             # human_friendly_id has two components ([wdm_type__value,
             # channel__value]) and the relationship is cardinality many, so
@@ -68,7 +68,7 @@ spec:
             channels:
               - [dwdm, "1"]
           - name: "CH2"
-            connector_type: LC
+            connector_type: lc
             channels:
               - [dwdm, "2"]
       # rear_interface is a Component relationship of cardinality one --
@@ -77,7 +77,7 @@ spec:
         kind: DcimOadmRearInterface
         data:
           name: "COM"
-          connector_type: LC
+          connector_type: lc
 
     - name: NYC1-MUX02
       wdm_type: cwdm
@@ -93,14 +93,14 @@ spec:
         kind: DcimOadmFrontInterface
         data:
           - name: "CH1"
-            connector_type: LC
+            connector_type: lc
             channels:
               - [cwdm, "20"]
       rear_interface:
         kind: DcimOadmRearInterface
         data:
           name: "COM"
-          connector_type: LC
+          connector_type: lc
 
 ---
 apiVersion: infrahub.app/v1
@@ -134,7 +134,7 @@ spec:
       form_factor: sfp_plus
       status: plugged
       wdm_type: dwdm
-      serial: "SFP-WDM-0001"
+      serial_number: "SFP-WDM-0001"
       manufacturer: Cisco
       # `interface` peer (InterfacePhysical) is a CONCRETE kind with a
       # composite human_friendly_id ([device__name__value, name__value]).
@@ -148,7 +148,7 @@ spec:
       form_factor: sfp_plus
       status: spare
       wdm_type: dwdm
-      serial: "SFP-WDM-0002"
+      serial_number: "SFP-WDM-0002"
       manufacturer: Cisco
       spare_location:
         kind: LocationSite
@@ -160,7 +160,7 @@ spec:
       form_factor: qsfp28
       status: spare
       wdm_type: cwdm
-      serial: "SFP-WDM-0003"
+      serial_number: "SFP-WDM-0003"
       manufacturer: Cisco
       spare_location:
         kind: LocationRack

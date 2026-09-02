@@ -2,16 +2,19 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 # ---------------------------------------------------------------------------
 # This schema is a starting point for building with Infrahub, not a finished production model.
-# Adapting it for your environment typically requires architectural review — see
+# Adapting it for your environment typically requires architectural review, see
 # docs.infrahub.app, or reach out to OpsMill for help.
 # ---------------------------------------------------------------------------
 version: "1.0"
 
+# Defines Location.Site. Mutually exclusive with extensions/location_site, load one, not both.
 nodes:
   - name: Region
     namespace: Location
+    description: A geographical region grouping countries and sites.
     label: Region
     icon: carbon:cics-region-target
+    include_in_menu: true
     menu_placement: LocationGeneric
     inherit_from:
       - LocationGeneric
@@ -21,8 +24,10 @@ nodes:
 
   - name: Country
     namespace: Location
+    description: A country, sitting between a region and the sites it contains.
     label: Country
     icon: gis:search-country
+    include_in_menu: true
     menu_placement: LocationGeneric
     inherit_from:
       - LocationGeneric
@@ -31,8 +36,10 @@ nodes:
 
   - name: Site
     namespace: Location
+    description: A physical location hosting equipment, such as a data center or an office.
     label: Site
     icon: ri:building-line
+    include_in_menu: true
     menu_placement: LocationGeneric
     inherit_from:
       - LocationGeneric
@@ -58,21 +65,21 @@ nodes:
           - name: decommissioning
             label: Decommissioning
             color: "#ff9800"
-          - name: retired
-            label: Retired
+          - name: deprecated
+            label: Deprecated
             color: "#6c757d"
         optional: false
-        order_weight: 1250
+        order_weight: 1200
       - name: facility
         kind: Text
         unique: false
         optional: true
-        order_weight: 1100
+        order_weight: 1150
       - name: physical_address
         kind: Text
         unique: false
         optional: true
-        order_weight: 1500
+        order_weight: 1400
       - name: timezone
         kind: Text
         optional: true

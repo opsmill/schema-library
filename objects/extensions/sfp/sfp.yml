@@ -38,7 +38,7 @@ kind: Object
 spec:
   kind: DcimStandardSFP
   data:
-    - serial: "SFP-STD-0001"
+    - serial_number: "SFP-STD-0001"
       sfp_type: lr
       form_factor: sfp_plus
       status: plugged
@@ -49,7 +49,7 @@ spec:
       # kind+data block -- this upserts against the existing interface.
       interface: [nyc1-rtr01, GigabitEthernet0/0/0/0]
 
-    - serial: "SFP-STD-0002"
+    - serial_number: "SFP-STD-0002"
       sfp_type: sr
       form_factor: sfp_plus
       status: spare
@@ -63,7 +63,7 @@ spec:
         data:
           name: NYC1
 
-    - serial: "SFP-STD-0003"
+    - serial_number: "SFP-STD-0003"
       sfp_type: t
       form_factor: sfp
       status: spare
@@ -81,7 +81,7 @@ kind: Object
 spec:
   kind: DcimBidiSFP
   data:
-    - serial: "SFP-BIDI-0001"
+    - serial_number: "SFP-BIDI-0001"
       sfp_type: zr
       form_factor: sfp_plus
       status: plugged
@@ -90,7 +90,7 @@ spec:
       manufacturer: Cisco
       interface: [nyc1-rtr01, GigabitEthernet0/0/0/1]
 
-    - serial: "SFP-BIDI-0002"
+    - serial_number: "SFP-BIDI-0002"
       sfp_type: zr
       form_factor: sfp_plus
       status: spare
