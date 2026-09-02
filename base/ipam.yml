@@ -48,7 +48,7 @@ nodes:
       - prefix__value
     display_label: prefix__value
     uniqueness_constraints:
-      - [ip_namespace, prefix__value]
+      - [prefix__value, ip_namespace]
     attributes:
       - name: status
         kind: Dropdown
@@ -118,7 +118,7 @@ nodes:
       - address__value
     display_label: address__value
     uniqueness_constraints:
-      - [ip_namespace, address__value]
+      - [address__value, ip_namespace]
     attributes:
       - name: description
         kind: Text

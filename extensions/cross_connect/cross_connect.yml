@@ -23,7 +23,7 @@ nodes:
       - provider__name__value
     display_label: "{{ identifier__value }} (Provider: {{ provider__name__value }})"
     uniqueness_constraints:
-      - [provider, identifier__value]
+      - [identifier__value, provider]
     attributes:
       - name: identifier
         kind: Text
