@@ -85,6 +85,7 @@ NOTE: This extension ships a standard Module/ModuleType node pair ready to use, 
 | computed_name | Name computed from the module bay; concrete module kinds may refine it. | Text | False |  |  |
 | serial_number | Serial number of the module, if known. | Text | True |  |  |
 | description |  | Text | True |  |  |
+| status | Operational status of the module. | Dropdown | False | active | provisioning, active, maintenance, failed, rma |
 
 #### Relationships
 
@@ -169,6 +170,33 @@ generics:
     kind: Text
     optional: true
     order_weight: 1100
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: provisioning
+      label: Provisioning
+      description: Module is being installed and provisioned.
+      color: '#f0ad4e'
+    - name: active
+      label: Active
+      description: Module is installed and operational.
+      color: '#00d25b'
+    - name: maintenance
+      label: Maintenance
+      description: Module is under maintenance.
+      color: '#ff9800'
+    - name: failed
+      label: Failed
+      description: Module is still installed but is not operational.
+      color: '#e04040'
+    - name: rma
+      label: RMA
+      description: Module has failed and is being returned to the manufacturer.
+      color: '#6c757d'
+    optional: false
+    description: Operational status of the module.
+    order_weight: 1200
   relationships:
   - name: module_bay
     peer: DcimModuleBay
