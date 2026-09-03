@@ -1,0 +1,57 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/lag.
+# Depends on: base, extensions/rack (DcimDevice: nyc1-rtr01, in NYC1-RACK-01).
+# Adds two fresh physical interfaces on nyc1-rtr01 (TenGigE0/0/0/1 and /2,
+# distinct from the pre-existing GigabitEthernet0/0/0/0) and bundles them
+# into a LAG. `interfaces` is a Component relationship of cardinality many
+# with a Generic peer (DcimInterface) -- since we need to mix two concrete
+# kinds (InterfacePhysical and InterfaceLag) under it, we use the
+# "list of {kind, data}" format rather than a single {kind, data: [...]}
+# block. Items are created in list order, so the member interfaces are
+# listed before the LAG that references them via `bundle_members`.
+# InterfacePhysical's human_friendly_id is [device__name__value, name__value]
+# (a 2-part list), and `bundle_members` is cardinality many with a CONCRETE
+# peer (InterfacePhysical), so it's a plain list of HFID lists.
+# Note: extensions/mlag builds on top of this LAG later -- kept self
+# contained here.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimDevice
+  data:
+    - name: nyc1-rtr01
+      device_type: ASR9001
+      platform: Cisco IOS-XR
+      # LocationRack inherits LocationHosting (a Generic) -- specify the
+      # concrete kind so the reference is unambiguous and upserts against
+      # the rack created by extensions/rack.
+      location:
+        kind: LocationRack
+        data:
+          name: NYC1-RACK-01
+          site: NYC1
+      interfaces:
+        - kind: InterfacePhysical
+          data:
+            name: TenGigE0/0/0/1
+            status: active
+            role: core
+        - kind: InterfacePhysical
+          data:
+            name: TenGigE0/0/0/2
+            status: active
+            role: core
+        - kind: InterfaceLag
+          data:
+            name: Bundle-Ether1
+            description: LAG toward nyc1-sw01 uplink.
+            status: active
+            role: core
+            bundle_number: 1
+            lacp_mode: active
+            lacp_rate: fast
+            bundle_members:
+              - ["nyc1-rtr01", "TenGigE0/0/0/1"]
+              - ["nyc1-rtr01", "TenGigE0/0/0/2"]

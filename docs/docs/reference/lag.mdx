@@ -22,33 +22,35 @@ This schema extension includes models for Link Aggregation Groups (LAGs), enabli
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| lacp_rate | LACP rate for the aggregated interface | Dropdown |  | fast | slow, fast |
-| lacp_mode | LACP mode for the aggregated interface | Dropdown |  | active | active, passive, disabled |
+| lacp_rate | LACP rate for the aggregated interface | Dropdown | False | fast | slow, fast |
+| lacp_mode | LACP mode for the aggregated interface | Dropdown | False | active | active, passive, disabled |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| lag_members | InterfacePhysical |  | many | Attribute |
+| bundle_members | InterfacePhysical | True | many | Attribute |
 
 ## Generics
 
 ### InterfaceBundle
 
 - **Label:** Generic Interface Bundle
+- **Description:** Generic holding the members of an interface bundle such as a LAG.
 - **Namespace:** Generic
 
 #### Attributes
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name | Name of the interface | Text |  |  |  |
+| name | Name of the interface | Text | False |  |  |
+| bundle_number | Bundle number for the aggregated interface | Number | False |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| bundle_members | InterfacePhysical |  | many | Attribute |
+| bundle_members | InterfacePhysical | True | many | Attribute |
 
 ## Extensions
 
@@ -73,37 +75,47 @@ version: '1.0'
 generics:
 - name: InterfaceBundle
   namespace: Generic
+  description: Generic holding the members of an interface bundle such as a LAG.
   label: Generic Interface Bundle
   include_in_menu: false
   attributes:
   - name: name
     kind: Text
+    optional: false
     description: Name of the interface
     order_weight: 1000
+  - name: bundle_number
+    kind: Number
+    optional: false
+    description: Bundle number for the aggregated interface
+    order_weight: 1250
   relationships:
   - name: bundle_members
-    label: Bundle members
     peer: InterfacePhysical
-    cardinality: many
+    label: Member(s)
     kind: Attribute
+    cardinality: many
+    identifier: interface__bundle
+    optional: true
     description: Physical Interfaces that are members of this aggregate
     order_weight: 1800
 nodes:
 - name: Lag
   namespace: Interface
-  label: LAG Interface
   description: LAG interface
+  label: LAG Interface
+  include_in_menu: false
   inherit_from:
   - DcimInterface
   - InterfaceLayer2
   - InterfaceLayer3
   - InterfaceHasSubInterface
   - GenericInterfaceBundle
-  include_in_menu: false
   attributes:
   - name: lacp_rate
-    label: LACP Rate
     kind: Dropdown
+    label: LACP Rate
+    default_value: fast
     choices:
     - name: slow
       label: Slow
@@ -111,12 +123,13 @@ nodes:
     - name: fast
       label: Fast
       color: '#E6E6FA'
-    default_value: fast
+    optional: false
     description: LACP rate for the aggregated interface
-    order_weight: 1700
+    order_weight: 1850
   - name: lacp_mode
-    label: LACP Mode
     kind: Dropdown
+    label: LACP Mode
+    default_value: active
     choices:
     - name: active
       label: Active
@@ -127,16 +140,18 @@ nodes:
     - name: disabled
       label: Disabled
       color: '#E6E6FA'
+    optional: false
     description: LACP mode for the aggregated interface
-    default_value: active
-    order_weight: 1750
+    order_weight: 1900
   relationships:
-  - name: lag_members
-    common_parent: device
-    label: Member(s)
+  - name: bundle_members
     peer: InterfacePhysical
-    cardinality: many
+    label: Member(s)
     kind: Attribute
+    cardinality: many
+    identifier: interface__bundle
+    common_parent: device
+    optional: true
     description: Physical Interfaces that are members of this aggregate
     order_weight: 1800
 extensions:
@@ -144,12 +159,13 @@ extensions:
   - kind: InterfacePhysical
     relationships:
     - name: bundle
-      label: Interface Bundle
       peer: GenericInterfaceBundle
-      optional: true
-      cardinality: one
+      label: Interface Bundle
       kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: interface__bundle
       description: Interface Bundle using this Physical Interface
-      order_weight: 1800
+      order_weight: 1950
 
 ```

@@ -1,0 +1,29 @@
+# ---------------------------------------------------------------------------
+# Mock data for base/ipam.yml.
+# Depends on: (none) -- safe to load with the rest of base.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: IpamPrefix
+  data:
+    - prefix: 10.0.0.0/16
+      description: Global backbone supernet.
+      status: active
+      role: backbone
+    - prefix: 192.0.2.0/24
+      description: Documentation / demo prefix (RFC 5737).
+      status: active
+      role: link
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: IpamIPAddress
+  data:
+    - address: 192.0.2.1/32
+      description: Demo loopback address.
+      status: active
+      role: loopback

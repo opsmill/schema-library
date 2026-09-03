@@ -2,7 +2,7 @@
 title: Patch Panel
 ---
 
-This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Finally you can also capture information about potential modules you would insert into your patch panel.
+This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Cassettes and other inserts are tracked as regular device modules in module bays, through extensions/device_module.
 
 NOTE: This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
 
@@ -10,6 +10,7 @@ NOTE: This extension is compatible with all sort of connectors, meaning you can 
 
 - **Dependencies:**
     - [base](dcim)
+    - [extensions/device_module](device_module)
 
 ## Nodes
 
@@ -26,7 +27,7 @@ NOTE: This extension is compatible with all sort of connectors, meaning you can 
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
+| name |  | Text | False |  |  |
 | module_capacity | The maximum number of modules that can be housed within this patch panel. | Number | True |  |  |
 | description |  | Text | True |  |  |
 
@@ -36,11 +37,11 @@ NOTE: This extension is compatible with all sort of connectors, meaning you can 
 | ---- | ---- | -------- | ----------- | ---- |
 | front_interfaces | DcimFrontPatchPanelInterface | True | many | Component |
 | rear_interfaces | DcimRearPatchPanelInterface | True | many | Component |
-| patch_panel_modules | DcimPatchPanelModule | True | many | Component |
 
 ### FrontPatchPanelInterface
 
 - **Label:** Patch Panel Front Interfaces
+- **Description:** Front interface of a patch panel, where equipment is patched in.
 - **Namespace:** Dcim
 - **Uniqueness Constraints:**
     - patch_panel, name__value
@@ -57,6 +58,7 @@ NOTE: This extension is compatible with all sort of connectors, meaning you can 
 ### RearPatchPanelInterface
 
 - **Label:** Patch Panel Rear Interfaces
+- **Description:** Rear interface of a patch panel, terminating the permanent cabling.
 - **Namespace:** Dcim
 - **Uniqueness Constraints:**
     - patch_panel, name__value
@@ -70,36 +72,12 @@ NOTE: This extension is compatible with all sort of connectors, meaning you can 
 | corresponding_front_rear | DcimFrontPatchPanelInterface | True | many | Attribute |
 | patch_panel | DcimPatchPanel | False | one | Parent |
 
-### PatchPanelModule
-
-- **Label:** Patch Panel Module
-- **Namespace:** Dcim
-- **Icon:** mdi:expansion-card
-- **Uniqueness Constraints:**
-    - patch_panel, position__value
-- **Human Friendly ID:** patch_panel__name__value, name__value
-
-#### Attributes
-
-| name | description | kind | optional | default_value | choices |
-| ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
-| position | Position for the module inside the Patch Panel. | Number |  |  |  |
-| module_type | Type of module inserted into the patch panel. | Dropdown | True |  | 3_mpo_24_fo_lc |
-| serial |  | Text | True |  |  |
-| description |  | Text | True |  |  |
-
-#### Relationships
-
-| name | peer | optional | cardinality | kind |
-| ---- | ---- | -------- | ----------- | ---- |
-| patch_panel | DcimPatchPanel | False | one | Parent |
-
 ## Generics
 
 ### GenericPatchPanelInterface
 
 - **Label:** Patch Panel Interfaces
+- **Description:** Generic interface of a patch panel, front or rear.
 - **Namespace:** Dcim
 - **Icon:** mdi:ethernet
 
@@ -107,9 +85,9 @@ NOTE: This extension is compatible with all sort of connectors, meaning you can 
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
+| name |  | Text | False |  |  |
 | description |  | Text | True |  |  |
-| connector_type |  | Dropdown |  |  | FC, LC, LC_PC, LC_UPC, LC_APC, LSH, LSH_PC, LSH_UPC, LSH_APC, LX_5, LX_5_PC, LX_5_UPC, LX_5_APC, MPO, MTRJ, SC, SC_PC, SC_UPC, SC_APC, ST, CS, SN, SMA_905, SMA_906, URM_P2 |
+| connector_type |  | Dropdown | False |  | fc, lc, lc_pc, lc_upc, lc_apc, lsh, lsh_pc, lsh_upc, lsh_apc, lx_5, lx_5_pc, lx_5_upc, lx_5_apc, mpo, mtrj, sc, sc_pc, sc_upc, sc_apc, st, cs, sn, sma_905, sma_906, urm_p2, urm_p4, urm_p8, splice |
 
 ## Code
 
@@ -117,267 +95,233 @@ NOTE: This extension is compatible with all sort of connectors, meaning you can 
 version: '1.0'
 generics:
 - name: GenericPatchPanelInterface
-  label: Patch Panel Interfaces
-  menu_placement: DcimPatchPanel
   namespace: Dcim
+  description: Generic interface of a patch panel, front or rear.
+  label: Patch Panel Interfaces
   icon: mdi:ethernet
+  include_in_menu: true
+  menu_placement: DcimPatchPanel
   attributes:
   - name: name
     kind: Text
+    optional: false
     order_weight: 1000
   - name: description
     kind: Text
     optional: true
-    order_weight: 2000
+    order_weight: 1100
   - name: connector_type
     kind: Dropdown
-    order_weight: 1100
     choices:
-    - name: FC
+    - name: fc
       label: FC
       description: Standardized fiber optic connector used primarily in datacom and
         telecom applications.
-    - name: LC
+    - name: lc
       label: LC
       description: Compact fiber optic connector with a push-pull mechanism.
-    - name: LC_PC
+    - name: lc_pc
       label: LC/PC
       description: Polished LC connector providing physical contact (PC).
-    - name: LC_UPC
+    - name: lc_upc
       label: LC/UPC
       description: Ultra-Physical Contact (UPC) variant of the LC connector with enhanced
         polish.
-    - name: LC_APC
+    - name: lc_apc
       label: LC/APC
       description: Angled Physical Contact (APC) version of the LC connector with
         a slanted fiber end-face.
-    - name: LSH
+    - name: lsh
       label: LSH
       description: European fiber optic connector offering high durability.
-    - name: LSH_PC
+    - name: lsh_pc
       label: LSH/PC
       description: Physical Contact version of LSH with standard polish.
-    - name: LSH_UPC
+    - name: lsh_upc
       label: LSH/UPC
       description: Ultra-Physical Contact variant of LSH, minimizing return loss with
         a superior polish.
-    - name: LSH_APC
+    - name: lsh_apc
       label: LSH/APC
       description: Angled Physical Contact version of LSH, designed to reduce back
         reflections.
-    - name: LX_5
+    - name: lx_5
       label: LX.5
       description: Miniaturized fiber optic connector similar to LC but with an additional
         shutter mechanism.
-    - name: LX_5_PC
+    - name: lx_5_pc
       label: LX.5/PC
       description: Physical Contact version of LX.5.
-    - name: LX_5_UPC
+    - name: lx_5_upc
       label: LX.5/UPC
       description: Ultra-Physical Contact variant of LX.5.
-    - name: LX_5_APC
+    - name: lx_5_apc
       label: LX.5/APC
       description: Angled Physical Contact version of LX.5.
-    - name: MPO
+    - name: mpo
       label: MPO
       description: Multi-fiber Push-On connector typically used in data centers for
         high-speed applications.
-    - name: MTRJ
+    - name: mtrj
       label: MTRJ
       description: Male-to-female fiber optic connector with two fibers.
-    - name: SC
+    - name: sc
       label: SC
       description: Square fiber optic connector with push-pull lock.
-    - name: SC_PC
+    - name: sc_pc
       label: SC/PC
       description: Physical Contact SC connector with a polished end-face.
-    - name: SC_UPC
+    - name: sc_upc
       label: SC/UPC
       description: Ultra-Physical Contact variant of SC.
-    - name: SC_APC
+    - name: sc_apc
       label: SC/APC
       description: Angled Physical Contact version of SC.
-    - name: ST
+    - name: st
       label: ST
       description: Bayonet-style fiber optic connector primarily used in industrial
         and military applications.
-    - name: CS
+    - name: cs
       label: CS
       description: Compact connector with a high-density duplex configuration.
-    - name: SN
+    - name: sn
       label: SN
       description: Small-form connector with dual fibers.
-    - name: SMA_905
+    - name: sma_905
       label: SMA 905
       description: Stainless steel fiber optic connector.
-    - name: SMA_906
+    - name: sma_906
       label: SMA 906
       description: Variant of SMA 905 with similar durability, frequently used in
         high-vibration settings.
-    - name: URM_P2
+    - name: urm_p2
       label: URM-P2
       description: Specialized fiber optic connector for industrial and harsh environments.
+    - name: urm_p4
+      label: URM-P4
+      description: Similar to URM-P2 but designed for higher performance.
+    - name: urm_p8
+      label: URM-P8
+      description: Enhanced version of URM connectors with higher protection.
+    - name: splice
+      label: Splice
+      description: Permanent fiber connection method where two fiber ends are fused.
+    optional: false
+    order_weight: 1200
 nodes:
 - name: PatchPanel
-  label: Patch Panel
+  namespace: Dcim
   description: A Patch Panel used for managing network cable connections in a data
     center or telecom setup.
+  label: Patch Panel
   icon: ic:round-device-hub
-  namespace: Dcim
+  include_in_menu: true
+  inherit_from:
+  - DcimPhysicalDevice
   human_friendly_id:
   - name__value
   order_by:
   - name__value
   display_label: name__value
-  inherit_from:
-  - DcimPhysicalDevice
   attributes:
   - name: name
     kind: Text
     unique: true
+    optional: false
     order_weight: 1000
   - name: module_capacity
-    label: Module Capacity
     kind: Number
+    label: Module Capacity
     optional: true
     description: The maximum number of modules that can be housed within this patch
       panel.
+    order_weight: 1300
   - name: description
     kind: Text
     optional: true
-    order_weight: 2000
+    order_weight: 1100
   relationships:
   - name: front_interfaces
     peer: DcimFrontPatchPanelInterface
-    identifier: front_interfaces
-    optional: true
-    cardinality: many
     kind: Component
+    cardinality: many
+    optional: true
+    identifier: patch_panel__front_interfaces
+    order_weight: 1350
   - name: rear_interfaces
     peer: DcimRearPatchPanelInterface
-    identifier: rear_interfaces
-    optional: true
-    cardinality: many
     kind: Component
-  - name: patch_panel_modules
-    label: Modules
-    peer: DcimPatchPanelModule
-    optional: true
     cardinality: many
-    kind: Component
+    optional: true
+    identifier: patch_panel__rear_interfaces
+    order_weight: 1450
 - name: FrontPatchPanelInterface
-  label: Patch Panel Front Interfaces
-  menu_placement: DcimGenericPatchPanelInterface
   namespace: Dcim
+  description: Front interface of a patch panel, where equipment is patched in.
+  label: Patch Panel Front Interfaces
+  include_in_menu: true
+  menu_placement: DcimGenericPatchPanelInterface
+  inherit_from:
+  - DcimEndpoint
+  - DcimGenericPatchPanelInterface
   human_friendly_id:
   - patch_panel__name__value
   - name__value
-  display_label: '{{ patch_panel__name__value }} > {{ name__value }}'
   order_by:
   - corresponding_front_rear__name__value
   - name__value
+  display_label: '{{ patch_panel__name__value }} > {{ name__value }}'
   uniqueness_constraints:
   - - patch_panel
     - name__value
-  inherit_from:
-  - DcimEndpoint
-  - DcimGenericPatchPanelInterface
   relationships:
   - name: corresponding_front_rear
-    label: Corresponding rear interface
     peer: DcimRearPatchPanelInterface
-    order_weight: 1200
-    optional: true
-    cardinality: one
+    label: Corresponding rear interface
     kind: Attribute
+    cardinality: one
+    optional: true
+    order_weight: 1300
   - name: patch_panel
     peer: DcimPatchPanel
-    order_weight: 900
-    identifier: front_interfaces
-    optional: false
-    cardinality: one
     kind: Parent
+    cardinality: one
+    optional: false
+    identifier: patch_panel__front_interfaces
+    order_weight: 900
 - name: RearPatchPanelInterface
-  label: Patch Panel Rear Interfaces
-  menu_placement: DcimGenericPatchPanelInterface
   namespace: Dcim
-  human_friendly_id:
-  - patch_panel__name__value
-  - name__value
-  display_label: '{{ patch_panel__name__value }} > {{ name__value }}'
-  order_by:
-  - patch_panel__name__value
-  - name__value
-  uniqueness_constraints:
-  - - patch_panel
-    - name__value
+  description: Rear interface of a patch panel, terminating the permanent cabling.
+  label: Patch Panel Rear Interfaces
+  include_in_menu: true
+  menu_placement: DcimGenericPatchPanelInterface
   inherit_from:
   - DcimEndpoint
   - DcimGenericPatchPanelInterface
-  relationships:
-  - name: corresponding_front_rear
-    label: Corresponding front interfaces
-    peer: DcimFrontPatchPanelInterface
-    order_weight: 1200
-    optional: true
-    cardinality: many
-    kind: Attribute
-  - name: patch_panel
-    peer: DcimPatchPanel
-    order_weight: 900
-    identifier: rear_interfaces
-    optional: false
-    cardinality: one
-    kind: Parent
-- name: PatchPanelModule
-  namespace: Dcim
-  label: Patch Panel Module
-  menu_placement: DcimPatchPanel
-  icon: mdi:expansion-card
   human_friendly_id:
   - patch_panel__name__value
   - name__value
-  display_label: '{{ patch_panel__name__value }} > {{ name__value }}'
   order_by:
   - patch_panel__name__value
-  - position__value
+  - name__value
+  display_label: '{{ patch_panel__name__value }} > {{ name__value }}'
   uniqueness_constraints:
   - - patch_panel
-    - position__value
-  attributes:
-  - name: name
-    kind: Text
-    order_weight: 1000
-  - name: position
-    kind: Number
-    description: Position for the module inside the Patch Panel.
-    order_weight: 1100
-  - name: module_type
-    label: Module Type
-    kind: Dropdown
-    description: Type of module inserted into the patch panel.
-    order_weight: 1200
-    optional: true
-    choices:
-    - name: 3_mpo_24_fo_lc
-      label: 24 FO LC 3 MPO
-      description: High-density MPO cassette with 24 fibers to front and 3 MPO to
-        rear.
-      color: '#7f7fff'
-  - name: serial
-    kind: Text
-    optional: true
-    order_weight: 1500
-  - name: description
-    kind: Text
-    optional: true
-    order_weight: 2000
+    - name__value
   relationships:
+  - name: corresponding_front_rear
+    peer: DcimFrontPatchPanelInterface
+    label: Corresponding front interfaces
+    kind: Attribute
+    cardinality: many
+    optional: true
+    order_weight: 1300
   - name: patch_panel
     peer: DcimPatchPanel
-    optional: false
-    order_weight: 900
-    cardinality: one
     kind: Parent
+    cardinality: one
+    optional: false
+    identifier: patch_panel__rear_interfaces
+    order_weight: 900
 
 ```

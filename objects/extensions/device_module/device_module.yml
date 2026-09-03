@@ -1,0 +1,87 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/device_module.
+# Depends on: base, extensions/location_minimal (LocationSite: NYC1),
+# extensions/rack (LocationRack: NYC1-RACK-01, DcimDevice: nyc1-rtr01).
+# Order: DcimModuleType -> DcimModuleBay -> DcimModule (module_bay/module_type
+# are resolved by human_friendly_id, so the targets must already exist).
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimModuleType
+  data:
+    - name: ASR9001-RP
+      description: "Route processor module for the ASR 9001."
+      part_number: "A9K-RP"
+      manufacturer: Cisco
+
+    - name: ASR9001-FAN
+      description: "Fan tray module for the ASR 9001."
+      part_number: "A9K-FAN"
+      manufacturer: Cisco
+
+    - name: MX204-RE
+      description: "Routing engine module for the MX204."
+      part_number: "RE-MX204"
+      manufacturer: Juniper
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimModuleBay
+  data:
+    # `device` is cardinality one and its peer DcimPhysicalDevice is a Generic,
+    # so it needs a nested kind+data block. The nested data mapping is
+    # validated as a full create spec for DcimDevice, whose only mandatory
+    # fields without a default are `name` and `location` -- and `location`
+    # is itself a Generic peer (LocationHosting), so it repeats the same
+    # nested pattern down to LocationRack (name + site). All values here
+    # match the existing nyc1-rtr01 fixture exactly, so this upserts/matches
+    # it instead of creating a duplicate.
+    - name: "slot 1"
+      position: 1
+      description: "Primary route processor slot."
+      device: &nyc1_rtr01
+        kind: DcimDevice
+        data:
+          name: nyc1-rtr01
+          location:
+            kind: LocationRack
+            data:
+              name: NYC1-RACK-01
+              site: NYC1
+
+    - name: "slot 2"
+      position: 2
+      description: "Secondary route processor slot."
+      device: *nyc1_rtr01
+
+    - name: "fan tray 1"
+      position: 3
+      description: "Fan tray slot."
+      device: *nyc1_rtr01
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimModule
+  data:
+    # `module_bay` (cardinality one, peer DcimModuleBay is concrete) is
+    # referenced by its computed human_friendly_id: "<device> > <bay name>".
+    # `module_type` (cardinality one, peer DcimModuleType is concrete) is
+    # referenced by its plain name. Both bays and types are created above,
+    # in this same file, before this document runs.
+    - module_bay: "nyc1-rtr01 > slot 1"
+      module_type: ASR9001-RP
+      serial_number: "FOC12345678"
+
+    - module_bay: "nyc1-rtr01 > slot 2"
+      module_type: ASR9001-RP
+      serial_number: "FOC87654321"
+
+    - module_bay: "nyc1-rtr01 > fan tray 1"
+      module_type: ASR9001-FAN
+      serial_number: "FAN00112233"

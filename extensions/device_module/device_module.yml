@@ -1,0 +1,258 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
+
+version: "1.0"
+
+generics:
+  - name: GenericModule
+    namespace: Dcim
+    description: "A generic module, such as a Linecard or Routing Engine, installed in a module bay."
+    label: "Module"
+    icon: mdi:expansion-card
+    include_in_menu: true
+    human_friendly_id:
+      - computed_name__value
+    display_label: computed_name__value
+    attributes:
+      - name: computed_name
+        kind: Text
+        unique: true
+        read_only: true
+        optional: false
+        allow_override: any
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "{{ module_bay__computed_name__value }}"
+        description: "Name computed from the module bay; concrete module kinds may refine it."
+        order_weight: 1000
+      - name: serial_number
+        kind: Text
+        optional: true
+        description: "Serial number of the module, if known."
+        order_weight: 1400
+      - name: description
+        kind: Text
+        optional: true
+        order_weight: 1100
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: provisioning
+            label: Provisioning
+            description: "Module is being installed and provisioned."
+            color: "#f0ad4e"
+          - name: active
+            label: Active
+            description: "Module is installed and operational."
+            color: "#00d25b"
+          - name: maintenance
+            label: Maintenance
+            description: "Module is under maintenance."
+            color: "#ff9800"
+          - name: failed
+            label: Failed
+            description: "Module is still installed but is not operational."
+            color: "#e04040"
+          - name: rma
+            label: RMA
+            description: "Module has failed and is being returned to the manufacturer."
+            color: "#6c757d"
+        optional: false
+        description: "Operational status of the module."
+        order_weight: 1200
+    relationships:
+      - name: module_bay
+        peer: DcimModuleBay
+        label: Module Bay
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: module_bay__module
+        # A module only exists once installed - it must be installed to be tracked.
+        # Spares awaiting installation aren't modeled by this node.
+        order_weight: 900
+
+  - name: GenericModuleType
+    namespace: Dcim
+    description: "A generic module type, with common specifications like part number and manufacturer."
+    label: "Module Type"
+    icon: mdi:database-cog
+    include_in_menu: true
+    menu_placement: DcimGenericModule
+    human_friendly_id:
+      - name__value
+    order_by:
+      - manufacturer__name__value
+      - name__value
+    display_label: name__value
+    uniqueness_constraints:
+      - ["name__value", "manufacturer"]
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        description: "Name of the module type."
+        order_weight: 1000
+      - name: description
+        kind: Text
+        optional: true
+        description: "Description of the module type."
+        order_weight: 1100
+      - name: part_number
+        kind: Text
+        label: Part Number
+        optional: true
+        description: "Part number of the module."
+        order_weight: 1200
+    relationships:
+      - name: manufacturer
+        peer: OrganizationManufacturer
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: manufacturer__moduletype
+        description: "Manufacturer of the module type."
+        order_weight: 1250
+
+nodes:
+  - name: ModuleBay
+    namespace: Dcim
+    description: "A physical bay on a device that can receive a module."
+    label: "Module Bay"
+    icon: mdi:tray
+    include_in_menu: true
+    menu_placement: DcimDevice
+    human_friendly_id:
+      - computed_name__value
+    order_by:
+      - device__name__value
+      - name__value
+    display_label: computed_name__value
+    uniqueness_constraints:
+      - ["device", "name__value"]
+    attributes:
+      - name: computed_name
+        kind: Text
+        unique: true
+        read_only: true
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "{{ device__name__value }} > {{ name__value }}"
+        optional: false
+        description: "Name computed from the device and bay name."
+        order_weight: 800
+      - name: name
+        kind: Text
+        optional: false
+        description: "Name of the bay, e.g. 'slot 1' or 'psu 1'."
+        order_weight: 1000
+      - name: position
+        kind: Number
+        optional: true
+        parameters:
+          min_value: 1
+        description: "Numeric position of the bay within the device (e.g. slot 1, 2, 3)."
+        order_weight: 1050
+      - name: description
+        kind: Text
+        optional: true
+        order_weight: 1100
+      - name: role
+        kind: Dropdown
+        optional: true
+        description: "The role of the module bay, indicating the type of module it is intended to receive."
+        order_weight: 1300
+        choices:
+          - name: supervisor
+            label: Supervisor
+            description: "Bay intended for a supervisor / routing engine module."
+            color: "#A9CCE3"
+          - name: line_card
+            label: Line Card
+            description: "Bay intended for a line card module."
+            color: "#B4E0DC"
+          - name: power_supply
+            label: Power Supply
+            description: "Bay intended for a power supply module."
+            color: "#E3DAC9"
+          - name: fan
+            label: Fan
+            description: "Bay intended for a fan module."
+            color: "#D2B4DE"
+    relationships:
+      - name: device
+        peer: DcimPhysicalDevice
+        label: Device
+        # Peer is DcimPhysicalDevice; base/dcim.yml adds `name` to that generic so
+        # `device__name__value` resolves in computed_name above.
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: device__module_bays
+        order_weight: 900
+      - name: installed_module
+        peer: DcimGenericModule
+        label: Installed Module
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: module_bay__module
+        order_weight: 1200
+
+  - name: Module
+    namespace: Dcim
+    description: "Standard module installed in a device."
+    label: "Module"
+    icon: mdi:expansion-card
+    include_in_menu: false
+    inherit_from:
+      - DcimGenericModule
+    attributes:
+      - name: computed_name
+        kind: Text
+        unique: true
+        read_only: true
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: "{{ module_bay__computed_name__value }} ({{ module_type__name__value }})"
+        optional: false
+        description: "Name computed from the module bay and module type."
+        order_weight: 1000
+    relationships:
+      - name: module_type
+        peer: DcimModuleType
+        kind: Attribute
+        cardinality: one
+        optional: false
+        order_weight: 950
+
+  - name: ModuleType
+    namespace: Dcim
+    description: "Standard module type, defining common specifications for a Module."
+    label: "Module Type"
+    icon: mdi:database-cog
+    include_in_menu: false
+    inherit_from:
+      - DcimGenericModuleType
+
+extensions:
+  nodes:
+    # DCIM Extensions
+    - kind: DcimPhysicalDevice
+      relationships:
+        - name: module_bays
+          peer: DcimModuleBay
+          label: Module Bays
+          kind: Component
+          cardinality: many
+          optional: true
+          identifier: device__module_bays
+          description: "Module bays available on this device."
+          order_weight: 1750

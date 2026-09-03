@@ -1,0 +1,86 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/cross_connect.
+# Depends on: base, extensions/location_minimal (LocationSite: NYC1, SJC1),
+# extensions/rack (LocationRack: NYC1-RACK-01, DcimDevice: nyc1-rtr01 with
+# interface GigabitEthernet0/0/0/0).
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimCrossConnect
+  data:
+    - identifier: "XC-NYC1-0001"
+      description: "Long-haul fiber cross-connect to Lumen POP"
+      status: connected
+      # provider is cardinality one to a CONCRETE kind (OrganizationProvider),
+      # but its existence isn't guaranteed on a fresh instance, so we use a
+      # nested kind+data block (full create spec -- OrganizationProvider's
+      # only mandatory field is `name`) instead of a bare scalar reference.
+      # This upserts rather than duplicating if it already exists.
+      provider:
+        kind: OrganizationProvider
+        data:
+          name: Lumen
+      # location is cardinality one to LocationHosting, a Generic -- nested
+      # kind+data block. LocationSite's only mandatory field is `name`.
+      location:
+        kind: LocationSite
+        data:
+          name: NYC1
+      # connected_endpoints is cardinality many to DcimEndpoint, a Generic --
+      # nested kind+data with `data` as a list. InterfacePhysical's mandatory
+      # fields are `name` and `device`; `device` is itself cardinality one to
+      # a Generic (DcimGenericDevice), so it needs its own nested kind+data
+      # repeating DcimDevice's mandatory fields (name + location), and so on
+      # down to LocationSite. Every level is a full create spec, so this
+      # upserts/matches existing objects rather than duplicating them.
+      # Uses a dedicated interface (TenGigE0/0/0/1) rather than the
+      # GigabitEthernet0/0/0/0 fixture, since an Interface's `connector` is
+      # cardinality one and that one is already attached to a DcimCable.
+      connected_endpoints:
+        kind: InterfacePhysical
+        data:
+          - name: TenGigE0/0/0/1
+            device:
+              kind: DcimDevice
+              data:
+                name: nyc1-rtr01
+                location:
+                  kind: LocationRack
+                  data:
+                    name: NYC1-RACK-01
+                    site:
+                      kind: LocationSite
+                      data:
+                        name: NYC1
+
+    - identifier: "XC-NYC1-0002"
+      description: "Planned cross-connect for new customer circuit"
+      status: planned
+      provider:
+        kind: OrganizationProvider
+        data:
+          name: Colt
+      # Demonstrates attaching a cross-connect at the rack level instead of
+      # the site level. LocationRack's mandatory fields are name + site.
+      location:
+        kind: LocationRack
+        data:
+          name: NYC1-RACK-01
+          site:
+            kind: LocationSite
+            data:
+              name: NYC1
+
+    - identifier: "XC-SJC1-0001"
+      description: "Reserved cross-connect pending activation"
+      status: reserved
+      provider:
+        kind: OrganizationProvider
+        data:
+          name: Lumen
+      location:
+        kind: LocationSite
+        data:
+          name: SJC1

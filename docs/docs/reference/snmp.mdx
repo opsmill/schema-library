@@ -2,7 +2,7 @@
 title: SNMP
 ---
 
-This schema extension contains models for SNMP Communities and SNMP Clients. As you can see this extension is not linked to Tenancy or Device, as you could decide to link the Community to different models based on your use case.
+This schema extension contains models for SNMP Communities and SNMP Clients. A community links to the devices it is configured on; any further wiring, to a tenant for instance, is left to you.
 
 ## Details
 
@@ -24,8 +24,8 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| community_string |  | Password |  |  |  |
-| access |  | Text |  |  |  |
+| community_string |  | Password | False |  |  |
+| access |  | Dropdown | False |  | read_only, read_write |
 
 ### CommunityV3
 
@@ -40,12 +40,12 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| username |  | Text |  |  |  |
-| auth_protocol |  | Text |  |  |  |
+| username |  | Text | False |  |  |
+| auth_protocol |  | Dropdown | False |  | none, md5, sha |
 | auth_password |  | Password | True |  |  |
-| privacy_protocol |  | Text |  |  |  |
+| privacy_protocol |  | Dropdown | False |  | none, des, aes |
 | privacy_password |  | Password | True |  |  |
-| security_level |  | Dropdown |  |  | noAuthNoPriv, authNoPriv, authPriv |
+| security_level |  | Dropdown | False |  | no_auth_no_priv, auth_no_priv, auth_priv |
 
 ### Client
 
@@ -59,14 +59,15 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
+| name |  | Text | False |  |  |
 | client_description |  | Text | True |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| community | SnmpCommunity |  | many |  |
+| ip_addresses | IpamIPAddress | True | many | Attribute |
+| communities | SnmpCommunity | True | many | Attribute |
 
 ## Generics
 
@@ -82,14 +83,15 @@ This schema extension contains models for SNMP Communities and SNMP Clients. As 
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
+| name |  | Text | False |  |  |
 | description |  | Text | True |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| clients | SnmpClient |  | many | Component |
+| clients | SnmpClient | True | many | Component |
+| devices | DcimGenericDevice | True | many | Attribute |
 
 ## Code
 
@@ -101,129 +103,180 @@ generics:
   description: Generic model for SNMP community configurations.
   label: SNMP Community
   icon: iconoir:community
+  include_in_menu: true
   human_friendly_id:
   - name__value
-  display_label: name__value
   order_by:
   - name__value
+  display_label: name__value
   attributes:
   - name: name
     kind: Text
+    unique: true
+    optional: false
     order_weight: 1000
   - name: description
     kind: Text
-    order_weight: 1100
     optional: true
+    order_weight: 1100
   relationships:
   - name: clients
     peer: SnmpClient
-    cardinality: many
     kind: Component
+    cardinality: many
+    optional: true
+    order_weight: 1900
+  - name: devices
+    peer: DcimGenericDevice
+    label: Devices
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: snmp_community__device
+    description: Devices this community is configured on.
+    order_weight: 1800
 nodes:
 - name: CommunityV2
   namespace: Snmp
   description: SNMP v1/v2c community configuration.
   label: SNMP v1/v2c
   icon: iconoir:community
+  include_in_menu: true
   menu_placement: SnmpCommunity
-  human_friendly_id:
-  - name__value
-  display_label: name__value
-  order_by:
-  - name__value
   inherit_from:
   - SnmpCommunity
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
   attributes:
   - name: community_string
     kind: Password
+    optional: false
     order_weight: 1300
   - name: access
-    kind: Text
-    enum:
-    - Read-Only
-    - Read-Write
+    kind: Dropdown
+    choices:
+    - name: read_only
+      label: Read-Only
+      description: Read-only access.
+    - name: read_write
+      label: Read-Write
+      description: Read-write access.
+    optional: false
     order_weight: 1200
 - name: CommunityV3
   namespace: Snmp
   description: SNMP version 3 configuration with enhanced security.
   label: SNMP v3
   icon: iconoir:community
+  include_in_menu: true
   menu_placement: SnmpCommunity
-  human_friendly_id:
-  - name__value
-  display_label: name__value
-  order_by:
-  - name__value
   inherit_from:
   - SnmpCommunity
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
   attributes:
   - name: username
     kind: Text
+    optional: false
     order_weight: 1300
   - name: auth_protocol
+    kind: Dropdown
     label: Authentication Protocol
-    kind: Text
-    enum:
-    - None
-    - MD5
-    - SHA
+    choices:
+    - name: none
+      label: None
+      description: No authentication.
+    - name: md5
+      label: MD5
+      description: MD5 authentication.
+    - name: sha
+      label: SHA
+      description: SHA authentication.
+    optional: false
     order_weight: 1400
   - name: auth_password
-    label: Authentication Password
     kind: Password
-    order_weight: 1500
+    label: Authentication Password
     optional: true
+    order_weight: 1500
   - name: privacy_protocol
+    kind: Dropdown
     label: Privacy Protocol
-    kind: Text
-    enum:
-    - None
-    - DES
-    - AES
+    choices:
+    - name: none
+      label: None
+      description: No privacy.
+    - name: des
+      label: DES
+      description: DES encryption.
+    - name: aes
+      label: AES
+      description: AES encryption.
+    optional: false
     order_weight: 1600
   - name: privacy_password
-    label: Privacy Password
     kind: Password
-    order_weight: 1700
+    label: Privacy Password
     optional: true
+    order_weight: 1700
   - name: security_level
-    label: Security Level
     kind: Dropdown
+    label: Security Level
     choices:
-    - name: noAuthNoPriv
+    - name: no_auth_no_priv
       label: NoAuthNoPriv
       description: No authentication and no privacy.
-    - name: authNoPriv
+    - name: auth_no_priv
       label: AuthNoPriv
       description: Authentication but no privacy.
-    - name: authPriv
+    - name: auth_priv
       label: AuthPriv
       description: Both authentication and privacy.
+    optional: false
     order_weight: 1200
 - name: Client
   namespace: Snmp
   description: Represents an SNMP client that interacts with SNMP Community.
   label: SNMP Client
   icon: ph:user-list-light
+  include_in_menu: true
   menu_placement: SnmpCommunity
   human_friendly_id:
   - name__value
-  display_label: name__value
   order_by:
   - name__value
+  display_label: name__value
   attributes:
   - name: name
     kind: Text
+    unique: true
+    optional: false
     order_weight: 1000
   - name: client_description
-    label: Description
     kind: Text
-    order_weight: 1100
+    label: Description
     optional: true
+    order_weight: 1100
   relationships:
-  - name: community
-    peer: SnmpCommunity
+  - name: ip_addresses
+    peer: IpamIPAddress
+    label: IP Addresses
+    kind: Attribute
     cardinality: many
+    optional: true
+    description: Authorized SNMP client address.
+    order_weight: 1150
+  - name: communities
+    peer: SnmpCommunity
+    kind: Attribute
+    cardinality: many
+    optional: true
     order_weight: 1200
 
 ```

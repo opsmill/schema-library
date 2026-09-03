@@ -1,0 +1,87 @@
+---
+title: Location Site
+---
+
+This schema extension introduces a standalone Location.Site node (with facility, physical address, timezone, and status). It defines the same Site node as extensions/location_minimal, so load one or the other, not both.
+
+## Details
+
+- **Dependencies:**
+    - [base](dcim)
+
+## Nodes
+
+### Site
+
+- **Label:** Site
+- **Description:** A physical location hosting equipment, such as a data center or an office.
+- **Namespace:** Location
+- **Icon:** ri:building-line
+- **Inherit From:** LocationGeneric, LocationHosting, IpamPrefixScope, IpamVLANGroupScope
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| status |  | Dropdown | False | active | active, planned, staging, decommissioning, deprecated |
+| facility |  | Text | True |  |  |
+| physical_address |  | Text | True |  |  |
+| timezone |  | Text | True |  |  |
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: Site
+  namespace: Location
+  description: A physical location hosting equipment, such as a data center or an
+    office.
+  label: Site
+  icon: ri:building-line
+  include_in_menu: true
+  menu_placement: LocationGeneric
+  inherit_from:
+  - LocationGeneric
+  - LocationHosting
+  - IpamPrefixScope
+  - IpamVLANGroupScope
+  display_label: name__value
+  attributes:
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: active
+      label: Active
+      color: '#00d25b'
+    - name: planned
+      label: Planned
+      color: '#2196f3'
+    - name: staging
+      label: Staging
+      color: '#f0ad4e'
+    - name: decommissioning
+      label: Decommissioning
+      color: '#ff9800'
+    - name: deprecated
+      label: Deprecated
+      color: '#6c757d'
+    optional: false
+    order_weight: 1200
+  - name: facility
+    kind: Text
+    unique: false
+    optional: true
+    order_weight: 1150
+  - name: physical_address
+    kind: Text
+    unique: false
+    optional: true
+    order_weight: 1400
+  - name: timezone
+    kind: Text
+    optional: true
+    order_weight: 1300
+
+```

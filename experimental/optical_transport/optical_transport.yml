@@ -1,4 +1,9 @@
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
 ---
 version: "1.0"
 
@@ -6,7 +11,7 @@ version: "1.0"
 #
 # Depends on:
 #   - base/dcim.yml                  (DcimGenericDevice, DcimPhysicalDevice, DcimEndpoint, DcimConnector)
-#   - extensions/modules/modules.yml (DeviceGenericModule, DeviceGenericModuleType)
+#   - extensions/device_module/device_module.yml (DcimGenericModule, DcimGenericModuleType, DcimModuleBay)
 #   - extensions/cable/cable.yml     (DcimCable)
 #
 # Four layers:
@@ -640,7 +645,7 @@ nodes:
     description: "Categorization of optical modules by function"
     icon: mdi:expansion-card
     inherit_from:
-      - DeviceGenericModuleType
+      - DcimGenericModuleType
     attributes:
       - name: name
         kind: Text
@@ -694,7 +699,7 @@ nodes:
     description: "Optical-electrical-optical conversion module (100G, 400G coherent) installed in chassis"
     icon: mdi:chip
     inherit_from:
-      - DeviceGenericModule
+      - DcimGenericModule
     display_label: computed_name__value
     uniqueness_constraints:
       - [computed_name__value]
@@ -707,8 +712,8 @@ nodes:
         optional: false
         computed_attribute:
           kind: Jinja2
-          jinja2_template: "{{ device__serial__value }}-TPD-{{ slot_number__value }}"
-        description: "Computed module name (e.g., ABC123-TPD-1/1)"
+          jinja2_template: "{{ module_bay__computed_name__value }}-TPD-{{ slot_number__value }}"
+        description: "Computed module name (e.g., dc1-leaf1 > slot 1-TPD-1/1)"
       - name: slot_number
         kind: Text
         optional: false
@@ -810,7 +815,7 @@ nodes:
     description: "Multiplexer/Demultiplexer/ROADM module for wavelength management installed in chassis"
     icon: mdi:router-network
     inherit_from:
-      - DeviceGenericModule
+      - DcimGenericModule
     display_label: computed_name__value
     human_friendly_id:
       - computed_name__value
@@ -821,8 +826,8 @@ nodes:
         optional: false
         computed_attribute:
           kind: Jinja2
-          jinja2_template: "{{ device__serial__value }}-MUX-{{ slot_number__value }}"
-        description: "Computed module name (e.g., ABC123-MUX-1/3)"
+          jinja2_template: "{{ module_bay__computed_name__value }}-MUX-{{ slot_number__value }}"
+        description: "Computed module name (e.g., dc1-leaf1 > slot 1-MUX-1/3)"
       - name: slot_number
         kind: Text
         optional: false
@@ -1114,7 +1119,7 @@ nodes:
     description: "Optical signal amplifier module (EDFA, Raman, VGC) installed in chassis"
     icon: mdi:amplifier
     inherit_from:
-      - DeviceGenericModule
+      - DcimGenericModule
     display_label: computed_name__value
     human_friendly_id:
       - computed_name__value
@@ -1125,8 +1130,8 @@ nodes:
         optional: false
         computed_attribute:
           kind: Jinja2
-          jinja2_template: "{{ device__serial__value }}-AMP-{{ slot_number__value }}"
-        description: "Computed module name (e.g., ABC123-AMP-1/5)"
+          jinja2_template: "{{ module_bay__computed_name__value }}-AMP-{{ slot_number__value }}"
+        description: "Computed module name (e.g., dc1-leaf1 > slot 1-AMP-1/5)"
       - name: slot_number
         kind: Text
         optional: false

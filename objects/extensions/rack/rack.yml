@@ -1,0 +1,46 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/rack.
+# Depends on: base, extensions/location_minimal (LocationSite: NYC1).
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: LocationRack
+  data:
+    - name: NYC1-RACK-01
+      site: NYC1
+      status: active
+      height: 42
+      facility: "R101"
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimDevice
+  data:
+    - name: nyc1-rtr01
+      status: active
+      role: edge
+      device_type: ASR9001
+      platform: Cisco IOS-XR
+      position: 40
+      rack_face: front
+      # LocationRack inherits LocationHosting (a Generic) -- specify the concrete
+      # kind so the reference is unambiguous and upserts against the rack above.
+      # `location` is cardinality one, so `data` is a single mapping, not a list.
+      # A nested kind+data block is validated as a full object spec, so it must
+      # repeat all of the target's mandatory fields (name + site here), not just
+      # enough to identify it -- the upsert then matches the rack created above.
+      location:
+        kind: LocationRack
+        data:
+          name: NYC1-RACK-01
+          site: NYC1
+      interfaces:
+        kind: InterfacePhysical
+        data:
+          - name: GigabitEthernet0/0/0/0
+            role: core
+            status: active

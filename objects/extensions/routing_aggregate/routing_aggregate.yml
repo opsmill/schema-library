@@ -1,0 +1,48 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/routing_aggregate.
+# Depends on: extensions/routing (RoutingProtocol generic), base/extensions/rack
+# (DcimDevice: nyc1-rtr01), extensions/vrf and extensions/routing (IpamVRF:
+# CUSTOMER-B, MGMT-VRF, CUST-A), extensions/aggregate (IpamPrefix: 10.0.0.0/16,
+# 192.0.2.0/24, namespace "default").
+#
+# RoutingAggregateRoute inherits RoutingProtocol: description (Text, unique,
+# also the human_friendly_id), status (Dropdown), device (peer DcimDevice,
+# concrete, cardinality one, mandatory), vrf (peer IpamVRF, concrete,
+# cardinality one, mandatory) are all inherited and mandatory. discard,
+# import_policies, export_policies and destination (peer IpamPrefix, many,
+# optional) are added by this node.
+#
+# `device` and `vrf` are concrete kinds with cardinality one, so plain
+# human_friendly_id scalars are used (e.g. `device: nyc1-rtr01`). `destination`
+# is cardinality many with a concrete peer (IpamPrefix) whose human_friendly_id
+# is composite (["ip_namespace__name", "prefix"]), so each entry is itself a
+# list, e.g. `["default", "10.0.0.0/16"]`.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingAggregateRoute
+  data:
+    - description: "Aggregate summary route for Customer A allocated block on nyc1-rtr01"
+      status: active
+      device: nyc1-rtr01
+      vrf: CUST-A
+      discard: false
+      import_policies: "CUST-A-EXPORT-SUMMARY"
+      destination:
+        - ["default", "10.0.0.0/16"]
+
+    - description: "Discard route for unused Customer B subnet on nyc1-rtr01"
+      status: active
+      device: nyc1-rtr01
+      vrf: CUSTOMER-B
+      discard: true
+      destination:
+        - ["default", "192.0.2.0/24"]
+
+    - description: "Disabled aggregate route pending decommission on nyc1-rtr01"
+      status: disabled
+      device: nyc1-rtr01
+      vrf: MGMT-VRF
+      discard: false

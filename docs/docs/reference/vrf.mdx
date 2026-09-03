@@ -14,7 +14,7 @@ This schema extension contains models to support VRF in your network.
 ### VRF
 
 - **Label:** VRF
-- **Description:** A VRF is isolated layer three domain
+- **Description:** A VRF is an isolated layer three domain.
 - **Namespace:** Ipam
 - **Icon:** mdi:router
 - **Human Friendly ID:** name__value
@@ -25,15 +25,15 @@ This schema extension contains models to support VRF in your network.
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name |  | Text | False |  |  |
 | vrf_rd |  | Text | True |  |  |
+| enforce_unique | Declares the intent that prefixes and addresses be unique in this VRF. Infrahub does not enforce it; use a check or generator. | Boolean | True | True |  |
 | description |  | Text | True |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| namespace | BuiltinIPNamespace | False | one | Attribute |
-| import_rt | IpamRouteTarget | True | one | Attribute |
-| export_rt | IpamRouteTarget | True | one | Attribute |
+| import_rt | IpamRouteTarget | True | many | Attribute |
+| export_rt | IpamRouteTarget | True | many | Attribute |
 
 ### RouteTarget
 
@@ -47,14 +47,15 @@ This schema extension contains models to support VRF in your network.
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
+| name |  | Text | False |  |  |
 | description |  | Text | True |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| vrf | IpamVRF | True | many |  |
+| import_vrf | IpamVRF | True | many | Generic |
+| export_vrf | IpamVRF | True | many | Generic |
 
 ## Extensions
 
@@ -87,9 +88,10 @@ version: '1.0'
 nodes:
 - name: VRF
   namespace: Ipam
-  description: A VRF is isolated layer three domain
+  description: A VRF is an isolated layer three domain.
   label: VRF
   icon: mdi:router
+  include_in_menu: true
   human_friendly_id:
   - name__value
   order_by:
@@ -98,41 +100,49 @@ nodes:
   attributes:
   - name: name
     kind: Text
-    optional: false
     unique: true
+    optional: false
+    order_weight: 1000
   - name: vrf_rd
-    label: Route Distinguisher
     kind: Text
+    label: Route Distinguisher
     optional: true
+    order_weight: 1050
+  - name: enforce_unique
+    kind: Boolean
+    label: Enforce Unique
+    description: Declares the intent that prefixes and addresses be unique in this
+      VRF. Infrahub does not enforce it; use a check or generator.
+    default_value: true
+    optional: true
+    order_weight: 1200
   - name: description
     kind: Text
     optional: true
-    order_weight: 1200
+    order_weight: 1100
   relationships:
-  - name: namespace
-    peer: BuiltinIPNamespace
-    optional: false
-    cardinality: one
-    kind: Attribute
   - name: import_rt
-    identifier: vrf__import
+    peer: IpamRouteTarget
     label: Import Targets
-    peer: IpamRouteTarget
-    optional: true
-    cardinality: one
     kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: vrf__import
+    order_weight: 1300
   - name: export_rt
-    identifier: vrf__export
-    label: Export Targets
     peer: IpamRouteTarget
-    optional: true
-    cardinality: one
+    label: Export Targets
     kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: vrf__export
+    order_weight: 1350
 - name: RouteTarget
   namespace: Ipam
   description: Route Target (RFC 4360)
   label: Route Target
   icon: mdi:target
+  include_in_menu: true
   menu_placement: IpamVRF
   human_friendly_id:
   - name__value
@@ -143,33 +153,50 @@ nodes:
   - name: name
     kind: Text
     unique: true
+    optional: false
+    order_weight: 1000
   - name: description
     kind: Text
     optional: true
+    order_weight: 1100
   relationships:
-  - name: vrf
+  - name: import_vrf
     peer: IpamVRF
-    optional: true
+    kind: Generic
+    label: Imported by VRFs
     cardinality: many
+    optional: true
+    identifier: vrf__import
+    order_weight: 1300
+  - name: export_vrf
+    peer: IpamVRF
+    kind: Generic
+    label: Exported by VRFs
+    cardinality: many
+    optional: true
+    identifier: vrf__export
+    order_weight: 1350
 extensions:
   nodes:
   - kind: IpamPrefix
     relationships:
     - name: vrf
-      label: VRF
       peer: IpamVRF
-      optional: true
-      cardinality: one
+      label: VRF
       kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: prefix__vrf
       order_weight: 1150
   - kind: IpamIPAddress
     relationships:
     - name: vrf
-      label: VRF
       peer: IpamVRF
-      optional: true
-      cardinality: one
+      label: VRF
       kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: ip_address__vrf
       order_weight: 1150
 
 ```

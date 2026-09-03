@@ -32,7 +32,7 @@ This schema extension contains all you need to model the Aggregate Routing Proto
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| destination | IpamPrefix |  |  | Attribute |
+| destination | IpamPrefix | True |  | Attribute |
 
 ## Code
 
@@ -43,30 +43,32 @@ nodes:
   namespace: Routing
   description: Aggregate Protocol with action and BGP communities
   label: Aggregate Routes
-  include_in_menu: false
   icon: grommet-icons:aggregate
+  include_in_menu: true
+  menu_placement: RoutingProtocol
   inherit_from:
   - RoutingProtocol
   attributes:
   - name: discard
-    label: Discard
     kind: Boolean
-    optional: true
+    label: Discard
     default_value: false
-    order_weight: 1275
+    optional: true
+    order_weight: 1350
   - name: import_policies
     kind: Text
     optional: true
-    order_weight: 1300
+    order_weight: 1400
   - name: export_policies
     kind: Text
     optional: true
-    order_weight: 1350
+    order_weight: 1450
   relationships:
   - name: destination
-    kind: Attribute
     peer: IpamPrefix
-    description: Destination network for the static route.
-    order_weight: 1200
+    kind: Attribute
+    optional: true
+    description: Destination network aggregated by this route.
+    order_weight: 1300
 
 ```

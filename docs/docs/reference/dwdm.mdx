@@ -25,8 +25,8 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
-| wdm_type | Type of WDM (e.g CWDM. DWDM) | Dropdown | False | dwdm | cwdm, dwdm |
+| name |  | Text | False |  |  |
+| wdm_type | Type of WDM technology (e.g. CWDM, DWDM) | Dropdown | False | dwdm | cwdm, dwdm |
 | description |  | Text | True |  |  |
 
 #### Relationships
@@ -39,6 +39,7 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 ### OadmFrontInterface
 
 - **Label:** Optical Multiplexer Front Interfaces
+- **Description:** Client-side interface of an optical add-drop multiplexer, carrying a single channel.
 - **Namespace:** Dcim
 - **Uniqueness Constraints:**
     - optical_multiplexer, name__value
@@ -55,6 +56,7 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 ### OadmRearInterface
 
 - **Label:** Optical Multiplexer Rear Interfaces
+- **Description:** Line-side interface of an optical add-drop multiplexer, carrying the multiplexed signal.
 - **Namespace:** Dcim
 - **Uniqueness Constraints:**
     - optical_multiplexer, name__value
@@ -82,10 +84,10 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| channel | WDM channel number. | Number |  |  |  |
-| wdm_type | Type of WDM (e.g CWDM. DWDM) | Dropdown | False | dwdm | cwdm, dwdm |
-| wavelength | Wavelength of the channel in nm. | Text |  |  |  |
-| frequency | Frequency of the channel in GHz. | Text |  |  |  |
+| channel | WDM channel number. | Number | False |  |  |
+| wdm_type | Type of WDM technology (e.g. CWDM, DWDM) | Dropdown | False | dwdm | cwdm, dwdm |
+| wavelength | Wavelength of the channel in nm. | Text | False |  |  |
+| frequency | Frequency of the channel in GHz. | Text | False |  |  |
 
 ### WdmSFP
 
@@ -99,7 +101,7 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| wdm_type | Type of WDM (e.g CWDM. DWDM) | Dropdown | False | dwdm | cwdm, dwdm |
+| wdm_type | Type of WDM technology (e.g. CWDM, DWDM) | Dropdown | False | dwdm | cwdm, dwdm |
 
 #### Relationships
 
@@ -112,6 +114,7 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 ### GenericOadmInterface
 
 - **Label:** Optical Multiplexer Interfaces
+- **Description:** Generic interface of an optical add-drop multiplexer, front or rear.
 - **Namespace:** Dcim
 - **Icon:** mdi:ethernet
 
@@ -119,9 +122,9 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
+| name |  | Text | False |  |  |
 | description |  | Text | True |  |  |
-| connector_type |  | Dropdown |  |  | FC, LC, LC_PC, LC_UPC, LC_APC, LSH, LSH_PC, LSH_UPC, LSH_APC, LX_5, LX_5_PC, LX_5_UPC, LX_5_APC, MPO, MTRJ, SC, SC_PC, SC_UPC, SC_APC, ST, CS, SN, SMA_905, SMA_906, URM_P2 |
+| connector_type |  | Dropdown | False |  | fc, lc, lc_pc, lc_upc, lc_apc, lsh, lsh_pc, lsh_upc, lsh_apc, lx_5, lx_5_pc, lx_5_upc, lx_5_apc, mpo, mtrj, sc, sc_pc, sc_upc, sc_apc, st, cs, sn, sma_905, sma_906, urm_p2, urm_p4, urm_p8, splice |
 
 ## Code
 
@@ -129,130 +132,143 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 version: '1.0'
 generics:
 - name: GenericOadmInterface
-  label: Optical Multiplexer Interfaces
-  menu_placement: DcimOpticalMultiplexer
   namespace: Dcim
+  description: Generic interface of an optical add-drop multiplexer, front or rear.
+  label: Optical Multiplexer Interfaces
   icon: mdi:ethernet
+  include_in_menu: true
+  menu_placement: DcimOpticalMultiplexer
   attributes:
   - name: name
     kind: Text
+    optional: false
     order_weight: 1000
   - name: description
     kind: Text
     optional: true
-    order_weight: 2000
+    order_weight: 1100
   - name: connector_type
     kind: Dropdown
-    order_weight: 1100
     choices:
-    - name: FC
+    - name: fc
       label: FC
       description: Standardized fiber optic connector used primarily in datacom and
         telecom applications.
-    - name: LC
+    - name: lc
       label: LC
       description: Compact fiber optic connector with a push-pull mechanism.
-    - name: LC_PC
+    - name: lc_pc
       label: LC/PC
       description: Polished LC connector providing physical contact (PC).
-    - name: LC_UPC
+    - name: lc_upc
       label: LC/UPC
       description: Ultra-Physical Contact (UPC) variant of the LC connector with enhanced
         polish.
-    - name: LC_APC
+    - name: lc_apc
       label: LC/APC
       description: Angled Physical Contact (APC) version of the LC connector with
         a slanted fiber end-face.
-    - name: LSH
+    - name: lsh
       label: LSH
       description: European fiber optic connector offering high durability.
-    - name: LSH_PC
+    - name: lsh_pc
       label: LSH/PC
       description: Physical Contact version of LSH with standard polish.
-    - name: LSH_UPC
+    - name: lsh_upc
       label: LSH/UPC
       description: Ultra-Physical Contact variant of LSH, minimizing return loss with
         a superior polish.
-    - name: LSH_APC
+    - name: lsh_apc
       label: LSH/APC
       description: Angled Physical Contact version of LSH, designed to reduce back
         reflections.
-    - name: LX_5
+    - name: lx_5
       label: LX.5
       description: Miniaturized fiber optic connector similar to LC but with an additional
         shutter mechanism.
-    - name: LX_5_PC
+    - name: lx_5_pc
       label: LX.5/PC
       description: Physical Contact version of LX.5.
-    - name: LX_5_UPC
+    - name: lx_5_upc
       label: LX.5/UPC
       description: Ultra-Physical Contact variant of LX.5.
-    - name: LX_5_APC
+    - name: lx_5_apc
       label: LX.5/APC
       description: Angled Physical Contact version of LX.5.
-    - name: MPO
+    - name: mpo
       label: MPO
       description: Multi-fiber Push-On connector typically used in data centers for
         high-speed applications.
-    - name: MTRJ
+    - name: mtrj
       label: MTRJ
       description: Male-to-female fiber optic connector with two fibers.
-    - name: SC
+    - name: sc
       label: SC
       description: Square fiber optic connector with push-pull lock.
-    - name: SC_PC
+    - name: sc_pc
       label: SC/PC
       description: Physical Contact SC connector with a polished end-face.
-    - name: SC_UPC
+    - name: sc_upc
       label: SC/UPC
       description: Ultra-Physical Contact variant of SC.
-    - name: SC_APC
+    - name: sc_apc
       label: SC/APC
       description: Angled Physical Contact version of SC.
-    - name: ST
+    - name: st
       label: ST
       description: Bayonet-style fiber optic connector primarily used in industrial
         and military applications.
-    - name: CS
+    - name: cs
       label: CS
       description: Compact connector with a high-density duplex configuration.
-    - name: SN
+    - name: sn
       label: SN
       description: Small-form connector with dual fibers.
-    - name: SMA_905
+    - name: sma_905
       label: SMA 905
       description: Stainless steel fiber optic connector.
-    - name: SMA_906
+    - name: sma_906
       label: SMA 906
       description: Variant of SMA 905 with similar durability, frequently used in
         high-vibration settings.
-    - name: URM_P2
+    - name: urm_p2
       label: URM-P2
       description: Specialized fiber optic connector for industrial and harsh environments.
+    - name: urm_p4
+      label: URM-P4
+      description: Similar to URM-P2 but designed for higher performance.
+    - name: urm_p8
+      label: URM-P8
+      description: Enhanced version of URM connectors with higher protection.
+    - name: splice
+      label: Splice
+      description: Permanent fiber connection method where two fiber ends are fused.
+    optional: false
+    order_weight: 1200
 nodes:
 - name: OpticalMultiplexer
-  label: Optical Multiplexer
+  namespace: Dcim
   description: An OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength
     Division Multiplexing) technologies.
+  label: Optical Multiplexer
   icon: mdi:transit-connection-variant
-  namespace: Dcim
+  include_in_menu: true
+  inherit_from:
+  - DcimPhysicalDevice
   human_friendly_id:
   - name__value
   order_by:
   - name__value
   display_label: name__value
-  inherit_from:
-  - DcimPhysicalDevice
   attributes:
   - name: name
     kind: Text
     unique: true
+    optional: false
     order_weight: 1000
   - name: wdm_type
     kind: Dropdown
-    description: Type of WDM (e.g CWDM. DWDM)
-    order_weight: 1110
-    optional: false
+    default_value: dwdm
     choices:
     - name: cwdm
       label: CWDM (Coarse Wavelength Division Multiplexing)
@@ -263,85 +279,100 @@ nodes:
       description: Supports dense wavelengths and amplification for long-distance
         communication.
       color: '#9933cc'
-    default_value: dwdm
+    optional: false
+    description: Type of WDM technology (e.g. CWDM, DWDM)
+    order_weight: 1300
   - name: description
     kind: Text
     optional: true
-    order_weight: 2000
+    order_weight: 1100
   relationships:
   - name: front_interfaces
     peer: DcimOadmFrontInterface
-    identifier: front_interfaces
-    optional: true
-    cardinality: many
     kind: Component
+    cardinality: many
+    optional: true
+    identifier: optical_multiplexer__front_interfaces
+    order_weight: 1350
   - name: rear_interface
     peer: DcimOadmRearInterface
-    identifier: rear_interfaces
-    optional: true
-    cardinality: one
     kind: Component
+    cardinality: one
+    optional: true
+    identifier: optical_multiplexer__rear_interface
+    order_weight: 1450
 - name: OadmFrontInterface
-  label: Optical Multiplexer Front Interfaces
-  menu_placement: DcimGenericOadmInterface
   namespace: Dcim
-  human_friendly_id:
-  - optical_multiplexer__name__value
-  - name__value
-  display_label: '{{ optical_multiplexer__name__value }} > {{ name__value }}'
-  order_by:
-  - optical_multiplexer__name__value
-  - name__value
-  uniqueness_constraints:
-  - - optical_multiplexer
-    - name__value
+  description: Client-side interface of an optical add-drop multiplexer, carrying
+    a single channel.
+  label: Optical Multiplexer Front Interfaces
+  include_in_menu: true
+  menu_placement: DcimGenericOadmInterface
   inherit_from:
   - DcimEndpoint
   - DcimGenericOadmInterface
+  human_friendly_id:
+  - optical_multiplexer__name__value
+  - name__value
+  order_by:
+  - optical_multiplexer__name__value
+  - name__value
+  display_label: '{{ optical_multiplexer__name__value }} > {{ name__value }}'
+  uniqueness_constraints:
+  - - optical_multiplexer
+    - name__value
   relationships:
   - name: optical_multiplexer
     peer: DcimOpticalMultiplexer
-    order_weight: 900
-    identifier: front_interfaces
-    optional: false
-    cardinality: one
     kind: Parent
+    cardinality: one
+    optional: false
+    identifier: optical_multiplexer__front_interfaces
+    order_weight: 900
   - name: channels
     peer: DcimWdmChannel
-    order_weight: 1200
-    optional: true
-    cardinality: many
     kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: oadm_interface__channels
+    order_weight: 1300
 - name: OadmRearInterface
-  label: Optical Multiplexer Rear Interfaces
-  menu_placement: DcimGenericOadmInterface
   namespace: Dcim
-  human_friendly_id:
-  - optical_multiplexer__name__value
-  - name__value
-  display_label: '{{ optical_multiplexer__name__value }} > {{ name__value }}'
-  order_by:
-  - optical_multiplexer__name__value
-  - name__value
-  uniqueness_constraints:
-  - - optical_multiplexer
-    - name__value
+  description: Line-side interface of an optical add-drop multiplexer, carrying the
+    multiplexed signal.
+  label: Optical Multiplexer Rear Interfaces
+  include_in_menu: true
+  menu_placement: DcimGenericOadmInterface
   inherit_from:
   - DcimEndpoint
   - DcimGenericOadmInterface
+  human_friendly_id:
+  - optical_multiplexer__name__value
+  - name__value
+  order_by:
+  - optical_multiplexer__name__value
+  - name__value
+  display_label: '{{ optical_multiplexer__name__value }} > {{ name__value }}'
+  uniqueness_constraints:
+  - - optical_multiplexer
+    - name__value
   relationships:
   - name: optical_multiplexer
     peer: DcimOpticalMultiplexer
-    order_weight: 900
-    identifier: rear_interface
-    optional: false
-    cardinality: one
     kind: Parent
+    cardinality: one
+    optional: false
+    identifier: optical_multiplexer__rear_interface
+    order_weight: 900
 - name: WdmChannel
   namespace: Dcim
   description: A WDM channel with its wavelength and frequency.
   label: WDM Channel
   icon: game-icons:laser-warning
+  include_in_menu: true
+  human_friendly_id:
+  - wdm_type__value
+  - channel__value
   order_by:
   - wdm_type__value
   - channel__value
@@ -353,18 +384,15 @@ nodes:
     - wdm_type__value
   - - channel__value
     - wdm_type__value
-  human_friendly_id:
-  - wdm_type__value
-  - channel__value
   attributes:
   - name: channel
     kind: Number
+    optional: false
     description: WDM channel number.
+    order_weight: 1000
   - name: wdm_type
     kind: Dropdown
-    description: Type of WDM (e.g CWDM. DWDM)
-    order_weight: 1110
-    optional: false
+    default_value: dwdm
     choices:
     - name: cwdm
       label: CWDM (Coarse Wavelength Division Multiplexing)
@@ -375,29 +403,34 @@ nodes:
       description: Supports dense wavelengths and amplification for long-distance
         communication.
       color: '#9933cc'
-    default_value: dwdm
+    optional: false
+    description: Type of WDM technology (e.g. CWDM, DWDM)
+    order_weight: 1100
   - name: wavelength
+    kind: Text
     label: Wavelength (nm)
-    kind: Text
+    optional: false
     description: Wavelength of the channel in nm.
+    order_weight: 1200
   - name: frequency
-    label: Frequency (GHz)
     kind: Text
+    label: Frequency (GHz)
+    optional: false
     description: Frequency of the channel in GHz.
+    order_weight: 1300
 - name: WdmSFP
   namespace: Dcim
-  inherit_from:
-  - DcimGenericSFP
   description: SFP with configuration for Wavelength Division Multiplexing.
   label: WDM SFP
   icon: mdi:laser-pointer
+  include_in_menu: true
   menu_placement: DcimGenericSFP
+  inherit_from:
+  - DcimGenericSFP
   attributes:
   - name: wdm_type
     kind: Dropdown
-    description: Type of WDM (e.g CWDM. DWDM)
-    order_weight: 1110
-    optional: false
+    default_value: dwdm
     choices:
     - name: cwdm
       label: CWDM (Coarse Wavelength Division Multiplexing)
@@ -408,14 +441,17 @@ nodes:
       description: Supports dense wavelengths and amplification for long-distance
         communication.
       color: '#9933cc'
-    default_value: dwdm
+    optional: false
+    description: Type of WDM technology (e.g. CWDM, DWDM)
+    order_weight: 1150
   relationships:
   - name: wdm_channel
-    label: WDM Channel
     peer: DcimWdmChannel
+    label: WDM Channel
     kind: Attribute
     cardinality: one
     optional: false
-    order_weight: 1150
+    identifier: wdm_sfp__channel
+    order_weight: 1250
 
 ```

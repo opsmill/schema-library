@@ -8,7 +8,6 @@ This extension is using the Routing Policies extensions and the Routing BGP one 
 
 - **Dependencies:**
     - [base](dcim)
-    - [extensions/routing](routing)
     - [extensions/routing_policies](routing_policies)
     - [extensions/routing_bgp](routing_bgp)
 
@@ -17,7 +16,7 @@ This extension is using the Routing Policies extensions and the Routing BGP one 
 ### PolicyBGP
 
 - **Label:** BGP Routing Policies
-- **Description:** A routing policiers for BGP
+- **Description:** A routing policy for BGP.
 - **Namespace:** Routing
 - **Icon:** carbon:deployment-policy
 - **Inherit From:** RoutingPolicy
@@ -43,8 +42,8 @@ In this context "extensions" refer to modifications or additions to the existing
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| import_routing_policies | RoutingPolicyBGP |  | many | Generic |
-| export_routing_policies | RoutingPolicyBGP |  | many | Generic |
+| import_routing_policies | RoutingPolicyBGP | True | many | Generic |
+| export_routing_policies | RoutingPolicyBGP | True | many | Generic |
 
 ### RoutingBGPSession
 
@@ -59,8 +58,8 @@ In this context "extensions" refer to modifications or additions to the existing
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| import_routing_policies | RoutingPolicy |  | many | Generic |
-| export_routing_policies | RoutingPolicy |  | many | Generic |
+| import_routing_policies | RoutingPolicyBGP | True | many | Generic |
+| export_routing_policies | RoutingPolicyBGP | True | many | Generic |
 
 ## Code
 
@@ -69,10 +68,11 @@ version: '1.0'
 nodes:
 - name: PolicyBGP
   namespace: Routing
-  description: A routing policiers for BGP
+  description: A routing policy for BGP.
   label: BGP Routing Policies
   icon: carbon:deployment-policy
-  include_in_menu: false
+  include_in_menu: true
+  menu_placement: RoutingPolicy
   inherit_from:
   - RoutingPolicy
 extensions:
@@ -87,19 +87,23 @@ extensions:
       state: absent
     relationships:
     - name: import_routing_policies
+      peer: RoutingPolicyBGP
       label: Import Routing Policies
-      peer: RoutingPolicyBGP
-      identifier: bgp__import_policies
+      kind: Generic
+      cardinality: many
+      identifier: bgppeergroup__import_policies
+      optional: true
       description: The routing-policies used by this instance for import.
-      kind: Generic
-      cardinality: many
+      order_weight: 1750
     - name: export_routing_policies
-      label: Export Routing Policies
       peer: RoutingPolicyBGP
-      identifier: bgp__export_policies
-      description: The routing-policies used by this instance for export.
+      label: Export Routing Policies
       kind: Generic
       cardinality: many
+      identifier: bgppeergroup__export_policies
+      optional: true
+      description: The routing-policies used by this instance for export.
+      order_weight: 1800
   - kind: RoutingBGPSession
     attributes:
     - name: import_policies
@@ -110,18 +114,22 @@ extensions:
       state: absent
     relationships:
     - name: import_routing_policies
+      peer: RoutingPolicyBGP
       label: Import Routing Policies
-      peer: RoutingPolicy
-      identifier: bgp__import_policies
+      kind: Generic
+      cardinality: many
+      identifier: bgpsession__import_policies
+      optional: true
       description: The routing-policies used by this instance for import.
-      kind: Generic
-      cardinality: many
+      order_weight: 1850
     - name: export_routing_policies
+      peer: RoutingPolicyBGP
       label: Export Routing Policies
-      peer: RoutingPolicy
-      identifier: bgp__export_policies
-      description: The routing-policies used by this instance for export.
       kind: Generic
       cardinality: many
+      identifier: bgpsession__export_policies
+      optional: true
+      description: The routing-policies used by this instance for export.
+      order_weight: 1900
 
 ```

@@ -1,0 +1,99 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/peering_ixp.
+# Depends on: extensions/routing (RoutingAutonomousSystem, RoutingBGPCommunity
+# via routing_bgp_community, RoutingPolicyBGP via routing_policies_bgp,
+# RoutingBGPSession via routing_bgp -- all already created), base (DcimDevice:
+# nyc1-rtr01/nyc1-rtr02; LocationSite: NYC1/SJC1), extensions/vrf (IpamIPAddress
+# 192.0.2.21/32, 192.0.2.22/32 in the "default" namespace).
+#
+# This file owns PeeringIXP and PeeringIXPConnection for real, and adds one
+# more RoutingBGPSession upsert to wire the extension's ixp_connection
+# attribute (added by extensions/peering_ixp/peering_ixp.yml onto
+# RoutingBGPSession) onto a pre-existing session.
+#
+# PeeringIXP's human_friendly_id is just `name__value`, so it's referenced as
+# a plain scalar string. local_as (cardinality one, peer
+# RoutingAutonomousSystem, a concrete kind) uses that kind's two-part
+# [asn, name] HFID as a YAML list, quoting the Number asn component as a
+# string. import_policies/export_policies (cardinality many, peer
+# RoutingPolicyBGP -- concrete, HFID name__value) and bgp_communities
+# (cardinality many, peer RoutingBGPCommunity -- concrete, HFID name__value)
+# are lists of HFIDs, and an HFID is always a list of its parts -- so each
+# single-part entry is itself a one-element list, not a bare string.
+#
+# PeeringIXPConnection's human_friendly_id is also just `name__value`.
+# internet_exchange_point (Parent, cardinality one, mandatory) references
+# PeeringIXP by its scalar HFID. router (cardinality one, peer DcimDevice,
+# concrete, HFID name__value) is a plain scalar. ipv4_address (cardinality
+# one, peer IpamIPAddress, concrete) uses that kind's two-part
+# [ip_namespace, address] HFID as a YAML list.
+#
+# The RoutingBGPSession upsert below matches the existing "eBGP session to
+# Customer A via CUST-A-EBGP on nyc1-rtr01" record (created by
+# objects/extensions/routing_bgp) by its description HFID and repeats only
+# its mandatory fields (description/status/role/session_type/vrf -- per
+# convention, see objects/extensions/routing_policies_bgp for the same
+# pattern) while adding the new ixp_connection link.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: PeeringIXP
+  data:
+    - name: NYC1-IX
+      description: "New York area internet exchange point serving the NYC1 site."
+      status: enabled
+      local_as:
+        - "65000"
+        - NYC1-BACKBONE-AS
+      import_policies:
+        - [CUST-A-IMPORT-PREFER-CUSTOMER]
+      export_policies:
+        - [CUST-A-EXPORT-DEFAULT-ROUTE]
+      bgp_communities:
+        - [NO-EXPORT]
+
+    - name: SJC1-IX
+      description: "San Jose area internet exchange point serving the SJC1 site."
+      status: enabled
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: PeeringIXPConnection
+  data:
+    - name: nyc1-rtr01-NYC1-IX
+      description: "nyc1-rtr01's connection into NYC1-IX"
+      peeringdb_netixlan: 25256
+      status: enabled
+      vlan: 100
+      router: nyc1-rtr01
+      internet_exchange_point: NYC1-IX
+      ipv4_address:
+        - default
+        - 192.0.2.21/32
+
+    - name: nyc1-rtr02-NYC1-IX
+      description: "nyc1-rtr02's connection into NYC1-IX"
+      status: enabled
+      vlan: 200
+      router: nyc1-rtr02
+      internet_exchange_point: NYC1-IX
+      ipv4_address:
+        - default
+        - 192.0.2.22/32
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingBGPSession
+  data:
+    - description: "eBGP session to Customer A via CUST-A-EBGP on nyc1-rtr01"
+      status: active
+      session_type: external
+      role: peering
+      vrf: CUST-A
+      ixp_connection: nyc1-rtr01-NYC1-IX

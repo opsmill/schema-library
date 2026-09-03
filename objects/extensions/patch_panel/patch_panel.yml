@@ -1,0 +1,83 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/patch_panel.
+# Depends on: base, extensions/location_minimal (LocationSite: NYC1),
+# extensions/rack (LocationRack: NYC1-RACK-01).
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimPatchPanel
+  data:
+    - name: NYC1-PP-01
+      description: 24-port LC fiber patch panel.
+      module_capacity: 24
+      position: 38
+      rack_face: front
+      # LocationRack inherits LocationHosting (a Generic) -- specify the
+      # concrete kind so the reference is unambiguous. `location` is
+      # cardinality one, so `data` is a single mapping, not a list. This
+      # matches the existing NYC1-RACK-01 rack created by extensions/rack.
+      location:
+        kind: LocationRack
+        data:
+          name: NYC1-RACK-01
+          site: NYC1
+      # rear_interfaces is a Component relationship (cardinality many) --
+      # nest the concrete kind with `data` as a list. The `patch_panel`
+      # Parent relationship on each child is implied by this nesting.
+      rear_interfaces:
+        kind: DcimRearPatchPanelInterface
+        data:
+          - name: RJ1
+            connector_type: lc
+          - name: RJ2
+            connector_type: lc
+
+    - name: NYC1-PP-02
+      description: 12-port SC fiber patch panel.
+      module_capacity: 12
+      position: 37
+      rack_face: front
+      location:
+        kind: LocationRack
+        data:
+          name: NYC1-RACK-01
+          site: NYC1
+      rear_interfaces:
+        kind: DcimRearPatchPanelInterface
+        data:
+          - name: RJ1
+            connector_type: sc
+
+---
+# Front interfaces are created as their own top-level documents (rather than
+# nested under the patch panel) so each one can reference its corresponding
+# rear interface created above via `corresponding_front_rear`. This document
+# runs after the one above, so those rear interfaces already exist.
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimFrontPatchPanelInterface
+  data:
+    - name: FR1
+      connector_type: lc
+      # patch_panel peer (DcimPatchPanel) is a CONCRETE kind with a
+      # single-field human_friendly_id (name), so a plain scalar works.
+      patch_panel: NYC1-PP-01
+      # corresponding_front_rear peer (DcimRearPatchPanelInterface) is a
+      # CONCRETE kind but its human_friendly_id has two components
+      # (patch_panel__name, name) -- a cardinality-one reference to a
+      # multi-component HFID must be given as a list of the HFID parts,
+      # in order, not a single scalar string.
+      corresponding_front_rear: [NYC1-PP-01, RJ1]
+
+    - name: FR2
+      connector_type: lc
+      patch_panel: NYC1-PP-01
+      corresponding_front_rear: [NYC1-PP-01, RJ2]
+
+    - name: FR1
+      connector_type: sc
+      patch_panel: NYC1-PP-02
+      corresponding_front_rear: [NYC1-PP-02, RJ1]

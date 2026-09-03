@@ -1,0 +1,126 @@
+---
+title: Aggregate
+---
+
+This schema extension contains models to capture IP aggregates assigned by a Regional Internet Registry (RIR). It introduces an Aggregate node (top-level IPv4/IPv6 prefix) and an RIR node (registry or private entity managing address space).
+
+## Details
+
+- **Dependencies:**
+    - [base](dcim)
+
+## Nodes
+
+### Aggregate
+
+- **Label:** Aggregate
+- **Description:** An aggregate is a top-level IPv4 or IPv6 prefix assigned by a RIR.
+- **Namespace:** Ipam
+- **Icon:** mdi:ip-network
+- **Uniqueness Constraints:**
+    - prefix__value
+- **Human Friendly ID:** prefix__value
+- **Inherit From:** BuiltinIPPrefix
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| description |  | Text | True |  |  |
+| date_added |  | DateTime | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| rir | OrganizationRIR | False | one | Attribute |
+
+### RIR
+
+- **Label:** RIR
+- **Description:** A Regional Internet Registry (ARIN, RIPE, APNIC, LACNIC, AFRINIC) or a private entity managing private address space.
+- **Namespace:** Organization
+- **Icon:** mdi:certificate
+- **Inherit From:** OrganizationGeneric
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| private | Indicates this RIR manages private (RFC 1918 / RFC 4193) address space. | Boolean | False | False |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| aggregates | IpamAggregate | True | many | Generic |
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: Aggregate
+  namespace: Ipam
+  description: An aggregate is a top-level IPv4 or IPv6 prefix assigned by a RIR.
+  label: Aggregate
+  icon: mdi:ip-network
+  include_in_menu: true
+  menu_placement: BuiltinIPAM
+  inherit_from:
+  - BuiltinIPPrefix
+  human_friendly_id:
+  - prefix__value
+  order_by:
+  - prefix__value
+  display_label: prefix__value
+  uniqueness_constraints:
+  - - prefix__value
+  attributes:
+  - name: description
+    kind: Text
+    optional: true
+    order_weight: 1100
+  - name: date_added
+    kind: DateTime
+    label: Date Added
+    optional: true
+    order_weight: 1200
+  relationships:
+  - name: rir
+    peer: OrganizationRIR
+    label: RIR
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: aggregate__rir
+    order_weight: 1000
+- name: RIR
+  namespace: Organization
+  description: A Regional Internet Registry (ARIN, RIPE, APNIC, LACNIC, AFRINIC) or
+    a private entity managing private address space.
+  label: RIR
+  icon: mdi:certificate
+  include_in_menu: true
+  menu_placement: OrganizationGeneric
+  inherit_from:
+  - OrganizationGeneric
+  attributes:
+  - name: private
+    kind: Boolean
+    label: Private
+    default_value: false
+    optional: false
+    description: Indicates this RIR manages private (RFC 1918 / RFC 4193) address
+      space.
+    order_weight: 1300
+  relationships:
+  - name: aggregates
+    peer: IpamAggregate
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: aggregate__rir
+    order_weight: 1400
+
+```

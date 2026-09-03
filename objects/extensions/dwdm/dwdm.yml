@@ -1,0 +1,170 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/dwdm.
+# Depends on: base, extensions/location_minimal (LocationSite: NYC1),
+# extensions/rack (LocationRack: NYC1-RACK-01, DcimDevice: nyc1-rtr01),
+# extensions/sfp (DcimGenericSFP base + existing plugged/spare SFPs on
+# GigabitEthernet0/0/0/0 and /1).
+#
+# DcimWdmChannel records are created first since both the OADM front
+# interfaces and the WDM SFPs below reference them. DcimOpticalMultiplexer
+# is created next, with its front/rear interfaces nested as Component
+# children. A new interface (GigabitEthernet0/0/0/4) is added on nyc1-rtr01
+# for the plugged WDM SFP demo, since GigabitEthernet0/0/0/0 through /3 are
+# already occupied by other fixtures.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimWdmChannel
+  data:
+    - channel: 1
+      wdm_type: dwdm
+      wavelength: "1550.12"
+      frequency: "193.10"
+
+    - channel: 2
+      wdm_type: dwdm
+      wavelength: "1550.92"
+      frequency: "193.20"
+
+    - channel: 20
+      wdm_type: cwdm
+      wavelength: "1611.00"
+      frequency: "186.00"
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimOpticalMultiplexer
+  data:
+    - name: NYC1-MUX01
+      wdm_type: dwdm
+      description: Primary DWDM multiplexer for the NYC1 backbone ring.
+      position: 20
+      rack_face: front
+      # `location` (from DcimPhysicalDevice) peer is LocationHosting, a
+      # Generic -- specify the concrete kind. Cardinality one, so `data` is
+      # a single mapping. This upserts against the existing rack.
+      location:
+        kind: LocationRack
+        data:
+          name: NYC1-RACK-01
+          site: NYC1
+      # front_interfaces is a Component relationship (cardinality many) --
+      # nest the concrete kind with `data` as a list. The `optical_multiplexer`
+      # Parent relationship on each child is implied by this nesting.
+      front_interfaces:
+        kind: DcimOadmFrontInterface
+        data:
+          - name: "CH1"
+            connector_type: lc
+            # `channels` peer (DcimWdmChannel) is a CONCRETE kind whose
+            # human_friendly_id has two components ([wdm_type__value,
+            # channel__value]) and the relationship is cardinality many, so
+            # it's a plain list of HFID lists (same pattern as
+            # `bundle_members` in objects/extensions/lag/lag.yml).
+            channels:
+              - [dwdm, "1"]
+          - name: "CH2"
+            connector_type: lc
+            channels:
+              - [dwdm, "2"]
+      # rear_interface is a Component relationship of cardinality one --
+      # nest the concrete kind with `data` as a single mapping.
+      rear_interface:
+        kind: DcimOadmRearInterface
+        data:
+          name: "COM"
+          connector_type: lc
+
+    - name: NYC1-MUX02
+      wdm_type: cwdm
+      description: Secondary CWDM multiplexer, spare capacity at NYC1.
+      position: 22
+      rack_face: front
+      location:
+        kind: LocationRack
+        data:
+          name: NYC1-RACK-01
+          site: NYC1
+      front_interfaces:
+        kind: DcimOadmFrontInterface
+        data:
+          - name: "CH1"
+            connector_type: lc
+            channels:
+              - [cwdm, "20"]
+      rear_interface:
+        kind: DcimOadmRearInterface
+        data:
+          name: "COM"
+          connector_type: lc
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimDevice
+  data:
+    # Upsert the existing fixture device to add a free physical interface
+    # for the plugged WDM SFP below (GigabitEthernet0/0/0/0 through /3 are
+    # already in use by other fixtures).
+    - name: nyc1-rtr01
+      location:
+        kind: LocationRack
+        data:
+          name: NYC1-RACK-01
+          site: NYC1
+      interfaces:
+        kind: InterfacePhysical
+        data:
+          - name: GigabitEthernet0/0/0/4
+            role: core
+            status: active
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimWdmSFP
+  data:
+    - sfp_type: zr
+      form_factor: sfp_plus
+      status: plugged
+      wdm_type: dwdm
+      serial_number: "SFP-WDM-0001"
+      manufacturer: Cisco
+      # `interface` peer (InterfacePhysical) is a CONCRETE kind with a
+      # composite human_friendly_id ([device__name__value, name__value]).
+      interface: [nyc1-rtr01, GigabitEthernet0/0/0/4]
+      # `wdm_channel` peer (DcimWdmChannel) is a CONCRETE kind with a
+      # composite human_friendly_id ([wdm_type__value, channel__value]),
+      # cardinality one -- a plain list of the HFID parts.
+      wdm_channel: [dwdm, "1"]
+
+    - sfp_type: zr
+      form_factor: sfp_plus
+      status: spare
+      wdm_type: dwdm
+      serial_number: "SFP-WDM-0002"
+      manufacturer: Cisco
+      spare_location:
+        kind: LocationSite
+        data:
+          name: NYC1
+      wdm_channel: [dwdm, "2"]
+
+    - sfp_type: zr
+      form_factor: qsfp28
+      status: spare
+      wdm_type: cwdm
+      serial_number: "SFP-WDM-0003"
+      manufacturer: Cisco
+      spare_location:
+        kind: LocationRack
+        data:
+          name: NYC1-RACK-01
+          site: NYC1
+      wdm_channel: [cwdm, "20"]

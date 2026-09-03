@@ -2,7 +2,7 @@
 title: Location Extended
 ---
 
-This schema extension is the most detailed when it comes to location, you'll find all the layers you can think of.
+This schema extension is the most detailed when it comes to location, you'll find all the layers you can think of. It defines its own hierarchical Location.Rack, incompatible with the flat one extensions/rack defines, so load one or the other, not both.
 
 ## Details
 
@@ -90,7 +90,7 @@ This schema extension is the most detailed when it comes to location, you'll fin
 - **Label:** Rack
 - **Namespace:** Location
 - **Icon:** clarity:rack-server-line
-- **Human Friendly ID:** shortname__value
+- **Human Friendly ID:** name__value
 - **Inherit From:** LocationGeneric
 
 #### Attributes
@@ -239,7 +239,7 @@ nodes:
   label: Rack
   display_label: name__value
   human_friendly_id:
-  - shortname__value
+  - name__value
   parent: LocationSuite
   children: ''
   icon: clarity:rack-server-line

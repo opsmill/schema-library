@@ -23,16 +23,16 @@ This schema extension contains models for VRRP.
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name | Unique name of the entry | Text |  |  |  |
-| group | VRRP Group | Text |  |  |  |
+| name | Unique name of the entry | Text | False |  |  |
+| vrid | Virtual Router ID (VRID, should be between 1 and 255) | Number | False |  |  |
 | password | VRRP Password/Key | HashedPassword | True |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| ip_address | IpamIPAddress | True | many | Attribute |
-| vrrp_interfaces | NetworkVRRPInterface |  | many | Component |
+| ip_addresses | IpamIPAddress | True | many | Attribute |
+| vrrp_interfaces | NetworkVRRPInterface | True | many | Component |
 
 ### VRRPInterface
 
@@ -47,7 +47,7 @@ This schema extension contains models for VRRP.
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| priority | VRRP Priority (Should be between 0 to 255) | Number |  | 100 |  |
+| priority | VRRP Priority (Should be between 1 and 255) | Number | False | 100 |  |
 
 #### Relationships
 
@@ -70,7 +70,7 @@ In this context "extensions" refer to modifications or additions to the existing
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| vrrp | NetworkVRRPInterface |  | one | Component |
+| vrrp | NetworkVRRPInterface | True | one | Component |
 
 ### IpamIPAddress
 
@@ -78,7 +78,7 @@ In this context "extensions" refer to modifications or additions to the existing
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| vrrp | NetworkVRRPGroup |  | one | Component |
+| vrrp | NetworkVRRPGroup | True | one | Attribute |
 
 ## Code
 
@@ -87,55 +87,63 @@ version: '1.0'
 nodes:
 - name: VRRPGroup
   namespace: Network
+  description: VRRP Group configuration
   label: VRRP Group
   icon: fluent:virtual-network-20-filled
-  description: VRRP Group configuration
-  display_label: name__value
-  order_by:
-  - name__value
+  include_in_menu: true
   human_friendly_id:
   - name__value
+  order_by:
+  - name__value
+  display_label: name__value
   attributes:
   - name: name
     kind: Text
     label: Name
     unique: true
+    optional: false
     description: Unique name of the entry
     order_weight: 1000
-  - name: group
-    kind: Text
-    description: VRRP Group
-    label: Group
+  - name: vrid
+    kind: Number
+    label: VRID
+    parameters:
+      min_value: 1
+      max_value: 255
+    optional: false
+    description: Virtual Router ID (VRID, should be between 1 and 255)
     order_weight: 1100
   - name: password
     kind: HashedPassword
-    description: VRRP Password/Key
     label: Password
     optional: true
+    description: VRRP Password/Key
     order_weight: 1400
   relationships:
-  - name: ip_address
+  - name: ip_addresses
+    peer: IpamIPAddress
+    label: IP Addresses
+    kind: Attribute
+    cardinality: many
+    optional: true
     on_delete: cascade
     description: VRRP IP (v4 or v6)
-    label: IP Address
-    peer: IpamIPAddress
-    optional: true
-    cardinality: many
-    kind: Attribute
     order_weight: 1200
   - name: vrrp_interfaces
-    on_delete: cascade
-    kind: Component
     peer: NetworkVRRPInterface
-    cardinality: many
     label: VRRP Interfaces
+    kind: Component
+    cardinality: many
+    on_delete: cascade
+    optional: true
     order_weight: 1300
 - name: VRRPInterface
   namespace: Network
+  description: VRRP Interface configuration
   label: VRRP Interface
   icon: carbon:interface-usage
+  include_in_menu: true
   menu_placement: NetworkVRRPGroup
-  description: VRRP Interface configuration
   order_by:
   - priority__value
   uniqueness_constraints:
@@ -145,46 +153,51 @@ nodes:
   - name: priority
     kind: Number
     label: VRRP Priority
-    description: VRRP Priority (Should be between 0 to 255)
-    regex: ^(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])$
     default_value: 100
+    parameters:
+      min_value: 1
+      max_value: 255
+    optional: false
+    description: VRRP Priority (Should be between 1 and 255)
     order_weight: 1100
   relationships:
   - name: vrrp_group
-    description: VRRP Group
-    label: VRRP Group
     peer: NetworkVRRPGroup
-    optional: false
-    cardinality: one
+    label: VRRP Group
     kind: Attribute
+    cardinality: one
+    optional: false
+    description: VRRP Group
     order_weight: 1200
   - name: interface
-    description: Interface L3
-    label: Interface
     peer: InterfaceLayer3
-    optional: false
-    cardinality: one
+    label: Interface
     kind: Attribute
+    cardinality: one
+    optional: false
+    description: Interface L3
     order_weight: 1300
 extensions:
   nodes:
   - kind: InterfaceLayer3
     relationships:
     - name: vrrp
-      kind: Component
       peer: NetworkVRRPInterface
-      description: VRRP Interface Configuration
-      cardinality: one
       label: VRRP
-      order_weight: 1500
+      kind: Component
+      cardinality: one
+      optional: true
+      description: VRRP Interface Configuration
+      order_weight: 1650
   - kind: IpamIPAddress
     relationships:
     - name: vrrp
-      kind: Component
       peer: NetworkVRRPGroup
-      description: Part of VRRP Group
-      cardinality: one
       label: VRRP Group
-      order_weight: 1600
+      kind: Attribute
+      cardinality: one
+      optional: true
+      description: Part of VRRP Group
+      order_weight: 1700
 
 ```

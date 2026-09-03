@@ -1,0 +1,26 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/routing_bgp_community.
+# Standalone: RoutingBGPCommunity (namespace Routing, name BGPCommunity) has
+# no device/vrf requirement -- it is a plain community list model with just
+# name/description/community plus optional `routing_policy` (Generic
+# RoutingPolicy, cardinality many) and `tags` relationships. Neither
+# relationship is exercised here since no concrete RoutingPolicy
+# implementer's object data exists yet in this repo.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingBGPCommunity
+  data:
+    - name: CUSTOMER-A-ROUTES
+      description: "Tags routes learned from Customer A's network."
+      community: "65000:100"
+
+    - name: BLACKHOLE
+      description: "Remote-triggered black hole (RTBH) community for DDoS mitigation."
+      community: "65000:666"
+
+    - name: NO-EXPORT
+      description: "Well-known community preventing readvertisement to any eBGP peer."
+      community: "65535:65281"

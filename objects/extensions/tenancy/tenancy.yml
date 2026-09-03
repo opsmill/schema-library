@@ -1,0 +1,29 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/tenancy.
+# Depends on: base. Optionally links to prefixes created by extensions/vlan
+# (IpamPrefix: 10.0.0.0/16, 192.0.2.0/24 in the "default" IP namespace) if
+# those have already been loaded -- the tenant-to-prefix wiring below is an
+# upsert against those existing records, not a re-creation.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OrganizationTenant
+  data:
+    - name: Acme Corp
+      description: Primary tenant for the NYC1 backbone.
+      # IpamPrefix is a concrete kind (not a Generic/interface), so cardinality-many
+      # references to it are a plain list of its two-part human_friendly_id
+      # ([ip_namespace, prefix]), same as extensions/vlan does for IpamVLAN.prefixes.
+      # This upserts against the prefix already created by extensions/vlan.
+      prefixes:
+        - ["default", "10.0.0.0/16"]
+
+    - name: Globex Corp
+      description: Secondary tenant, owns the point-to-point link network.
+      prefixes:
+        - ["default", "192.0.2.0/24"]
+
+    - name: Initech
+      description: Tenant with no infrastructure assigned yet.

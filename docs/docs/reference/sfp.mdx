@@ -55,7 +55,7 @@ Improvements:
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| serial |  | Text | True |  |  |
+| serial_number |  | Text | True |  |  |
 | sfp_type | Type of SFP, such as LR, SR, T. | Dropdown | False |  | lr, sr, lrm, t, sr4, lr4, zr, er, dac, aoc |
 | status |  | Dropdown | False | plugged | plugged, spare, decommissioned |
 | form_factor | The physical form factor of the SFP module. | Dropdown | False |  | sfp, sfp_plus, qsfp, qsfp_plus, qsfp28, qsfp_dd, cfp, cfp2, cfp4, xfp, sfp56, qsfp56, osfp |
@@ -64,7 +64,7 @@ Improvements:
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| interface | DcimInterface | True | one | Attribute |
+| interface | InterfacePhysical | True | one | Attribute |
 | spare_location | LocationHosting | True | one | Attribute |
 | manufacturer | OrganizationManufacturer | True | one | Attribute |
 
@@ -76,13 +76,13 @@ In this context "extensions" refer to modifications or additions to the existing
 
 :::
 
-### DcimInterface
+### InterfacePhysical
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| plugged_sfp | DcimGenericSFP | True | one |  |
+| plugged_sfp | DcimGenericSFP | True | one | Generic |
 
 ### LocationHosting
 
@@ -90,7 +90,7 @@ In this context "extensions" refer to modifications or additions to the existing
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| spare_sfps | DcimGenericSFP | True | many |  |
+| spare_sfps | DcimGenericSFP | True | many | Generic |
 
 ### OrganizationManufacturer
 
@@ -98,7 +98,7 @@ In this context "extensions" refer to modifications or additions to the existing
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| sfps | DcimGenericSFP | True | many |  |
+| sfps | DcimGenericSFP | True | many | Generic |
 
 ## Code
 
@@ -113,15 +113,12 @@ generics:
   include_in_menu: true
   display_label: '{{ form_factor__value }} {{ sfp_type__value }}'
   attributes:
-  - name: serial
+  - name: serial_number
     kind: Text
     optional: true
     order_weight: 1400
   - name: sfp_type
     kind: Dropdown
-    description: Type of SFP, such as LR, SR, T.
-    order_weight: 1100
-    optional: false
     choices:
     - name: lr
       label: LR (Long Reach)
@@ -164,10 +161,11 @@ generics:
       label: AOC (Active Optical Cable)
       description: Active Optical Cable, used for short connections over fiber.
       color: '#6699ff'
+    optional: false
+    description: Type of SFP, such as LR, SR, T.
+    order_weight: 1100
   - name: status
     kind: Dropdown
-    optional: false
-    order_weight: 1300
     default_value: plugged
     choices:
     - name: plugged
@@ -182,11 +180,10 @@ generics:
       label: Decommissioned
       description: Decommissioned might be broken or not used anymore.
       color: '#ffd27f'
+    optional: false
+    order_weight: 1200
   - name: form_factor
     kind: Dropdown
-    description: The physical form factor of the SFP module.
-    order_weight: 1000
-    optional: false
     choices:
     - name: sfp
       label: SFP
@@ -227,75 +224,88 @@ generics:
     - name: osfp
       label: OSFP
       color: '#0099cc'
+    optional: false
+    description: The physical form factor of the SFP module.
+    order_weight: 1000
   relationships:
   - name: interface
-    peer: DcimInterface
+    peer: InterfacePhysical
     kind: Attribute
-    optional: true
     cardinality: one
-    order_weight: 1200
+    optional: true
+    identifier: sfp__interface
+    order_weight: 1300
   - name: spare_location
     peer: LocationHosting
     kind: Attribute
-    optional: true
     cardinality: one
+    optional: true
     order_weight: 1500
   - name: manufacturer
     peer: OrganizationManufacturer
-    cardinality: one
     kind: Attribute
+    cardinality: one
     optional: true
     order_weight: 1350
 nodes:
 - name: StandardSFP
   namespace: Dcim
-  inherit_from:
-  - DcimGenericSFP
   description: Standard SFP module for various types (e.g., LR, SR, T).
   label: Standard SFP
   icon: mdi:gpu
+  include_in_menu: true
   menu_placement: DcimGenericSFP
-- name: BidiSFP
-  namespace: Dcim
   inherit_from:
   - DcimGenericSFP
+- name: BidiSFP
+  namespace: Dcim
   description: Bidirectional SFP supporting two wavelengths for single-fiber operation.
   label: Bidirectional SFP
   icon: lineicons:arrow-both-direction-vertical-1
+  include_in_menu: true
   menu_placement: DcimGenericSFP
+  inherit_from:
+  - DcimGenericSFP
   attributes:
   - name: wavelength_tx
-    label: Transmit Wavelength (nm)
     kind: Number
+    label: Transmit Wavelength (nm)
     optional: false
     description: Transmit wavelength in nm.
     order_weight: 1175
   - name: wavelength_rx
-    label: Receive Wavelength (nm)
     kind: Number
+    label: Receive Wavelength (nm)
     optional: false
     description: Receive wavelength in nm.
     order_weight: 1150
 extensions:
   nodes:
-  - kind: DcimInterface
+  - kind: InterfacePhysical
     relationships:
     - name: plugged_sfp
       peer: DcimGenericSFP
+      kind: Generic
       cardinality: one
       optional: true
+      identifier: sfp__interface
+      order_weight: 1700
   - kind: LocationHosting
     relationships:
     - name: spare_sfps
       peer: DcimGenericSFP
+      kind: Generic
       cardinality: many
       optional: true
+      order_weight: 1750
   - kind: OrganizationManufacturer
     relationships:
     - name: sfps
-      label: SFPs
       peer: DcimGenericSFP
+      kind: Generic
+      label: SFPs
       cardinality: many
       optional: true
+      order_weight: 1500
 
 ```

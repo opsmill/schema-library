@@ -1,0 +1,73 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
+version: "1.0"
+
+nodes:
+  - name: Aggregate
+    namespace: Ipam
+    description: An aggregate is a top-level IPv4 or IPv6 prefix assigned by a RIR.
+    label: Aggregate
+    icon: mdi:ip-network
+    include_in_menu: true
+    menu_placement: BuiltinIPAM
+    inherit_from:
+      - BuiltinIPPrefix
+    human_friendly_id:
+      - prefix__value
+    order_by:
+      - prefix__value
+    display_label: prefix__value
+    uniqueness_constraints:
+      - [prefix__value]
+    attributes:
+      - name: description
+        kind: Text
+        optional: true
+        order_weight: 1100
+      - name: date_added
+        kind: DateTime
+        label: Date Added
+        optional: true
+        order_weight: 1200
+    relationships:
+      - name: rir
+        peer: OrganizationRIR
+        label: RIR
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: aggregate__rir
+        order_weight: 1000
+
+  - name: RIR
+    namespace: Organization
+    description: >-
+      A Regional Internet Registry (ARIN, RIPE, APNIC, LACNIC, AFRINIC) or a private
+      entity managing private address space.
+    label: RIR
+    icon: mdi:certificate
+    include_in_menu: true
+    menu_placement: OrganizationGeneric
+    inherit_from:
+      - OrganizationGeneric
+    attributes:
+      - name: private
+        kind: Boolean
+        label: Private
+        default_value: false
+        optional: false
+        description: Indicates this RIR manages private (RFC 1918 / RFC 4193) address space.
+        order_weight: 1300
+    relationships:
+      - name: aggregates
+        peer: IpamAggregate
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: aggregate__rir
+        order_weight: 1400

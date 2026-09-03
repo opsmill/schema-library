@@ -23,7 +23,7 @@ With this schema extension in place you will be able to capture all your physica
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| status |  | Dropdown | False |  | active, provisioning, maintenance, drained |
+| status |  | Dropdown | False | active | active, provisioning, maintenance, drained |
 
 ### VirtualMachine
 
@@ -52,6 +52,7 @@ With this schema extension in place you will be able to capture all your physica
 
 ### GenericUnit
 
+- **Label:** Compute
 - **Description:** A generic unit that can compute (e.g. server, vm ...).
 - **Namespace:** Compute
 
@@ -74,23 +75,28 @@ generics:
 - name: GenericUnit
   namespace: Compute
   description: A generic unit that can compute (e.g. server, vm ...).
-  include_in_menu: false
+  label: Compute
+  include_in_menu: true
 - name: HostVirtualMachine
   namespace: Virtualization
   description: A generic unit that can host VM
   include_in_menu: false
   relationships:
   - name: virtual_machines
-    cardinality: many
     peer: VirtualizationVirtualMachine
     kind: Component
+    cardinality: many
     optional: true
+    identifier: host__virtual_machine
+    order_weight: 1450
 nodes:
 - name: PhysicalServer
   namespace: Compute
   description: A physical server with fixed resources and specific hardware characteristics.
   label: Physical Server
   icon: mdi:server
+  include_in_menu: true
+  menu_placement: ComputeGenericUnit
   inherit_from:
   - ComputeGenericUnit
   - DcimGenericDevice
@@ -99,65 +105,71 @@ nodes:
   attributes:
   - name: status
     kind: Dropdown
-    optional: false
-    order_weight: 1100
+    default_value: active
     choices:
     - name: active
       label: Active
       description: Fully operational and currently in service.
-      color: '#7fbf7f'
+      color: '#00d25b'
     - name: provisioning
       label: Provisioning
       description: In the process of being set up and configured.
-      color: '#ffff7f'
+      color: '#f0ad4e'
     - name: maintenance
       label: Maintenance
       description: Undergoing routine maintenance or repairs.
-      color: '#ffd27f'
+      color: '#ff9800'
     - name: drained
       label: Drained
       description: Temporarily taken out of service.
-      color: '#bfbfbf'
+      color: '#9e9e9e'
+    optional: false
+    order_weight: 1200
 - name: VirtualMachine
   namespace: Virtualization
   description: A virtual machine hosted on a server or a cluster.
   label: Virtual Machine
   icon: carbon:virtual-machine
+  menu_placement: ComputeGenericUnit
+  include_in_menu: true
   inherit_from:
   - ComputeGenericUnit
   - DcimGenericDevice
   attributes:
   - name: role
     kind: Dropdown
-    optional: true
-    description: Role of the virtual machine.
-    order_weight: 1400
     choices:
     - name: application
+      label: Application
       color: '#7f7fff'
     - name: storage
+      label: Storage
       color: '#bf7fbf'
+    optional: true
+    description: Role of the virtual machine.
+    order_weight: 1300
   - name: vcpu
     kind: Number
     optional: true
-    order_weight: 1900
     description: Number of CPU cores assigned to the VM.
+    order_weight: 1400
   - name: memory
     kind: Number
     optional: true
-    order_weight: 1900
     description: Amount of memory (in GB) assigned to the VM.
+    order_weight: 1450
   - name: disk
     kind: Number
     optional: true
-    order_weight: 1900
     description: Disk space (in GB) assigned to the VM.
+    order_weight: 1500
   relationships:
   - name: host
     peer: VirtualizationHostVirtualMachine
-    optional: false
-    cardinality: one
     kind: Attribute
-    order_weight: 1500
+    cardinality: one
+    optional: false
+    identifier: host__virtual_machine
+    order_weight: 1350
 
 ```

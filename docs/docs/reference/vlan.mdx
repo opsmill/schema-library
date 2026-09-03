@@ -14,35 +14,16 @@ This schema extension contains models to support VLANs in you network.
 ### VLAN
 
 - **Label:** VLAN
-- **Description:** A VLAN is isolated layer two domain
+- **Description:** A plain VLAN, with no QinQ role of its own.
 - **Namespace:** Ipam
-- **Icon:** mdi:lan-pending
 - **Uniqueness Constraints:**
-    - vlan_id__value, l2domain
-- **Human Friendly ID:** name__value
+    - vlan_id__value, vlan_group
+- **Inherit From:** IpamGenericVLAN
 
-#### Attributes
+### VLANGroup
 
-| name | description | kind | optional | default_value | choices |
-| ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
-| description |  | Text | True |  |  |
-| vlan_id |  | Number |  |  |  |
-| status |  | Dropdown |  |  | active, provisioning, maintenance, drained |
-| role |  | Dropdown | True |  | server, management, user |
-
-#### Relationships
-
-| name | peer | optional | cardinality | kind |
-| ---- | ---- | -------- | ----------- | ---- |
-| location | LocationHosting | True | many |  |
-| prefixes | IpamPrefix | True | many |  |
-| l2domain | IpamL2Domain | False | one | Attribute |
-
-### L2Domain
-
-- **Label:** Layer 2 Domain
-- **Description:** Represents layer 2 domain.
+- **Label:** VLAN Group
+- **Description:** A VLAN group scopes VLANs to a domain (site, rack, etc.).
 - **Namespace:** Ipam
 - **Icon:** mdi:domain-switch
 - **Human Friendly ID:** name__value
@@ -51,13 +32,42 @@ This schema extension contains models to support VLANs in you network.
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
+| name |  | Text | False |  |  |
+| description |  | Text | True |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| vlans | IpamVLAN | True | many | Component |
+| scope | IpamVLANGroupScope | True | one | Attribute |
+| vlans | IpamGenericVLAN | True | many | Component |
+
+## Generics
+
+### GenericVLAN
+
+- **Label:** VLAN
+- **Description:** A VLAN is an isolated layer two domain.
+- **Namespace:** Ipam
+- **Icon:** mdi:lan-pending
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| description |  | Text | True |  |  |
+| vlan_id |  | Number | False |  |  |
+| status |  | Dropdown | False | active | active, reserved, provisioning, maintenance, deprecated |
+| role |  | Dropdown | True |  | server, management, user |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| prefixes | IpamPrefix | True | many | Attribute |
+| vlan_group | IpamVLANGroup | False | one | Attribute |
 
 ## Extensions
 
@@ -67,13 +77,21 @@ In this context "extensions" refer to modifications or additions to the existing
 
 :::
 
+### IpamVLANGroupScope
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| vlan_groups | IpamVLANGroup | True | many | Attribute |
+
 ### IpamPrefix
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| vlan | IpamVLAN | True | one | Attribute |
+| vlan | IpamGenericVLAN | True | one | Attribute |
 
 ### InterfaceLayer2
 
@@ -81,31 +99,20 @@ In this context "extensions" refer to modifications or additions to the existing
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| untagged_vlan | IpamVLAN | True | one | Generic |
-| tagged_vlan | IpamVLAN | True | many | Generic |
-
-### LocationHosting
-
-#### Relationships
-
-| name | peer | optional | cardinality | kind |
-| ---- | ---- | -------- | ----------- | ---- |
-| vlans | IpamVLAN | True | many |  |
+| untagged_vlan | IpamGenericVLAN | True | one | Generic |
+| tagged_vlan | IpamGenericVLAN | True | many | Generic |
 
 ## Code
 
 ```yaml
 version: '1.0'
-nodes:
-- name: VLAN
+generics:
+- name: GenericVLAN
   namespace: Ipam
-  description: A VLAN is isolated layer two domain
+  description: A VLAN is an isolated layer two domain.
   label: VLAN
   icon: mdi:lan-pending
-  menu_placement: IpamL2Domain
-  uniqueness_constraints:
-  - - vlan_id__value
-    - l2domain
+  include_in_menu: true
   human_friendly_id:
   - name__value
   order_by:
@@ -114,33 +121,44 @@ nodes:
   attributes:
   - name: name
     kind: Text
+    optional: false
+    order_weight: 1000
   - name: description
     kind: Text
     optional: true
+    order_weight: 1100
   - name: vlan_id
     kind: Number
+    optional: false
+    order_weight: 1050
   - name: status
     kind: Dropdown
+    default_value: active
     choices:
     - name: active
       label: Active
       description: Fully operational and currently in service.
-      color: '#7fbf7f'
+      color: '#00d25b'
+    - name: reserved
+      label: Reserved
+      description: Reserved for future use, not yet active.
+      color: '#4d90fe'
     - name: provisioning
       label: Provisioning
       description: In the process of being set up and configured.
-      color: '#ffff7f'
+      color: '#f0ad4e'
     - name: maintenance
       label: Maintenance
       description: Undergoing routine maintenance or repairs.
-      color: '#ffd27f'
-    - name: drained
-      label: Drained
-      description: Temporarily taken out of service.
-      color: '#bfbfbf'
+      color: '#ff9800'
+    - name: deprecated
+      label: Deprecated
+      description: No longer in use and scheduled for removal.
+      color: '#e04040'
+    optional: false
+    order_weight: 1200
   - name: role
     kind: Dropdown
-    optional: true
     choices:
     - name: server
       label: Server
@@ -154,71 +172,108 @@ nodes:
       label: User
       description: Segments designed for end-user access and activities.
       color: '#a0b78d'
-  relationships:
-  - name: location
-    peer: LocationHosting
     optional: true
-    cardinality: many
+    order_weight: 1300
+  relationships:
   - name: prefixes
     peer: IpamPrefix
-    optional: true
-    cardinality: many
-  - name: l2domain
-    peer: IpamL2Domain
-    optional: false
-    cardinality: one
     kind: Attribute
-    order_weight: 1200
-- name: L2Domain
+    cardinality: many
+    optional: true
+    identifier: vlan__prefix
+    order_weight: 1500
+  - name: vlan_group
+    peer: IpamVLANGroup
+    label: VLAN Group
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: vlan_group__vlan
+    order_weight: 1400
+nodes:
+- name: VLAN
   namespace: Ipam
-  description: Represents layer 2 domain.
-  label: Layer 2 Domain
+  description: A plain VLAN, with no QinQ role of its own.
+  label: VLAN
+  include_in_menu: false
+  inherit_from:
+  - IpamGenericVLAN
+  uniqueness_constraints:
+  - - vlan_id__value
+    - vlan_group
+- name: VLANGroup
+  namespace: Ipam
+  description: A VLAN group scopes VLANs to a domain (site, rack, etc.).
+  label: VLAN Group
   icon: mdi:domain-switch
+  include_in_menu: true
+  menu_placement: IpamGenericVLAN
   human_friendly_id:
   - name__value
   display_label: name__value
   attributes:
   - name: name
     kind: Text
+    unique: true
+    optional: false
     order_weight: 1000
-  relationships:
-  - name: vlans
-    peer: IpamVLAN
+  - name: description
+    kind: Text
     optional: true
-    cardinality: many
+    order_weight: 1100
+  relationships:
+  - name: scope
+    peer: IpamVLANGroupScope
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: vlan_group__scope
+    order_weight: 900
+  - name: vlans
+    peer: IpamGenericVLAN
     kind: Component
+    cardinality: many
+    optional: true
+    identifier: vlan_group__vlan
+    order_weight: 1500
 extensions:
   nodes:
+  - kind: IpamVLANGroupScope
+    relationships:
+    - name: vlan_groups
+      peer: IpamVLANGroup
+      label: VLAN Groups
+      kind: Attribute
+      cardinality: many
+      optional: true
+      identifier: vlan_group__scope
+      order_weight: 1600
   - kind: IpamPrefix
     relationships:
     - name: vlan
-      peer: IpamVLAN
-      optional: true
-      cardinality: one
+      peer: IpamGenericVLAN
       kind: Attribute
-      order_weight: 1400
+      cardinality: one
+      optional: true
+      identifier: vlan__prefix
+      order_weight: 1450
   - kind: InterfaceLayer2
     relationships:
     - name: untagged_vlan
+      peer: IpamGenericVLAN
       label: Untagged VLAN
-      peer: IpamVLAN
-      optional: true
+      kind: Generic
       cardinality: one
-      kind: Generic
+      optional: true
       identifier: interface_l2__untagged_vlan
+      order_weight: 1500
     - name: tagged_vlan
+      peer: IpamGenericVLAN
       label: Tagged VLANs
-      peer: IpamVLAN
-      optional: true
-      cardinality: many
       kind: Generic
-      identifier: interface_l2__tagged_vlan
-  - kind: LocationHosting
-    relationships:
-    - name: vlans
-      label: VLANs
-      peer: IpamVLAN
       cardinality: many
       optional: true
+      identifier: interface_l2__tagged_vlan
+      order_weight: 1550
 
 ```

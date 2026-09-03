@@ -1,15 +1,21 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
 version: "1.0"
 nodes:
   - name: CircuitContract
     namespace: Dcim
-    inherit_from:
-      - CoreFileObject
     description: A contract document associated with a circuit service, including terms, costs, and validity period.
     label: Circuit Contract
     icon: mdi:file-sign
+    include_in_menu: true
     menu_placement: DcimCircuit
+    inherit_from:
+      - CoreFileObject
     human_friendly_id:
       - name__value
     order_by:
@@ -18,23 +24,26 @@ nodes:
     attributes:
       - name: name
         kind: Text
+        read_only: true # You must set the attribute to read-only as the value will be handled by the system
         computed_attribute:
           kind: Jinja2
           jinja2_template: "contract_{{ circuit__circuit_id__value }}"
-        read_only: true # You must set the attribute to read-only as the value will be handled by the system
         optional: false # As it's a Jinja2 kind of attribute you can make it mandatory
+        order_weight: 1000
       - name: contract_start
         kind: DateTime
         optional: false
+        order_weight: 1200
       - name: contract_end
         kind: DateTime
         optional: false
+        order_weight: 1300
       - name: monthly_cost
         kind: Number
         optional: true
+        order_weight: 1400
       - name: currency
         kind: Dropdown
-        optional: true
         choices:
           - name: usd
             label: USD
@@ -45,6 +54,8 @@ nodes:
           - name: gbp
             label: GBP
             description: British Pound Sterling
+        optional: true
+        order_weight: 1450
     relationships:
       # Example of a relationship to capture the account that signed the contract
       # - name: signed_by
@@ -57,13 +68,16 @@ nodes:
         kind: Attribute
         cardinality: one
         optional: false
+        identifier: circuit__contract
         order_weight: 950
-
 extensions:
   nodes:
     - kind: DcimCircuit
       relationships:
         - name: contract
           peer: DcimCircuitContract
+          kind: Generic
           cardinality: one
           optional: true
+          identifier: circuit__contract
+          order_weight: 1550

@@ -8,7 +8,6 @@ This extension is using the Routing Policies extensions and the Routing OSPF one
 
 - **Dependencies:**
     - [base](dcim)
-    - [extensions/routing](routing)
     - [extensions/routing_policies](routing_policies)
     - [extensions/routing_ospf](routing_ospf)
 
@@ -17,7 +16,7 @@ This extension is using the Routing Policies extensions and the Routing OSPF one
 ### PolicyOSPF
 
 - **Label:** OSPF Routing Policies
-- **Description:** A routing policiers for OSPF
+- **Description:** A routing policy for OSPF.
 - **Namespace:** Routing
 - **Icon:** carbon:deployment-policy
 - **Inherit From:** RoutingPolicy
@@ -43,8 +42,8 @@ In this context "extensions" refer to modifications or additions to the existing
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| import_routing_policies | RoutingPolicyOSPF |  | many | Generic |
-| export_routing_policies | RoutingPolicyOSPF |  | many | Generic |
+| import_routing_policies | RoutingPolicyOSPF | True | many | Generic |
+| export_routing_policies | RoutingPolicyOSPF | True | many | Generic |
 
 ## Code
 
@@ -53,10 +52,11 @@ version: '1.0'
 nodes:
 - name: PolicyOSPF
   namespace: Routing
-  description: A routing policiers for OSPF
+  description: A routing policy for OSPF.
   label: OSPF Routing Policies
   icon: carbon:deployment-policy
-  include_in_menu: false
+  include_in_menu: true
+  menu_placement: RoutingPolicy
   inherit_from:
   - RoutingPolicy
 extensions:
@@ -71,18 +71,22 @@ extensions:
       state: absent
     relationships:
     - name: import_routing_policies
+      peer: RoutingPolicyOSPF
       label: Import Routing Policies
-      peer: RoutingPolicyOSPF
+      kind: Generic
+      cardinality: many
       identifier: ospf__import_policies
+      optional: true
       description: The routing-policies used by this instance for import.
-      kind: Generic
-      cardinality: many
+      order_weight: 1600
     - name: export_routing_policies
-      label: Export Routing Policies
       peer: RoutingPolicyOSPF
-      identifier: ospf__export_policies
-      description: The routing-policies used by this instance for export.
+      label: Export Routing Policies
       kind: Generic
       cardinality: many
+      identifier: ospf__export_policies
+      optional: true
+      description: The routing-policies used by this instance for export.
+      order_weight: 1650
 
 ```

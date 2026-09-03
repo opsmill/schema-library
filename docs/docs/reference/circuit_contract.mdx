@@ -18,7 +18,6 @@ This schema extension provides models for managing Circuit Contracts, enabling s
 - **Description:** A contract document associated with a circuit service, including terms, costs, and validity period.
 - **Namespace:** Dcim
 - **Icon:** mdi:file-sign
-- **Display Label:** Contract (Circuit `{{ circuit__circuit_id__value }}`)
 - **Human Friendly ID:** name__value
 - **Inherit From:** CoreFileObject
 
@@ -52,7 +51,7 @@ In this context "extensions" refer to modifications or additions to the existing
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| contract | DcimCircuitContract | True | one |  |
+| contract | DcimCircuitContract | True | one | Generic |
 
 ## Code
 
@@ -61,13 +60,14 @@ version: '1.0'
 nodes:
 - name: CircuitContract
   namespace: Dcim
-  inherit_from:
-  - CoreFileObject
   description: A contract document associated with a circuit service, including terms,
     costs, and validity period.
   label: Circuit Contract
   icon: mdi:file-sign
+  include_in_menu: true
   menu_placement: DcimCircuit
+  inherit_from:
+  - CoreFileObject
   human_friendly_id:
   - name__value
   order_by:
@@ -76,23 +76,26 @@ nodes:
   attributes:
   - name: name
     kind: Text
+    read_only: true
     computed_attribute:
       kind: Jinja2
       jinja2_template: contract_{{ circuit__circuit_id__value }}
-    read_only: true
     optional: false
+    order_weight: 1000
   - name: contract_start
     kind: DateTime
     optional: false
+    order_weight: 1200
   - name: contract_end
     kind: DateTime
     optional: false
+    order_weight: 1300
   - name: monthly_cost
     kind: Number
     optional: true
+    order_weight: 1400
   - name: currency
     kind: Dropdown
-    optional: true
     choices:
     - name: usd
       label: USD
@@ -103,12 +106,15 @@ nodes:
     - name: gbp
       label: GBP
       description: British Pound Sterling
+    optional: true
+    order_weight: 1450
   relationships:
   - name: circuit
     peer: DcimCircuit
     kind: Attribute
     cardinality: one
     optional: false
+    identifier: circuit__contract
     order_weight: 950
 extensions:
   nodes:
@@ -116,7 +122,10 @@ extensions:
     relationships:
     - name: contract
       peer: DcimCircuitContract
+      kind: Generic
       cardinality: one
       optional: true
+      identifier: circuit__contract
+      order_weight: 1550
 
 ```

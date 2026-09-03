@@ -1,0 +1,85 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/routing_policies_bgp.
+# Depends on: extensions/routing_bgp (RoutingBGPPeerGroup: CUST-A-EBGP;
+# RoutingBGPSession: the transit session on nyc1-rtr02 -- both already
+# created by objects/extensions/routing_bgp/routing_bgp.yml).
+#
+# This file owns RoutingPolicyBGP (a concrete implementation of the
+# RoutingPolicy generic from extensions/routing_policies) and wires it onto
+# the pre-existing peer group / session via the import_routing_policies /
+# export_routing_policies relationships added by
+# extensions/routing_policies_bgp/routing_policies_bgp.yml onto
+# RoutingBGPPeerGroup and RoutingBGPSession.
+#
+# RoutingPolicyBGP's human_friendly_id is just `name__value` (inherited from
+# the RoutingPolicy generic), so it's referenced as a plain scalar string.
+#
+# import_routing_policies / export_routing_policies are cardinality-many
+# relationships whose peer (RoutingPolicyBGP) is a concrete kind, so they take
+# a list of HFIDs rather than the nested kind+data form. An HFID is always a
+# list of its parts, so each single-part entry is a one-element list -- a bare
+# string there is read as a node ID.
+#
+# The RoutingBGPPeerGroup/RoutingBGPSession upserts below repeat only their
+# mandatory fields (per convention -- see objects/extensions/routing_bgp for
+# the same pattern): RoutingBGPPeerGroup requires
+# name/description/status/device/vrf; RoutingBGPSession requires
+# description/status/role/session_type/vrf. Their human_friendly_id values
+# (name+description for the peer group, description alone for the session)
+# are among those, so no separate identity block is needed.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingPolicyBGP
+  data:
+    - name: CUST-A-IMPORT-PREFER-CUSTOMER
+      description: "Import routes learned from Customer A, setting local preference for backbone selection."
+      policy_type: import_policy
+      weight: 100
+      address_family: ipv4
+
+    - name: CUST-A-EXPORT-DEFAULT-ROUTE
+      description: "Export a default route and backbone summaries to Customer A."
+      policy_type: export_policy
+      weight: 100
+      address_family: ipv4
+
+    - name: TRANSIT-EXPORT-NO-CUSTOMER-ROUTES
+      description: >-
+        Export only our own backbone prefixes to the upstream transit
+        provider, filtering out customer routes.
+      policy_type: export_policy
+      weight: 500
+      address_family: all
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingBGPPeerGroup
+  data:
+    - name: CUST-A-EBGP
+      description: "eBGP peer group for Customer A on nyc1-rtr01"
+      status: active
+      device: nyc1-rtr01
+      vrf: CUST-A
+      import_routing_policies:
+        - [CUST-A-IMPORT-PREFER-CUSTOMER]
+      export_routing_policies:
+        - [CUST-A-EXPORT-DEFAULT-ROUTE]
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: RoutingBGPSession
+  data:
+    - description: "eBGP session to upstream transit provider via TRANSIT-UPSTREAM-EBGP on nyc1-rtr02"
+      status: active
+      session_type: external
+      role: upstream
+      vrf: TRANSIT-VRF
+      export_routing_policies:
+        - [TRANSIT-EXPORT-NO-CUSTOMER-ROUTES]

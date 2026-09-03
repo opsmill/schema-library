@@ -1,0 +1,77 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/snmp.
+# Standalone extension -- no fixture dependencies. The `devices` relationship
+# on SnmpCommunity (-> DcimGenericDevice) and `ip_addresses` on SnmpClient
+# (-> IpamIPAddress) are optional and intentionally left unset here.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: SnmpCommunityV2
+  data:
+    - name: public-ro
+      description: Legacy read-only community used by monitoring pollers.
+      community_string: public
+      access: read_only
+    - name: private-rw
+      description: Read-write community used by legacy management tools.
+      community_string: private123
+      access: read_write
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: SnmpCommunityV3
+  data:
+    - name: monitoring-v3
+      description: SNMPv3 user for the monitoring platform, auth + privacy enabled.
+      username: svc-monitoring
+      auth_protocol: sha
+      auth_password: AuthPass123!
+      privacy_protocol: aes
+      privacy_password: PrivPass123!
+      security_level: auth_priv
+    - name: readonly-v3
+      description: SNMPv3 user with authentication only, no privacy.
+      username: svc-readonly
+      auth_protocol: md5
+      auth_password: ReadOnlyAuth1
+      privacy_protocol: none
+      security_level: auth_no_priv
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: SnmpClient
+  data:
+    - name: nms-poller-01
+      client_description: Primary NMS polling server.
+      # SnmpCommunity is a Generic -- specify the concrete kind. `communities` is
+      # cardinality many, so `data` is a list under the single kind mapping.
+      communities:
+        kind: SnmpCommunityV3
+        data:
+          - name: monitoring-v3
+            username: svc-monitoring
+            auth_protocol: sha
+            privacy_protocol: aes
+            security_level: auth_priv
+    - name: legacy-monitor-01
+      client_description: Legacy monitoring host polling via SNMPv2c.
+      communities:
+        kind: SnmpCommunityV2
+        data:
+          - name: public-ro
+            community_string: public
+            access: read_only
+    - name: netops-workstation
+      client_description: NetOps engineer workstation with read-write access.
+      communities:
+        kind: SnmpCommunityV2
+        data:
+          - name: private-rw
+            community_string: private123
+            access: read_write

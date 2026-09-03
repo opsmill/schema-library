@@ -1,0 +1,108 @@
+---
+title: Device PSU Module
+---
+
+This schema extension adds a PSU (Power Supply Unit) flavor on top of the generic Module/ModuleType from extensions/device_module, so you can track power supplies installed in a device's module bays alongside PSU-specific attributes like wattage and hot-swap capability.
+
+## Details
+
+- **Dependencies:**
+    - [base](dcim)
+    - [extensions/device_module](device_module)
+
+## Nodes
+
+### PSUModule
+
+- **Label:** PSU Module
+- **Description:** Power Supply Unit (PSU) installed in a device.
+- **Namespace:** Dcim
+- **Icon:** mdi:power-plug
+- **Inherit From:** DcimGenericModule
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| computed_name | Name computed from the module bay and module type. | Text | False |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| module_type | DcimPSUModuleType | False | one | Attribute |
+
+### PSUModuleType
+
+- **Label:** PSU Module Type
+- **Description:** PSU module type, defining common specifications such as wattage and hot-swap capability.
+- **Namespace:** Dcim
+- **Icon:** mdi:database-cog
+- **Inherit From:** DcimGenericModuleType
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| wattage | Wattage in watts. | Number | True |  |  |
+| hot_swappable | Whether the PSU can be replaced without powering down the device. | Boolean | False | False |  |
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: PSUModule
+  namespace: Dcim
+  description: Power Supply Unit (PSU) installed in a device.
+  label: PSU Module
+  icon: mdi:power-plug
+  include_in_menu: false
+  inherit_from:
+  - DcimGenericModule
+  attributes:
+  - name: computed_name
+    kind: Text
+    unique: true
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{{ module_bay__computed_name__value }} ({{ module_type__name__value
+        }})'
+    optional: false
+    description: Name computed from the module bay and module type.
+    order_weight: 1000
+  relationships:
+  - name: module_type
+    peer: DcimPSUModuleType
+    kind: Attribute
+    cardinality: one
+    optional: false
+    order_weight: 950
+- name: PSUModuleType
+  namespace: Dcim
+  description: PSU module type, defining common specifications such as wattage and
+    hot-swap capability.
+  label: PSU Module Type
+  icon: mdi:database-cog
+  include_in_menu: false
+  inherit_from:
+  - DcimGenericModuleType
+  attributes:
+  - name: wattage
+    kind: Number
+    label: Wattage (W)
+    optional: true
+    parameters:
+      min_value: 1
+    description: Wattage in watts.
+    order_weight: 1300
+  - name: hot_swappable
+    kind: Boolean
+    label: Hot-Swappable
+    default_value: false
+    optional: false
+    description: Whether the PSU can be replaced without powering down the device.
+    order_weight: 1350
+
+```

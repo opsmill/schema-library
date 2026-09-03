@@ -1,0 +1,41 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/vlan.
+# Depends on: base, extensions/location_minimal (LocationSite: NYC1).
+# The prefix reference below assumes the built-in "default" IP namespace, which
+# every Infrahub instance ships with.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: IpamVLANGroup
+  data:
+    - name: NYC1-VLANs
+      description: VLAN group scoped to the NYC1 site.
+      # IpamVLANGroupScope is a Generic -- specify the concrete kind.
+      # `scope` is cardinality one, so `data` is a single mapping, not a list.
+      scope:
+        kind: LocationSite
+        data:
+          name: NYC1
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: IpamVLAN
+  data:
+    - name: NYC1-SERVERS
+      description: Server VLAN at NYC1.
+      vlan_id: 100
+      status: active
+      role: server
+      vlan_group: NYC1-VLANs
+      prefixes:
+        - ["default", "192.0.2.0/24"]
+    - name: NYC1-MGMT
+      description: Out-of-band management VLAN at NYC1.
+      vlan_id: 999
+      status: active
+      role: management
+      vlan_group: NYC1-VLANs

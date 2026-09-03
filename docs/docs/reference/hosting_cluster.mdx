@@ -25,8 +25,8 @@ A rather generic cluster built with compute units (e.g. servers) and able to hos
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| cluster_type | Type of the cluster. | Dropdown |  |  | aws, kvm, gcp, vmware |
-| status |  | Dropdown | False |  | active, provisioning, maintenance, drained |
+| technology | Underlying virtualisation or clustering technology. | Dropdown | False |  | vmware, kvm, hyper_v, xen, nutanix, openstack, kubernetes, public_cloud |
+| status |  | Dropdown | False | active | active, provisioning, maintenance, drained |
 
 ## Code
 
@@ -35,52 +35,68 @@ version: '1.0'
 nodes:
 - name: Hosting
   namespace: Cluster
-  label: Hosting Cluster
   description: A cluster hosting virtual machines.
+  label: Hosting Cluster
   icon: mdi:dots-hexagon
-  menu_placement: ClusterGeneric
+  include_in_menu: true
+  menu_placement: ComputeGenericUnit
   inherit_from:
   - ClusterGeneric
   - VirtualizationHostVirtualMachine
   - ClusterGenericComputeUnitNodes
   attributes:
-  - name: cluster_type
+  - name: technology
     kind: Dropdown
-    order_weight: 1200
-    description: Type of the cluster.
+    label: Technology
     choices:
-    - name: aws
-      label: Amazon Web Service
-      color: '#b90028'
-    - name: kvm
-      label: KVM
-      color: '#0082e2'
-    - name: gcp
-      label: Google Cloud Platform
-      color: '#e29200'
     - name: vmware
-      label: VMware
+      label: VMware vSphere
       color: '#3d8600'
+    - name: kvm
+      label: KVM / QEMU
+      color: '#0082e2'
+    - name: hyper_v
+      label: Hyper-V
+      color: '#00adef'
+    - name: xen
+      label: Xen / XenServer
+      color: '#f5821f'
+    - name: nutanix
+      label: Nutanix AHV
+      color: '#024da1'
+    - name: openstack
+      label: OpenStack
+      color: '#ed1944'
+    - name: kubernetes
+      label: Kubernetes
+      color: '#326ce5'
+    - name: public_cloud
+      label: Public Cloud
+      color: '#888888'
+    optional: false
+    description: Underlying virtualisation or clustering technology.
+    order_weight: 1300
   - name: status
     kind: Dropdown
-    optional: false
-    order_weight: 1300
+    default_value: active
     choices:
     - name: active
       label: Active
       description: Fully operational and currently in service.
-      color: '#7fbf7f'
+      color: '#00d25b'
     - name: provisioning
       label: Provisioning
       description: In the process of being set up and configured.
-      color: '#ffff7f'
+      color: '#f0ad4e'
     - name: maintenance
       label: Maintenance
       description: Undergoing routine maintenance or repairs.
-      color: '#ffd27f'
+      color: '#ff9800'
     - name: drained
       label: Drained
       description: Temporarily taken out of service.
-      color: '#bfbfbf'
+      color: '#9e9e9e'
+    optional: false
+    order_weight: 1200
 
 ```

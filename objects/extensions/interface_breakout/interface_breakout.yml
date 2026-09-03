@@ -1,0 +1,77 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/interface_breakout.
+# Depends on: base, extensions/rack (DcimDevice: nyc1-rtr01, in LocationRack
+# NYC1-RACK-01), which in turn depends on extensions/location_minimal for
+# LocationSite NYC1.
+#
+# interface_breakout only extends InterfacePhysical -- it adds a
+# `breakout_capability` attribute plus a self-referencing relationship pair
+# (breakout_parent_interface / breakout_child_interfaces, identifier
+# "physical__breakout"). It introduces no new node/generic kind, so there is
+# nothing new to add to the menu.
+#
+# breakout_parent_interface is cardinality one with peer InterfacePhysical, a
+# concrete kind whose human_friendly_id is the 2-part
+# [device__name__value, name__value] (see base/dcim.yml, generic DcimInterface,
+# inherited by InterfacePhysical). A cardinality-one relationship to a
+# concrete peer with a multi-part HFID is referenced as a plain list of
+# scalars (a "ONE_REF"): [device_name, interface_name].
+#
+# The breakout parent interface is listed first below so that each child's
+# breakout_parent_interface reference resolves against an interface that
+# already exists by the time it is processed.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimDevice
+  data:
+    - name: nyc1-rtr01
+      status: active
+      role: edge
+      device_type: ASR9001
+      platform: Cisco IOS-XR
+      position: 40
+      rack_face: front
+      # LocationRack inherits LocationHosting (a Generic) -- specify the
+      # concrete kind so the reference is unambiguous and upserts against the
+      # existing rack from extensions/rack's mock data.
+      location:
+        kind: LocationRack
+        data:
+          name: NYC1-RACK-01
+          site: NYC1
+      # `interfaces` is a Component relationship (cardinality many, concrete
+      # peer InterfacePhysical) -- each entry below is created/upserted
+      # individually against nyc1-rtr01, alongside the existing
+      # GigabitEthernet0/0/0/0 interface from extensions/rack (this does not
+      # replace or remove it).
+      interfaces:
+        kind: InterfacePhysical
+        data:
+          - name: HundredGigE0/0/0/1
+            description: "100G port, broken out into 4x 25G"
+            role: core
+            status: active
+            breakout_capability: true
+          - name: HundredGigE0/0/0/1/0
+            description: "Breakout child 1/4 of HundredGigE0/0/0/1"
+            role: access
+            status: active
+            breakout_parent_interface: ["nyc1-rtr01", "HundredGigE0/0/0/1"]
+          - name: HundredGigE0/0/0/1/1
+            description: "Breakout child 2/4 of HundredGigE0/0/0/1"
+            role: access
+            status: active
+            breakout_parent_interface: ["nyc1-rtr01", "HundredGigE0/0/0/1"]
+          - name: HundredGigE0/0/0/1/2
+            description: "Breakout child 3/4 of HundredGigE0/0/0/1"
+            role: access
+            status: active
+            breakout_parent_interface: ["nyc1-rtr01", "HundredGigE0/0/0/1"]
+          - name: HundredGigE0/0/0/1/3
+            description: "Breakout child 4/4 of HundredGigE0/0/0/1"
+            role: access
+            status: active
+            breakout_parent_interface: ["nyc1-rtr01", "HundredGigE0/0/0/1"]

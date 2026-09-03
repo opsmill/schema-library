@@ -1,0 +1,60 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
+version: "1.0"
+
+# Defines Location.Site. Mutually exclusive with extensions/location_minimal, load one, not both.
+nodes:
+  - name: Site
+    namespace: Location
+    description: A physical location hosting equipment, such as a data center or an office.
+    label: Site
+    icon: ri:building-line
+    include_in_menu: true
+    menu_placement: LocationGeneric
+    inherit_from:
+      - LocationGeneric
+      - LocationHosting
+      - IpamPrefixScope
+      - IpamVLANGroupScope
+    display_label: name__value
+    attributes:
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: active
+            label: Active
+            color: "#00d25b"
+          - name: planned
+            label: Planned
+            color: "#2196f3"
+          - name: staging
+            label: Staging
+            color: "#f0ad4e"
+          - name: decommissioning
+            label: Decommissioning
+            color: "#ff9800"
+          - name: deprecated
+            label: Deprecated
+            color: "#6c757d"
+        optional: false
+        order_weight: 1200
+      - name: facility
+        kind: Text
+        unique: false
+        optional: true
+        order_weight: 1150
+      - name: physical_address
+        kind: Text
+        unique: false
+        optional: true
+        order_weight: 1400
+      - name: timezone
+        kind: Text
+        optional: true
+        order_weight: 1300

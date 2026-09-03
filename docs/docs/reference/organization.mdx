@@ -21,8 +21,8 @@ Basic Organization schema to capture organizations, vendors, and related informa
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| device_type | DcimDeviceType | True | many |  |
-| platform | DcimPlatform | True | many |  |
+| device_types | DcimDeviceType | True | many | Attribute |
+| platforms | DcimPlatform | True | many | Attribute |
 
 ### Provider
 
@@ -36,7 +36,7 @@ Basic Organization schema to capture organizations, vendors, and related informa
 ### Generic
 
 - **Label:** Organization
-- **Description:** An organization represent a legal entity, a company.
+- **Description:** An organization represents a legal entity, such as a company.
 - **Namespace:** Organization
 - **Icon:** mdi:domain
 - **Human Friendly ID:** name__value
@@ -45,7 +45,7 @@ Basic Organization schema to capture organizations, vendors, and related informa
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
+| name |  | Text | False |  |  |
 | description |  | Text | True |  |  |
 
 #### Relationships
@@ -61,56 +61,63 @@ version: '1.0'
 generics:
 - name: Generic
   namespace: Organization
+  description: An organization represents a legal entity, such as a company.
   label: Organization
-  description: An organization represent a legal entity, a company.
+  icon: mdi:domain
+  include_in_menu: true
   human_friendly_id:
   - name__value
   order_by:
   - name__value
   display_label: name__value
-  icon: mdi:domain
-  include_in_menu: true
   attributes:
   - name: name
     kind: Text
     unique: true
+    optional: false
     order_weight: 1000
   - name: description
     kind: Text
     optional: true
-    order_weight: 1200
+    order_weight: 1100
   relationships:
   - name: tags
     peer: BuiltinTag
-    cardinality: many
     kind: Attribute
+    cardinality: many
     optional: true
-    order_weight: 3000
+    order_weight: 2000
 nodes:
 - name: Manufacturer
   namespace: Organization
   description: Device Manufacturer
   icon: mdi:domain
-  inherit_from:
-  - OrganizationGeneric
   include_in_menu: true
   menu_placement: OrganizationGeneric
+  inherit_from:
+  - OrganizationGeneric
   relationships:
-  - name: device_type
+  - name: device_types
     peer: DcimDeviceType
+    kind: Attribute
     cardinality: many
     optional: true
-  - name: platform
+    identifier: manufacturer__device_type
+    order_weight: 1300
+  - name: platforms
     peer: DcimPlatform
+    kind: Attribute
     cardinality: many
     optional: true
+    identifier: manufacturer__platform
+    order_weight: 1400
 - name: Provider
   namespace: Organization
   description: Circuit or Location Provider
   icon: mdi:domain
-  inherit_from:
-  - OrganizationGeneric
   include_in_menu: true
   menu_placement: OrganizationGeneric
+  inherit_from:
+  - OrganizationGeneric
 
 ```

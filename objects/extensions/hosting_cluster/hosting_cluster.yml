@@ -1,0 +1,91 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/hosting_cluster.
+# Depends on: base, extensions/location_minimal (LocationSite: SJC1, NYC1),
+# extensions/cluster (ClusterGeneric, ClusterGenericComputeUnitNodes),
+# extensions/compute (ComputePhysicalServer "sjc1-esx01" already exists).
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: ComputePhysicalServer
+  data:
+    - name: sjc1-esx02
+      description: Second ESXi hypervisor host in the SJC1 cluster.
+      status: active
+      device_type: PowerEdge R660
+      rack_face: front
+      location:
+        kind: LocationSite
+        data:
+          name: SJC1
+    - name: nyc1-esx01
+      description: First KVM hypervisor host in the NYC1 cluster.
+      status: active
+      device_type: PowerEdge R660
+      rack_face: front
+      location:
+        kind: LocationSite
+        data:
+          name: NYC1
+    - name: nyc1-esx02
+      description: Second KVM hypervisor host in the NYC1 cluster.
+      status: active
+      device_type: PowerEdge R660
+      rack_face: front
+      location:
+        kind: LocationSite
+        data:
+          name: NYC1
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: ClusterHosting
+  data:
+    - name: SJC1-VMware-Cluster01
+      description: VMware vSphere cluster at SJC1 built from physical servers.
+      technology: vmware
+      status: active
+      # `locations` is cardinality many (a cluster can span locations), and
+      # LocationGeneric is a Generic -- each entry is a human_friendly_id, and
+      # an HFID is always a list of its parts, so the single-part site name is
+      # wrapped in a list. A bare string there is read as a node ID.
+      locations:
+        - [SJC1]
+      # `nodes` is cardinality many, and ComputeGenericUnit is a Generic --
+      # a flat list of HFID strings is not enough (the peer schema can't be
+      # resolved), so specify the concrete kind with a list of upsert specs.
+      nodes:
+        kind: ComputePhysicalServer
+        data:
+          - name: sjc1-esx01
+            location:
+              kind: LocationSite
+              data:
+                name: SJC1
+          - name: sjc1-esx02
+            location:
+              kind: LocationSite
+              data:
+                name: SJC1
+    - name: NYC1-KVM-Cluster01
+      description: KVM/QEMU cluster at NYC1 built from physical servers.
+      technology: kvm
+      status: active
+      locations:
+        - [NYC1]
+      nodes:
+        kind: ComputePhysicalServer
+        data:
+          - name: nyc1-esx01
+            location:
+              kind: LocationSite
+              data:
+                name: NYC1
+          - name: nyc1-esx02
+            location:
+              kind: LocationSite
+              data:
+                name: NYC1

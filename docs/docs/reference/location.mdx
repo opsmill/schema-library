@@ -13,17 +13,16 @@ Basic Location schema to capture locations, sites, and related information.
 ### Generic
 
 - **Label:** Location
-- **Description:** Generic Location, could be a country, city ...
+- **Description:** A location in the estate, such as a region, a country or a site.
 - **Namespace:** Location
 - **Icon:** mingcute:location-line
-- **Human Friendly ID:** shortname__value
+- **Human Friendly ID:** name__value
 
 #### Attributes
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name |  | Text |  |  |  |
-| shortname |  | Text |  |  |  |
+| name |  | Text | False |  |  |
 | description |  | Text | True |  |  |
 
 #### Relationships
@@ -36,20 +35,19 @@ Basic Location schema to capture locations, sites, and related information.
 
 - **Description:** Location directly hosting device and services.
 - **Namespace:** Location
-- **Human Friendly ID:** shortname__value
+- **Human Friendly ID:** name__value
 
 #### Attributes
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| shortname |  | Text |  |  |  |
+| name |  | Text | False |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| prefixes | IpamPrefix | True | many |  |
-| devices | DcimPhysicalDevice | True | many |  |
+| devices | DcimPhysicalDevice | True | many | Generic |
 
 ## Code
 
@@ -58,55 +56,56 @@ version: '1.0'
 generics:
 - name: Generic
   namespace: Location
-  description: Generic Location, could be a country, city ...
+  description: A location in the estate, such as a region, a country or a site.
   label: Location
   icon: mingcute:location-line
   include_in_menu: true
   hierarchical: true
   human_friendly_id:
-  - shortname__value
+  - name__value
   order_by:
   - name__value
   display_label: name__value
   attributes:
   - name: name
     kind: Text
-    order_weight: 1000
-  - name: shortname
-    kind: Text
     unique: true
-    order_weight: 1100
+    optional: false
+    order_weight: 1000
   - name: description
     kind: Text
     optional: true
-    order_weight: 1200
+    order_weight: 1100
   relationships:
   - name: tags
     peer: BuiltinTag
     kind: Attribute
-    optional: true
     cardinality: many
+    optional: true
+    order_weight: 2000
 - name: Hosting
   namespace: Location
   description: Location directly hosting device and services.
   include_in_menu: false
   human_friendly_id:
-  - shortname__value
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
   attributes:
-  - name: shortname
+  - name: name
     kind: Text
     unique: true
-    order_weight: 1100
+    optional: false
+    order_weight: 1000
   relationships:
-  - name: prefixes
-    label: Prefixes
-    peer: IpamPrefix
-    cardinality: many
-    optional: true
   - name: devices
-    label: Devices
     peer: DcimPhysicalDevice
+    label: Devices
+    kind: Generic
     cardinality: many
     optional: true
+    identifier: physical_device__location
+    order_weight: 1500
 
 ```

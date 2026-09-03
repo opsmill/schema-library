@@ -2,54 +2,721 @@
 title: Topology
 ---
 
-This schema extension introduces abstract network pods and services running in the pods, such as MPLS and EVPN.
+A schema for defining and managing network topology, strategies, and services.
 
 ## Details
 
 - **Dependencies:**
     - [base](dcim)
+    - [extensions/vlan](vlan)
 
-## Generics
+## Nodes
 
-### Generic
+### Topology
 
 - **Label:** Topology
-- **Description:** Generic model for topology.
+- **Description:** A Topology represents the entire network pod.
 - **Namespace:** Topology
 - **Icon:** carbon:network-3
+- **Human Friendly ID:** name__value
+- **Inherit From:** CoreArtifactTarget
 
 #### Attributes
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text |  |  |  |
 | description |  | Text | True |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
+| elements | TopologyGenericElement | True | many | Component |
+| strategy | TopologyNetworkStrategy | True | one | Component |
 | location | LocationGeneric | True | one | Attribute |
+| devices | DcimGenericDevice | True | many | Component |
+| network_services | TopologyNetworkService | True | many | Component |
+
+### MPLSStrategy
+
+- **Label:** MPLS Strategy
+- **Description:** Specific strategy attributes for MPLS.
+- **Namespace:** Topology
+- **Icon:** eos-icons:neural-network
+- **Human Friendly ID:** name__value
+- **Inherit From:** TopologyNetworkStrategy
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| underlay |  | Dropdown |  |  | ospf, isis, bgp |
+| overlay |  | Dropdown |  |  | ldp, rsvp, segment_routing |
+
+### EVPNStrategy
+
+- **Label:** EVPN Strategy
+- **Description:** Specific strategy attributes for EVPN.
+- **Namespace:** Topology
+- **Icon:** carbon:load-balancer-network
+- **Human Friendly ID:** name__value
+- **Inherit From:** TopologyNetworkStrategy
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| underlay |  | Dropdown |  |  | ebgp, ospf, isis |
+| overlay |  | Dropdown |  |  | ebgp, ibgp |
+
+### PhysicalElement
+
+- **Label:** Physical Topology Element
+- **Description:** Physical aspect of topology elements.
+- **Namespace:** Topology
+- **Icon:** carbon:network-3-reference
+- **Human Friendly ID:** name__value
+- **Inherit From:** TopologyGenericElement
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| mtu |  | Number |  | 1500 |  |
+| border |  | Boolean |  | False |  |
+| mlag_support |  | Boolean |  | False |  |
+| device_role |  | Dropdown |  |  | spine, leaf, pe_router, p_router, route_reflector, cpe, firewall |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| device_type | DcimDeviceType | True | one | Attribute |
+
+### DhcpOption
+
+- **Label:** Dhcp Option
+- **Description:** Represents a configurable option within a Dhcp server.
+- **Namespace:** Network
+- **Icon:** gis:globe-options
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text |  |  |  |
+| description |  | Text | True |  |  |
+| option_code |  | Number |  |  |  |
+| content |  | Text |  |  |  |
+
+### DhcpServer
+
+- **Label:** Dhcp Server
+- **Description:** Represents a Dhcp server in the network.
+- **Namespace:** Network
+- **Icon:** eos-icons:ip
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetworkManagementServer
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| lease_time |  | Text |  |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| dhcp_options | NetworkDhcpOption | True | many | Component |
+
+### NameServer
+
+- **Label:** DNS Server
+- **Description:** Represents a DNS server in the network.
+- **Namespace:** Network
+- **Icon:** eos-icons:dns
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetworkManagementServer
+
+### NTPServer
+
+- **Label:** NTP Server
+- **Description:** Represents a NTP server in the network.
+- **Namespace:** Network
+- **Icon:** iconoir:time-zone
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetworkManagementServer
+
+### NetworkServiceIdentifier
+
+- **Label:** Network Service Identifier
+- **Description:** Generic model for different types of identifiers used in network services.
+- **Namespace:** Topology
+- **Icon:** mdi:identifier
+- **Human Friendly ID:** identifier__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| identifier |  | Number |  |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| service | TopologyNetworkService | True | one |  |
+
+### NetworkService
+
+- **Label:** Network Service
+- **Description:** Network services attached to a Topology.
+- **Namespace:** Topology
+- **Icon:** carbon:ibm-cloud-internet-services
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text |  |  |  |
+| description |  | Text |  |  |  |
+| service_type |  | Text |  |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| identifier | TopologyNetworkServiceIdentifier | False | one | Attribute |
+| topology | TopologyTopology | False | one | Parent |
+| vlan | IpamVLAN | True | one | Component |
+| prefix | IpamPrefix | True | one | Component |
+
+## Generics
+
+### ManagementServer
+
+- **Label:** Network Management Servers
+- **Description:** Generic model for network management server (dns, ntp, and dhcp).
+- **Namespace:** Network
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text |  |  |  |
+| description |  | Text | True |  |  |
+| status |  | Dropdown |  |  | active, provisioning, maintenance, drained |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| location | LocationGeneric | True | many |  |
+| ip_addresses | IpamIPAddress | True | many | Component |
+
+### GenericElement
+
+- **Label:** Generic Topology Element
+- **Description:** Base model for elements
+- **Namespace:** Topology
+- **Icon:** carbon:network-3-reference
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text |  |  |  |
+| description |  | Text | True |  |  |
+| quantity |  | Number |  |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| topology | TopologyTopology | False | one | Parent |
+
+### NetworkStrategy
+
+- **Label:** Network Strategy
+- **Description:** Generic model for network strategies (underlays and overlays).
+- **Namespace:** Topology
+- **Icon:** iconoir:strategy
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text |  |  |  |
+| description |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| topology | TopologyTopology | True | many |  |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### DcimGenericDevice
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| topology | TopologyTopology | True | one |  |
+
+### IpamPrefix
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| network_service | TopologyNetworkService | True | one |  |
 
 ## Code
 
 ```yaml
 version: '1.0'
 generics:
-- name: Generic
-  namespace: Topology
-  description: Generic model for topology.
-  label: Topology
-  icon: carbon:network-3
+- name: ManagementServer
+  namespace: Network
+  description: Generic model for network management server (dns, ntp, and dhcp).
+  label: Network Management Servers
+  human_friendly_id:
+  - name__value
+  display_label: name__value
+  order_by:
+  - name__value
+  include_in_menu: true
   attributes:
+  - name: name
+    kind: Text
+    order_weight: 1000
   - name: description
     kind: Text
-    order_weight: 1300
+    order_weight: 1100
+    optional: true
+  - name: status
+    kind: Dropdown
+    choices:
+    - name: active
+      label: Active
+      description: Fully operational and currently in service.
+      color: '#7fbf7f'
+    - name: provisioning
+      label: Provisioning
+      description: In the process of being set up and configured.
+      color: '#ffff7f'
+    - name: maintenance
+      label: Maintenance
+      description: Undergoing routine maintenance or repairs.
+      color: '#ffd27f'
+    - name: drained
+      label: Drained
+      description: Temporarily taken out of service.
+      color: '#bfbfbf'
+  relationships:
+  - name: location
+    peer: LocationGeneric
+    optional: true
+    cardinality: many
+  - name: ip_addresses
+    peer: IpamIPAddress
+    optional: true
+    cardinality: many
+    kind: Component
+- name: GenericElement
+  namespace: Topology
+  description: Base model for elements
+  label: Generic Topology Element
+  icon: carbon:network-3-reference
+  human_friendly_id:
+  - name__value
+  display_label: name__value
+  order_by:
+  - name__value
+  include_in_menu: false
+  menu_placement: TopologyTopology
+  attributes:
+  - name: name
+    kind: Text
+    order_weight: 1000
+  - name: description
+    kind: Text
+    order_weight: 1100
+    optional: true
+  - name: quantity
+    kind: Number
+    order_weight: 1200
+  relationships:
+  - name: topology
+    peer: TopologyTopology
+    cardinality: one
+    kind: Parent
+    optional: false
+- name: NetworkStrategy
+  namespace: Topology
+  description: Generic model for network strategies (underlays and overlays).
+  label: Network Strategy
+  icon: iconoir:strategy
+  human_friendly_id:
+  - name__value
+  display_label: name__value
+  order_by:
+  - name__value
+  include_in_menu: true
+  menu_placement: TopologyTopology
+  attributes:
+  - name: name
+    kind: Text
+    order_weight: 1000
+  - name: description
+    kind: Text
+    order_weight: 1100
     optional: true
   relationships:
+  - name: topology
+    peer: TopologyTopology
+    optional: true
+    cardinality: many
+nodes:
+- name: Topology
+  namespace: Topology
+  description: A Topology represents the entire network pod.
+  label: Topology
+  icon: carbon:network-3
+  human_friendly_id:
+  - name__value
+  display_label: name__value
+  order_by:
+  - name__value
+  inherit_from:
+  - CoreArtifactTarget
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    order_weight: 1000
+  - name: description
+    kind: Text
+    optional: true
+    order_weight: 1100
+  relationships:
+  - name: elements
+    peer: TopologyGenericElement
+    optional: true
+    cardinality: many
+    kind: Component
+  - name: strategy
+    peer: TopologyNetworkStrategy
+    optional: true
+    cardinality: one
+    kind: Component
   - name: location
     peer: LocationGeneric
     optional: true
     cardinality: one
     kind: Attribute
+  - name: devices
+    peer: DcimGenericDevice
+    optional: true
+    cardinality: many
+    kind: Component
+  - name: network_services
+    peer: TopologyNetworkService
+    optional: true
+    cardinality: many
+    kind: Component
+- name: MPLSStrategy
+  namespace: Topology
+  description: Specific strategy attributes for MPLS.
+  label: MPLS Strategy
+  icon: eos-icons:neural-network
+  inherit_from:
+  - TopologyNetworkStrategy
+  menu_placement: TopologyNetworkStrategy
+  include_in_menu: false
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: underlay
+    kind: Dropdown
+    choices:
+    - name: ospf
+      label: OSPF
+    - name: isis
+      label: ISIS
+    - name: bgp
+      label: BGP
+  - name: overlay
+    kind: Dropdown
+    choices:
+    - name: ldp
+      label: LDP
+    - name: rsvp
+      label: RSVP
+    - name: segment_routing
+      label: Segment Routing
+- name: EVPNStrategy
+  namespace: Topology
+  description: Specific strategy attributes for EVPN.
+  label: EVPN Strategy
+  icon: carbon:load-balancer-network
+  inherit_from:
+  - TopologyNetworkStrategy
+  menu_placement: TopologyNetworkStrategy
+  include_in_menu: false
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: underlay
+    kind: Dropdown
+    choices:
+    - name: ebgp
+      label: EBGP
+    - name: ospf
+      label: OSPF
+    - name: isis
+      label: ISIS
+  - name: overlay
+    kind: Dropdown
+    choices:
+    - name: ebgp
+      label: EBGP
+    - name: ibgp
+      label: IBGP
+- name: PhysicalElement
+  namespace: Topology
+  description: Physical aspect of topology elements.
+  label: Physical Topology Element
+  icon: carbon:network-3-reference
+  menu_placement: TopologyTopology
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  inherit_from:
+  - TopologyGenericElement
+  attributes:
+  - name: mtu
+    kind: Number
+    default_value: 1500
+    order_weight: 3000
+  - name: border
+    kind: Boolean
+    label: Is a Topology Border
+    default_value: false
+    order_weight: 2400
+  - name: mlag_support
+    kind: Boolean
+    label: MLAG Support
+    default_value: false
+    order_weight: 2500
+  - name: device_role
+    label: Role
+    kind: Dropdown
+    choices:
+    - name: spine
+      color: '#ffb3ba'
+    - name: leaf
+      color: '#ffdfba'
+    - name: pe_router
+      color: '#baffc9'
+    - name: p_router
+      color: '#bae1ff'
+    - name: route_reflector
+      color: '#ffbaba'
+    - name: cpe
+      color: '#f2bae1'
+    - name: firewall
+      color: '#c5a3ff'
+    order_weight: 1300
+  relationships:
+  - name: device_type
+    label: Type
+    peer: DcimDeviceType
+    optional: true
+    cardinality: one
+    kind: Attribute
+    order_weight: 1400
+- name: DhcpOption
+  namespace: Network
+  description: Represents a configurable option within a Dhcp server.
+  label: Dhcp Option
+  icon: gis:globe-options
+  menu_placement: NetworkManagementServer
+  include_in_menu: false
+  human_friendly_id:
+  - name__value
+  display_label: name__value
+  order_by:
+  - name__value
+  attributes:
+  - name: name
+    kind: Text
+    order_weight: 1000
+  - name: description
+    kind: Text
+    optional: true
+    order_weight: 1100
+  - name: option_code
+    kind: Number
+    order_weight: 2000
+  - name: content
+    kind: Text
+    order_weight: 2100
+- name: DhcpServer
+  namespace: Network
+  description: Represents a Dhcp server in the network.
+  label: Dhcp Server
+  icon: eos-icons:ip
+  menu_placement: NetworkManagementServer
+  include_in_menu: false
+  human_friendly_id:
+  - name__value
+  display_label: name__value
+  order_by:
+  - name__value
+  inherit_from:
+  - NetworkManagementServer
+  attributes:
+  - name: lease_time
+    kind: Text
+    order_weight: 2100
+  relationships:
+  - name: dhcp_options
+    peer: NetworkDhcpOption
+    optional: true
+    cardinality: many
+    kind: Component
+- name: NameServer
+  namespace: Network
+  description: Represents a DNS server in the network.
+  label: DNS Server
+  icon: eos-icons:dns
+  menu_placement: NetworkManagementServer
+  human_friendly_id:
+  - name__value
+  display_label: name__value
+  order_by:
+  - name__value
+  inherit_from:
+  - NetworkManagementServer
+- name: NTPServer
+  namespace: Network
+  description: Represents a NTP server in the network.
+  label: NTP Server
+  icon: iconoir:time-zone
+  menu_placement: NetworkManagementServer
+  human_friendly_id:
+  - name__value
+  display_label: name__value
+  order_by:
+  - name__value
+  inherit_from:
+  - NetworkManagementServer
+- name: NetworkServiceIdentifier
+  namespace: Topology
+  description: Generic model for different types of identifiers used in network services.
+  label: Network Service Identifier
+  icon: mdi:identifier
+  menu_placement: TopologyNetworkService
+  human_friendly_id:
+  - identifier__value
+  order_by:
+  - identifier__value
+  display_label: identifier__value
+  attributes:
+  - name: identifier
+    kind: Number
+  relationships:
+  - name: service
+    label: Network Service
+    peer: TopologyNetworkService
+    cardinality: one
+    optional: true
+- name: NetworkService
+  namespace: Topology
+  description: Network services attached to a Topology.
+  label: Network Service
+  icon: carbon:ibm-cloud-internet-services
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: name
+    label: Service Name
+    kind: Text
+    order_weight: 1000
+  - name: description
+    kind: Text
+    order_weight: 1100
+  - name: service_type
+    kind: Text
+    enum:
+    - Layer2
+    - Layer3
+    order_weight: 1200
+  relationships:
+  - name: identifier
+    peer: TopologyNetworkServiceIdentifier
+    cardinality: one
+    kind: Attribute
+    optional: false
+  - name: topology
+    peer: TopologyTopology
+    cardinality: one
+    kind: Parent
+    optional: false
+  - name: vlan
+    peer: IpamVLAN
+    optional: true
+    cardinality: one
+    kind: Component
+    order_weight: 1500
+  - name: prefix
+    peer: IpamPrefix
+    optional: true
+    cardinality: one
+    kind: Component
+    order_weight: 1400
+extensions:
+  nodes:
+  - kind: DcimGenericDevice
+    relationships:
+    - name: topology
+      peer: TopologyTopology
+      optional: true
+      cardinality: one
+  - kind: IpamPrefix
+    relationships:
+    - name: network_service
+      label: Network Service
+      peer: TopologyNetworkService
+      optional: true
+      cardinality: one
+      order_weight: 1400
 
 ```

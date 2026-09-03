@@ -59,7 +59,7 @@ def _generate_schema_reference_content(schema_key: str, schema_metadata: dict) -
     if "dependencies" in schema_metadata:
         for dep in schema_metadata["dependencies"]:
             if dep == "base":
-                link = "dcim"  # TODO: This is a hack, should be improved ... maybe merging all base references
+                link = "dcim"
             else:
                 link = dep.split("/")[1]
             schema_data["dependencies"].append({"name": dep, "link": link})
@@ -122,7 +122,8 @@ def _generate_home_page_documentation() -> None:
     template_text = template_file.read_text(encoding="utf-8")
 
     # Render the template
-    environment = jinja2.Environment(trim_blocks=True)
+    # keep_trailing_newline keeps the template's final newline, which markdownlint (MD047) requires.
+    environment = jinja2.Environment(trim_blocks=True, keep_trailing_newline=True)
     template = environment.from_string(template_text)
     rendered_file = template.render(toc=toc_content)
 

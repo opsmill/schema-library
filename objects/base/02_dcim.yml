@@ -1,0 +1,49 @@
+# ---------------------------------------------------------------------------
+# Mock data for base/dcim.yml.
+# Depends on: base/organization.yml (manufacturer references).
+#
+# NOTE: DcimDevice is intentionally NOT populated here. DcimPhysicalDevice.location
+# is a required relationship to LocationHosting, and base/location.yml only defines
+# the abstract LocationGeneric/LocationHosting mixins -- there is no concrete node
+# to attach a device to until a location extension is loaded. See
+# objects/extensions/rack and objects/extensions/compute for device instances built
+# on top of extensions/location_minimal.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimPlatform
+  data:
+    - name: Cisco IOS-XR
+      manufacturer: Cisco
+    - name: Juniper Junos
+      manufacturer: Juniper
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimDeviceType
+  data:
+    - name: ASR9001
+      description: Cisco ASR 9001 aggregation router.
+      manufacturer: Cisco
+      part_number: ASR-9001
+      height: 2
+      full_depth: true
+      weight: 18
+    - name: MX204
+      description: Juniper MX204 universal routing platform.
+      manufacturer: Juniper
+      part_number: MX204-HWBASE3-AC
+      height: 1
+      full_depth: false
+      weight: 9
+    - name: PowerEdge R660
+      description: Dell PowerEdge R660 rack server.
+      manufacturer: Dell
+      part_number: R660
+      height: 1
+      full_depth: true
+      weight: 16

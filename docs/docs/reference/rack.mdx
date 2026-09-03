@@ -1,0 +1,163 @@
+---
+title: Rack
+---
+
+This schema extension introduces a Rack model representing a physical equipment rack installed at a site. Racks can be placed at a LocationSite and can host devices and other equipment. LocationRack needs a Location.Site: extensions/location_site is declared above as the smallest provider, but extensions/location_minimal provides the same node as part of its hierarchy and satisfies the rack equally, load whichever suits, never both. LocationRack is also defined, hierarchically and incompatibly, by experimental/location_extended, so load one or the other, not both.
+
+## Details
+
+- **Dependencies:**
+    - [base](dcim)
+    - [extensions/location_site](location_site)
+
+## Nodes
+
+### Rack
+
+- **Label:** Rack
+- **Description:** A physical equipment rack installed at a site.
+- **Namespace:** Location
+- **Icon:** clarity:rack-server-line
+- **Uniqueness Constraints:**
+    - site, name__value
+- **Human Friendly ID:** site__name__value, name__value
+- **Inherit From:** LocationHosting
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| facility |  | Text | True |  |  |
+| status |  | Dropdown | False | active | active, available, reserved, planned, decommissioning, deprecated |
+| height |  | Number | False | 42 |  |
+| serial_number |  | Text | True |  |  |
+| asset_tag |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| site | LocationSite | False | one | Parent |
+| tags | BuiltinTag | True | many | Attribute |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### LocationSite
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| racks | LocationRack | True | many | Component |
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: Rack
+  namespace: Location
+  description: A physical equipment rack installed at a site.
+  label: Rack
+  icon: clarity:rack-server-line
+  include_in_menu: true
+  menu_placement: LocationGeneric
+  inherit_from:
+  - LocationHosting
+  human_friendly_id:
+  - site__name__value
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  uniqueness_constraints:
+  - - site
+    - name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: false
+    optional: false
+    order_weight: 1000
+  - name: facility
+    kind: Text
+    optional: true
+    order_weight: 1150
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: active
+      label: Active
+      description: Rack is installed and in use.
+      color: '#00d25b'
+    - name: available
+      label: Available
+      description: Rack is installed and has capacity for new equipment.
+      color: '#00bcd4'
+    - name: reserved
+      label: Reserved
+      description: Rack is allocated but not yet in use.
+      color: '#4d90fe'
+    - name: planned
+      label: Planned
+      description: Rack is planned but not yet installed.
+      color: '#2196f3'
+    - name: decommissioning
+      label: Decommissioning
+      description: Rack is being phased out and emptied.
+      color: '#ff9800'
+    - name: deprecated
+      label: Deprecated
+      description: Rack has been removed from service.
+      color: '#6c757d'
+    optional: false
+    order_weight: 1200
+  - name: height
+    kind: Number
+    label: Height (U)
+    default_value: 42
+    optional: false
+    order_weight: 1300
+  - name: serial_number
+    kind: Text
+    optional: true
+    order_weight: 1350
+  - name: asset_tag
+    kind: Text
+    optional: true
+    order_weight: 1400
+  relationships:
+  - name: site
+    peer: LocationSite
+    kind: Parent
+    cardinality: one
+    optional: false
+    identifier: site__racks
+    order_weight: 900
+  - name: tags
+    peer: BuiltinTag
+    kind: Attribute
+    cardinality: many
+    optional: true
+    order_weight: 2000
+extensions:
+  nodes:
+  - kind: LocationSite
+    relationships:
+    - name: racks
+      peer: LocationRack
+      kind: Component
+      cardinality: many
+      optional: true
+      identifier: site__racks
+      order_weight: 1850
+
+```

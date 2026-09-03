@@ -1,0 +1,126 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
+version: "1.0"
+
+nodes:
+  - name: Tenant
+    namespace: Organization
+    description: A tenant is the owner of the corresponding devices, addressing, and locations.
+    label: Tenant
+    icon: mdi:domain
+    include_in_menu: true
+    menu_placement: OrganizationGeneric
+    inherit_from:
+      - OrganizationGeneric
+    relationships:
+      - name: devices
+        peer: DcimGenericDevice
+        label: Devices
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: tenant__device
+        order_weight: 1300
+      - name: prefixes
+        peer: IpamPrefix
+        label: Prefixes
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: tenant__prefix
+        order_weight: 1350
+      - name: addresses
+        peer: IpamIPAddress
+        label: Addresses
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: tenant__ip_address
+        order_weight: 1400
+      - name: locations
+        peer: LocationHosting
+        label: Locations
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: tenant__location
+        order_weight: 1450
+
+extensions:
+  nodes:
+    - kind: DcimGenericDevice
+      relationships:
+        - name: tenant
+          peer: OrganizationTenant
+          kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: tenant__device
+          order_weight: 1850
+    - kind: IpamPrefix
+      relationships:
+        - name: tenant
+          peer: OrganizationTenant
+          kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: tenant__prefix
+          order_weight: 1400
+    - kind: IpamIPAddress
+      relationships:
+        - name: tenant
+          peer: OrganizationTenant
+          kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: tenant__ip_address
+          order_weight: 1350
+    - kind: LocationHosting
+      relationships:
+        - name: tenant
+          peer: OrganizationTenant
+          kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: tenant__location
+# ---------------------------------------------------------------------------
+# Composing with other extensions
+# ---------------------------------------------------------------------------
+# This extension only wires Tenant onto nodes that live in the base schema, so it has
+# no dependency beyond `base` and can always be loaded on its own.
+#
+# Some extensions (e.g. `extensions/circuit`, which defines `DcimCircuit`) are optional
+# and aren't guaranteed to be loaded. Adding a hard `peer: DcimCircuit` relationship here
+# would break schema loading whenever the circuit extension isn't present, so that wiring
+# is intentionally left out of this file.
+#
+# If you do load `extensions/circuit` and want a Tenant on a Circuit, add the reciprocal
+# pair below to your own schema (e.g. a small local extension file that depends on both
+# `extensions/tenancy` and `extensions/circuit`):
+#
+#   extensions:
+#     nodes:
+#       - kind: DcimCircuit
+#         relationships:
+#           - name: tenant
+#             peer: OrganizationTenant
+#             identifier: tenant__circuit
+#             optional: true
+#             cardinality: one
+#             kind: Attribute
+#       - kind: OrganizationTenant
+#         relationships:
+#           - name: circuits
+#             peer: DcimCircuit
+#             identifier: tenant__circuit
+#             cardinality: many
+#             optional: true
+#             kind: Generic
+#
+# The same pattern applies to any other optional extension node you want tenancy on.
+          order_weight: 1800

@@ -1,5 +1,10 @@
-# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
 ---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
 version: "1.0"
 nodes:
   - name: IXP
@@ -7,6 +12,7 @@ nodes:
     description: "An Internet Exchange Point (IXP) for peering"
     label: "Internet Exchange"
     icon: "mdi:network"
+    include_in_menu: true
     human_friendly_id:
       - "name__value"
     order_by:
@@ -16,86 +22,94 @@ nodes:
       - name: name
         kind: Text
         unique: true
+        optional: false
         description: "Name of the Internet Exchange"
         order_weight: 1000
       - name: description
         kind: Text
-        description: "An optional description of the Internet Exchange"
         optional: true
+        description: "An optional description of the Internet Exchange"
         order_weight: 1100
       - name: status
         kind: Dropdown
+        default_value: "enabled"
         choices:
           - name: enabled
             label: Enabled
             description: "Internet Exchange is active and operational"
-            color: "#a8dadc"
+            color: "#00d25b"
           - name: disabled
             label: Disabled
             description: "Internet Exchange is not operational"
             color: "#b0bec5"
-        default_value: "enabled"
+        optional: false
         order_weight: 1200
     relationships:
       - name: connections
         peer: PeeringIXPConnection
-        optional: true
-        cardinality: many
         kind: Component
+        cardinality: many
+        optional: true
         description: "IXP connections associated with this Internet Exchange"
+        order_weight: 1500
       - name: local_as
         peer: RoutingAutonomousSystem
-        optional: true
-        cardinality: one
         kind: Attribute
+        cardinality: one
+        optional: true
         order_weight: 1300
       - name: import_policies
+        peer: RoutingPolicyBGP
         label: Import Routing Policies
-        peer: RoutingPolicyBGP
+        kind: Generic
+        cardinality: many
+        optional: true
         identifier: ixp__import_bgppolicies
-        optional: true
-        cardinality: many
-        kind: Generic
-        description: "Import routing policies applied to the session"
+        description: "Import routing policies applied to every session on this internet exchange point"
+        order_weight: 1600
       - name: export_policies
-        label: Export Routing Policies
         peer: RoutingPolicyBGP
+        label: Export Routing Policies
+        kind: Generic
+        cardinality: many
+        optional: true
         identifier: ixp__export_bgppolicies
-        optional: true
-        cardinality: many
-        kind: Generic
-        description: "Export routing policies applied to the session"
+        description: "Export routing policies applied to every session on this internet exchange point"
+        order_weight: 1650
       - name: bgp_communities
-        label: "BGP Communities"
         peer: RoutingBGPCommunity
-        optional: true
-        cardinality: many
+        label: "BGP Communities"
         kind: Generic
-        description: "BGP communities associated with the session"
+        cardinality: many
+        optional: true
+        description: "BGP communities associated with this internet exchange point"
+        order_weight: 1700
       - name: tags
         peer: BuiltinTag
-        optional: true
-        cardinality: many
         kind: Attribute
-        order_weight: 3000
+        cardinality: many
+        optional: true
+        order_weight: 2000
 
   - name: IXPConnection
     namespace: Peering
     description: "A connection to an Internet Exchange Point (IXP)"
     label: "IXP Connection"
     icon: "mdi:lan-connect"
+    include_in_menu: true
     menu_placement: PeeringIXP
-    uniqueness_constraints:
-      - ["name__value"]
     human_friendly_id:
       - "name__value"
     order_by:
       - name__value
     display_label: name__value
+    uniqueness_constraints:
+      - ["name__value"]
     attributes:
       - name: name
         kind: Text
         unique: true
+        optional: false
         description: "Name of the IXP Connection"
         order_weight: 1000
       - name: description
@@ -104,20 +118,20 @@ nodes:
         description: "Description of the IXP Connection"
         order_weight: 1100
       - name: peeringdb_netixlan
-        label: PeeringDB Netixlan
         kind: Number
+        label: PeeringDB Netixlan
         optional: true
         description: "PeeringDB ID for the IXP connection"
         order_weight: 1150
       - name: status
         kind: Dropdown
-        optional: true
+        default_value: "enabled"
         choices:
           - name: enabled
             label: Enabled
             description: "The system is fully operational and functioning as expected."
-            color: "#a8dadc"
-          - name: pre-maintenance
+            color: "#00d25b"
+          - name: pre_maintenance
             label: Pre-Maintenance
             description: "Preparation stage before performing maintenance tasks."
             color: "#f4a261"
@@ -125,7 +139,7 @@ nodes:
             label: Maintenance
             description: "Currently undergoing maintenance tasks."
             color: "#e9c46a"
-          - name: post-maintenance
+          - name: post_maintenance
             label: Post-Maintenance
             description: "Final checks and verifications after maintenance tasks."
             color: "#f0e5de"
@@ -133,12 +147,12 @@ nodes:
             label: Disabled
             description: "The system is not operational and cannot be used."
             color: "#b0bec5"
-        default_value: "enabled"
+        optional: true
         order_weight: 1200
       - name: vlan
         kind: Number
-        description: "VLAN ID for the connection"
         optional: true
+        description: "VLAN ID for the connection"
         order_weight: 1300
       - name: mac_address
         kind: MacAddress
@@ -148,36 +162,65 @@ nodes:
         order_weight: 1350
     relationships:
       - name: ipv6_address
-        label: IPv6 Address
-        description: "IPv6 address assigned to the connection"
         peer: IpamIPAddress
-        identifier: ixpconn__ipv6_address
-        cardinality: one
+        label: IPv6 Address
         kind: Attribute
+        cardinality: one
+        identifier: ixpconn__ipv6_address
+        optional: true
+        description: "IPv6 address assigned to the connection"
         order_weight: 1400
       - name: ipv4_address
-        label: IPv4 Address
-        description: "IPv4 address assigned to the connection"
         peer: IpamIPAddress
-        identifier: ixpconn__ipv4_address
-        cardinality: one
+        label: IPv4 Address
         kind: Attribute
+        cardinality: one
+        identifier: ixpconn__ipv4_address
+        optional: true
+        description: "IPv4 address assigned to the connection"
         order_weight: 1375
       - name: internet_exchange_point
-        label: IXP
         peer: PeeringIXP
-        optional: false
-        cardinality: one
+        label: IXP
         kind: Parent
+        cardinality: one
+        optional: false
         description: "The Internet Exchange Point this connection is part of"
+        order_weight: 900
       - name: router
         peer: DcimDevice
-        cardinality: one
         kind: Attribute
+        cardinality: one
+        optional: true
         description: "The router this IXP connection is connected to"
-        order_weight: 1400
+        order_weight: 1500
+      - name: bgp_sessions
+        peer: RoutingBGPSession
+        label: BGP Sessions
+        kind: Component
+        cardinality: many
+        optional: true
+        on_delete: no-action # a session outlives its IXP connection; it is owned by its device
+        identifier: ixpconn__bgpsessions
+        description: "BGP sessions established over this IXP connection"
+        order_weight: 1550
       - name: tags
         peer: BuiltinTag
-        cardinality: many
         kind: Attribute
-        order_weight: 3000
+        cardinality: many
+        optional: true
+        order_weight: 2000
+
+extensions:
+  nodes:
+    - kind: RoutingBGPSession
+      relationships:
+        - name: ixp_connection
+          peer: PeeringIXPConnection
+          label: IXP Connection
+          kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: ixpconn__bgpsessions
+          description: "The IXP connection this BGP session is established over"
+          order_weight: 1800

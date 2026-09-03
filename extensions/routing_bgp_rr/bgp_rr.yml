@@ -1,5 +1,10 @@
 ---
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
 version: "1.0"
 
 nodes:
@@ -8,44 +13,48 @@ nodes:
     description: "A Route Reflector (RR) Cluster used for grouping internal peers"
     label: "Route Reflector Cluster"
     icon: "mdi:router-network"
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: RoutingBGPSession
     human_friendly_id:
       - name__value
     display_label: name__value
     attributes:
       - name: name
         kind: Text
+        unique: true
+        optional: false
         description: "Name of the Route Reflector Cluster"
         order_weight: 1000
-        unique: true
       - name: description
         kind: Text
-        description: "Optional description of the Route Reflector Cluster"
         optional: true
+        description: "Optional description of the Route Reflector Cluster"
         order_weight: 1100
     relationships:
       - name: cluster_id
-        label: "Cluster ID"
         peer: IpamIPAddress
-        description: "Cluster ID represented as a reference to an IP Address"
-        cardinality: one
+        label: "Cluster ID"
         kind: Attribute
+        cardinality: one
         optional: false
+        description: "Cluster ID represented as a reference to an IP Address"
         order_weight: 1200
       - name: peer_groups
-        label: "BGP Peer Groups"
         peer: RoutingBGPPeerGroup
-        cardinality: many
+        label: "BGP Peer Groups"
         kind: Generic
+        cardinality: many
         optional: true
+        order_weight: 1300
 
 extensions:
   nodes:
     - kind: RoutingBGPPeerGroup
       relationships:
         - name: rr_cluster
-          label: "RR Cluster"
           peer: RoutingBGPRRCluster
-          cardinality: one
+          label: "RR Cluster"
           kind: Attribute
-          order_weight: 1600
+          cardinality: one
+          optional: true
+          order_weight: 1700

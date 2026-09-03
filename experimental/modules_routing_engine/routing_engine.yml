@@ -1,5 +1,10 @@
 ---
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
 version: "1.0"
 
 nodes:
@@ -8,7 +13,7 @@ nodes:
     description: "Routing Engine Type information, detailing specifications such as part number and manufacturer."
     label: "Routing Engine Type"
     inherit_from:
-      - DeviceGenericModuleType
+      - DcimGenericModuleType
     relationships:
       - name: routing_engines
         peer: DeviceRoutingEngine
@@ -22,18 +27,9 @@ nodes:
     label: "Routing Engine"
     icon: "mdi:cpu-64-bit"
     inherit_from:
-      - DeviceGenericModule
-    uniqueness_constraints:
-      - ["serial_number__value"]
-      #  # Only one RE per Device RE-Slot
-      # - ["device", "slot__value"]
-    human_friendly_id:
-      - device__name__value
-      - slot__value
-    order_by:
-      - device__name__value
-      - slot__value
-    display_label: serial_number__value
+      - DcimGenericModule
+    # human_friendly_id, order_by, and display_label are inherited from DcimGenericModule
+    # (computed_name__value, derived from module_bay + module_type), which is already unique.
     attributes:
       - name: slot
         kind: Number

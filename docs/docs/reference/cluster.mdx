@@ -14,7 +14,6 @@ This schema extension contains the foundations to capture clusters. With this on
 
 ### Generic
 
-- **Label:** Clusters
 - **Description:** A cluster of machines hosting services or other machines.
 - **Namespace:** Cluster
 - **Icon:** mdi:dots-hexagon
@@ -24,14 +23,14 @@ This schema extension contains the foundations to capture clusters. With this on
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| name | Name of the cluster. | Text |  |  |  |
+| name | Name of the cluster. | Text | False |  |  |
 | description |  | Text | True |  |  |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| location | LocationGeneric | False | many | Attribute |
+| locations | LocationGeneric | False | many | Attribute |
 | tags | BuiltinTag | True | many | Attribute |
 
 ### GenericComputeUnitNodes
@@ -43,7 +42,7 @@ This schema extension contains the foundations to capture clusters. With this on
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| nodes | ComputeGenericUnit |  | many | Component |
+| nodes | ComputeGenericUnit | True | many | Component |
 
 ## Extensions
 
@@ -59,7 +58,7 @@ In this context "extensions" refer to modifications or additions to the existing
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| worker_in_cluster | ClusterGenericComputeUnitNodes | True | one |  |
+| worker_in_cluster | ClusterGenericComputeUnitNodes | True | one | Generic |
 
 ### LocationGeneric
 
@@ -77,8 +76,8 @@ generics:
 - name: Generic
   namespace: Cluster
   description: A cluster of machines hosting services or other machines.
-  label: Clusters
   icon: mdi:dots-hexagon
+  include_in_menu: false
   human_friendly_id:
   - name__value
   order_by:
@@ -87,25 +86,27 @@ generics:
   attributes:
   - name: name
     kind: Text
-    description: Name of the cluster.
     unique: true
+    optional: false
+    description: Name of the cluster.
     order_weight: 1000
   - name: description
     kind: Text
     optional: true
+    order_weight: 1100
   relationships:
-  - name: location
-    label: Location
+  - name: locations
     peer: LocationGeneric
-    optional: false
-    cardinality: many
+    label: Locations
     kind: Attribute
+    cardinality: many
+    optional: false
     order_weight: 1400
   - name: tags
     peer: BuiltinTag
-    optional: true
-    cardinality: many
     kind: Attribute
+    cardinality: many
+    optional: true
     order_weight: 2000
 - name: GenericComputeUnitNodes
   namespace: Cluster
@@ -114,30 +115,35 @@ generics:
   include_in_menu: false
   relationships:
   - name: nodes
-    label: Nodes
-    identifier: worker_in_cluster
-    cardinality: many
     peer: ComputeGenericUnit
+    label: Nodes
     kind: Component
+    cardinality: many
+    identifier: worker_in_cluster
+    optional: true
+    order_weight: 1500
 extensions:
   nodes:
   - kind: ComputeGenericUnit
     relationships:
     - name: worker_in_cluster
-      identifier: worker_in_cluster
-      label: Worker in cluster
       peer: ClusterGenericComputeUnitNodes
+      kind: Generic
+      label: Worker in cluster
       cardinality: one
-      description: This device is a worker node of the specified cluster.
       optional: true
+      identifier: worker_in_cluster
+      description: This device is a worker node of the specified cluster.
+      order_weight: 1900
   - kind: LocationGeneric
     relationships:
     - name: clusters
-      label: Clusters
       peer: ClusterGeneric
-      cardinality: many
+      label: Clusters
       kind: Component
-      description: All clusters available on that location.
+      cardinality: many
       optional: true
+      description: All clusters available on that location.
+      order_weight: 1650
 
 ```

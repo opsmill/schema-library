@@ -13,6 +13,7 @@ This schema extension contains a generic to create Routing Policies. This Generi
 
 ### Policy
 
+- **Label:** Routing Policy
 - **Description:** Policy defining the rules for routing traffic in a network.
 - **Namespace:** Routing
 - **Icon:** carbon:deployment-policy
@@ -24,9 +25,9 @@ This schema extension contains a generic to create Routing Policies. This Generi
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name | The name of the routing policy. | Text | False |  |  |
 | description | An optional description of the routing policy. | Text | True |  |  |
-| policy_type | The type of routing policy which specifies the direction of route advertisement. | Dropdown |  |  | import-policy, export-policy, import-export-policy |
+| policy_type | The type of routing policy which specifies the direction of route advertisement. | Dropdown | False |  | import_policy, export_policy, import_export_policy |
 | weight | Priority of the routing policy. The higher the number, the higher the priority. | Number | True | 1000 |  |
-| address_family | The address family for the routing policy indicating the type of IP address. | Dropdown |  | all | ipv4, ipv6, all |
+| address_family | The address family for the routing policy indicating the type of IP address. | Dropdown | False | all | ipv4, ipv6, all |
 
 ## Code
 
@@ -35,9 +36,10 @@ version: '1.0'
 generics:
 - name: Policy
   namespace: Routing
-  icon: carbon:deployment-policy
-  include_in_menu: false
   description: Policy defining the rules for routing traffic in a network.
+  label: Routing Policy
+  icon: carbon:deployment-policy
+  include_in_menu: true
   human_friendly_id:
   - name__value
   order_by:
@@ -46,45 +48,45 @@ generics:
   attributes:
   - name: name
     kind: Text
-    description: The name of the routing policy.
     unique: true
     optional: false
+    description: The name of the routing policy.
     order_weight: 1000
   - name: description
     kind: Text
-    description: An optional description of the routing policy.
     optional: true
+    description: An optional description of the routing policy.
     order_weight: 1100
   - name: policy_type
-    label: Type
     kind: Dropdown
-    description: The type of routing policy which specifies the direction of route
-      advertisement.
+    label: Type
     choices:
-    - name: import-policy
+    - name: import_policy
       label: Import
       description: Policy for incoming routes.
       color: '#E6E6FA'
-    - name: export-policy
+    - name: export_policy
       label: Export
       description: Policy for outgoing routes.
       color: '#E6E6FA'
-    - name: import-export-policy
+    - name: import_export_policy
       label: Import + Export
       description: Policy for both incoming and outgoing routes.
       color: '#E6E6FA'
+    optional: false
+    description: The type of routing policy which specifies the direction of route
+      advertisement.
     order_weight: 1200
   - name: weight
     kind: Number
+    default_value: 1000
+    optional: true
     description: Priority of the routing policy. The higher the number, the higher
       the priority.
-    optional: true
-    default_value: 1000
     order_weight: 1400
   - name: address_family
-    description: The address family for the routing policy indicating the type of
-      IP address.
     kind: Dropdown
+    default_value: all
     choices:
     - name: ipv4
       label: IPv4
@@ -98,7 +100,9 @@ generics:
       label: All
       description: Policy applies to both IPv4 and IPv6 addresses.
       color: '#E6E6FA'
-    default_value: all
+    optional: false
+    description: The address family for the routing policy indicating the type of
+      IP address.
     order_weight: 1150
 
 ```

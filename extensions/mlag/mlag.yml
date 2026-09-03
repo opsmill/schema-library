@@ -1,5 +1,10 @@
 ---
 # yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
 version: "1.0"
 
 generics:
@@ -10,31 +15,35 @@ generics:
   # and add the necessary relationships/attributes to it following MlagDomain node example below
   - name: MlagDomain
     namespace: Generic
-    include_in_menu: false
+    description: Generic holding the peer links and interfaces shared by the members of an MLAG domain.
     label: MLAG Domain
-    display_label: domain_id__value
+    include_in_menu: false
     human_friendly_id:
       - domain_id__value
+    display_label: domain_id__value
     attributes:
       - name: domain_id
-        label: "MLAG Domain ID"
         kind: Text
+        label: "MLAG Domain ID"
         unique: true # TODO: This one could be a mess to make unique...
+        optional: false
         description: "Identifier for the MLAG domain"
-        order_weight: 900
+        order_weight: 1000
       - name: reload_delay
-        label: "Reload Delay"
         kind: Number
-        description: "Time in seconds to wait before bringing up the MLAG after a reload"
+        label: "Reload Delay"
         default_value: 300
+        optional: false
+        description: "Time in seconds to wait before bringing up the MLAG after a reload"
         order_weight: 1650
     relationships:
       - name: peer_links
-        label: "Peer Links"
-        description: "LAG interfaces used as peer-links between the MLAG peers"
         peer: InterfaceLag
-        cardinality: many
+        label: "Peer Links"
         kind: Attribute
+        cardinality: many
+        optional: true
+        description: "LAG interfaces used as peer-links between the MLAG peers"
         order_weight: 1500
         # Depending on the use-case this could be optional or not
         # Example: User creates a MLAG domain and generator implements it = keep it optional
@@ -45,33 +54,35 @@ generics:
         # max_count: 2
         # min_count: 2
       - name: mlag_interfaces
-        label: "MLAG Interface(s)"
         peer: MlagInterface
-        cardinality: many
+        label: "MLAG Interface(s)"
         kind: Component
+        cardinality: many
+        optional: true
         description: "Bundle interfaces that are spread across all devices in this MLAG domain."
-        order_weight: 1500
+        order_weight: 1550
 
 nodes:
   - name: Interface
     namespace: Mlag
-    label: MLAG Interface
     description: "Multi-Chassis Link Aggregation Group Interface"
+    label: MLAG Interface
+    include_in_menu: false
     inherit_from:
       - InterfaceLayer2
       - GenericInterfaceBundle
-    include_in_menu: false
-    uniqueness_constraints:
-      - [mlag_domain, name__value]
     human_friendly_id:
       - mlag_domain__domain_id__value
       - name__value
     order_by:
       - name__value
     display_label: name__value
+    uniqueness_constraints:
+      - [mlag_domain, name__value]
     attributes:
       - name: name
         kind: Text
+        optional: false
         description: "Name of the interface"
         order_weight: 1000
       - name: description
@@ -81,7 +92,7 @@ nodes:
         order_weight: 1100
       - name: status
         kind: Dropdown
-        description: "The status of the interface"
+        default_value: "active"
         choices:
           - name: provisioning
             label: Provisioning
@@ -94,7 +105,7 @@ nodes:
           - name: active
             label: Active
             description: "Interface is active and operational."
-            color: "#A9CCE3" # pastel blue
+            color: "#00d25b"
           - name: maintenance
             label: Maintenance
             description: "Interface is under maintenance."
@@ -111,12 +122,11 @@ nodes:
             label: Outage
             description: "Interface is currently experiencing an outage."
             color: "#F4CCCC" # pastel red
-        default_value: "active"
+        optional: false
+        description: "The status of the interface"
         order_weight: 1200
       - name: role
         kind: Dropdown
-        optional: true
-        description: "The role of the interface in the network"
         choices:
           - name: server
             label: Server Interface
@@ -126,35 +136,38 @@ nodes:
             label: Router Interface
             description: "Interface connecting routers"
             color: "#B2D4E6" # pastel sky blue
-        order_weight: 1250
+        optional: true
+        description: "The role of the interface in the network"
+        order_weight: 1300
     relationships:
       - name: mlag_domain
-        label: "MLAG Domain"
         peer: GenericMlagDomain
-        optional: false
-        cardinality: one
+        label: "MLAG Domain"
         kind: Parent
+        cardinality: one
+        optional: false
         description: "MLAG Domain this MLAG Interface belongs to"
-        order_weight: 1750
+        order_weight: 900
 
   # Placeholder node implementation of MLAG domain
   - name: Domain
     namespace: Mlag
-    label: MLAG Domain
     description: "MLAG (Multi-Chassis Link Aggregation Group) Domain"
+    label: MLAG Domain
     icon: mingcute:cloud-line
+    include_in_menu: true
     inherit_from:
       - GenericMlagDomain
     relationships:
       - name: peers
         peer: DcimDevice
-        optional: false
-        cardinality: many
         kind: Generic
+        cardinality: many
+        optional: false
         identifier: device__mlag_domain
         # Most of the vendor limit to 2 devices (peers) per group/domain
-        max_count: 2
         min_count: 2
+        max_count: 2
         order_weight: 950
 
 extensions:
@@ -162,21 +175,21 @@ extensions:
     - kind: InterfaceLag
       relationships:
         - name: mlag_peer_link
-          label: "MLAG Peer Link"
           peer: MlagDomain
-          optional: true
-          cardinality: one
+          label: "MLAG Peer Link"
           kind: Attribute
+          cardinality: one
+          optional: true
           description: "MLAG Domain this LAG is used as peer link"
-          order_weight: 1800
+          order_weight: 1950
     - kind: DcimDevice
       relationships:
         - name: mlag_domain
-          label: "MLAG Domain"
           peer: MlagDomain
-          optional: true
-          cardinality: one
+          label: "MLAG Domain"
           kind: Attribute
-          description: "MLAG Domain this device belongs to"
-          order_weight: 1800
+          cardinality: one
+          optional: true
           identifier: device__mlag_domain
+          description: "MLAG Domain this device belongs to"
+          order_weight: 1900
