@@ -2,7 +2,7 @@
 # Mock data for extensions/routing_aggregate.
 # Depends on: extensions/routing (RoutingProtocol generic), base/extensions/rack
 # (DcimDevice: nyc1-rtr01), extensions/vrf and extensions/routing (IpamVRF:
-# CUSTOMER-B, MGMT-VRF, CUST-A), extensions/aggregate (IpamPrefix: 10.0.0.0/16,
+# CUSTOMER-B, MGMT-VRF, CUST-A), extensions/ipam_aggregate (IpamPrefix: 10.0.0.0/16,
 # 192.0.2.0/24, namespace "default").
 #
 # RoutingAggregateRoute inherits RoutingProtocol: description (Text, unique,

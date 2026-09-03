@@ -1,15 +1,15 @@
 # ---------------------------------------------------------------------------
-# Mock data for extensions/dwdm.
+# Mock data for extensions/optical_multiplexer.
 # Depends on: base, extensions/location_minimal (LocationSite: NYC1),
 # extensions/rack (LocationRack: NYC1-RACK-01, DcimDevice: nyc1-rtr01),
-# extensions/sfp (DcimGenericSFP base + existing plugged/spare SFPs on
+# extensions/transceiver (DcimGenericTransceiver base + existing plugged/spare transceivers on
 # GigabitEthernet0/0/0/0 and /1).
 #
 # DcimWdmChannel records are created first since both the OADM front
-# interfaces and the WDM SFPs below reference them. DcimOpticalMultiplexer
+# interfaces and the WDM transceivers below reference them. DcimOpticalMultiplexer
 # is created next, with its front/rear interfaces nested as Component
 # children. A new interface (GigabitEthernet0/0/0/4) is added on nyc1-rtr01
-# for the plugged WDM SFP demo, since GigabitEthernet0/0/0/0 through /3 are
+# for the plugged WDM transceiver demo, since GigabitEthernet0/0/0/0 through /3 are
 # already occupied by other fixtures.
 # ---------------------------------------------------------------------------
 ---
@@ -109,7 +109,7 @@ spec:
   kind: DcimDevice
   data:
     # Upsert the existing fixture device to add a free physical interface
-    # for the plugged WDM SFP below (GigabitEthernet0/0/0/0 through /3 are
+    # for the plugged WDM transceiver below (GigabitEthernet0/0/0/0 through /3 are
     # already in use by other fixtures).
     - name: nyc1-rtr01
       location:
@@ -128,9 +128,9 @@ spec:
 apiVersion: infrahub.app/v1
 kind: Object
 spec:
-  kind: DcimWdmSFP
+  kind: DcimWdmTransceiver
   data:
-    - sfp_type: zr
+    - transceiver_type: zr
       form_factor: sfp_plus
       status: plugged
       wdm_type: dwdm
@@ -144,7 +144,7 @@ spec:
       # cardinality one -- a plain list of the HFID parts.
       wdm_channel: [dwdm, "1"]
 
-    - sfp_type: zr
+    - transceiver_type: zr
       form_factor: sfp_plus
       status: spare
       wdm_type: dwdm
@@ -156,7 +156,7 @@ spec:
           name: NYC1
       wdm_channel: [dwdm, "2"]
 
-    - sfp_type: zr
+    - transceiver_type: zr
       form_factor: qsfp28
       status: spare
       wdm_type: cwdm

@@ -2,7 +2,7 @@
 title: Rack
 ---
 
-This schema extension introduces a Rack model representing a physical equipment rack installed at a site. Racks can be placed at a LocationSite and can host devices and other equipment. LocationRack needs a Location.Site: extensions/location_site is declared above as the smallest provider, but extensions/location_minimal provides the same node as part of its hierarchy and satisfies the rack equally, load whichever suits, never both. LocationRack is also defined, hierarchically and incompatibly, by experimental/location_extended, so load one or the other, not both.
+This schema extension introduces a Rack node representing a physical equipment rack installed at a site. Racks are placed at a LocationSite, which comes from extensions/location_site or extensions/location_minimal, and can host devices and other equipment. experimental/location_extended defines its own Rack node, so do not load both.
 
 ## Details
 

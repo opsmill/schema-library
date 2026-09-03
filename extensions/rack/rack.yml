@@ -7,7 +7,7 @@
 # ---------------------------------------------------------------------------
 version: "1.0"
 
-# Defines Location.Rack. Mutually exclusive with experimental/location_extended, load one, not both.
+# Defines LocationRack. experimental/location_extended defines its own LocationRack, so load one or the other, not both.
 nodes:
   - name: Rack
     namespace: Location

@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# Mock data for extensions/device_psu_module.
+# Mock data for extensions/device_module_psu.
 # Depends on: base, extensions/location_minimal (LocationSite: NYC1),
 # extensions/rack (LocationRack: NYC1-RACK-01, DcimDevice: nyc1-rtr01),
 # extensions/device_module (DcimModuleBay/DcimModule kinds).

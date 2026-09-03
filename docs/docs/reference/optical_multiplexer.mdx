@@ -1,14 +1,18 @@
 ---
-title: DWDM
+title: Optical Multiplexer
 ---
 
-This schema extension contains models for OADM (Optical Add Drop Multiplexer) supporting various WDM (Wavelength Division Multiplexing) technologies such as DWDM (Dense Wavelength Division Multiplexing) or CWDM (Coarse Wavelength Division Multiplexing). With some vendors, the tunable optics are not configured via the channel number but via the wavelength and/or the frequency. This model provides a unique entry in Infrahub for those.
+This schema extension models optical add-drop multiplexers (OADM) and the wavelength division multiplexing (WDM) channels they carry, for both CWDM and DWDM. It adds an Optical Multiplexer device with front and rear interfaces, a WDM Channel node holding channel number, wavelength and frequency, and a WDM Transceiver flavour of the transceiver model tuned to a channel.
+
+Some vendors configure tunable optics by wavelength or frequency rather than channel number; the WDM Channel node gives you a single entry in Infrahub for all three.
+
+Not designed to be loaded together with experimental/optical_transport, which covers the same domain in more depth.
 
 ## Details
 
 - **Dependencies:**
     - [base](dcim)
-    - [extensions/sfp](sfp)
+    - [extensions/transceiver](transceiver)
 
 ## Nodes
 
@@ -89,13 +93,13 @@ This schema extension contains models for OADM (Optical Add Drop Multiplexer) su
 | wavelength | Wavelength of the channel in nm. | Text | False |  |  |
 | frequency | Frequency of the channel in GHz. | Text | False |  |  |
 
-### WdmSFP
+### WdmTransceiver
 
-- **Label:** WDM SFP
-- **Description:** SFP with configuration for Wavelength Division Multiplexing.
+- **Label:** WDM Transceiver
+- **Description:** Transceiver tuned to a Wavelength Division Multiplexing channel.
 - **Namespace:** Dcim
 - **Icon:** mdi:laser-pointer
-- **Inherit From:** DcimGenericSFP
+- **Inherit From:** DcimGenericTransceiver
 
 #### Attributes
 
@@ -418,15 +422,15 @@ nodes:
     optional: false
     description: Frequency of the channel in GHz.
     order_weight: 1300
-- name: WdmSFP
+- name: WdmTransceiver
   namespace: Dcim
-  description: SFP with configuration for Wavelength Division Multiplexing.
-  label: WDM SFP
+  description: Transceiver tuned to a Wavelength Division Multiplexing channel.
+  label: WDM Transceiver
   icon: mdi:laser-pointer
   include_in_menu: true
-  menu_placement: DcimGenericSFP
+  menu_placement: DcimGenericTransceiver
   inherit_from:
-  - DcimGenericSFP
+  - DcimGenericTransceiver
   attributes:
   - name: wdm_type
     kind: Dropdown
@@ -451,7 +455,7 @@ nodes:
     kind: Attribute
     cardinality: one
     optional: false
-    identifier: wdm_sfp__channel
+    identifier: wdm_transceiver__channel
     order_weight: 1250
 
 ```

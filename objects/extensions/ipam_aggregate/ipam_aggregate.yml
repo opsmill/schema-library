@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# Mock data for extensions/aggregate.
+# Mock data for extensions/ipam_aggregate.
 # Depends on: base only.
 # IpamAggregate inherits BuiltinIPPrefix; its only mandatory attribute is
 # `prefix` (an IPNetwork). `ip_namespace` is optional and defaults to the

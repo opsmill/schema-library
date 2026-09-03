@@ -287,15 +287,15 @@ nodes:
         description: Frequency of the channel in GHz.
         order_weight: 1300
 
-  - name: WdmSFP
+  - name: WdmTransceiver
     namespace: Dcim
-    description: SFP with configuration for Wavelength Division Multiplexing.
-    label: WDM SFP
+    description: Transceiver tuned to a Wavelength Division Multiplexing channel.
+    label: WDM Transceiver
     icon: mdi:laser-pointer
     include_in_menu: true
-    menu_placement: DcimGenericSFP
+    menu_placement: DcimGenericTransceiver
     inherit_from:
-      - DcimGenericSFP
+      - DcimGenericTransceiver
     attributes:
       - name: wdm_type
         kind: Dropdown
@@ -319,5 +319,5 @@ nodes:
         kind: Attribute
         cardinality: one
         optional: false
-        identifier: wdm_sfp__channel
+        identifier: wdm_transceiver__channel
         order_weight: 1250

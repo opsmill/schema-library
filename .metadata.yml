@@ -1,23 +1,25 @@
 ---
 # yamllint disable rule:line-length
 base/dcim:
-  description:
-    Basic DCIM schema to capture devices, racks, interfaces, and related
-    information.
+  description: 'Base DCIM schema: device types, platforms, devices, and physical and
+    virtual interfaces, plus the endpoint and connector generics that cables, circuits
+    and cross-connects build on.'
   name: DCIM
 base/ipam:
-  description: Basic IPAM schema to capture IP addresses, subnets, and related information.
+  description: 'Base IPAM schema: IP prefixes and IP addresses, plus the scope generics
+    a prefix or a VLAN group can be attached to.'
   name: IPAM
 base/location:
-  description: Basic Location schema to capture locations, sites, and related information.
-  name: Locations
+  description: 'Base Location schema: the generic every location tier inherits from,
+    and the hosting generic that lets devices and other objects be placed at a location.
+    Concrete tiers such as Site come from the location extensions.'
+  name: Location
 base/organization:
-  description:
-    Basic Organization schema to capture organizations, vendors, and related
-    information.
+  description: 'Base Organization schema: the generic organization plus Manufacturer
+    and Provider nodes.'
   name: Organization
 experimental/azure:
-  attribution: "[Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)"
+  attribution: '[Rowan Coleman](https://www.linkedin.com/in/rowan-coleman-6a147156/)'
   dependencies:
     - base
   description: This schema extension introduces cloud support for Microsoft Azure.
@@ -32,41 +34,36 @@ experimental/circuit_service:
     - One single CircuitService would be needed to store MPLS related information (e.g. service id, provider ...)
     - On each site we would create a circuit connecting on one side our device and the CircuitService on the other side
   name: Circuit Service
+experimental/firewall_policer:
+  dependencies:
+    - base
+  description: This schema extension contains models for traffic policers and the
+    classes and rules that reference them, so you can describe rate limiting alongside
+    the interfaces it is applied to.
+  name: Firewall Policer
 experimental/infiniband:
   dependencies:
     - base
     - extensions/compute
-  description: This schema extension adds support for InfiniBand switches.
-  name: Infiniband
-experimental/optical_transport:
-  dependencies:
-    - base
-    - extensions/device_module
-    - extensions/cable
-  description: >
-    Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3000 and similar
-    platforms). Covers four layers: wavelength (ITU-T G.694.1 grid, optical bands, DWDM channels),
-    topology (logical optical nodes, passive multiplexers, fiber links), equipment
-    (transponder/amplifier/ROADM modules, ROADM degrees, WSS cross-connects), and service
-    (end-to-end optical services, optical paths, path segments). Not designed to be loaded together
-    with extensions/dwdm.
-  name: Optical Transport
+  description: 'This schema extension models the hardware of an InfiniBand fabric:
+    switches with their configuration profile (AAA, role, split-ready, SSH and CLI
+    settings), switch and management interfaces with lane width, split and speed options,
+    rail-optimized scalable units (RSU) and the fabric that groups them. It does not
+    model the InfiniBand protocol itself (subnet manager, partitions, routing).'
+  name: InfiniBand Fabric Hardware
 experimental/location_extended:
   dependencies:
     - base
-  exclusive_with:
-    - extensions/rack
-  description: >-
-    This schema extension is the most detailed when it comes to location, you'll find all the
-    layers you can think of. It defines its own hierarchical Location.Rack, incompatible with
-    the flat one extensions/rack defines, so load one or the other, not both.
+  description: This schema extension is the most detailed when it comes to location,
+    you'll find all the layers you can think of. It defines its own hierarchical Location.Rack,
+    incompatible with the flat one extensions/rack defines, so load one or the other,
+    not both.
   name: Location Extended
 experimental/modules_linecards:
   dependencies:
     - base
     - extensions/device_module
-  description:
-    This schema extension allows you to capture Linecard related information
+  description: This schema extension allows you to capture Linecard related information
     like the version. You can insert the Linecard into a Dcim Physical Device and
     leverage the Linecard type model. The Linecard can accept PIC to help configure
     PORT information like breakout-capabilities and configurations.
@@ -75,11 +72,18 @@ experimental/modules_routing_engine:
   dependencies:
     - base
     - extensions/device_module
-  description:
-    This schema extension allows you to capture Routing Engine related
+  description: This schema extension allows you to capture Routing Engine related
     information like the version. You can insert the Routing Engine into a Dcim Physical
     Device and leverage the Routing Engine type model.
   name: Modules Routing Engine
+experimental/optical_transport:
+  dependencies:
+    - base
+    - extensions/device_module
+    - extensions/cable
+  description: |
+    Comprehensive optical transport network schemas for DWDM/WDM systems (ADVA FSP 3000 and similar platforms). Covers four layers: wavelength (ITU-T G.694.1 grid, optical bands, DWDM channels), topology (logical optical nodes, passive multiplexers, fiber links), equipment (transponder/amplifier/ROADM modules, ROADM degrees, WSS cross-connects), and service (end-to-end optical services, optical paths, path segments). Not designed to be loaded together with extensions/optical_multiplexer.
+  name: Optical Transport
 experimental/qos:
   dependencies:
     - base
@@ -94,175 +98,156 @@ experimental/topology:
   dependencies:
     - base
     - extensions/vlan
-  description:
-    A schema for defining and managing network topology, strategies, and
+  description: A schema for defining and managing network topology, strategies, and
     services.
   name: Topology
 experimental/vlan-translation:
   dependencies:
     - base
-  description:
-    This schema extension is based on Juniper VLAN MAP, and not yet test
+  description: This schema extension is based on Juniper VLAN MAP, and not yet test
     out for other vendors.
   name: VLAN Translation
-extensions/aggregate:
-  dependencies:
-    - base
-  description:
-    This schema extension contains models to capture IP aggregates assigned by
-    a Regional Internet Registry (RIR). It introduces an Aggregate node (top-level IPv4/IPv6
-    prefix) and an RIR node (registry or private entity managing address space).
-  name: Aggregate
 extensions/cable:
   dependencies:
     - base
-  description:
-    This schema extension contains a basic Cable model allowing you to
+  description: This schema extension contains a basic Cable model allowing you to
     connect two endpoints.
   name: Cable
 extensions/circuit:
   dependencies:
     - base
-  description:
-    This schema extension contains Circuits and ways to connect them with
-    your infrastructure! The circuit could be a fiber connecting two sites, you would
-    then have two endpoints, one on each site.
+  description: This schema extension adds Circuit and Circuit Endpoint nodes and links
+    them to your infrastructure. A circuit could be a fiber connecting two sites,
+    with one endpoint on each site.
   name: Circuit
+extensions/circuit_contract:
+  dependencies:
+    - base
+    - extensions/circuit
+  description: This schema extension adds a Circuit Contract node to capture the service
+    agreement behind a circuit with its provider.
+  name: Circuit Contract
 extensions/cluster:
   dependencies:
     - base
     - extensions/compute
-  description:
-    This schema extension contains the foundations to capture clusters.
-    With this one in place you can unlock various clusters flavors (hosting cluster
-    able to host VMs, firewall clusters built with specific appliances ...)
+  description: This schema extension contains the foundations to capture clusters.
+    With this one in place you can unlock various cluster flavours (a hosting cluster
+    able to host VMs, a firewall cluster built with specific appliances ...).
   name: Cluster
 extensions/compute:
   dependencies:
     - base
-  description:
-    With this schema extension in place you will be able to capture all
-    your physical servers. It also gives you the baseline to build virtualization.
-    You might consider HostingCluster extension to go with!
+  description: This schema extension captures physical servers and virtual machines,
+    with a generic compute unit both inherit from and a generic for anything able
+    to host VMs. Pair it with extensions/hosting_cluster to group compute units into
+    clusters.
   name: Compute
 extensions/cross_connect:
   dependencies:
     - base
-  description:
-    This extension contains schema to capture Cross Connect. You can see
-    it as "a cable operated by a provider". You will be able to attach it to a location
-    and then connect endpoints to it (e.g. rear interface of a patch panel, circuit
-    endpoint ...)
-  name: Cross Connect
-extensions/dwdm:
+  description: 'This schema extension adds a Cross-Connect node. Think of it as a
+    cable operated by a provider: attach it to a location, then connect endpoints
+    to it (e.g. the rear interface of a patch panel or a circuit endpoint).'
+  name: Cross-Connect
+extensions/device_module:
   dependencies:
     - base
-    - extensions/sfp
-  description:
-    This schema extension contains models for OADM (Optical Add Drop Multiplexer)
-    supporting various WDM (Wavelength Division Multiplexing) technologies such as
-    DWDM (Dense Wavelength Division Multiplexing) or CWDM (Coarse Wavelength Division
-    Multiplexing). With some vendors, the tunable optics are not configured via the
-    channel number but via the wavelength and/or the frequency. This model provides
-    a unique entry in Infrahub for those.
-  name: DWDM
-experimental/firewall_policer:
+  description: |
+    This schema extension lets you capture module bays on a DcimPhysicalDevice and the modules installed into them (e.g. fan trays, line cards). A device can have any number of module bays, and each bay can optionally hold one module.
+
+    It ships a ready-to-use Module and Module Type pair, plus the generic Module and Module Type you can build your own flavours on: see extensions/device_module_psu, or the experimental modules_linecards and modules_routing_engine extensions.
+  name: Device Module
+extensions/device_module_psu:
   dependencies:
     - base
-  description:
-    This schema extension contains models for traffic policers and the classes
-    and rules that reference them, so you can describe rate limiting alongside
-    the interfaces it is applied to.
-  name: Firewall Policer
+    - extensions/device_module
+  description: This schema extension adds a PSU (Power Supply Unit) flavour on top
+    of the generic Module and Module Type from extensions/device_module, so you can
+    track power supplies installed in a device's module bays with PSU-specific attributes
+    such as wattage and hot-swap capability.
+  name: PSU Module
 extensions/hosting_cluster:
   dependencies:
     - base
     - extensions/cluster
     - extensions/compute
-  description:
-    A rather generic cluster built with compute units (e.g. servers) and
-    able to host VMs.
+  description: A generic cluster built from compute units (e.g. servers) that can
+    host virtual machines.
   name: Hosting Cluster
 extensions/interface_breakout:
   dependencies:
     - base
-  description:
-    This schema extension introduces relationships to support breakout
+  description: This schema extension introduces relationships to support breakout
     interfaces, enabling you to document the breakout of a physical interface into
     smaller physical interfaces.
   name: Interface Breakout
+extensions/ipam_aggregate:
+  dependencies:
+    - base
+  description: This schema extension captures the top-level IPv4 and IPv6 blocks assigned
+    by a Regional Internet Registry (RIR). It adds an Aggregate node for the block
+    and an RIR node for the registry or private entity that manages the address space.
+  name: IPAM Aggregate
 extensions/lag:
   dependencies:
     - base
-  description:
-    This schema extension includes models for Link Aggregation Groups (LAGs),
-    enabling you to link physical interfaces as building blocs of your LAG interface.
+  description: This schema extension includes models for Link Aggregation Groups (LAGs),
+    enabling you to link physical interfaces as building blocks of your LAG interface.
     It can be used in standard networking environments as well as in compute scenarios,
     such as capturing bond interfaces.
-  name: Lag
+  name: LAG
 extensions/location_minimal:
   dependencies:
     - base
-  exclusive_with:
-    - extensions/location_site
-  description: >-
-    This schema extension is minimal but will provide you with basic items to store location
-    related data, as a Region -> Country -> Site hierarchy. It defines the same Location.Site
-    node as extensions/location_site, so load one or the other, not both. Note that
-    LocationGeneric.name is unique across every location kind, so a name used at one tier
-    cannot be reused at another; a single-country deployment therefore enters the hierarchy at
-    Country (with Region as the national node) rather than duplicating a country under several
-    regions.
+  description: This schema extension provides a self-contained Region -> Country ->
+    Metro -> Site hierarchy for storing location data, with the Site carrying facility,
+    physical address, timezone and status. Its Site node is the same as the one in
+    extensions/location_site, so the two can be loaded together. A location name is
+    unique across every tier, so a single-country deployment should enter the hierarchy
+    at Country, with Region as the national node, rather than repeating a country
+    under several regions.
   name: Location Minimal
 extensions/location_site:
   dependencies:
     - base
-  exclusive_with:
-    - extensions/location_minimal
-  description: >-
-    This schema extension introduces a standalone Location.Site node (with facility,
-    physical address, timezone, and status). It defines the same Site node as
-    extensions/location_minimal, so load one or the other, not both.
+  description: This schema extension introduces a Site node with facility, physical
+    address, timezone and status, for deployments that want a flat list of sites without
+    a hierarchy. It is the same Site node as in extensions/location_minimal, which
+    adds Region, Country and Metro tiers above it.
   name: Location Site
 extensions/mlag:
   dependencies:
     - base
     - extensions/lag
   description: |
-    This schema extension contains the foundations to capture Multi-Chassis Link Aggregation Group (MLAG). It comes on top of the LAG extension.
+    This schema extension contains the foundations to capture Multi-Chassis Link Aggregation Groups (MLAG). It comes on top of the LAG extension.
 
-    In this implementation, a MLAG interface is essentially a LAG interface but linked to a MLAG domain (instead of a device). The MLAG domain regroup devices together (usually 2) and is built over LAG interfaces used as peer-link between the devices. MLAG interfaces defined at the MLAG domain level are then spread across all devices in the domain.
+    In this implementation, a MLAG interface is essentially a LAG interface but linked to a MLAG domain (instead of a device). The MLAG domain regroups devices together (usually 2) and is built over LAG interfaces used as peer-link between the devices. MLAG interfaces defined at the MLAG domain level are then spread across all devices in the domain.
 
-    Note: This is a very minimalist implementation of MLAG, the goal is to make it easy to blend with existing models you might have. For example, if you are operating in a data center fabric environment you might already have a LeafGroup or similar concept. In that case you can have your LeafGroup inherit from GenericMlagDomain and add the necessary relationships/attributes.
+    This is a deliberately minimal implementation of MLAG, meant to blend with models you already have. For example, in a data center fabric you might already have a LeafGroup or similar concept: have it inherit from GenericMlagDomain and add the relationships and attributes you need.
 
-    Next steps:
-
-    - Add support for layer 3 overlay for MLAG interfaces (loopback, peer address ...)
-    - Create virtual relationship so MLAG interfaces can be seen on the devices in the domain
+    Not covered yet: the layer 3 overlay for MLAG interfaces (loopback, peer address ...) and surfacing MLAG interfaces on each device in the domain.
   name: MLAG
-extensions/device_module:
+extensions/optical_multiplexer:
   dependencies:
     - base
+    - extensions/transceiver
   description: |
-    This schema extension lets you capture module bays on a Dcim Physical Device and the modules installed into them (e.g. fan trays, line cards). A device can have any number of module bays, and each bay can optionally hold one module.
+    This schema extension models optical add-drop multiplexers (OADM) and the wavelength division multiplexing (WDM) channels they carry, for both CWDM and DWDM. It adds an Optical Multiplexer device with front and rear interfaces, a WDM Channel node holding channel number, wavelength and frequency, and a WDM Transceiver flavour of the transceiver model tuned to a channel.
 
-    NOTE: This extension ships a standard Module/ModuleType node pair ready to use, alongside the generic Module/ModuleType you can build your own flavors on top of (see the device_psu_module, modules_linecards, or modules_routing_engine extensions).
-  name: Device Modules
-extensions/device_psu_module:
-  dependencies:
-    - base
-    - extensions/device_module
-  description: |
-    This schema extension adds a PSU (Power Supply Unit) flavor on top of the generic Module/ModuleType from extensions/device_module, so you can track power supplies installed in a device's module bays alongside PSU-specific attributes like wattage and hot-swap capability.
-  name: Device PSU Module
+    Some vendors configure tunable optics by wavelength or frequency rather than channel number; the WDM Channel node gives you a single entry in Infrahub for all three.
+
+    Not designed to be loaded together with experimental/optical_transport, which covers the same domain in more depth.
+  name: Optical Multiplexer
 extensions/patch_panel:
   dependencies:
     - base
     - extensions/device_module
   description: |
-    This schema extension allows you to capture patch panel related information like rear/front interfaces and mapping between them. You can insert the patch panel into a rack and leverage the device type model. Cassettes and other inserts are tracked as regular device modules in module bays, through extensions/device_module.
+    This schema extension allows you to capture patch panel related information like rear and front interfaces and the mapping between them. You can insert the patch panel into a rack and leverage the device type model. Cassettes and other inserts are tracked as regular device modules in module bays, through extensions/device_module.
 
-    NOTE: This extension is compatible with all sort of connectors, meaning you can plug cable, circuits, cross-connect to front & rear interfaces!
+    The front and rear interfaces accept all sorts of connectors, so you can plug cables, circuits and cross-connects into them.
   name: Patch Panel
 extensions/peering_ixp:
   dependencies:
@@ -270,184 +255,167 @@ extensions/peering_ixp:
     - extensions/routing_bgp
     - extensions/routing_bgp_community
     - extensions/routing_policies_bgp
-  description:
-    This schema extension contains all you need to model anything revolving
-    around internet peering (Exchange points ...)!
-  name: Peering IXP
+  description: This schema extension adds an Internet Exchange (IXP) node and an IXP
+    Connection node linking your devices to an exchange, and ties IXP connections
+    to the BGP sessions established over them.
+  name: Internet Exchange
 extensions/physical_disk:
   dependencies:
     - base
   description: |
-    Simple schema allowing you to capture physical disks information for the sake of inventory and lifecycle management.
+    Simple schema allowing you to capture physical disk information for inventory and lifecycle management.
 
-    NOTE: This extension is compatible with all sort of device. You can apply the generic "DeviceWithPhysicalDisks" to particular model to enable disks tracking. You might also link that schema to location for instance to capture spares.
+    This extension works with any kind of device: apply the DcimDeviceWithPhysicalDisks generic to a model to enable disk tracking. You might also link disks to a location, for instance to capture spares.
   name: Physical Disk
-extensions/rack:
-  dependencies:
-    - base
-    - extensions/location_site
-  exclusive_with:
-    - experimental/location_extended
-  description: >-
-    This schema extension introduces a Rack model representing a physical equipment
-    rack installed at a site. Racks can be placed at a LocationSite and can host devices
-    and other equipment. LocationRack needs a Location.Site: extensions/location_site is
-    declared above as the smallest provider, but extensions/location_minimal provides the
-    same node as part of its hierarchy and satisfies the rack equally, load whichever
-    suits, never both. LocationRack is also defined, hierarchically and incompatibly, by
-    experimental/location_extended, so load one or the other, not both.
-  name: Rack
 extensions/qinq:
   dependencies:
     - base
     - extensions/vlan
-  description:
-    This schema extension adds the Service VLAN and Customer VLAN nodes needed
-    to model QinQ on top of the VLAN extension.
+  description: This schema extension adds the Service VLAN and Customer VLAN nodes
+    needed to model QinQ on top of the VLAN extension.
   name: QinQ
+extensions/rack:
+  dependencies:
+    - base
+    - extensions/location_site
+  description: This schema extension introduces a Rack node representing a physical
+    equipment rack installed at a site. Racks are placed at a LocationSite, which
+    comes from extensions/location_site or extensions/location_minimal, and can host
+    devices and other equipment. experimental/location_extended defines its own Rack
+    node, so do not load both.
+  name: Rack
 extensions/routing:
   dependencies:
     - base
     - extensions/vrf
-  description:
-    This schema extension contains generics to create Routing Protocol
-    "Instance". The idea is to create one Routing Protocol instance per IpamVRF +
+  description: This schema extension contains the Routing Protocol generic that every
+    protocol extension builds on. The idea is one protocol instance per IpamVRF and
     DcimDevice pair.
   name: Routing
 extensions/routing_aggregate:
   dependencies:
     - base
     - extensions/routing
-  description:
-    This schema extension contains all you need to model the Aggregate
-    Routing Protocol.
+  description: 'This schema extension adds an Aggregate Route node: a summary route,
+    with its destination prefix and discard flag, announced by a routing protocol
+    instance.'
   name: Routing Aggregate
 extensions/routing_bgp:
   dependencies:
     - base
     - extensions/routing
-  description: This schema extension contains all you need to model your BGP platform.
+  description: This schema extension adds Autonomous System, BGP Peer Group and BGP
+    Session nodes, and links autonomous systems to devices and organizations.
   name: Routing BGP
 extensions/routing_bgp_community:
   dependencies:
     - base
     - extensions/routing_policies
-  description: This schema extension adds the BGP Communities models.
+  description: This schema extension adds a BGP Community node to reference from routing
+    policies.
   name: Routing BGP Community
 extensions/routing_bgp_rr:
   dependencies:
     - base
     - extensions/routing_bgp
-  description:
-    This schema extension extend the BGP extension to add BGP Route Reflector
-    Clustering.
-  name: Routing BGP RR
+  description: This schema extension adds a Route Reflector Cluster node on top of
+    the BGP extension and links it to BGP peer groups.
+  name: Routing BGP Route Reflector
 extensions/routing_ospf:
   dependencies:
     - base
     - extensions/routing
-  description:
-    This schema extension contains all you need to model the OSPF Routing
-    Protocol.
+  description: This schema extension adds OSPF and OSPF Interface nodes to model an
+    OSPF instance per device and VRF and the interfaces it runs on.
   name: Routing OSPF
 extensions/routing_pim:
   dependencies:
     - base
     - extensions/routing
-  description: This schema extension contains all you need to model the PIM Protocol.
+  description: This schema extension adds PIM (Protocol Independent Multicast) and
+    PIM Interface nodes to model a PIM instance per device and VRF and the interfaces
+    it runs on.
   name: Routing PIM
 extensions/routing_policies:
   dependencies:
     - base
-  description:
-    This schema extension contains a generic to create Routing Policies.
-    This Generic can be extend for each Routing Protocols you may want to use.
+  description: This schema extension contains the Routing Policy generic. Each routing
+    protocol extension subclasses it with its own policy flavour.
   name: Routing Policies
 extensions/routing_policies_aggregate:
   dependencies:
     - base
     - extensions/routing_policies
-  description:
-    This extension is using the Routing Policies extensions and the Routing
-    Aggregate one together.
+    - extensions/routing_aggregate
+  description: This schema extension adds an Aggregate Routing Policy node, a flavour
+    of the Routing Policy generic, and replaces the free-text import and export policies
+    on Aggregate Route with relationships to it.
   name: Routing Policies Aggregate
 extensions/routing_policies_bgp:
   dependencies:
     - base
     - extensions/routing_policies
     - extensions/routing_bgp
-  description:
-    This extension is using the Routing Policies extensions and the Routing
-    BGP one together.
+  description: This schema extension adds a BGP Routing Policy node, a flavour of
+    the Routing Policy generic, and replaces the free-text import and export policies
+    on BGP Peer Group and BGP Session with relationships to it.
   name: Routing Policies BGP
 extensions/routing_policies_ospf:
   dependencies:
     - base
     - extensions/routing_policies
     - extensions/routing_ospf
-  description:
-    This extension is using the Routing Policies extensions and the Routing
-    OSPF one together.
+  description: This schema extension adds an OSPF Routing Policy node, a flavour of
+    the Routing Policy generic, and replaces the free-text import and export policies
+    on OSPF with relationships to it.
   name: Routing Policies OSPF
 extensions/routing_policies_pim:
   dependencies:
     - base
     - extensions/routing_policies
     - extensions/routing_pim
-  description:
-    This schema inherits the `RoutingPolicy` schema and removes `import_policies`
-    and `export_policies` attributes. However it adds a number of relationships to
-    `RoutingPIM`.
-  name: Routing Policies (PIM)
-extensions/sfp:
-  dependencies:
-    - base
-  description: |
-    This schema extension gives you all the models you need to document Small Form-factor Pluggable (SFP).
-
-    You can either plug it into an interface or attach it to a location (e.g. it's a spare SFP stored in a rack).
-
-    Improvements:
-
-    - As of now there is no verification with type / form factor / protocol / distance ...
-    - You could plug any SFP into any equipment interface (e.g. a virtual interface ...)
-    - You could link a SFP to an interface AND a location ...
-  name: SFP
+  description: This schema extension adds a PIM Routing Policy node, a flavour of
+    the Routing Policy generic, and replaces the free-text import and export policies
+    on PIM with relationships to it.
+  name: Routing Policies PIM
 extensions/snmp:
   dependencies:
     - base
-  description:
-    This schema extension contains models for SNMP Communities and SNMP
-    Clients. A community links to the devices it is configured on; any further
-    wiring, to a tenant for instance, is left to you.
+  description: This schema extension contains models for SNMP Communities and SNMP
+    Clients. A community links to the devices it is configured on; any further wiring,
+    to a tenant for instance, is left to you.
   name: SNMP
 extensions/tenancy:
   dependencies:
     - base
-  description:
-    This schema extension introduces a Tenant node that can own devices, IP
-    prefixes/addresses, and hosting locations. See the comment at the bottom of
-    `tenancy.yml` for an example of how to extend tenancy onto optional extension
-    nodes such as `DcimCircuit`.
+  description: This schema extension introduces a Tenant node that can own devices,
+    IP prefixes and addresses, and hosting locations. See the comment at the bottom
+    of tenancy.yml for an example of how to extend tenancy onto optional extension
+    nodes such as DcimCircuit.
   name: Tenancy
+extensions/transceiver:
+  dependencies:
+    - base
+  description: |
+    This schema extension models pluggable transceivers across form factors (SFP, SFP+, QSFP, QSFP28, QSFP-DD, OSFP, CFP, XFP and more), with a Standard Transceiver and a Bidirectional Transceiver flavour built on a shared generic. A transceiver is either plugged into a physical interface or stored as a spare at a location, and can be linked to its manufacturer.
+
+    Limitations: there is no validation between type, form factor, protocol and distance; any transceiver can be plugged into any physical interface; and nothing prevents a transceiver from being linked to both an interface and a spare location.
+  name: Transceiver
 extensions/vlan:
   dependencies:
     - base
-  description: This schema extension contains models to support VLANs in you network.
+  description: This schema extension adds VLAN and VLAN Group nodes, with a generic
+    VLAN to build on, and links VLANs to prefixes and layer 2 interfaces.
   name: VLAN
 extensions/vrf:
   dependencies:
     - base
-  description: This schema extension contains models to support VRF in your network.
+  description: This schema extension adds VRF and Route Target nodes and links prefixes
+    and IP addresses to a VRF.
   name: VRF
 extensions/vrrp:
   dependencies:
     - base
-  description: This schema extension contains models for VRRP.
+  description: This schema extension adds VRRP Group and VRRP Interface nodes, linking
+    a virtual IP address to the layer 3 interfaces that take part in the group.
   name: VRRP
-extensions/circuit_contract:
-  dependencies:
-    - base
-    - extensions/circuit
-  description: This schema extension provides models for managing Circuit Contracts, enabling structured representation of service agreements with network providers. Compatible with Infrahub 1.8.
-  name: Circuit Contract

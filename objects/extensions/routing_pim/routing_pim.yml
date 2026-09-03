@@ -33,7 +33,7 @@
 #     [pim, interface].
 #
 # GigabitEthernet0/0/0/0 through /4 are already used by other extensions'
-# mock data (rack, cable, vrrp, sfp, dwdm) -- new interfaces
+# mock data (rack, cable, vrrp, transceiver, optical_multiplexer) -- new interfaces
 # (GigabitEthernet0/0/0/5 and /0/0/0/6) are added below instead of
 # double-using an occupied one. They are created first, as a Component
 # relationship on the existing nyc1-rtr01 device (this upserts the device and
