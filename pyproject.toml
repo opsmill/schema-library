@@ -5,7 +5,7 @@ description = ""
 authors = [{name = "OpsMill", email = "info@opsmill.com"}]
 requires-python = ">=3.10,<3.13"
 dependencies = [
-    "infrahub-sdk[all]>=1.17.0",
+    "infrahub-sdk[all]>=1.23.1",
     "invoke>=2.2.1",
     "toml>=0.10.2",
 ]

@@ -13,16 +13,16 @@ generics:
   # them without requiring users to modify their schema manually.
   - name: VLANGroupScope
     namespace: Ipam
-    label: VLAN Group Scope
     description: >-
       Mixin for objects that can scope a VLAN group (e.g. Region, Site). The reverse
       relationship is added by extensions/vlan.
+    label: VLAN Group Scope
     include_in_menu: false
 
   - name: PrefixScope
     namespace: Ipam
-    label: Prefix Scope
     description: Mixin for objects that can scope IP prefixes (e.g. Region, Site).
+    label: Prefix Scope
     include_in_menu: false
     relationships:
       - name: prefixes
