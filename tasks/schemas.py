@@ -73,39 +73,6 @@ def _resolve_load_order(graph, all_extensions):
     return load_order
 
 
-# Drop the extensions we must not load: the experimental ones unless the flag is set,
-# and one member of every `exclusive_with` pair (two extensions defining the same kind).
-# A member is only skipped once its partner is selected, so the partner is always loaded
-# first and anything depending on the skipped member is satisfied by the partner instead.
-def _select_extensions(metadata, load_order):
-    selected = []  # Extensions we keep, in load order
-    for extension in load_order:
-        # If it's experimental extension and flag is false we skip
-        if extension.startswith("experimental/") and not TEST_EXPERIMENTAL:
-            continue
-
-        # An experimental extension always yields to the extension it collides with,
-        # even when the load order puts the experimental one first
-        blocking = [
-            other
-            for other in metadata.get(extension, {}).get("exclusive_with") or []
-            if other in selected
-            or (
-                extension.startswith("experimental/")
-                and not other.startswith("experimental/")
-            )
-        ]
-        if blocking:
-            print(
-                f"⏭  Skipping `{extension}`: mutually exclusive with {', '.join(blocking)}"
-            )
-            continue
-
-        selected.append(extension)
-
-    return selected
-
-
 @task
 def load_all_schemas(context: Context) -> None:
     # Parse metadata file
@@ -117,35 +84,10 @@ def load_all_schemas(context: Context) -> None:
     # Determine the correct order to load extensions
     load_order = _resolve_load_order(graph, all_extensions)
 
-    # Load each extension respecting dependencies
-    for extension in _select_extensions(metadata, load_order):
+    # Load each extension respecting dependencies, skipping experimental ones unless the flag is set
+    for extension in load_order:
+        if extension.startswith("experimental/") and not TEST_EXPERIMENTAL:
+            continue
         _load_extension(context, Path(extension))
 
     print("All good! ✨")
-
-
-@task
-def load_demo_ipam_dcim(context: Context) -> None:
-    """[DEMO] Load IPAM + DCIM base schemas and a handful of common extensions."""
-    schemas_to_load = {
-        "base",
-        "extensions/aggregate",
-        "extensions/cable",
-        "extensions/circuit",
-        "extensions/compute",
-        "extensions/cluster",
-        "extensions/hosting_cluster",
-        "extensions/lag",
-        "extensions/location_minimal",
-        "extensions/vlan",
-        "extensions/qinq",
-        "extensions/rack",
-        "extensions/vrf",
-    }
-
-    # `.metadata.yml` is the normative dependency graph, so the demo order comes from it
-    metadata = _load_yaml_metadata()
-    load_order = _resolve_load_order(*_build_dependency_graph(metadata))
-
-    for path in (p for p in load_order if p in schemas_to_load):
-        _load_extension(context, Path(path))

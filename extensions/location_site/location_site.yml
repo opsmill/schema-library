@@ -7,7 +7,7 @@
 # ---------------------------------------------------------------------------
 version: "1.0"
 
-# Defines Location.Site. Mutually exclusive with extensions/location_minimal, load one, not both.
+# Defines LocationSite. extensions/location_minimal defines the same node inside its hierarchy; keep the two in sync.
 nodes:
   - name: Site
     namespace: Location

@@ -7,7 +7,7 @@
 # ---------------------------------------------------------------------------
 version: "1.0"
 
-# Defines Location.Site. Mutually exclusive with extensions/location_site, load one, not both.
+# Self-contained Region -> Country -> Metro -> Site hierarchy. Site matches extensions/location_site, keep them in sync.
 nodes:
   - name: Region
     namespace: Location
@@ -24,7 +24,7 @@ nodes:
 
   - name: Country
     namespace: Location
-    description: A country, sitting between a region and the sites it contains.
+    description: A country, sitting between a region and the metros it contains.
     label: Country
     icon: gis:search-country
     include_in_menu: true
@@ -32,6 +32,18 @@ nodes:
     inherit_from:
       - LocationGeneric
     parent: LocationRegion
+    children: LocationMetro
+
+  - name: Metro
+    namespace: Location
+    description: A metropolitan area grouping the sites of one city or urban region.
+    label: Metro
+    icon: healthicons:city
+    include_in_menu: true
+    menu_placement: LocationGeneric
+    inherit_from:
+      - LocationGeneric
+    parent: LocationCountry
     children: LocationSite
 
   - name: Site
@@ -46,7 +58,7 @@ nodes:
       - LocationHosting
       - IpamPrefixScope
       - IpamVLANGroupScope
-    parent: LocationCountry
+    parent: LocationMetro
     display_label: name__value
     attributes:
       - name: status

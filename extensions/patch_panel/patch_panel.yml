@@ -24,7 +24,7 @@ generics:
         kind: Text
         optional: true
         order_weight: 1100
-      # NOTE: this choice list is duplicated in extensions/dwdm and the two must be
+      # NOTE: this choice list is duplicated in extensions/optical_multiplexer and the two must be
       # kept in sync. Infrahub cannot share a choice list across extension files without a
       # shared generic in a common ancestor, which is a base-tier change.
       - name: connector_type

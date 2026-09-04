@@ -8,9 +8,9 @@
 # base generic that base itself never implements, so the endpoints need a Site
 # to exist. The sites are created below with their name only, deliberately
 # without a parent: extensions/location_site has no tier above Site, and
-# extensions/location_minimal puts them under Americas -> United States, so
-# restating either tree here would tie this file to one of the two mutually
-# exclusive location extensions. Restating location_minimal's tree is not an
+# extensions/location_minimal puts them under Americas -> United States -> Metro, so
+# restating that tree here would make this file depend on location_minimal
+# being loaded. Restating location_minimal's tree is not an
 # option anyway, since re-upserting the hierarchy root fails with "Not
 # supported to assign a value to parent for LocationRegion".
 #

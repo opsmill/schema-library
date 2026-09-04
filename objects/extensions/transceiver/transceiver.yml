@@ -1,11 +1,11 @@
 # ---------------------------------------------------------------------------
-# Mock data for extensions/sfp.
+# Mock data for extensions/transceiver.
 # Depends on: base, extensions/location_minimal (LocationSite: NYC1, SJC1),
 # extensions/rack (LocationRack: NYC1-RACK-01, DcimDevice: nyc1-rtr01 with
 # interface GigabitEthernet0/0/0/0), extensions/organization (OrganizationManufacturer:
 # Cisco, Dell).
 #
-# extensions/dwdm builds on top of extensions/sfp in a later wave -- this file
+# extensions/optical_multiplexer builds on top of extensions/transceiver in a later wave -- this file
 # stays self-contained and doesn't assume dwdm data exists.
 # ---------------------------------------------------------------------------
 ---
@@ -15,8 +15,8 @@ spec:
   kind: DcimDevice
   data:
     # Upsert the existing fixture device to add a second physical interface,
-    # needed so the plugged BidiSFP below has a free interface to plug into
-    # (GigabitEthernet0/0/0/0 is already used by the plugged StandardSFP).
+    # needed so the plugged BidiTransceiver below has a free interface to plug into
+    # (GigabitEthernet0/0/0/0 is already used by the plugged StandardTransceiver).
     - name: nyc1-rtr01
       location:
         kind: LocationRack
@@ -36,10 +36,10 @@ spec:
 apiVersion: infrahub.app/v1
 kind: Object
 spec:
-  kind: DcimStandardSFP
+  kind: DcimStandardTransceiver
   data:
     - serial_number: "SFP-STD-0001"
-      sfp_type: lr
+      transceiver_type: lr
       form_factor: sfp_plus
       status: plugged
       manufacturer: Cisco
@@ -50,7 +50,7 @@ spec:
       interface: [nyc1-rtr01, GigabitEthernet0/0/0/0]
 
     - serial_number: "SFP-STD-0002"
-      sfp_type: sr
+      transceiver_type: sr
       form_factor: sfp_plus
       status: spare
       manufacturer: Cisco
@@ -64,7 +64,7 @@ spec:
           name: NYC1
 
     - serial_number: "SFP-STD-0003"
-      sfp_type: t
+      transceiver_type: t
       form_factor: sfp
       status: spare
       manufacturer: Dell
@@ -79,10 +79,10 @@ spec:
 apiVersion: infrahub.app/v1
 kind: Object
 spec:
-  kind: DcimBidiSFP
+  kind: DcimBidiTransceiver
   data:
     - serial_number: "SFP-BIDI-0001"
-      sfp_type: zr
+      transceiver_type: zr
       form_factor: sfp_plus
       status: plugged
       wavelength_tx: 1310
@@ -91,7 +91,7 @@ spec:
       interface: [nyc1-rtr01, GigabitEthernet0/0/0/1]
 
     - serial_number: "SFP-BIDI-0002"
-      sfp_type: zr
+      transceiver_type: zr
       form_factor: sfp_plus
       status: spare
       wavelength_tx: 1550

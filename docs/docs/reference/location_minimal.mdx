@@ -2,7 +2,7 @@
 title: Location Minimal
 ---
 
-This schema extension is minimal but will provide you with basic items to store location related data, as a Region -> Country -> Site hierarchy. It defines the same Location.Site node as extensions/location_site, so load one or the other, not both. Note that LocationGeneric.name is unique across every location kind, so a name used at one tier cannot be reused at another; a single-country deployment therefore enters the hierarchy at Country (with Region as the national node) rather than duplicating a country under several regions.
+This schema extension provides a self-contained Region -> Country -> Metro -> Site hierarchy for storing location data, with the Site carrying facility, physical address, timezone and status. Its Site node is the same as the one in extensions/location_site, so the two can be loaded together. A location name is unique across every tier, so a single-country deployment should enter the hierarchy at Country, with Region as the national node, rather than repeating a country under several regions.
 
 ## Details
 
@@ -22,9 +22,17 @@ This schema extension is minimal but will provide you with basic items to store 
 ### Country
 
 - **Label:** Country
-- **Description:** A country, sitting between a region and the sites it contains.
+- **Description:** A country, sitting between a region and the metros it contains.
 - **Namespace:** Location
 - **Icon:** gis:search-country
+- **Inherit From:** LocationGeneric
+
+### Metro
+
+- **Label:** Metro
+- **Description:** A metropolitan area grouping the sites of one city or urban region.
+- **Namespace:** Location
+- **Icon:** healthicons:city
 - **Inherit From:** LocationGeneric
 
 ### Site
@@ -63,7 +71,7 @@ nodes:
   children: LocationCountry
 - name: Country
   namespace: Location
-  description: A country, sitting between a region and the sites it contains.
+  description: A country, sitting between a region and the metros it contains.
   label: Country
   icon: gis:search-country
   include_in_menu: true
@@ -71,6 +79,17 @@ nodes:
   inherit_from:
   - LocationGeneric
   parent: LocationRegion
+  children: LocationMetro
+- name: Metro
+  namespace: Location
+  description: A metropolitan area grouping the sites of one city or urban region.
+  label: Metro
+  icon: healthicons:city
+  include_in_menu: true
+  menu_placement: LocationGeneric
+  inherit_from:
+  - LocationGeneric
+  parent: LocationCountry
   children: LocationSite
 - name: Site
   namespace: Location
@@ -85,7 +104,7 @@ nodes:
   - LocationHosting
   - IpamPrefixScope
   - IpamVLANGroupScope
-  parent: LocationCountry
+  parent: LocationMetro
   display_label: name__value
   attributes:
   - name: status

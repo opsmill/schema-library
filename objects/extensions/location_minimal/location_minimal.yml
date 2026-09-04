@@ -1,6 +1,8 @@
 # ---------------------------------------------------------------------------
 # Mock data for extensions/location_minimal.
 # Depends on: base.
+# Builds the Region -> Country -> Metro -> Site hierarchy; the sites NYC1 and
+# SJC1 are the ones every other extension's mock data attaches to.
 # ---------------------------------------------------------------------------
 ---
 apiVersion: infrahub.app/v1
@@ -15,15 +17,23 @@ spec:
         data:
           - name: United States
             children:
-              kind: LocationSite
+              kind: LocationMetro
               data:
-                - name: NYC1
-                  status: active
-                  facility: Equinix NY5
-                  physical_address: "755 Secaucus Rd, Secaucus, NJ 07094"
-                  timezone: America/New_York
-                - name: SJC1
-                  status: active
-                  facility: Equinix SV1
-                  physical_address: "2001 Ryan Ave, San Jose, CA 95131"
-                  timezone: America/Los_Angeles
+                - name: New York
+                  children:
+                    kind: LocationSite
+                    data:
+                      - name: NYC1
+                        status: active
+                        facility: Equinix NY5
+                        physical_address: "755 Secaucus Rd, Secaucus, NJ 07094"
+                        timezone: America/New_York
+                - name: San Jose
+                  children:
+                    kind: LocationSite
+                    data:
+                      - name: SJC1
+                        status: active
+                        facility: Equinix SV1
+                        physical_address: "2001 Ryan Ave, San Jose, CA 95131"
+                        timezone: America/Los_Angeles

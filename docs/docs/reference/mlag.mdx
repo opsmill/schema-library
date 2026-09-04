@@ -2,16 +2,13 @@
 title: MLAG
 ---
 
-This schema extension contains the foundations to capture Multi-Chassis Link Aggregation Group (MLAG). It comes on top of the LAG extension.
+This schema extension contains the foundations to capture Multi-Chassis Link Aggregation Groups (MLAG). It comes on top of the LAG extension.
 
-In this implementation, a MLAG interface is essentially a LAG interface but linked to a MLAG domain (instead of a device). The MLAG domain regroup devices together (usually 2) and is built over LAG interfaces used as peer-link between the devices. MLAG interfaces defined at the MLAG domain level are then spread across all devices in the domain.
+In this implementation, a MLAG interface is essentially a LAG interface but linked to a MLAG domain (instead of a device). The MLAG domain regroups devices together (usually 2) and is built over LAG interfaces used as peer-link between the devices. MLAG interfaces defined at the MLAG domain level are then spread across all devices in the domain.
 
-Note: This is a very minimalist implementation of MLAG, the goal is to make it easy to blend with existing models you might have. For example, if you are operating in a data center fabric environment you might already have a LeafGroup or similar concept. In that case you can have your LeafGroup inherit from GenericMlagDomain and add the necessary relationships/attributes.
+This is a deliberately minimal implementation of MLAG, meant to blend with models you already have. For example, in a data center fabric you might already have a LeafGroup or similar concept: have it inherit from GenericMlagDomain and add the relationships and attributes you need.
 
-Next steps:
-
-- Add support for layer 3 overlay for MLAG interfaces (loopback, peer address ...)
-- Create virtual relationship so MLAG interfaces can be seen on the devices in the domain
+Not covered yet: the layer 3 overlay for MLAG interfaces (loopback, peer address ...) and surfacing MLAG interfaces on each device in the domain.
 
 ## Details
 

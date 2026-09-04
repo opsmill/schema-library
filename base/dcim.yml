@@ -58,6 +58,7 @@ generics:
         optional: true
         identifier: device__platform
         order_weight: 1250
+
   - name: PhysicalDevice
     namespace: Dcim
     description: Generic holding attributes and relationships relevant for physical device.
@@ -70,8 +71,8 @@ generics:
       - name: name
         kind: Text
         unique: true
-        allow_override: any
         optional: false
+        allow_override: any
         order_weight: 1000
       - name: position
         kind: Number
@@ -112,6 +113,7 @@ generics:
         optional: false
         identifier: physical_device__location
         order_weight: 1500
+
   - name: Endpoint
     namespace: Dcim
     description: Generic Endpoint to receive a connector.
@@ -124,6 +126,7 @@ generics:
         optional: true
         identifier: connector__endpoint
         order_weight: 1600
+
   # connected_endpoints is kind Attribute so both ends render inline on the connector form.
   # A high-fan-out connector kind should override the relationship back to Generic.
   - name: Connector
@@ -137,8 +140,8 @@ generics:
         cardinality: many
         optional: true
         identifier: connector__endpoint
-
         order_weight: 1500
+
   - name: Interface
     namespace: Dcim
     description: Generic Network Interface
@@ -352,6 +355,7 @@ nodes:
         optional: false
         identifier: manufacturer__device_type
         order_weight: 1250
+
   - name: Platform
     namespace: Dcim
     description: A Platform represent the type of software running on a device.
@@ -387,9 +391,10 @@ nodes:
         peer: OrganizationManufacturer
         kind: Attribute
         cardinality: one
-        identifier: manufacturer__platform
         optional: true
+        identifier: manufacturer__platform
         order_weight: 1300
+
   - name: Device
     namespace: Dcim
     description: A configurable network device including routers, switches...
@@ -457,6 +462,7 @@ nodes:
             color: "#e8e7fd"
         optional: true
         order_weight: 1300
+
   - name: Physical
     namespace: Interface
     description: "Physical network port on a device"
@@ -485,7 +491,7 @@ nodes:
         peer: InterfaceHasSubInterface
         kind: Attribute
         cardinality: one
-        identifier: "sub__interface"
         optional: true
+        identifier: "sub__interface"
         description: "Parent interface to which this sub-interface belongs"
         order_weight: 1600
