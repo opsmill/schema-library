@@ -1,6 +1,8 @@
+import re
 import sys
 from collections import defaultdict
 from pathlib import Path
+from typing import Any
 
 import jinja2
 import yaml  # type: ignore
@@ -12,11 +14,68 @@ METADATA_FILE = CURRENT_DIRECTORY.parent / ".metadata.yml"
 TEMPLATE_DIRECTORY = DOCUMENTATION_DIRECTORY / "_templates"
 REFERENCE_DIRECTORY = DOCUMENTATION_DIRECTORY / "docs" / "reference"
 
+# Matches an inline code span: a run of backticks, the shortest content that
+# reaches a matching run, and the closing run. DOTALL so a span may wrap lines.
+INLINE_CODE_PATTERN = re.compile(r"(?P<fence>`+).*?(?P=fence)", re.DOTALL)
+
 
 def _sanitize_description(desc):
     if not isinstance(desc, str):
         return desc
     return desc.replace("\n", " ").replace("  ", " ").strip()
+
+
+def _escape_mdx_braces(text: str) -> str:
+    """Escape MDX expression braces that sit outside inline code spans.
+
+    Docusaurus parses the reference pages as MDX, where a bare ``{...}`` is a
+    JSX expression rather than literal text. A schema description carrying
+    braces -- NetBox's ``Ethernet{module}/1`` port-name token, say -- therefore
+    breaks the docs build with "Objects are not valid as a React child", because
+    ``module`` resolves to the MDX module object.
+
+    Braces inside an inline code span are already inert, and a backslash there
+    would render literally rather than escaping, so those spans are left alone.
+
+    Args:
+        text: Text destined for MDX prose or a Markdown table cell.
+
+    Returns:
+        The text with braces outside inline code spans backslash-escaped.
+    """
+    if not isinstance(text, str) or ("{" not in text and "}" not in text):
+        return text
+
+    def escape(segment: str) -> str:
+        return segment.replace("{", "\\{").replace("}", "\\}")
+
+    parts: list[str] = []
+    position = 0
+    for match in INLINE_CODE_PATTERN.finditer(text):
+        parts.append(escape(text[position : match.start()]))
+        parts.append(match.group(0))
+        position = match.end()
+    parts.append(escape(text[position:]))
+
+    return "".join(parts)
+
+
+def _escape_mdx_structure(value: Any) -> Any:
+    """Recursively apply :func:`_escape_mdx_braces` to every string in a value.
+
+    Args:
+        value: Any nested combination of dicts, lists and scalars.
+
+    Returns:
+        The same shape, with every string escaped for MDX.
+    """
+    if isinstance(value, str):
+        return _escape_mdx_braces(value)
+    if isinstance(value, list):
+        return [_escape_mdx_structure(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _escape_mdx_structure(item) for key, item in value.items()}
+    return value
 
 
 def _generate_toc_content(metadata) -> defaultdict[str, list]:
@@ -30,9 +89,11 @@ def _generate_toc_content(metadata) -> defaultdict[str, list]:
     for key in metadata:
         # TODO: Handle the case where we can't split the key
         current_item = {
-            "name": metadata[key].get("name"),
+            "name": _escape_mdx_braces(metadata[key].get("name")),
             "link": "./reference/" + key.split("/")[1] + ".mdx",
-            "description": _sanitize_description(metadata[key].get("description", "")),
+            "description": _escape_mdx_braces(
+                _sanitize_description(metadata[key].get("description", ""))
+            ),
         }
 
         result[key.split("/")[0]].append(current_item)
@@ -91,6 +152,12 @@ def _generate_schema_reference_content(schema_key: str, schema_metadata: dict) -
         # Extract nodes, generics, and extensions if present
         for section in ["nodes", "generics", "extensions"]:
             schema_data[section] = schema_definition.get(section, [])
+
+        # Everything above is rendered as MDX prose or into a Markdown table,
+        # so braces in it have to be escaped. The code section below is not:
+        # it lands inside a fenced block, where MDX leaves braces alone and an
+        # escape would show up verbatim in the rendered YAML.
+        schema_data = _escape_mdx_structure(schema_data)
 
         # Add the code section
         schema_data["code"] = yaml.dump(schema_definition, sort_keys=False)

@@ -63,6 +63,8 @@ jobs:
         run: "uv run mypy --show-error-codes ."
       - name: "Pylint Tests"
         run: "uv run pylint --ignore .venv ."
+      - name: "Unit Tests"
+        run: "uv run pytest"
 
   yaml-lint:
     name: Run yaml lint

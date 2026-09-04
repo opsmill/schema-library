@@ -18,7 +18,16 @@ dev = [
     "pylint>=4.0.4",
     "vale>=3.13.0.0",
     "types-pyyaml>=6.0.12.20250915",
+    # Covers the docs-generation helpers in tasks/, whose escaping rules are
+    # subtle enough to regress without being noticed until a docs build fails.
+    "pytest>=8.3.0",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# `tasks` is a top-level package in the repo root rather than an installed
+# distribution, so the root has to be on the import path for the tests.
+pythonpath = ["."]
 
 [tool.pylint.messages_control]
 # Line length is enforced by Black, so pylint doesn't need to check it.
