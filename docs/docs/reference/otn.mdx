@@ -35,12 +35,6 @@ Out of scope, and what to reach for instead:
 - **Icon:** mdi:ethernet
 - **Inherit From:** OtnGenericPort, OtnOpticalPort
 
-#### Attributes
-
-| name | description | kind | optional | default_value | choices |
-| ---- | ----------- | ---- | -------- | ------------- | ------- |
-| connector_type |  | Dropdown | True |  | LC, SC, MPO-12, MPO-16, FC, E2000, MU, CS, splice |
-
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
@@ -55,12 +49,6 @@ Out of scope, and what to reach for instead:
 - **Icon:** mdi:lan-connect
 - **Inherit From:** OtnGenericPort, OtnOpticalPort
 
-#### Attributes
-
-| name | description | kind | optional | default_value | choices |
-| ---- | ----------- | ---- | -------- | ------------- | ------- |
-| connector_type |  | Dropdown | True |  | LC, SC, MPO-12, MPO-16, FC, E2000, MU, CS, splice |
-
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
@@ -74,12 +62,6 @@ Out of scope, and what to reach for instead:
 - **Namespace:** Otn
 - **Icon:** mdi:transit-connection
 - **Inherit From:** OtnGenericPort, OtnOpticalPort
-
-#### Attributes
-
-| name | description | kind | optional | default_value | choices |
-| ---- | ----------- | ---- | -------- | ------------- | ------- |
-| connector_type |  | Dropdown | True |  | LC, SC, MPO-12, MPO-16, FC, E2000, MU, CS, splice |
 
 #### Relationships
 
@@ -96,12 +78,6 @@ Out of scope, and what to reach for instead:
 - **Icon:** mdi:call-split
 - **Inherit From:** OtnGenericPort, OtnOpticalPort
 
-#### Attributes
-
-| name | description | kind | optional | default_value | choices |
-| ---- | ----------- | ---- | -------- | ------------- | ------- |
-| connector_type |  | Dropdown | True |  | LC, SC, MPO-12, MPO-16, FC, E2000, MU, CS, splice |
-
 ### RoadmDegreePort
 
 - **Label:** ROADM degree port
@@ -110,12 +86,6 @@ Out of scope, and what to reach for instead:
 - **Icon:** mdi:compass-outline
 - **Inherit From:** OtnGenericPort, OtnOpticalPort
 
-#### Attributes
-
-| name | description | kind | optional | default_value | choices |
-| ---- | ----------- | ---- | -------- | ------------- | ------- |
-| connector_type |  | Dropdown | True |  | LC, SC, MPO-12, MPO-16, FC, E2000, MU, CS, splice |
-
 ### AmplifierPort
 
 - **Label:** Amplifier port
@@ -123,12 +93,6 @@ Out of scope, and what to reach for instead:
 - **Namespace:** Otn
 - **Icon:** mdi:amplifier
 - **Inherit From:** OtnGenericPort, OtnOpticalPort
-
-#### Attributes
-
-| name | description | kind | optional | default_value | choices |
-| ---- | ----------- | ---- | -------- | ------------- | ------- |
-| connector_type |  | Dropdown | True |  | LC, SC, MPO-12, MPO-16, FC, E2000, MU, CS, splice |
 
 ### MuxClientPort
 
@@ -367,7 +331,7 @@ Out of scope, and what to reach for instead:
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name |  | Text | False |  |  |
 | mode_class | Two values, and the pluggable-reach report filters on it. | Dropdown | False | transponder | transponder, pluggable |
-| modulation |  | Text | False |  |  |
+| modulation |  | Dropdown | False |  | DP-QPSK, DP-8QAM, DP-16QAM, DP-64QAM |
 | description |  | Text | True |  |  |
 | line_rate_gbps | Client-side capacity in Gbps. Already a whole number in its natural unit. | Number | False |  |  |
 | baud_mbaud | Symbol rate in megabaud. 59.84 GBd is 59840. Sets the spectral width. | Number | False |  |  |
@@ -376,7 +340,7 @@ Out of scope, and what to reach for instead:
 | cd_tolerance_fs_per_nm | Chromatic dispersion the receiver compensates, in fs/nm. 100000 ps/nm is 100000000. | Number | False |  |  |
 | nominal_reach_m | Vendor-quoted reach in metres. A starting point for the budget, not a guarantee. | Number | False |  |  |
 | nominal_reach_display | Nominal reach in km. Read-only, derived from nominal_reach_m. | Text | True |  |  |
-| fec_type |  | Text | False | SD-FEC |  |
+| fec_type |  | Dropdown | False | SD-FEC | none, GFEC, SD-FEC, cFEC, oFEC |
 | fec_latency_ns | Encoder and decoder latency in nanoseconds. Small next to propagation, but not zero. | Number | False | 0 |  |
 
 #### Relationships
@@ -404,8 +368,8 @@ Out of scope, and what to reach for instead:
 | description |  | Text | True |  |  |
 | bit_rate_kbps | Nominal line rate in kbps. E1 is 2048, 100GBASE-LR4 is 103100000. | Number | False |  |  |
 | bit_rate_display | Bit rate in Mbps below one gigabit, Gbps at or above it. | Text | True |  |  |
-| default_container_type | The first step of the mapping chain, not the last. E1 maps into VC-12, not ODU1. | Text | False |  |  |
-| default_mapping | ITU-T G.709 mapping procedure. Generic, bit-synchronous or asynchronous. | Text | False |  |  |
+| default_container_type | The first step of the mapping chain, not the last. E1 maps into VC-12, not ODU1. | Dropdown | False |  | ODU0, ODU1, ODU2, ODU2e, ODU3, ODU4, ODUC1, ODUC2, ODUC3, ODUC4, ODUflex, VC-12, VC-4, STM-N |
+| default_mapping | ITU-T G.709 mapping procedure. Generic, bit-synchronous or asynchronous. | Dropdown | False |  | GMP, BMP, AMP |
 
 #### Relationships
 
@@ -427,8 +391,8 @@ Out of scope, and what to reach for instead:
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name |  | Text | False |  |  |
-| odu_type |  | Text | False |  |  |
-| mapping_mode |  | Text | False | GMP |  |
+| odu_type |  | Dropdown | False |  | ODU0, ODU1, ODU2, ODU2e, ODU3, ODU4, ODUC1, ODUC2, ODUC3, ODUC4, ODUC6, ODUC8, ODUflex, VC-12, VC-4, STM-N |
+| mapping_mode |  | Dropdown | False | GMP | GMP, BMP, AMP |
 | description |  | Text | True |  |  |
 | segment_sequence | Which segment of its circuit this container rides. 1 for a circuit that spans one wavelength. | Number | False | 1 |  |
 | tributary_slots | Slots this container occupies in its parent. An ODU2 in an ODU4 takes 8. | Number | False | 0 |  |
@@ -794,7 +758,7 @@ Out of scope, and what to reach for instead:
 | insertion_loss_display | Insertion loss in dB. Read-only, derived from insertion_loss_mdb. | Text | True |  |  |
 | vendor |  | Text | True |  |  |
 | model |  | Text | True |  |  |
-| element_class | What the optical budget engine branches on. | Dropdown | False |  | transponder, roadm, amplifier, mux_demux, patch_panel, fiber_span, splitter, attenuator, raman_pump, odu_switch |
+| element_class | Which class of optical element this is. Set it to match the kind. | Dropdown | False |  | transponder, roadm, amplifier, mux_demux, patch_panel, fiber_span, splitter, attenuator, raman_pump, odu_switch |
 
 ### GenericDevice
 
@@ -1075,7 +1039,7 @@ generics:
       label: ODU switch
       color: '#673ab7'
     optional: false
-    description: What the optical budget engine branches on.
+    description: Which class of optical element this is. Set it to match the kind.
     order_weight: 1800
 - name: GenericDevice
   namespace: Otn
@@ -1338,50 +1302,6 @@ nodes:
   inherit_from:
   - OtnGenericPort
   - OtnOpticalPort
-  attributes:
-  - name: connector_type
-    kind: Dropdown
-    choices:
-    - name: LC
-      label: LC
-      description: Small-form duplex latch. What transponder and pluggable optics
-        take.
-      color: '#2196f3'
-    - name: SC
-      label: SC
-      description: Push-pull square ferrule, common on older distribution frames.
-      color: '#4caf50'
-    - name: MPO-12
-      label: MPO-12
-      description: Twelve-fibre ribbon ferrule for parallel optics.
-      color: '#9c27b0'
-    - name: MPO-16
-      label: MPO-16
-      description: Sixteen-fibre ribbon ferrule for 400G parallel optics.
-      color: '#673ab7'
-    - name: FC
-      label: FC
-      description: Threaded ferrule. Still found on test sets and metro equipment.
-      color: '#ff9800'
-    - name: E2000
-      label: E2000
-      description: Shuttered push-pull connector, widespread on European carrier plant.
-      color: '#00bcd4'
-    - name: MU
-      label: MU
-      description: Miniature unibody connector, half the footprint of an SC.
-      color: '#8bc34a'
-    - name: CS
-      label: CS
-      description: Narrow-pitch duplex connector, used for QSFP-DD breakout.
-      color: '#e91e63'
-    - name: splice
-      label: Splice
-      description: Fusion splice rather than a mated pair. No connector loss and no
-        polish.
-      color: '#9e9e9e'
-    optional: true
-    order_weight: 1900
   relationships:
   - name: transceiver
     peer: OtnTransceiver
@@ -1400,50 +1320,6 @@ nodes:
   inherit_from:
   - OtnGenericPort
   - OtnOpticalPort
-  attributes:
-  - name: connector_type
-    kind: Dropdown
-    choices:
-    - name: LC
-      label: LC
-      description: Small-form duplex latch. What transponder and pluggable optics
-        take.
-      color: '#2196f3'
-    - name: SC
-      label: SC
-      description: Push-pull square ferrule, common on older distribution frames.
-      color: '#4caf50'
-    - name: MPO-12
-      label: MPO-12
-      description: Twelve-fibre ribbon ferrule for parallel optics.
-      color: '#9c27b0'
-    - name: MPO-16
-      label: MPO-16
-      description: Sixteen-fibre ribbon ferrule for 400G parallel optics.
-      color: '#673ab7'
-    - name: FC
-      label: FC
-      description: Threaded ferrule. Still found on test sets and metro equipment.
-      color: '#ff9800'
-    - name: E2000
-      label: E2000
-      description: Shuttered push-pull connector, widespread on European carrier plant.
-      color: '#00bcd4'
-    - name: MU
-      label: MU
-      description: Miniature unibody connector, half the footprint of an SC.
-      color: '#8bc34a'
-    - name: CS
-      label: CS
-      description: Narrow-pitch duplex connector, used for QSFP-DD breakout.
-      color: '#e91e63'
-    - name: splice
-      label: Splice
-      description: Fusion splice rather than a mated pair. No connector loss and no
-        polish.
-      color: '#9e9e9e'
-    optional: true
-    order_weight: 1900
   relationships:
   - name: transceiver
     peer: OtnTransceiver
@@ -1462,50 +1338,6 @@ nodes:
   inherit_from:
   - OtnGenericPort
   - OtnOpticalPort
-  attributes:
-  - name: connector_type
-    kind: Dropdown
-    choices:
-    - name: LC
-      label: LC
-      description: Small-form duplex latch. What transponder and pluggable optics
-        take.
-      color: '#2196f3'
-    - name: SC
-      label: SC
-      description: Push-pull square ferrule, common on older distribution frames.
-      color: '#4caf50'
-    - name: MPO-12
-      label: MPO-12
-      description: Twelve-fibre ribbon ferrule for parallel optics.
-      color: '#9c27b0'
-    - name: MPO-16
-      label: MPO-16
-      description: Sixteen-fibre ribbon ferrule for 400G parallel optics.
-      color: '#673ab7'
-    - name: FC
-      label: FC
-      description: Threaded ferrule. Still found on test sets and metro equipment.
-      color: '#ff9800'
-    - name: E2000
-      label: E2000
-      description: Shuttered push-pull connector, widespread on European carrier plant.
-      color: '#00bcd4'
-    - name: MU
-      label: MU
-      description: Miniature unibody connector, half the footprint of an SC.
-      color: '#8bc34a'
-    - name: CS
-      label: CS
-      description: Narrow-pitch duplex connector, used for QSFP-DD breakout.
-      color: '#e91e63'
-    - name: splice
-      label: Splice
-      description: Fusion splice rather than a mated pair. No connector loss and no
-        polish.
-      color: '#9e9e9e'
-    optional: true
-    order_weight: 1900
   relationships:
   - name: carrier
     peer: OtnOpticalCarrier
@@ -1532,50 +1364,6 @@ nodes:
   inherit_from:
   - OtnGenericPort
   - OtnOpticalPort
-  attributes:
-  - name: connector_type
-    kind: Dropdown
-    choices:
-    - name: LC
-      label: LC
-      description: Small-form duplex latch. What transponder and pluggable optics
-        take.
-      color: '#2196f3'
-    - name: SC
-      label: SC
-      description: Push-pull square ferrule, common on older distribution frames.
-      color: '#4caf50'
-    - name: MPO-12
-      label: MPO-12
-      description: Twelve-fibre ribbon ferrule for parallel optics.
-      color: '#9c27b0'
-    - name: MPO-16
-      label: MPO-16
-      description: Sixteen-fibre ribbon ferrule for 400G parallel optics.
-      color: '#673ab7'
-    - name: FC
-      label: FC
-      description: Threaded ferrule. Still found on test sets and metro equipment.
-      color: '#ff9800'
-    - name: E2000
-      label: E2000
-      description: Shuttered push-pull connector, widespread on European carrier plant.
-      color: '#00bcd4'
-    - name: MU
-      label: MU
-      description: Miniature unibody connector, half the footprint of an SC.
-      color: '#8bc34a'
-    - name: CS
-      label: CS
-      description: Narrow-pitch duplex connector, used for QSFP-DD breakout.
-      color: '#e91e63'
-    - name: splice
-      label: Splice
-      description: Fusion splice rather than a mated pair. No connector loss and no
-        polish.
-      color: '#9e9e9e'
-    optional: true
-    order_weight: 1900
 - name: RoadmDegreePort
   namespace: Otn
   description: Line-facing degree on a ROADM. One per direction.
@@ -1585,50 +1373,6 @@ nodes:
   inherit_from:
   - OtnGenericPort
   - OtnOpticalPort
-  attributes:
-  - name: connector_type
-    kind: Dropdown
-    choices:
-    - name: LC
-      label: LC
-      description: Small-form duplex latch. What transponder and pluggable optics
-        take.
-      color: '#2196f3'
-    - name: SC
-      label: SC
-      description: Push-pull square ferrule, common on older distribution frames.
-      color: '#4caf50'
-    - name: MPO-12
-      label: MPO-12
-      description: Twelve-fibre ribbon ferrule for parallel optics.
-      color: '#9c27b0'
-    - name: MPO-16
-      label: MPO-16
-      description: Sixteen-fibre ribbon ferrule for 400G parallel optics.
-      color: '#673ab7'
-    - name: FC
-      label: FC
-      description: Threaded ferrule. Still found on test sets and metro equipment.
-      color: '#ff9800'
-    - name: E2000
-      label: E2000
-      description: Shuttered push-pull connector, widespread on European carrier plant.
-      color: '#00bcd4'
-    - name: MU
-      label: MU
-      description: Miniature unibody connector, half the footprint of an SC.
-      color: '#8bc34a'
-    - name: CS
-      label: CS
-      description: Narrow-pitch duplex connector, used for QSFP-DD breakout.
-      color: '#e91e63'
-    - name: splice
-      label: Splice
-      description: Fusion splice rather than a mated pair. No connector loss and no
-        polish.
-      color: '#9e9e9e'
-    optional: true
-    order_weight: 1900
 - name: AmplifierPort
   namespace: Otn
   description: Amplifier input or output.
@@ -1638,50 +1382,6 @@ nodes:
   inherit_from:
   - OtnGenericPort
   - OtnOpticalPort
-  attributes:
-  - name: connector_type
-    kind: Dropdown
-    choices:
-    - name: LC
-      label: LC
-      description: Small-form duplex latch. What transponder and pluggable optics
-        take.
-      color: '#2196f3'
-    - name: SC
-      label: SC
-      description: Push-pull square ferrule, common on older distribution frames.
-      color: '#4caf50'
-    - name: MPO-12
-      label: MPO-12
-      description: Twelve-fibre ribbon ferrule for parallel optics.
-      color: '#9c27b0'
-    - name: MPO-16
-      label: MPO-16
-      description: Sixteen-fibre ribbon ferrule for 400G parallel optics.
-      color: '#673ab7'
-    - name: FC
-      label: FC
-      description: Threaded ferrule. Still found on test sets and metro equipment.
-      color: '#ff9800'
-    - name: E2000
-      label: E2000
-      description: Shuttered push-pull connector, widespread on European carrier plant.
-      color: '#00bcd4'
-    - name: MU
-      label: MU
-      description: Miniature unibody connector, half the footprint of an SC.
-      color: '#8bc34a'
-    - name: CS
-      label: CS
-      description: Narrow-pitch duplex connector, used for QSFP-DD breakout.
-      color: '#e91e63'
-    - name: splice
-      label: Splice
-      description: Fusion splice rather than a mated pair. No connector loss and no
-        polish.
-      color: '#9e9e9e'
-    optional: true
-    order_weight: 1900
 - name: MuxClientPort
   namespace: Otn
   description: One channel of a multiplexer. The side facing the transponder or router
@@ -2336,12 +2036,25 @@ nodes:
     description: Two values, and the pluggable-reach report filters on it.
     order_weight: 1100
   - name: modulation
-    kind: Text
-    enum:
-    - DP-QPSK
-    - DP-8QAM
-    - DP-16QAM
-    - DP-64QAM
+    kind: Dropdown
+    choices:
+    - name: DP-QPSK
+      label: DP-QPSK
+      description: Dual-polarisation QPSK. Four bits per symbol, the longest reach
+        of the four.
+      color: '#2196f3'
+    - name: DP-8QAM
+      label: DP-8QAM
+      description: Dual-polarisation 8QAM. Six bits per symbol.
+      color: '#4caf50'
+    - name: DP-16QAM
+      label: DP-16QAM
+      description: Dual-polarisation 16QAM. Eight bits per symbol.
+      color: '#ff9800'
+    - name: DP-64QAM
+      label: DP-64QAM
+      description: Dual-polarisation 64QAM. Twelve bits per symbol, the shortest reach.
+      color: '#e91e63'
     optional: false
     order_weight: 1200
   - name: description
@@ -2414,14 +2127,32 @@ nodes:
     description: Nominal reach in km. Read-only, derived from nominal_reach_m.
     order_weight: 1910
   - name: fec_type
-    kind: Text
+    kind: Dropdown
     default_value: SD-FEC
-    enum:
-    - none
-    - GFEC
-    - SD-FEC
-    - cFEC
-    - oFEC
+    choices:
+    - name: none
+      label: None
+      description: No forward error correction.
+      color: '#9e9e9e'
+    - name: GFEC
+      label: GFEC
+      description: The G.709 Reed-Solomon code. Hard decision, about 7 percent overhead.
+      color: '#2196f3'
+    - name: SD-FEC
+      label: SD-FEC
+      description: Soft-decision FEC. More coding gain than a hard-decision code,
+        at more latency.
+      color: '#4caf50'
+    - name: cFEC
+      label: cFEC
+      description: Concatenated FEC from OIF 400ZR. Less coding gain and less power
+        than oFEC.
+      color: '#00bcd4'
+    - name: oFEC
+      label: oFEC
+      description: Open FEC from OpenROADM and OpenZR+. More coding gain, for longer
+        reach.
+      color: '#9c27b0'
     optional: false
     order_weight: 1950
   - name: fec_latency_ns
@@ -2523,32 +2254,86 @@ nodes:
     description: Bit rate in Mbps below one gigabit, Gbps at or above it.
     order_weight: 1510
   - name: default_container_type
-    kind: Text
-    enum:
-    - ODU0
-    - ODU1
-    - ODU2
-    - ODU2e
-    - ODU3
-    - ODU4
-    - ODUC1
-    - ODUC2
-    - ODUC3
-    - ODUC4
-    - ODUflex
-    - VC-12
-    - VC-4
-    - STM-N
+    kind: Dropdown
+    choices:
+    - name: ODU0
+      label: ODU0
+      description: About 1.25 Gbps. Sized for a gigabit Ethernet client.
+      color: '#2196f3'
+    - name: ODU1
+      label: ODU1
+      description: About 2.5 Gbps, the original G.709 tributary rate.
+      color: '#2196f3'
+    - name: ODU2
+      label: ODU2
+      description: About 10 Gbps. Takes 10G Ethernet at its WAN rate.
+      color: '#2196f3'
+    - name: ODU2e
+      label: ODU2e
+      description: About 10.4 Gbps, sized for the 10GBASE-R LAN rate.
+      color: '#2196f3'
+    - name: ODU3
+      label: ODU3
+      description: About 40 Gbps.
+      color: '#2196f3'
+    - name: ODU4
+      label: ODU4
+      description: About 100 Gbps. Takes 100G Ethernet.
+      color: '#2196f3'
+    - name: ODUC1
+      label: ODUC1
+      description: ODUCn at n=1. About 100 Gbps.
+      color: '#673ab7'
+    - name: ODUC2
+      label: ODUC2
+      description: ODUCn at n=2. About 200 Gbps.
+      color: '#673ab7'
+    - name: ODUC3
+      label: ODUC3
+      description: ODUCn at n=3. About 300 Gbps.
+      color: '#673ab7'
+    - name: ODUC4
+      label: ODUC4
+      description: ODUCn at n=4. About 400 Gbps.
+      color: '#673ab7'
+    - name: ODUflex
+      label: ODUflex
+      description: Sized to the client rather than to a fixed rate.
+      color: '#00bcd4'
+    - name: VC-12
+      label: VC-12
+      description: SDH virtual container carrying a 2 Mbps E1.
+      color: '#ff9800'
+    - name: VC-4
+      label: VC-4
+      description: SDH virtual container carrying the 140 Mbps STM-1 payload.
+      color: '#ff9800'
+    - name: STM-N
+      label: STM-N
+      description: A whole SDH aggregate carried transparently.
+      color: '#ff9800'
     optional: false
     description: The first step of the mapping chain, not the last. E1 maps into VC-12,
       not ODU1.
     order_weight: 1600
   - name: default_mapping
-    kind: Text
-    enum:
-    - GMP
-    - BMP
-    - AMP
+    kind: Dropdown
+    choices:
+    - name: GMP
+      label: GMP
+      description: Generic mapping procedure. Rate agnostic, and what a modern client
+        uses.
+      color: '#2196f3'
+    - name: BMP
+      label: BMP
+      description: Bit-synchronous mapping procedure. Client and container clocks
+        are locked.
+      color: '#4caf50'
+    - name: AMP
+      label: AMP
+      description: Asynchronous mapping procedure. Justification bytes absorb the
+        clock offset.
+      color: '#ff9800'
     optional: false
     description: ITU-T G.709 mapping procedure. Generic, bit-synchronous or asynchronous.
     order_weight: 1700
@@ -2589,33 +2374,93 @@ nodes:
     optional: false
     order_weight: 1000
   - name: odu_type
-    kind: Text
-    enum:
-    - ODU0
-    - ODU1
-    - ODU2
-    - ODU2e
-    - ODU3
-    - ODU4
-    - ODUC1
-    - ODUC2
-    - ODUC3
-    - ODUC4
-    - ODUC6
-    - ODUC8
-    - ODUflex
-    - VC-12
-    - VC-4
-    - STM-N
+    kind: Dropdown
+    choices:
+    - name: ODU0
+      label: ODU0
+      description: About 1.25 Gbps. Sized for a gigabit Ethernet client.
+      color: '#2196f3'
+    - name: ODU1
+      label: ODU1
+      description: About 2.5 Gbps, the original G.709 tributary rate.
+      color: '#2196f3'
+    - name: ODU2
+      label: ODU2
+      description: About 10 Gbps. Takes 10G Ethernet at its WAN rate.
+      color: '#2196f3'
+    - name: ODU2e
+      label: ODU2e
+      description: About 10.4 Gbps, sized for the 10GBASE-R LAN rate.
+      color: '#2196f3'
+    - name: ODU3
+      label: ODU3
+      description: About 40 Gbps.
+      color: '#2196f3'
+    - name: ODU4
+      label: ODU4
+      description: About 100 Gbps. Takes 100G Ethernet.
+      color: '#2196f3'
+    - name: ODUC1
+      label: ODUC1
+      description: ODUCn at n=1. About 100 Gbps.
+      color: '#673ab7'
+    - name: ODUC2
+      label: ODUC2
+      description: ODUCn at n=2. About 200 Gbps.
+      color: '#673ab7'
+    - name: ODUC3
+      label: ODUC3
+      description: ODUCn at n=3. About 300 Gbps.
+      color: '#673ab7'
+    - name: ODUC4
+      label: ODUC4
+      description: ODUCn at n=4. About 400 Gbps.
+      color: '#673ab7'
+    - name: ODUC6
+      label: ODUC6
+      description: ODUCn at n=6. About 600 Gbps.
+      color: '#673ab7'
+    - name: ODUC8
+      label: ODUC8
+      description: ODUCn at n=8. About 800 Gbps.
+      color: '#673ab7'
+    - name: ODUflex
+      label: ODUflex
+      description: Sized to the client rather than to a fixed rate.
+      color: '#00bcd4'
+    - name: VC-12
+      label: VC-12
+      description: SDH virtual container carrying a 2 Mbps E1.
+      color: '#ff9800'
+    - name: VC-4
+      label: VC-4
+      description: SDH virtual container carrying the 140 Mbps STM-1 payload.
+      color: '#ff9800'
+    - name: STM-N
+      label: STM-N
+      description: A whole SDH aggregate carried transparently.
+      color: '#ff9800'
     optional: false
     order_weight: 1100
   - name: mapping_mode
-    kind: Text
+    kind: Dropdown
     default_value: GMP
-    enum:
-    - GMP
-    - BMP
-    - AMP
+    choices:
+    - name: GMP
+      label: GMP
+      description: Generic mapping procedure. Rate agnostic, and what a modern client
+        uses.
+      color: '#2196f3'
+    - name: BMP
+      label: BMP
+      description: Bit-synchronous mapping procedure. Client and container clocks
+        are locked.
+      color: '#4caf50'
+    - name: AMP
+      label: AMP
+      description: Asynchronous mapping procedure. Justification bytes absorb the
+        clock offset.
+      color: '#ff9800'
     optional: false
     order_weight: 1200
   - name: description
