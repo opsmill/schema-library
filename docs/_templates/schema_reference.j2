@@ -77,6 +77,24 @@ title: {{ schema.name }}
 {% if schema.attribution -%}
 - **Attribution:** {{ schema.attribution }}
 {% endif %}
+{% if schema.use_cases or schema.not_covered %}
+
+## Use cases
+{% if schema.use_cases %}
+
+This extension covers:
+{% for item in schema.use_cases %}
+- {{ item }}
+{% endfor -%}
+{% endif -%}
+{% if schema.not_covered %}
+
+Out of scope, and what to reach for instead:
+{% for item in schema.not_covered %}
+- {{ item }}
+{% endfor -%}
+{% endif -%}
+{% endif %}
 {% if schema.nodes %}
 
 ## Nodes
