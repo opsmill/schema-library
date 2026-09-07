@@ -850,6 +850,31 @@ nodes:
           max_length: 256
         optional: true
         order_weight: 1200
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: planned
+            label: Planned
+            color: "#2196f3"
+          - name: active
+            label: Active
+            color: "#4caf50"
+          - name: standby
+            label: Standby
+            color: "#00bcd4"
+          - name: maintenance
+            label: Maintenance
+            color: "#ffc107"
+          - name: failed
+            label: Failed
+            color: "#ff5722"
+          - name: decommissioned
+            label: Decommissioned
+            color: "#9e9e9e"
+        optional: false
+        description: Lifecycle state of the duct itself, independent of the spans pulled through it.
+        order_weight: 1300
     relationships:
       - name: spans
         peer: OtnFiberSpan
@@ -899,6 +924,31 @@ nodes:
         optional: true
         description: Position of this span within its optical multiplex section, counting from the A end.
         order_weight: 1200
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: planned
+            label: Planned
+            color: "#2196f3"
+          - name: active
+            label: Active
+            color: "#4caf50"
+          - name: standby
+            label: Standby
+            color: "#00bcd4"
+          - name: maintenance
+            label: Maintenance
+            color: "#ffc107"
+          - name: failed
+            label: Failed
+            color: "#ff5722"
+          - name: decommissioned
+            label: Decommissioned
+            color: "#9e9e9e"
+        optional: false
+        description: Lifecycle state of the span. A planned span is designed but not yet spliced through.
+        order_weight: 1300
       - name: length_m
         kind: Number
         parameters:
@@ -1047,6 +1097,31 @@ nodes:
           max_length: 256
         optional: true
         order_weight: 1100
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: planned
+            label: Planned
+            color: "#2196f3"
+          - name: active
+            label: Active
+            color: "#4caf50"
+          - name: standby
+            label: Standby
+            color: "#00bcd4"
+          - name: maintenance
+            label: Maintenance
+            color: "#ffc107"
+          - name: failed
+            label: Failed
+            color: "#ff5722"
+          - name: decommissioned
+            label: Decommissioned
+            color: "#9e9e9e"
+        optional: false
+        description: Lifecycle state of the section as a whole, not of the spans it groups.
+        order_weight: 1200
     relationships:
       - name: roadm_a
         peer: OtnRoadm
@@ -1791,6 +1866,43 @@ nodes:
     # oms_sequence is stored because Infrahub relationships carry no order, so a
     # section hands back a set and a budget cannot be walked over one.
     attributes:
+      - name: amplifier_type
+        kind: Dropdown
+        choices:
+          - name: edfa
+            label: EDFA
+            description: Erbium-doped fibre amplifier. The usual choice on a C band line system.
+            color: "#2196f3"
+          - name: soa
+            label: SOA
+            description: Semiconductor optical amplifier. Compact, noisier, found in access gear.
+            color: "#ff9800"
+          - name: hybrid
+            label: Hybrid
+            description: An erbium stage combined with distributed Raman gain in one box.
+            color: "#673ab7"
+        optional: true
+        description: Nameplate amplifier technology. A Raman-only pump is its own kind, OtnRamanPump.
+        order_weight: 1300
+      # OtnGenericPort.role carries booster and preamp for ports. This is the device's own role in the chain.
+      - name: stage
+        kind: Dropdown
+        choices:
+          - name: booster
+            label: Booster
+            description: First stage after the transmitter, lifting power into the span.
+            color: "#ff9800"
+          - name: inline
+            label: Inline
+            description: A mid-route stage that recovers span loss and passes the light on.
+            color: "#4caf50"
+          - name: preamp
+            label: Pre-amplifier
+            description: Last stage before the receiver, raising power to its sensitivity.
+            color: "#ffc107"
+        optional: true
+        description: Nameplate stage this amplifier is built for, not a position derived from the plant.
+        order_weight: 1400
       # 3000 is the quantum-limited floor for an EDFA and 10000 is a bad one.
       - name: noise_figure_mdb
         kind: Number
@@ -1845,6 +1957,25 @@ nodes:
         optional: false
         description: Position in this amplifier's own chain, counting along the direction it amplifies.
         order_weight: 1560
+      - name: max_total_output_power_mdbm
+        kind: Number
+        parameters:
+          min_value: 0
+          max_value: 30000
+        optional: true
+        description: Rated total output power in milli-dBm, 0 to +30 dBm. A nameplate ceiling, not a reading.
+        order_weight: 1570
+      - name: max_total_output_power_display
+        kind: Text
+        read_only: true
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: >-
+            {% if max_total_output_power_mdbm__value is not none %}{{
+            max_total_output_power_mdbm__value / 1000 }} dBm{% endif %}
+        optional: true
+        description: Rated total output power in dBm. Read-only, derived from max_total_output_power_mdbm.
+        order_weight: 1580
     # The two inverses of the section's two amplifier relationships, each on the
     # matching identifier. Exactly one is set, and which one answers the direction.
     relationships:
@@ -2146,6 +2277,9 @@ nodes:
           - name: planned
             label: Planned
             color: "#2196f3"
+          - name: reserved
+            label: Reserved
+            color: "#ff9800"
           - name: active
             label: Active
             color: "#4caf50"
@@ -2291,6 +2425,12 @@ nodes:
           - name: active
             label: Active
             color: "#4caf50"
+          - name: maintenance
+            label: Maintenance
+            color: "#ffc107"
+          - name: failed
+            label: Failed
+            color: "#ff5722"
           - name: rejected
             label: Rejected
             color: "#f44336"
@@ -2471,7 +2611,9 @@ nodes:
     # constraint sits on, which is why it cannot be declared on `OtnService`.
     uniqueness_constraints:
       # It refuses a repeat of segment 2 and is blind to the sequence 1, 2, 4.
-      - ["service", "segment_sequence__value"]
+      # A service's protect path is a second OtnOpticalPath at the same segment_sequence
+      # with path_role protect, so the working and protect routes hang off one service.
+      - ["service", "segment_sequence__value", "path_role__value"]
     attributes:
       - name: name
         kind: Text
@@ -2499,6 +2641,25 @@ nodes:
         optional: false
         description: Which segment of its circuit this path is. 1 for a circuit that spans one wavelength.
         order_weight: 1200
+      - name: path_role
+        kind: Dropdown
+        default_value: working
+        choices:
+          - name: working
+            label: Working
+            description: The route the service takes while nothing on it has failed.
+            color: "#4caf50"
+          - name: protect
+            label: Protect
+            description: The standby route the service switches to when its working one fails.
+            color: "#2196f3"
+          - name: express
+            label: Express
+            description: A route passing a site optically, with nothing added or dropped there.
+            color: "#9c27b0"
+        optional: false
+        description: Which role this path plays for its service, working, protect or express.
+        order_weight: 1300
     relationships:
       # Mandatory. A path with no service has no meaning here: it is one wavelength's
       # route chosen to answer one customer's request, and its figures come from that.

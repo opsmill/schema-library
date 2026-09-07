@@ -245,6 +245,9 @@ extensions/otn:
     - Optical path budgets. OtnOpticalPath records which elements the light crosses
       and in what order, not the loss, OSNR margin or latency of that route. Compute
       those in a planning tool such as GNPy.
+    - Frequency plans other than one fixed dense grid. OtnFrequencyGrid models a single
+      ITU-T G.694.1 fixed 50 GHz plan across the C band, from 191.35 to 196.10 THz.
+      L band, C plus L systems, flexgrid and other channel spacings are out of scope.
   use_cases:
     - Recording the ITU-T G.694.1 dense grid and G.694.2 coarse plan as separate kinds,
       so a carrier pointed at the wrong plan is refused when written.

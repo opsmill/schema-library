@@ -25,6 +25,7 @@ Out of scope, and what to reach for instead:
 - Rack elevations, device types and platforms for optical gear. Model the physical asset as a DcimPhysicalDevice and link it with OtnGenericDevice.dcim_device.
 - Optical performance monitoring. The schema carries ratings and settings, such as a port's transmit power or a mode's required OSNR, but nothing that is measured, such as live power, OSNR, pre-FEC BER or an error counter. Those change continuously and belong in the network management system or a time series store.
 - Optical path budgets. OtnOpticalPath records which elements the light crosses and in what order, not the loss, OSNR margin or latency of that route. Compute those in a planning tool such as GNPy.
+- Frequency plans other than one fixed dense grid. OtnFrequencyGrid models a single ITU-T G.694.1 fixed 50 GHz plan across the C band, from 191.35 to 196.10 THz. L band, C plus L systems, flexgrid and other channel spacings are out of scope.
 
 ## Nodes
 
@@ -191,6 +192,7 @@ Out of scope, and what to reach for instead:
 | name |  | Text | False |  |  |
 | owner | Who owns the trench. Often not the network operator. | Text | True |  |  |
 | description |  | Text | True |  |  |
+| status | Lifecycle state of the duct itself, independent of the spans pulled through it. | Dropdown | False | active | planned, active, standby, maintenance, failed, decommissioned |
 
 #### Relationships
 
@@ -214,6 +216,7 @@ Out of scope, and what to reach for instead:
 | name |  | Text | False |  |  |
 | description |  | Text | True |  |  |
 | oms_sequence | Position of this span within its optical multiplex section, counting from the A end. | Number | True |  |  |
+| status | Lifecycle state of the span. A planned span is designed but not yet spliced through. | Dropdown | False | active | planned, active, standby, maintenance, failed, decommissioned |
 | length_m | Route length in metres, not straight-line distance. 500 km is the practical ceiling. | Number | False |  |  |
 | length_display | Route length in km. Read-only, derived from length_m. | Text | True |  |  |
 | splice_count | Fusion splices along the span. Roughly one per drum of cable. | Number | False | 0 |  |
@@ -248,6 +251,7 @@ Out of scope, and what to reach for instead:
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name |  | Text | False |  |  |
 | description |  | Text | True |  |  |
+| status | Lifecycle state of the section as a whole, not of the spans it groups. | Dropdown | False | active | planned, active, standby, maintenance, failed, decommissioned |
 
 #### Relationships
 
@@ -430,11 +434,15 @@ Out of scope, and what to reach for instead:
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
+| amplifier_type | Nameplate amplifier technology. A Raman-only pump is its own kind, OtnRamanPump. | Dropdown | True |  | edfa, soa, hybrid |
+| stage | Nameplate stage this amplifier is built for, not a position derived from the plant. | Dropdown | True |  | booster, inline, preamp |
 | noise_figure_mdb | Noise figure in millidecibels. 4.0 dB is 4000. Sets the ASE this stage adds. | Number | False | 4000 |  |
 | noise_figure_display | Noise figure in dB. Read-only, derived from noise_figure_mdb. | Text | True |  |  |
 | gain_mdb | Gain in millidecibels. 22.0 dB is 22000. Must cover the loss ahead of the input. | Number | False | 22000 |  |
 | gain_display | Gain in dB. Read-only, derived from gain_mdb. | Text | True |  |  |
 | oms_sequence | Position in this amplifier's own chain, counting along the direction it amplifies. | Number | False |  |  |
+| max_total_output_power_mdbm | Rated total output power in milli-dBm, 0 to +30 dBm. A nameplate ceiling, not a reading. | Number | True |  |  |
+| max_total_output_power_display | Rated total output power in dBm. Read-only, derived from max_total_output_power_mdbm. | Text | True |  |  |
 
 #### Relationships
 
@@ -555,7 +563,7 @@ Out of scope, and what to reach for instead:
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name |  | Text | False |  |  |
 | description |  | Text | True |  |  |
-| status |  | Dropdown | False | active | planned, active, decommissioned |
+| status |  | Dropdown | False | active | planned, reserved, active, decommissioned |
 
 #### Relationships
 
@@ -586,7 +594,7 @@ Out of scope, and what to reach for instead:
 | description |  | Text | True |  |  |
 | rate_gbps | Requested client capacity in Gbps. Already whole in its natural unit. | Number | False |  |  |
 | sla |  | Dropdown | False | silver | gold, silver, bronze, best_effort |
-| status |  | Dropdown | False | planned | planned, provisioning, active, rejected, decommissioned |
+| status |  | Dropdown | False | planned | planned, provisioning, active, maintenance, failed, rejected, decommissioned |
 | service_profile |  | Dropdown | False | ip-transit | ai-training-dci, ai-inference, hpc-research, ip-transit, legacy-sdh |
 | max_latency_ns | One-way latency budget in nanoseconds. Null on the profiles that have none. | Number | True |  |  |
 | max_latency_display | Latency budget in microseconds. Read-only, derived from max_latency_ns. | Text | True |  |  |
@@ -631,7 +639,7 @@ Out of scope, and what to reach for instead:
 - **Namespace:** Otn
 - **Icon:** mdi:map-marker-path
 - **Uniqueness Constraints:**
-    - service, segment_sequence__value
+    - service, segment_sequence__value, path_role__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -641,6 +649,7 @@ Out of scope, and what to reach for instead:
 | name |  | Text | False |  |  |
 | description |  | Text | True |  |  |
 | segment_sequence | Which segment of its circuit this path is. 1 for a circuit that spans one wavelength. | Number | False | 1 |  |
+| path_role | Which role this path plays for its service, working, protect or express. | Dropdown | False | working | working, protect, express |
 
 #### Relationships
 
@@ -1620,6 +1629,32 @@ nodes:
       max_length: 256
     optional: true
     order_weight: 1200
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: planned
+      label: Planned
+      color: '#2196f3'
+    - name: active
+      label: Active
+      color: '#4caf50'
+    - name: standby
+      label: Standby
+      color: '#00bcd4'
+    - name: maintenance
+      label: Maintenance
+      color: '#ffc107'
+    - name: failed
+      label: Failed
+      color: '#ff5722'
+    - name: decommissioned
+      label: Decommissioned
+      color: '#9e9e9e'
+    optional: false
+    description: Lifecycle state of the duct itself, independent of the spans pulled
+      through it.
+    order_weight: 1300
   relationships:
   - name: spans
     peer: OtnFiberSpan
@@ -1666,6 +1701,32 @@ nodes:
     description: Position of this span within its optical multiplex section, counting
       from the A end.
     order_weight: 1200
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: planned
+      label: Planned
+      color: '#2196f3'
+    - name: active
+      label: Active
+      color: '#4caf50'
+    - name: standby
+      label: Standby
+      color: '#00bcd4'
+    - name: maintenance
+      label: Maintenance
+      color: '#ffc107'
+    - name: failed
+      label: Failed
+      color: '#ff5722'
+    - name: decommissioned
+      label: Decommissioned
+      color: '#9e9e9e'
+    optional: false
+    description: Lifecycle state of the span. A planned span is designed but not yet
+      spliced through.
+    order_weight: 1300
   - name: length_m
     kind: Number
     parameters:
@@ -1810,6 +1871,31 @@ nodes:
       max_length: 256
     optional: true
     order_weight: 1100
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: planned
+      label: Planned
+      color: '#2196f3'
+    - name: active
+      label: Active
+      color: '#4caf50'
+    - name: standby
+      label: Standby
+      color: '#00bcd4'
+    - name: maintenance
+      label: Maintenance
+      color: '#ffc107'
+    - name: failed
+      label: Failed
+      color: '#ff5722'
+    - name: decommissioned
+      label: Decommissioned
+      color: '#9e9e9e'
+    optional: false
+    description: Lifecycle state of the section as a whole, not of the spans it groups.
+    order_weight: 1200
   relationships:
   - name: roadm_a
     peer: OtnRoadm
@@ -2535,6 +2621,47 @@ nodes:
   - OtnGenericDevice
   - OtnOpticalElement
   attributes:
+  - name: amplifier_type
+    kind: Dropdown
+    choices:
+    - name: edfa
+      label: EDFA
+      description: Erbium-doped fibre amplifier. The usual choice on a C band line
+        system.
+      color: '#2196f3'
+    - name: soa
+      label: SOA
+      description: Semiconductor optical amplifier. Compact, noisier, found in access
+        gear.
+      color: '#ff9800'
+    - name: hybrid
+      label: Hybrid
+      description: An erbium stage combined with distributed Raman gain in one box.
+      color: '#673ab7'
+    optional: true
+    description: Nameplate amplifier technology. A Raman-only pump is its own kind,
+      OtnRamanPump.
+    order_weight: 1300
+  - name: stage
+    kind: Dropdown
+    choices:
+    - name: booster
+      label: Booster
+      description: First stage after the transmitter, lifting power into the span.
+      color: '#ff9800'
+    - name: inline
+      label: Inline
+      description: A mid-route stage that recovers span loss and passes the light
+        on.
+      color: '#4caf50'
+    - name: preamp
+      label: Pre-amplifier
+      description: Last stage before the receiver, raising power to its sensitivity.
+      color: '#ffc107'
+    optional: true
+    description: Nameplate stage this amplifier is built for, not a position derived
+      from the plant.
+    order_weight: 1400
   - name: noise_figure_mdb
     kind: Number
     default_value: 4000
@@ -2584,6 +2711,25 @@ nodes:
     description: Position in this amplifier's own chain, counting along the direction
       it amplifies.
     order_weight: 1560
+  - name: max_total_output_power_mdbm
+    kind: Number
+    parameters:
+      min_value: 0
+      max_value: 30000
+    optional: true
+    description: Rated total output power in milli-dBm, 0 to +30 dBm. A nameplate
+      ceiling, not a reading.
+    order_weight: 1570
+  - name: max_total_output_power_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if max_total_output_power_mdbm__value is not none %}{{
+        max_total_output_power_mdbm__value / 1000 }} dBm{% endif %}'
+    optional: true
+    description: Rated total output power in dBm. Read-only, derived from max_total_output_power_mdbm.
+    order_weight: 1580
   relationships:
   - name: oms_a2b
     peer: OtnOpticalMultiplexSection
@@ -2853,6 +2999,9 @@ nodes:
     - name: planned
       label: Planned
       color: '#2196f3'
+    - name: reserved
+      label: Reserved
+      color: '#ff9800'
     - name: active
       label: Active
       color: '#4caf50'
@@ -2981,6 +3130,12 @@ nodes:
     - name: active
       label: Active
       color: '#4caf50'
+    - name: maintenance
+      label: Maintenance
+      color: '#ffc107'
+    - name: failed
+      label: Failed
+      color: '#ff5722'
     - name: rejected
       label: Rejected
       color: '#f44336'
@@ -3130,6 +3285,7 @@ nodes:
   uniqueness_constraints:
   - - service
     - segment_sequence__value
+    - path_role__value
   attributes:
   - name: name
     kind: Text
@@ -3155,6 +3311,27 @@ nodes:
     description: Which segment of its circuit this path is. 1 for a circuit that spans
       one wavelength.
     order_weight: 1200
+  - name: path_role
+    kind: Dropdown
+    default_value: working
+    choices:
+    - name: working
+      label: Working
+      description: The route the service takes while nothing on it has failed.
+      color: '#4caf50'
+    - name: protect
+      label: Protect
+      description: The standby route the service switches to when its working one
+        fails.
+      color: '#2196f3'
+    - name: express
+      label: Express
+      description: A route passing a site optically, with nothing added or dropped
+        there.
+      color: '#9c27b0'
+    optional: false
+    description: Which role this path plays for its service, working, protect or express.
+    order_weight: 1300
   relationships:
   - name: service
     peer: OtnService
