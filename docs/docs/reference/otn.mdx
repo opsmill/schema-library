@@ -871,16 +871,16 @@ In this context "extensions" refer to modifications or additions to the existing
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | latitude_microdeg | Latitude in millionths of a degree. No Float kind exists. | Number | True |  |  |
 | longitude_microdeg | Longitude in millionths of a degree. No Float kind exists. | Number | True |  |  |
-| site_type | A PoP hosting OTN equipment, or a customer site handing traffic to one. | Dropdown | False | pop | pop, customer |
+| site_type | A PoP hosting OTN equipment, or a customer site handing traffic to one. | Dropdown | True | pop | pop, customer |
 
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| otn_facility | OtnFacility | True | one | Attribute |
-| devices | OtnGenericDevice | True | many | Generic |
+| otn_devices | OtnGenericDevice | True | many | Generic |
 | spans_a | OtnFiberSpan | True | many | Attribute |
 | spans_b | OtnFiberSpan | True | many | Attribute |
+| otn_facility | OtnFacility | True | one | Attribute |
 
 ## Code
 
@@ -3472,7 +3472,7 @@ extensions:
         max_value: 90000000
       optional: true
       description: Latitude in millionths of a degree. No Float kind exists.
-      order_weight: 1400
+      order_weight: 1600
     - name: longitude_microdeg
       kind: Number
       parameters:
@@ -3480,7 +3480,7 @@ extensions:
         max_value: 180000000
       optional: true
       description: Longitude in millionths of a degree. No Float kind exists.
-      order_weight: 1500
+      order_weight: 1700
     - name: site_type
       kind: Dropdown
       default_value: pop
@@ -3491,19 +3491,12 @@ extensions:
       - name: customer
         label: Customer site
         color: '#ff9800'
-      optional: false
+      optional: true
       description: A PoP hosting OTN equipment, or a customer site handing traffic
         to one.
-      order_weight: 1600
+      order_weight: 1800
     relationships:
-    - name: otn_facility
-      peer: OtnFacility
-      kind: Attribute
-      cardinality: one
-      optional: true
-      identifier: otn_site__facility
-      order_weight: 930
-    - name: devices
+    - name: otn_devices
       peer: OtnGenericDevice
       kind: Generic
       cardinality: many
@@ -3526,5 +3519,12 @@ extensions:
       optional: true
       identifier: otn_span__site_b
       order_weight: 920
+    - name: otn_facility
+      peer: OtnFacility
+      kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: otn_site__facility
+      order_weight: 930
 
 ```
