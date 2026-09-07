@@ -22,7 +22,7 @@ Out of scope, and what to reach for instead:
 - Cabling between optical devices. No OTN port is a DcimEndpoint, so extensions/cable cannot terminate on optical gear. Fiber is modelled as OtnFiberSpan and OtnConduit instead.
 - Validation of what a schema cannot express, such as which port kind may hold a pluggable, or whether a mux client port binds exactly one channel. This extension ships no checks; the schema comments mark each such rule.
 - Rack elevations, device types and platforms for optical gear. Model the physical asset as a DcimPhysicalDevice and link it with OtnGenericDevice.dcim_device.
-- Optical performance monitoring. No kind records optical power, OSNR, pre-FEC BER or any other reading. That data changes continuously and belongs in the network management system or a time series store, not in a source of truth.
+- Optical performance monitoring. The schema carries ratings and settings, such as a port's transmit power or a mode's required OSNR, but nothing that is measured, such as live power, OSNR, pre-FEC BER or an error counter. Those change continuously and belong in the network management system or a time series store.
 - Optical path budgets. OtnOpticalPath records which elements the light crosses and in what order, not the loss, OSNR margin or latency of that route. Compute those in a planning tool such as GNPy.
 
 ## Nodes
