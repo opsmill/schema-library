@@ -12,10 +12,8 @@
 version: "1.0"
 
 generics:
-  # ---- from schemas/otn_base.yml ----
-  # None of them inherits from another. Infrahub's GenericSchemaWrite has no
-  # inherit_from key at all, so a generic taxonomy is composed by listing several
-  # generics on a concrete node, never by stacking them.
+  # Base generics. Generics cannot inherit generics, so a concrete node lists
+  # several rather than stacking them.
   - name: GenericPort
     namespace: Otn
     description: Any port on any OTN device. The connection surface of the network.
@@ -124,11 +122,8 @@ generics:
         optional: false
         identifier: otn_device__ports
         order_weight: 800
-      # Declared once. The relationship is symmetric and self-referencing, so
-      # both ends are the same edge; the explicit identifier is what stops
-      # Infrahub deriving a different string per side and splitting it into two
-      # phantom one-way links. Immutable after the first load: changing the
-      # identifier would orphan every connection already recorded.
+      # Symmetric and self-referencing, so both ends are the same edge. The explicit
+      # identifier stops Infrahub splitting it into two one-way links.
       - name: connected_to
         peer: OtnGenericPort
         kind: Attribute
@@ -144,12 +139,8 @@ generics:
     label: Optical element
     icon: mdi:blur-linear
     include_in_menu: false
-    # No order_by and no human_friendly_id. `order_by: [name__value]` is
-    # rejected at load with "OtnOpticalElement.order_by: attribute 'name' not
-    # defined on this schema": the key resolves against the generic's own
-    # attributes, not against what its members inherit, and this generic
-    # declares none. So a hop's element is written by UUID and no object file
-    # can name one. Every member kind carries its own order_by.
+    # No order_by and no human_friendly_id: both resolve against this generic's own
+    # attributes, and it declares none. Every member kind carries its own order_by.
     attributes:
       - name: insertion_loss_mdb
         kind: Number
@@ -288,13 +279,10 @@ generics:
         identifier: otn_site__devices
         on_delete: no-action
         order_weight: 800
-      # An OTN device names the optical role; DcimPhysicalDevice names the
-      # physical asset. This edge joins the two records for one box, so a
-      # deployment that already tracks its routers in Dcim links them rather
-      # than duplicating them. Optional, because a deployment with no Dcim
-      # inventory is equally valid. It does not merge the two graphs: no OTN
-      # port is a DcimEndpoint, so extensions/cable still cannot terminate on
-      # optical gear, and an extensions block cannot change that.
+      # An OTN device names the optical role; DcimPhysicalDevice names the physical
+      # asset. This edge joins the two records for one box rather than duplicating
+      # it, and it does not merge the two graphs: no OTN port is a DcimEndpoint, so
+      # extensions/cable still cannot terminate on optical gear.
       - name: dcim_device
         peer: DcimPhysicalDevice
         label: Physical device record
@@ -320,9 +308,7 @@ generics:
     icon: mdi:lightbulb-on-outline
     include_in_menu: false
     attributes:
-      # Optional because a grey router port is not on the C-band grid. The
-      # bounds are the two endpoints of the 96-channel 50 GHz grid in units.py,
-      # asserted equal by tests/unit/test_schema_contract.py.
+      # Optional because a grey router port is not on the C-band grid.
       - name: center_frequency_mhz
         kind: Number
         parameters:
@@ -377,20 +363,9 @@ generics:
         optional: true
         description: Receiver sensitivity in dBm. Derived from rx_sensitivity_mdbm.
         order_weight: 1810
-      # A Dropdown rather than an enum, so a connector carries a label, a colour
-      # and a sentence. The six original names are unchanged, so no loaded value
-      # is rewritten; MU, CS and splice are new.
-      #
-      # Changing the kind on this generic alone is refused with
-      # "connector_type inherited from OtnOpticalPort must be the same kind
-      # ["Dropdown", "Text"]", because the loaded schema has materialised the Text
-      # attribute onto every optical port kind. All six kinds that inherit this
-      # generic restate the list in otn_ports.yml, and a restatement one choice
-      # short is accepted in silence.
-      #
-      # OtnCopperPort declares its own connector_type too, also a Dropdown, but
-      # with its own three-choice copper list. No kind inherits both port
-      # generics.
+      # A Dropdown rather than an enum, so a connector carries a label, a colour and
+      # a sentence. Every kind inheriting this generic restates the list, and a
+      # restatement one choice short is accepted in silence.
       - name: connector_type
         kind: Dropdown
         choices:
@@ -432,9 +407,8 @@ generics:
             color: "#9e9e9e"
         optional: true
         order_weight: 1900
-      # Return loss is a polish property, not a connector property: an LC comes
-      # in all three. Null on every port loaded before this attribute existed,
-      # which is what keeps the change non-destructive.
+      # Return loss is a polish property, not a connector property: an LC comes in
+      # all three. Optional, so ports loaded before it existed stay valid.
       - name: polish
         kind: Dropdown
         choices:
@@ -465,9 +439,7 @@ generics:
     icon: mdi:cable-data
     include_in_menu: false
     attributes:
-      # kbps, not Mbps. E1 is 2.048 Mbps and T1 is 1.544 Mbps; as integer Mbps
-      # both round to 2, which would make the two signals this generic exists to
-      # carry indistinguishable.
+      # kbps, not Mbps: as integer Mbps, E1 at 2.048 and T1 at 1.544 both round to 2.
       - name: speed_kbps
         kind: Number
         default_value: 2048
@@ -505,15 +477,8 @@ generics:
         optional: false
         order_weight: 1900
 
-  # ---- from schemas/otn_ports.yml ----
-  # Two flat generics. Generics cannot inherit generics in Infrahub, so the
-  # concrete monitors multi-inherit both plus OtnGenericPort, which is the shape
-  # OtnAmplifierPort already uses for OtnGenericPort and OtnOpticalPort.
-  #
-  # human_friendly_id and uniqueness_constraints are not declared here. Both come
-  # from OtnGenericPort, and a constraint on a generic binds across every kind
-  # that inherits it, so (device, name) stays unique across all five monitors
-  # taken together.
+  # Monitor generics. The concrete monitors list both of these plus OtnGenericPort,
+  # whose (device, name) constraint then binds across all five taken together.
   - name: Monitor
     namespace: Otn
     description: The one fact every monitoring interface carries, whatever it measures.
@@ -521,8 +486,6 @@ generics:
     icon: mdi:gauge
     include_in_menu: false
     attributes:
-      # A reading with no timestamp is not a reading. This is a last known
-      # value, not a telemetry feed; the age is what makes drift meaningful.
       - name: measured_at
         kind: DateTime
         optional: false
@@ -535,14 +498,8 @@ generics:
     label: Channel monitor
     icon: mdi:chart-histogram
     include_in_menu: false
-    # A ROADM degree and a multiplexer report the same two numbers, so the two
-    # are declared once here rather than twice. The kinds stay distinct,
-    # because a degree and a multiplexer are different equipment and a query
-    # should be able to say which it means. It also leaves room for the two to
-    # diverge without a migration on loaded data.
-    #
-    # This generic does not inherit OtnMonitor. Generics do not inherit
-    # generics; the concrete kinds take both.
+    # A ROADM degree and a multiplexer report the same two numbers, so they are
+    # declared once here. The kinds stay distinct so a query can say which it means.
     attributes:
       - name: total_power_mdbm
         kind: Number
@@ -562,7 +519,7 @@ generics:
         order_weight: 1310
 
 nodes:
-  # ---- from schemas/otn_ports.yml ----
+  # Ports.
   - name: RouterPort
     namespace: Otn
     description: Grey optics on an IP router. Not on the C-band grid.
@@ -615,18 +572,9 @@ nodes:
         optional: true
         order_weight: 1900
     relationships:
-      # The module fitted in this port, and the inverse of OtnTransceiver.port.
-      # Both ends are cardinality one, so the edge is one to one: the server
-      # refuses the second write with "has 2 peers for
-      # otn_optical_port__transceiver, maximum of 1 allowed". That is the
-      # duplicate rule, carried by the schema rather than by a check.
-      #
-      # Declared on the three concrete kinds that have a cage and never on the
-      # OtnOpticalPort generic, which would hand the field to all eight optical
-      # port kinds including the five that hold no module.
-      #
-      # Optional on both sides, so a spare, an RMA and a decommissioned unit stay
-      # modellable.
+      # The module fitted in this port, and the inverse of OtnTransceiver.port. Both
+      # ends are cardinality one, so a second module in one port is refused at write
+      # time. Declared only on the three concrete kinds that have a cage.
       - name: transceiver
         peer: OtnTransceiver
         label: Module fitted in this port
@@ -689,8 +637,6 @@ nodes:
         optional: true
         order_weight: 1900
     relationships:
-      # The one-to-one edge OtnRouterPort.transceiver documents, here on the kind
-      # that takes a grey pluggable on the transponder side.
       - name: transceiver
         peer: OtnTransceiver
         label: Module fitted in this port
@@ -753,45 +699,10 @@ nodes:
         optional: true
         order_weight: 1900
     relationships:
-      # The wavelength this port terminates, and the deletion boundary.
-      #
-      # Deleting a transponder already deletes this port: OtnGenericDevice.ports
-      # is kind: Component with on_delete: cascade, and a port has no meaning
-      # apart from the device it sits in. The deletion stops here.
-      #
-      # A carrier is not a component of a line port. It is a spectrum allocation
-      # on a route, holding a channel, a mode, its sections, its containers and
-      # possibly ODU switches, and it exists in the plan whether or not a box is
-      # currently lighting it. Cascading from this port would reach the carrier's
-      # containers and the services groomed into them, so pulling one transponder
-      # would destroy customer service records. It would also delete the
-      # wavelength out from under the line port at the far end, which is still
-      # installed: a carrier is terminated at both of its ends.
-      #
-      # Same policy as OtnService.diversity_group and OtnService.containers, for
-      # the same reason those two state.
-      #
-      # Light has direction, and that is not an argument for cascade here. A line
-      # port is a transceiver: every one of them carries both tx_power_mdbm and
-      # rx_sensitivity_mdbm, so there is no single transmitting end to own the
-      # wavelength. Cascade on a cardinality-one relationship fires from either
-      # port, so it would give two owners where the intuition asked for one.
-      # OtnOpticalCarrier holds no direction at all, deliberately: where this
-      # model needs direction it makes two objects, the way an amplifier hut
-      # does, and the budget engine evaluates a carrier both ways and takes the
-      # worse. Direction lives on the plant and on the path traversal, never on
-      # the wavelength.
-      #
-      # The model also already says "the light stopped" with status, which is
-      # planned, active or decommissioned. A planned carrier has no light and
-      # exists anyway. This kind is a spectrum allocation on a route, not the
-      # photons on it, and deleting a box must not silently release spectrum
-      # that channel_collision.py exists to police.
-      #
-      # There is a demo argument too, and it is the stronger one. A cascade makes
-      # the fault disappear. no-action leaves a lit carrier with nothing
-      # terminating it, which is visible and checkable, the shape
-      # monitor_completeness already works in.
+      # The wavelength this port terminates. The deletion boundary stops here: a
+      # carrier is a spectrum allocation on a route, terminated at both of its ends,
+      # so cascading from one port would delete the containers and the customer
+      # services groomed into them.
       - name: carrier
         peer: OtnOpticalCarrier
         label: Wavelength this port terminates
@@ -801,8 +712,6 @@ nodes:
         identifier: otn_carrier__line_ports
         on_delete: no-action
         order_weight: 850
-      # The one-to-one edge OtnRouterPort.transceiver documents, here on the kind
-      # that takes a coloured pluggable on the line side.
       - name: transceiver
         peer: OtnTransceiver
         label: Module fitted in this port
@@ -970,8 +879,8 @@ nodes:
         order_weight: 1900
 
   # One multiplexer channel and the common side it shares. Neither declares an
-  # insertion loss: the loss belongs to the device and the budget engine reads it
-  # from the path hop's element, so a second per-port figure would double count.
+  # insertion loss: that belongs to the device, so a per-port figure would double
+  # count.
   - name: MuxClientPort
     namespace: Otn
     description: One channel of a multiplexer. The side facing the transponder or router that lights it.
@@ -981,12 +890,9 @@ nodes:
     inherit_from:
       - OtnGenericPort
       - OtnOpticalPort
-    # Two optional edges, not one mandatory edge to a shared channel generic. The
-    # dense and coarse grid kinds were kept apart, and Infrahub has no
-    # cross-relationship constraint, so the schema cannot say "exactly one of
-    # these two". mux_channel_binding owns the neither case and the both case.
-    #
-    # Neither cascades: deleting a channel must not delete the port that named it.
+    # A channel port should bind exactly one of these two edges. Infrahub has no
+    # cross-relationship constraint, so both neither and both are writable.
+    # Unenforced here.
     relationships:
       - name: dwdm_channel
         peer: OtnFrequencyGrid
@@ -1007,7 +913,6 @@ nodes:
         on_delete: no-action
         order_weight: 860
 
-  # It binds no channel because it carries every channel the device lights.
   - name: MuxLinePort
     namespace: Otn
     description: The common side of a multiplexer, where the whole band leaves.
@@ -1028,21 +933,11 @@ nodes:
       - OtnGenericPort
       - OtnCopperPort
 
-  # The five monitors. They declare readings, because what a monitor measures is
-  # what distinguishes it. Eleven of the fourteen readings belong to exactly one
-  # family, so a single kind with a discriminator could not say which readings a
-  # monitor must carry and which it cannot take. Five kinds can, and the schema
-  # then refuses both halves: a missing reading, because the attribute is
-  # mandatory, and an impossible one, because the kind has no field for it.
+  # The five monitors. Eleven of the fourteen readings belong to exactly one family,
+  # so five kinds can refuse both a missing reading and an impossible one.
   - name: AmplifierMonitor
-    # Nothing here constrains which device kind a monitor may hang off, and that
-    # is measured rather than overlooked. Infrahub 1.11.0 refuses to let a
-    # concrete kind narrow the peer of a relationship it inherits, from either
-    # end, at schema check and before any load. OtnGenericPort.device peers
-    # OtnGenericDevice, so a receiver monitor on an amplifier is writable. The
-    # remaining option was a Python check, which is the layer these five kinds
-    # exist to leave, so the gap is accepted and stated instead. The generator
-    # that writes the monitors is the only thing that ever creates one.
+    # Nothing constrains which device kind a monitor hangs off: a concrete kind
+    # cannot narrow the peer of a relationship it inherits from OtnGenericPort.
     namespace: Otn
     description: The last reading taken from an amplifier's monitoring interface.
     label: Amplifier monitor
@@ -1090,10 +985,8 @@ nodes:
         optional: true
         description: Output power in dBm. Read-only, derived from output_power_mdbm.
         order_weight: 1230
-      # measured_gain_mdb is declared here and on OtnRamanMonitor, with
-      # identical bounds and an identical template. It cannot live on
-      # OtnMonitor, because that would put a gain field on the channel and
-      # receiver monitors, which is the failure these five kinds remove.
+      # Declared here and on OtnRamanMonitor rather than on OtnMonitor, which would
+      # put a gain field on the three monitor kinds that cannot produce one.
       - name: measured_gain_mdb
         kind: Number
         parameters:
@@ -1121,8 +1014,7 @@ nodes:
         description: Gain tilt across the band in millidecibels. Negative tilts the red end down.
         order_weight: 1260
 
-  # No attributes of its own. Both readings come from OtnChannelMonitor, which
-  # OtnMuxDemuxMonitor takes too, so the pair is declared once.
+  # No attributes of its own: both readings come from OtnChannelMonitor.
   - name: RoadmDegreeMonitor
     namespace: Otn
     description: The last reading taken from a ROADM degree's monitoring interface.
@@ -1161,9 +1053,6 @@ nodes:
     order_by:
       - name__value
     attributes:
-      # The same declaration OtnAmplifierMonitor carries. Two kinds, one gain
-      # reading each, and no gain field on the three kinds that cannot produce
-      # one.
       - name: measured_gain_mdb
         kind: Number
         parameters:
@@ -1211,9 +1100,7 @@ nodes:
     order_by:
       - name__value
     attributes:
-      # OSNR sits here and on no other monitor kind. A coherent receiver's DSP
-      # computes it. An amplifier reports power, not OSNR, and after the split
-      # there is no field on an amplifier monitor to put it in.
+      # OSNR sits on no other monitor kind: a coherent receiver's DSP computes it.
       - name: measured_osnr_mdb
         kind: Number
         parameters:
@@ -1240,7 +1127,6 @@ nodes:
         optional: false
         description: Received power at the coherent front end, in millidecibel-milliwatts.
         order_weight: 1520
-      # Parts per billion keeps a bit error rate an integer: 2.1e-3 is 2100000.
       - name: pre_fec_ber_ppb
         kind: Number
         parameters:
@@ -1274,10 +1160,7 @@ nodes:
         description: Differential group delay in femtoseconds.
         order_weight: 1560
 
-  # The catalog entry and the physical unit. Neither inherits anything: a part
-  # number is not racked and a pluggable is fitted into a port rather than being
-  # one. They live beside the ports they plug into, so the file count does not
-  # move.
+  # The catalog entry and the physical unit. Neither is racked, so neither inherits.
   - name: TransceiverType
     namespace: Otn
     description: A pluggable optic part number and what it can be made to do.
@@ -1345,8 +1228,7 @@ nodes:
         optional: false
         description: The cage this part fits. It decides which ports can hold it.
         order_weight: 1300
-      # A fixed-wavelength optic can only ever sit on the channel it was bought
-      # for, which is what makes this worth storing rather than deriving.
+      # A fixed-wavelength optic can only sit on the channel it was bought for.
       - name: tunable
         kind: Boolean
         default_value: false
@@ -1355,7 +1237,9 @@ nodes:
         order_weight: 1400
     relationships:
       # Optional, so a part number can be recorded before the mode catalog is
-      # populated. A type with no modes says nothing about what it can run.
+      # populated. Nothing compares this list against the mode a carrier actually
+      # runs, so a module can be fitted to a carrier it cannot support.
+      # Unenforced here.
       - name: supported_modes
         peer: OtnOpticalMode
         label: Modes this part can run
@@ -1415,19 +1299,12 @@ nodes:
         identifier: otn_transceiver_type__units
         on_delete: no-action
         order_weight: 900
-      # Optional, and therefore carrying no uniqueness constraint: Infrahub
-      # refuses a constraint on an optional relationship, and making this one
-      # mandatory would leave a spare, an RMA and a decommissioned unit
-      # unmodellable.
-      #
-      # The duplicate is refused anyway, by the inverse rather than by a
-      # constraint. OtnLinePort, OtnClientPort and OtnRouterPort each declare a
-      # cardinality-one `transceiver` on this identifier, so both ends are
-      # cardinality one and the second module in a port is refused at write time.
-      #
-      # The port kind stays with the transceiver_placement check. This peers the
-      # generic, and a relationship to a generic cannot be filtered by peer kind,
-      # so the schema accepts a module written into an amplifier port.
+      # Optional, so a spare, an RMA and a decommissioned unit stay modellable, and
+      # therefore carrying no uniqueness constraint: Infrahub refuses one on an
+      # optional relationship. The duplicate is refused by the inverse instead, since
+      # every `transceiver` on this identifier is cardinality one. This peers the
+      # generic, and a relationship to a generic cannot be filtered by peer kind, so
+      # a module written into an amplifier port is accepted. Unenforced here.
       - name: port
         peer: OtnOpticalPort
         label: Port this unit is fitted in
@@ -1438,15 +1315,10 @@ nodes:
         on_delete: no-action
         order_weight: 950
 
-  # ---- from schemas/otn_plant.yml ----
-  # A `cardinality: one` relationship here gets an inverse when the peer is a page
-  # an operator lands on and the reverse list is what that page is for. Otherwise
-  # the reverse direction is a server-side filter on the forward side, which costs
-  # nothing and does not duplicate the fact. site_a and site_b have inverses on
-  # LocationSite, added through the `extensions:` block at the end of this file;
-  # roadm_a and roadm_b have inverses on OtnRoadm, defined further down in this
-  # same file. Every inverse reuses the identifier declared here, and an inverse
-  # on a new identifier loads without complaint and then reads an empty list.
+  # Plant.
+  # A `cardinality: one` relationship earns an inverse only where the peer's own page
+  # is what the reverse list is for; otherwise use a server-side filter on the forward
+  # side. An inverse must reuse the forward identifier, or it reads an empty list.
   - name: FiberType
     namespace: Otn
     description: Single-mode fiber family. Attenuation, dispersion and group index at 1550 nm.
@@ -1474,22 +1346,8 @@ nodes:
           max_length: 256
         optional: true
         order_weight: 1100
-      # One coefficient per fibre family, measured at 1550 nm, and the budget
-      # engine applies it to every span it is given. That is right for the dense
-      # grid, where every channel sits between 1530 and 1565 nm. It is wrong for
-      # a coarse wavelength, where it understates the loss over the coarse tail
-      # by about a decibel, more than the margin by which a section in this
-      # dataset already fails.
-      #
-      # So no coarse span reaches the engine: a coarse span belongs to no
-      # optical multiplex section, and tests/unit/test_geant_dataset.py refuses
-      # an `oms` on any span touching a site of `site_type: customer`. Budgeting
-      # a coarse link needs a coefficient per wavelength band, which is a schema
-      # change.
-      #
-      # Named for the coefficient it is, because the plain `attenuation` names
-      # now belong to the attenuators, which hold an attenuation rather than a
-      # rate.
+      # One coefficient per fibre family, measured at 1550 nm. That is right for the
+      # dense grid and understates the loss on a coarse wavelength.
       - name: attenuation_coefficient_mdb_per_km
         kind: Number
         parameters:
@@ -1603,10 +1461,8 @@ nodes:
     order_by:
       - name__value
     display_label: name__value
-    # The inherited insertion_loss_mdb stays at its default of 0 on a span. A
-    # span's real loss is length x attenuation plus splices plus connectors plus
-    # aging margin, and the budget engine computes it on demand. The stored 0
-    # does not mean the span is lossless.
+    # The inherited insertion_loss_mdb stays at 0 on a span. A span's real loss is
+    # length x attenuation plus splices, connectors and aging margin.
     attributes:
       - name: name
         kind: Text
@@ -1622,10 +1478,8 @@ nodes:
           max_length: 256
         optional: true
         order_weight: 1100
-      # Not unique: a uniqueness constraint cannot reference an optional
-      # relationship, and oms has to stay optional so a span is creatable before
-      # its section exists. Duplicate positions are rejected by a check, not by
-      # the schema.
+      # Not unique: a uniqueness constraint cannot reference an optional relationship,
+      # and oms stays optional so a span is creatable before its section exists.
       - name: oms_sequence
         kind: Number
         parameters:
@@ -1738,13 +1592,8 @@ nodes:
         identifier: otn_oms__spans
         on_delete: no-action
         order_weight: 840
-      # The inverse of OtnRamanPump.span, on the same identifier, and both sides
-      # are needed. A budget walks a section, reaches its spans and reads what
-      # is on them; without this side nothing on that walk can see a pump, so
-      # every pumped span sums to zero gain and the check passes while reporting
-      # a loss the network does not have. It is also what makes OtnRamanPump
-      # reachable in the UI, because the sidebar does not name device kinds, and
-      # tests/unit/test_menu.py asserts that.
+      # The inverse of OtnRamanPump.span, on the same identifier. A budget walks a
+      # section to its spans, so without this side no pump is visible on that walk.
       - name: raman_pumps
         peer: OtnRamanPump
         kind: Attribute
@@ -1753,14 +1602,8 @@ nodes:
         identifier: otn_span__raman_pumps
         on_delete: no-action
         order_weight: 850
-      # The ports at each end of the glass. No port kind had any edge to a span or
-      # a section in either direction, so the only thing naming the degree port
-      # facing a given span was the far site's shortname inside the port's name
-      # string, a naming convention doing a relationship's job.
-      #
-      # Declared on the span alone: the inverse would put the field on every port
-      # kind and most ports terminate no span. Empty means unjudgeable rather than
-      # clean, because an empty list and a fault look the same from outside.
+      # The ports at each end of the glass. Declared on the span alone: the inverse
+      # would put the field on every port kind and most ports terminate no span.
       - name: terminating_ports
         peer: OtnGenericPort
         label: Ports at the ends of this span
@@ -1824,14 +1667,8 @@ nodes:
         identifier: otn_oms__spans
         on_delete: no-action
         order_weight: 900
-      # One relationship per direction of travel, rather than one holding both
-      # chains. Which chain an amplifier is in is then stored by the graph, and
-      # no attribute on the amplifier can disagree with it.
-      #
-      # Both stay optional: a section is creatable before its amplifiers exist.
-      # A query that selects one and forgets the other is not an error at the
-      # server, and `peers` hands back an empty list for a key that is not
-      # there, so the loud failure is the budget engine's N+1 rule instead.
+      # One relationship per direction of travel rather than one holding both chains,
+      # so which chain an amplifier is in is stored by the graph. Both stay optional.
       - name: amplifiers_a2b
         peer: OtnAmplifier
         kind: Attribute
@@ -1849,7 +1686,7 @@ nodes:
         on_delete: no-action
         order_weight: 920
 
-  # ---- from schemas/otn_logical.yml ----
+  # Logical.
   - name: FrequencyGrid
     namespace: Otn
     description: One ITU-T G.694.1 channel. 50 GHz fixed grid, 191.35 to 196.10 THz.
@@ -1871,9 +1708,7 @@ nodes:
         optional: false
         description: ITU channel number, 1 to 96. Channel 1 is 191.35 THz.
         order_weight: 1000
-      # Stored rather than computed so that "which channel is 193.5 THz" is a
-      # GraphQL range filter instead of a Python loop. A guard test recomputes
-      # all 96 from units.py.
+      # Stored rather than computed, so "which channel is 193.5 THz" is a range filter.
       - name: center_frequency_mhz
         kind: Number
         unique: true
@@ -1893,8 +1728,7 @@ nodes:
         optional: true
         description: Centre frequency in THz. Byte-identical to the optical-port rendering.
         order_weight: 1510
-    # The inverse of OtnOpticalCarrier.channel, on the same identifier, so a
-    # channel's page answers "who holds this wavelength".
+    # The inverse of OtnOpticalCarrier.channel, on the same identifier.
     relationships:
       - name: carriers
         peer: OtnOpticalCarrier
@@ -1906,11 +1740,8 @@ nodes:
         on_delete: no-action
         order_weight: 900
 
-  # The coarse plan, G.694.2, in its own kind. `OtnOpticalCarrier.channel` is
-  # mandatory, cardinality one, and peers `OtnFrequencyGrid`, so the server
-  # rejects a carrier pointed at a coarse wavelength with "must be of type:
-  # ['OtnFrequencyGrid']". Holding both plans in one kind would turn that
-  # write-time rejection into a check that runs in a pipeline.
+  # The coarse plan is a separate kind so that `OtnOpticalCarrier.channel`, which
+  # peers `OtnFrequencyGrid` alone, refuses a mispointed carrier at write time.
   - name: CwdmChannel
     namespace: Otn
     description: One ITU-T G.694.2 coarse wavelength. 20 nm spacing, 1271 to 1611 nm.
@@ -1932,10 +1763,6 @@ nodes:
         optional: false
         description: Nominal central wavelength in nm. Wavelength n is 1271 + (n - 1) x 20.
         order_weight: 1000
-      # Stored rather than computed, for the reason center_frequency_mhz is
-      # stored above: "which coarse wavelengths could an erbium amplifier reach"
-      # is then a GraphQL filter instead of a Python loop. A guard test
-      # recomputes all eighteen wavelengths and all eighteen bands from units.py.
       - name: band
         kind: Dropdown
         choices:
@@ -1970,9 +1797,6 @@ nodes:
       - name__value
     display_label: name__value
     attributes:
-      # The regex admits a space, a plus and a slash, which the device-name
-      # regex does not: "OpenZR+ 400G" and "DP-16QAM 64GBd 400G" both need it.
-      # A human_friendly_id tolerates both characters.
       - name: name
         kind: Text
         unique: true
@@ -2089,8 +1913,7 @@ nodes:
         optional: false
         description: Encoder and decoder latency in nanoseconds. Small next to propagation, but not zero.
         order_weight: 1960
-    # The inverse of OtnOpticalCarrier.optical_mode, on the same identifier, so
-    # a mode's page answers which carriers use it.
+    # The inverse of OtnOpticalCarrier.optical_mode, on the same identifier.
     relationships:
       - name: carriers
         peer: OtnOpticalCarrier
@@ -2144,27 +1967,18 @@ nodes:
           - name: fibre_channel
             label: Fibre Channel
             color: "#ff9800"
-          # Being declared here says nothing about automatic selection. That
-          # is `auto_selectable` below, and it is per signal, not per layer.
           - name: infiniband
             label: InfiniBand
             color: "#673ab7"
         optional: false
         description: Grouping the catalog by layer is the first thing a reader does.
         order_weight: 1200
-      # Whether the rate rule may pick this signal when a service states none.
-      #
-      # Per signal, where the Python allow-list it replaces was per layer.
-      # Finer, and strictly more expressive: two rows on one layer may differ.
-      # The measured reason every InfiniBand row is false is recorded in
-      # `objects/04_client_signals.yml`.
+      # Per signal, where the rule it replaces was per layer: two rows on one layer
+      # may differ.
       - name: auto_selectable
         kind: Boolean
-        # `default_value: false` with `optional: false` fails closed: a row added
-        # without a decision is unreachable by the automatic path until somebody
-        # writes `true` in a diff. A default of true would fail open, and the
-        # next specialised signal would be handed to a service that never asked
-        # for it, silently. That is the defect this flag exists to prevent.
+        # Fails closed: a row added without a decision is unreachable by the
+        # automatic path until somebody writes true.
         default_value: false
         optional: false
         description: May the rate rule pick this signal when a service states none.
@@ -2175,8 +1989,6 @@ nodes:
           max_length: 256
         optional: true
         order_weight: 1300
-      # kbps, not Mbps, for the same reason OtnCopperPort.speed_kbps is: E1 is
-      # 2.048 Mbps and rounds to 2 as an integer.
       - name: bit_rate_kbps
         kind: Number
         parameters:
@@ -2185,9 +1997,6 @@ nodes:
         optional: false
         description: Nominal line rate in kbps. E1 is 2048, 100GBASE-LR4 is 103100000.
         order_weight: 1500
-      # Two divisors in one template. The catalog spans seven orders of
-      # magnitude, so a single divisor renders E1 as 0.002048 Gbps or
-      # 400GBASE-FR4 as 412500.0 Mbps.
       - name: bit_rate_display
         kind: Text
         read_only: true
@@ -2238,8 +2047,7 @@ nodes:
         identifier: otn_client_signal__containers
         on_delete: no-action
         order_weight: 900
-      # The inverse of OtnService.client_signal, so a catalog row's page answers
-      # "which services hand this over".
+      # The inverse of OtnService.client_signal, on the same identifier.
       - name: services
         peer: OtnService
         kind: Attribute
@@ -2269,12 +2077,8 @@ nodes:
           regex: "^[A-Za-z0-9._-]+$"
         optional: false
         order_weight: 1000
-      # Sixteen values: ClientSignal.default_container_type's fourteen, plus
-      # ODUC6 and ODUC8. Those two are line containers for the 600G and 800G
-      # modes and no client maps directly into one, so they belong here and not
-      # in the client enum.
-      # VC-12, VC-4 and STM-N are here because an E1 maps into VC-12 into STM-N
-      # into ODU1, and without them that chain cannot be written at all.
+      # OtnClientSignal.default_container_type's fourteen values plus ODUC6 and
+      # ODUC8, which are line containers no client maps directly into.
       - name: odu_type
         kind: Text
         enum:
@@ -2311,14 +2115,9 @@ nodes:
           max_length: 256
         optional: true
         order_weight: 1300
-      # Which segment of its circuit this container rides. The same field and
-      # the same default as OtnOpticalPath.segment_sequence, and read the same
-      # way: a container written before this feature rode the one and only
-      # segment, so 1 is the correct value and not just a value that loads.
-      #
-      # A circuit is therefore its containers ordered by this, and its
-      # wavelengths are its paths ordered by this. Two readings of one sequence
-      # from two places, and a test asserts they agree.
+      # Which segment of its circuit this container rides. A circuit is its
+      # containers ordered by this, as its wavelengths are its paths ordered by
+      # OtnOpticalPath.segment_sequence.
       - name: segment_sequence
         kind: Number
         default_value: 1
@@ -2328,16 +2127,6 @@ nodes:
         optional: false
         description: Which segment of its circuit this container rides. 1 for a circuit that spans one wavelength.
         order_weight: 1400
-      # Two numbers, not one. tributary_slots is what this container occupies in
-      # its parent; tributary_slot_capacity is what it offers to its children.
-      # The capacity check sums the first across children and compares it to
-      # the second on the parent, which needs both to exist.
-      #
-      # 640 on both bounds is ODUC8, the widest row in containers.SLOT_TABLE and
-      # the line container for the fastest mode in the catalog. A bound below the
-      # widest row rejects a container the slot arithmetic considers legal, so
-      # `tests/unit/test_containers.py` recomputes 640 from the table and fails
-      # if either number moves alone.
       - name: tributary_slots
         kind: Number
         default_value: 0
@@ -2356,14 +2145,11 @@ nodes:
         optional: false
         description: Slots this container offers to its children. An ODU4 offers 80.
         order_weight: 1600
-    # The two `direction` keys are mandatory. Both sides default to
-    # bidirectional, which collides on a shared identifier and is rejected at
-    # load time. outbound on the parent side and inbound on the child side
-    # resolves to one edge: write only the child's parent_container and the
-    # parent reports the child with no second write.
+    # The two `direction` keys are mandatory. Both sides default to bidirectional,
+    # which collides on a shared identifier and is rejected at load time.
     relationships:
-      # The wavelength this container rides. Optional, because a container may
-      # be multiplexed into a parent that holds the carrier instead.
+      # Optional, because a container may be multiplexed into a parent that holds the
+      # carrier.
       - name: carrier
         peer: OtnOpticalCarrier
         kind: Attribute
@@ -2389,22 +2175,12 @@ nodes:
         direction: outbound
         on_delete: no-action
         order_weight: 810
-      # Which circuit owns this container. Only a client container carries one. A
-      # line container leaves it empty on purpose: it belongs to a wavelength,
-      # and naming a service on it would claim that one of the several services
-      # groomed into that wavelength owns the whole of it.
+      # Only a client container carries one. A line container leaves it empty on
+      # purpose: it belongs to a wavelength that several services may share.
       - name: service
-        # Stored, not derived, and it cannot be derived. The chain container to
-        # parent_container to carrier to optical_path to service does exist, but
-        # `OtnOpticalCarrier.optical_path` is cardinality many since grooming
-        # let two services share a wavelength, so that walk yields every service
-        # on the wavelength rather than the one that owns this container. That
-        # is the right answer for `transforms/impact_report.py`, whose question
-        # is who is affected by a cut, and the wrong one for
-        # `transforms/service_trace.py`, which listed a neighbour's containers
-        # as part of a service's own circuit with nothing raised. The naming
-        # convention `odu-<service>` was the only link before this, and nothing
-        # read it.
+        # Stored, not derived. OtnOpticalCarrier.optical_path is cardinality many
+        # since grooming, so walking back through the carrier yields every service on
+        # the wavelength rather than the one that owns this container.
         peer: OtnService
         kind: Attribute
         cardinality: one
@@ -2422,7 +2198,7 @@ nodes:
         on_delete: no-action
         order_weight: 900
 
-  # ---- from schemas/otn_devices.yml ----
+  # Devices.
   - name: Router
     namespace: Otn
     description: IP router. Light terminates here, so it contributes no insertion loss.
@@ -2451,9 +2227,8 @@ nodes:
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
-    # The inverses of OtnOpticalMultiplexSection.roadm_a and .roadm_b, each on
-    # the identifier its forward side declares. A ROADM inherits site at 800 and
-    # ports at 900, so these follow at 960 and 970.
+    # The inverses of OtnOpticalMultiplexSection.roadm_a and .roadm_b, each on the
+    # identifier its forward side declares.
     relationships:
       - name: sections_a
         peer: OtnOpticalMultiplexSection
@@ -2483,14 +2258,10 @@ nodes:
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
-    # oms_sequence is stored because Infrahub relationships carry no order, so
-    # OtnOpticalMultiplexSection.amplifiers hands back a set. The budget cannot
-    # be walked over a set: the loss ahead of an amplifier is the loss of
-    # whatever sits immediately before it. OtnFiberSpan carries an explicit
-    # position for the same reason.
+    # oms_sequence is stored because Infrahub relationships carry no order, so a
+    # section hands back a set and a budget cannot be walked over one.
     attributes:
-      # 3000 is the quantum-limited floor for an EDFA and 10000 is a bad one, so
-      # the bounds bracket the whole plausible range rather than this dataset's.
+      # 3000 is the quantum-limited floor for an EDFA and 10000 is a bad one.
       - name: noise_figure_mdb
         kind: Number
         default_value: 4000
@@ -2529,16 +2300,9 @@ nodes:
         optional: true
         description: Gain in dB. Read-only, derived from gain_mdb.
         order_weight: 1550
-      # No direction attribute. An amplifier hut is bidirectional and this model
-      # gives each direction its own object, but which chain an object is in is
-      # the relationship holding it, oms_a2b or oms_b2a, and an attribute
-      # restating that would be a second copy that can disagree with the first.
-      #
-      # It does two jobs and both are its own. It orders a chain that the
-      # relationship has already identified, so a sorted chain is in traversal
-      # order and the engine never reverses one. And it fixes which member of
-      # that chain is which: position 1 is the booster, position N+1 is the
-      # pre-amplifier, and amplifier k feeds span k of its own walk.
+      # No direction attribute: which chain an amplifier is in is the relationship
+      # holding it, oms_a2b or oms_b2a. This orders that chain and fixes which member
+      # is which: position 1 is the booster and position N+1 the pre-amplifier.
       - name: oms_sequence
         kind: Number
         parameters:
@@ -2546,36 +2310,19 @@ nodes:
           # 51, not 50: a section with N spans carries N+1 amplifiers per
           # direction, and the span attribute caps N at 50.
           max_value: 51
-        # Mandatory, and with no default_value on purpose. A default of 1 would
-        # let a new amplifier take a silent position at the head of its chain,
-        # collide with the real first amplifier, and sort stably into a wrong
-        # answer rather than raising.
-        #
-        # Not unique, and it cannot be: a uniqueness constraint cannot reference
-        # an optional relationship, and the section relationships have to stay
-        # optional so an amplifier is creatable before its section exists.
-        # Rejecting duplicate positions is a test's job.
+        # No default_value on purpose: a default of 1 would let a new amplifier take
+        # a silent position at the head of its chain and sort into a wrong answer.
         optional: false
         description: Position in this amplifier's own chain, counting along the direction it amplifies.
         order_weight: 1560
     # The two inverses of the section's two amplifier relationships, each on the
-    # matching identifier. Exactly one is set on any amplifier, and which one it
-    # is answers the direction question the deleted attribute used to answer.
-    #
-    # Two, not one, because one relationship cannot be the inverse of two
-    # identifiers. The alternative was dropping the amplifier's section
-    # relationship entirely and reaching the section by server-side filter, and
-    # that was rejected: an amplifier page is a page an operator lands on, and
-    # "which section and which way" is what it is for. The honest accounting is
-    # that this trades one attribute for one relationship and the schema does
-    # not get shorter.
+    # matching identifier. Exactly one is set, and which one answers the direction.
     relationships:
       - name: oms_a2b
         peer: OtnOpticalMultiplexSection
         kind: Attribute
         cardinality: one
-        # Both optional, because an amplifier is creatable before its section
-        # exists.
+        # Both optional, because an amplifier is creatable before its section exists.
         optional: true
         identifier: otn_oms__amplifiers_a2b
         on_delete: no-action
@@ -2600,9 +2347,7 @@ nodes:
       - OtnOpticalElement
     relationships:
       # The wavelengths a coarse multiplexer lights are a property of the device
-      # rather than of the plan. Without this relationship OtnCwdmChannel is a
-      # kind nothing points at, which fails the sidebar reachability test in
-      # tests/unit/test_menu.py.
+      # rather than of the plan.
       - name: cwdm_channels
         peer: OtnCwdmChannel
         kind: Attribute
@@ -2628,24 +2373,15 @@ nodes:
     label: Raman pump
     icon: mdi:laser-pointer
     include_in_menu: false
-    # Two generics, listed side by side. Infrahub's GenericSchemaWrite has no
-    # inherit_from key, so OtnOpticalElement cannot inherit OtnGenericDevice and
-    # a kind that is both a racked device and something light passes through has
-    # to say so twice.
-    #
-    # No attribute storing which direction the pump amplifies. That is the
-    # conclusion, and injection_end and propagation are the two physical facts
-    # that compute it: a counter-propagating pump fires back up the fibre from
-    # the far end, so one at the B end amplifies the A to B signal, and a
-    # co-propagating pump at the A end amplifies it too.
+    # Two generics side by side: a kind that is both a racked device and something
+    # light passes through has to say so twice. No attribute stores which direction
+    # the pump amplifies; injection_end and propagation are what compute it.
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
     attributes:
-      # On-off gain: the difference in received signal power with the pump on
-      # against the pump off. It reduces the effective loss of the span it sits
-      # on rather than adding a stage to the chain, which is why the budget
-      # subtracts it from the fiber loss and no amplifier object is involved.
+      # On-off gain is received signal power with the pump on against the pump off.
+      # It reduces the effective loss of its span rather than adding a stage.
       - name: on_off_gain_mdb
         kind: Number
         default_value: 10000
@@ -2665,15 +2401,6 @@ nodes:
         optional: true
         description: On-off gain in dB. Read-only, derived from on_off_gain_mdb.
         order_weight: 1530
-      # Where the pump is spliced in. The two choices name the span's own
-      # endpoint relationships, site_a and site_b, rather than inventing a
-      # vocabulary.
-      #
-      # default_value exists because a mandatory attribute needs one for the
-      # schema to load, and site_b is what every shipped counter-propagating
-      # forward pump takes. It is a loading device and not an assertion: the
-      # generator writes the value explicitly on every pump, and injection_end
-      # is in NEVER_SUPPRESSED so the generated file always shows it.
       - name: injection_end
         kind: Dropdown
         default_value: site_b
@@ -2687,11 +2414,9 @@ nodes:
         optional: false
         description: Which end of its span the pump is injected at, named against the span's own site_a and site_b.
         order_weight: 1540
-      # Counter-propagating is the default: the pump fires against the signal,
-      # so pump noise is averaged over the span instead of landing on the signal
-      # at its weakest point. The budget reads this and injection_end together:
-      # the direction a pump amplifies is
-      # (injection_end == site_a) == (propagation == co).
+      # Counter-propagating is the default: the pump fires against the signal, so pump
+      # noise is averaged over the span instead of landing on it at its weakest point.
+      # The direction a pump amplifies is (injection_end == site_a) == (propagation == co).
       - name: propagation
         kind: Dropdown
         default_value: counter
@@ -2705,9 +2430,7 @@ nodes:
         optional: false
         description: Whether the pump fires against the signal or with it.
         order_weight: 1550
-    # Mandatory: a detached pump is gain the budget can never find. The inverse
-    # `raman_pumps` lives on OtnFiberSpan in otn_plant.yml and carries the same
-    # identifier.
+    # Mandatory: a detached pump is gain no budget can find.
     relationships:
       - name: span
         peer: OtnFiberSpan
@@ -2724,25 +2447,16 @@ nodes:
     label: ODU switch
     icon: mdi:swap-horizontal-variant
     include_in_menu: false
-    # Two flat generics side by side, the composition OtnMuxDemux already uses.
-    # OtnOpticalElement is here because OtnPathHop.element peers that generic,
-    # and a segment's route has to be able to name the device it terminates on.
-    #
-    # insertion_loss_mdb arrives with OtnOpticalElement and applies to the
-    # incoming segment only. This device terminates the light rather than
-    # passing it through, so the outgoing segment starts at a transmitter and
-    # not at an attenuated signal. That asymmetry is why the loss cannot be
-    # added into one total spanning both segments: each segment carries its own
-    # budget and the device is the boundary between them.
+    # OtnOpticalElement is here because OtnPathHop.element peers that generic. The
+    # inherited insertion_loss_mdb applies to the incoming segment only: this device
+    # terminates the light, so the outgoing segment starts at a transmitter.
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
     attributes:
-      # `regenerator` is the default because it is the cheaper device and the
-      # one a route that does not close needs: it carries the whole payload
-      # across without looking inside it. `cross_connect` demultiplexes to
-      # containers and regroups them, which is what lets the segments either
-      # side carry different clients.
+      # `regenerator` is the default: it carries the whole payload across without
+      # looking inside it. `cross_connect` demultiplexes to containers and regroups
+      # them.
       - name: switching_mode
         kind: Dropdown
         default_value: regenerator
@@ -2756,47 +2470,21 @@ nodes:
         optional: false
         description: Whether the device carries the whole payload through or demultiplexes and regroups containers.
         order_weight: 1300
-      # Nanoseconds as an integer, the unit OtnOpticalMode.fec_latency_ns and
-      # OtnOpticalPath.latency_ns already use. No Float kind exists.
-      #
-      # No paired _display, for the reason fec_latency_ns has none: the whole
-      # plausible range is hundreds of nanoseconds, and the repository's only
-      # nanosecond rendering divides by 1000, so every device would read
-      # "0.0 us". The figure an operator wants is the circuit total, and
-      # latency_display on the path renders that.
+      # Nanoseconds, the unit fec_latency_ns and latency_ns already use. No paired
+      # _display: the whole plausible range is hundreds of nanoseconds.
       - name: framing_latency_ns
         kind: Number
-        # A device nobody has characterised adds nothing to the circuit rather
-        # than adding a guess.
         default_value: 0
         parameters:
           min_value: 0
-          # fec_latency_ns's ceiling, reused. A framing delay of 100 us would be
-          # the largest single term in the whole latency budget.
           max_value: 100000
         optional: false
         description: Delay this device adds in nanoseconds, from framing and from the electrical crossing.
         order_weight: 1520
-    # The wavelengths this device terminates. It is what
-    # src/infrahub_demo_otn/chains.py reads to learn which carriers a junction
-    # can join, and it is the whole of the junction predicate: a device with an
-    # empty list contributes no junction.
     relationships:
-      # It is not what finds the chain, and R-008 measured that rather than
-      # assuming it. A device-to-device traversal filtered on this edge alone
-      # returns zero paths, because a ROADM has no edge to a carrier and a
-      # carrier has no edge to a device other than this one. Widen the filter
-      # until paths come back and dropping this edge from it changes nothing
-      # about which paths come back: 100 either way, and 48 of those join two
-      # carriers at the one section all 71 of them cross, with nothing there to
-      # terminate the light and re-originate it. Choosing the cover is a search
-      # over the carriers this relationship names, not a traversal this
-      # relationship makes possible.
-      #
-      # Attachment, not termination: `oxc-mil-01` is patched to 37 wavelengths
-      # that terminate on Milan transponders. `OtnLinePort.carrier` is the
-      # termination answer. The identifier stays put; Infrahub freezes it at
-      # first load and rejects a change with `not_supported`.
+      # Attachment, not termination: a cross-connect is patched to wavelengths that
+      # terminate on transponders elsewhere. OtnLinePort.carrier is the termination
+      # answer.
       - name: carriers
         peer: OtnOpticalCarrier
         label: Carriers patched to this shelf
@@ -2804,24 +2492,12 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_odu_switch__carriers
-        # Matching the other side and every other cross-reference here. A device
-        # and a wavelength are independent objects: deleting either one leaves
-        # the other.
         on_delete: no-action
         order_weight: 1900
 
-  # Two attenuator kinds rather than one carrying an attenuator_type Dropdown and
-  # an optional range. That is the split the five monitor kinds already argue
-  # for: a pad with a maximum is a field that should not exist, and with two
-  # kinds it does not.
-  #
-  # Neither kind declares ports. Both inherit `ports` from OtnGenericDevice and
-  # hold none, and both reach a path through OtnPathHop.element the way
-  # OtnFiberSpan does.
-  #
-  # The budget engine adds attenuation_mdb to the inherited insertion_loss_mdb
-  # itself. No summed total is stored: one number could not say which half is the
-  # device and which is the setting.
+  # Two attenuator kinds rather than one carrying a type Dropdown and an optional
+  # range: a pad with a maximum is a field that should not exist. Neither declares
+  # ports; both inherit `ports` from OtnGenericDevice and hold none.
   - name: FixedAttenuator
     namespace: Otn
     description: A pad. One fixed amount of loss, patched into a link that arrives too hot.
@@ -2881,10 +2557,9 @@ nodes:
         optional: true
         description: Attenuation in dB. Read-only, derived from attenuation_mdb.
         order_weight: 1910
-      # The absolute ceiling is on the attribute, so the schema refuses a
-      # physically impossible figure at write time. It cannot refuse a setting
-      # past this device's own maximum, a sibling attribute's value, so
-      # attenuator_range owns that half and only that half.
+      # The absolute ceiling is on the attribute, so the schema refuses a physically
+      # impossible figure at write time. It cannot refuse a setting past this device's
+      # own maximum, which is a sibling attribute's value. Unenforced here.
       - name: max_attenuation_mdb
         kind: Number
         parameters:
@@ -2904,7 +2579,7 @@ nodes:
         description: Maximum attenuation in dB. Read-only, derived from max_attenuation_mdb.
         order_weight: 1930
 
-  # ---- from schemas/otn_carrier.yml ----
+  # Carrier.
   - name: OpticalCarrier
     namespace: Otn
     description: One provisioned wavelength. Occupies its channel on every section it crosses.
@@ -2931,8 +2606,7 @@ nodes:
           max_length: 256
         optional: true
         order_weight: 1100
-      # A carrier the generator writes on a branch stays `planned` until the
-      # change merges; a pre-provisioned one is `active`.
+      # A carrier written on a branch stays `planned` until the change merges.
       - name: status
         kind: Dropdown
         default_value: active
@@ -2965,35 +2639,20 @@ nodes:
         identifier: otn_carrier__optical_mode
         on_delete: no-action
         order_weight: 810
-      # Many, not one, and the change is the grooming model showing through. A
-      # wavelength used to carry one service, so one optical path per carrier was
-      # the truth. Once two services groom their client containers into the same
-      # line container, both of their paths ride this carrier. Each service still
-      # has exactly one path of its own, which is `otn_service__optical_path` and
-      # is untouched.
-      #
-      # The name stays singular although the cardinality is now many, a
-      # deliberate ugliness rather than an oversight. See the identifier below.
+      # Many, not one, because two services grooming into one line container both
+      # ride this carrier. Each service still has exactly one path of its own. The
+      # name stays singular although the cardinality is many; see the identifier below.
       - name: optical_path
         peer: OtnOpticalPath
         kind: Attribute
-        # Measured rather than assumed: with cardinality one, the second service
-        # to groom into a shared wavelength failed provisioning outright with
-        # "Node <id> has 2 peers for otn_carrier__optical_path, maximum of 1
-        # allowed". That is the schema refusing the thing the feature exists to
-        # do.
         cardinality: many
         optional: true
-        # Renaming to `optical_paths` is a relationship rename, and Infrahub
-        # reads the old and the new as two relationships on one identifier:
-        # "Identifier of relationships must be unique for a given direction".
-        # Widening a cardinality migrates cleanly, renaming does not, and the
-        # rename would cost a re-bootstrap of every branch to buy a plural.
+        # Not renamed to `optical_paths`: Infrahub reads the old and the new as two
+        # relationships on one identifier and refuses the load.
         identifier: otn_carrier__optical_path
         on_delete: no-action
         order_weight: 820
-      # Unordered, and it does not need to be: occupancy is a set membership
-      # question. Ordering along a route lives on the path hops.
+      # Unordered: occupancy is set membership. Ordering along a route is on the hops.
       - name: sections
         peer: OtnOpticalMultiplexSection
         kind: Attribute
@@ -3002,8 +2661,7 @@ nodes:
         identifier: otn_carrier__sections
         on_delete: no-action
         order_weight: 900
-      # What the wavelength carries, so "what dies if this carrier dies" is a
-      # read of the carrier rather than a reverse filter.
+      # What the wavelength carries, so "what dies with this carrier" is a read of it.
       - name: containers
         peer: OtnContainer
         kind: Attribute
@@ -3012,16 +2670,8 @@ nodes:
         identifier: otn_carrier__containers
         on_delete: no-action
         order_weight: 910
-      # The inverse of OtnOduSwitch.carriers, and both sides write
-      # `otn_odu_switch__carriers` by hand. Leaving it off would have Infrahub
-      # derive one per side from that side's own kind and peer, which agrees
-      # only when the two pairs mirror each other, and the derived string is
-      # frozen the moment a load succeeds. Changing it afterwards is rejected
-      # with `not_supported` and costs a remove-and-re-add on both sides.
-      #
-      # Attachment, not termination. A regenerator terminates the two
-      # wavelengths it joins; a cross-connect grooms behind a transponder and
-      # terminates nothing. `line_ports` is the termination answer.
+      # The inverse of OtnOduSwitch.carriers, both sides writing the identifier by
+      # hand. Attachment, not termination: `line_ports` is the termination answer.
       - name: odu_switches
         peer: OtnOduSwitch
         label: ODU switches this carrier is patched to
@@ -3031,22 +2681,9 @@ nodes:
         identifier: otn_odu_switch__carriers
         on_delete: no-action
         order_weight: 920
-      # The inverse of OtnLinePort.carrier, both sides writing
-      # otn_carrier__line_ports by hand, on the same argument odu_switches above
-      # makes: a derived identifier is frozen the moment a load succeeds and
-      # changing it afterwards costs a remove-and-re-add on both sides.
-      #
-      # Many, because a wavelength is terminated at each of its ends, and those
-      # are two ports on two devices at two sites.
-      #
-      # on_delete: no-action, and here the case is plainer than on the port side:
-      # cascade would mean deleting a wavelength deletes the physical ports that
-      # terminated it, so retiring a service would remove hardware from the
-      # inventory.
-      #
-      # Optional, and it is genuinely reachable: generators/optical_service.py
-      # provisions a wavelength and binds no line port, so a freshly provisioned
-      # carrier has an empty list here.
+      # The inverse of OtnLinePort.carrier, both sides writing the identifier by
+      # hand. Many, because a wavelength is terminated at each of its two ends.
+      # no-action: deleting a wavelength must not delete the ports that terminated it.
       - name: line_ports
         peer: OtnLinePort
         label: Line ports terminating this wavelength
@@ -3057,15 +2694,13 @@ nodes:
         on_delete: no-action
         order_weight: 930
 
-  # ---- from schemas/otn_service.yml ----
+  # Service.
   - name: Service
     namespace: Otn
     description: Customer intent. Two endpoints, a rate, a profile and an optional latency budget.
     label: Service
     icon: mdi:file-document-outline
     include_in_menu: false
-    # `CoreArtifactTarget` because a service is the target of a generator
-    # definition.
     inherit_from:
       - CoreArtifactTarget
     human_friendly_id:
@@ -3095,9 +2730,8 @@ nodes:
         optional: false
         description: Who bought it. A Text field, because this model has no organisation kind.
         order_weight: 1200
-      # Customer intent, not a modulation format. The generator enumerates every
-      # mode whose line rate meets this number; the mode it picks lands on the
-      # carrier.
+      # Customer intent, not a modulation format. The mode chosen to meet it lands on
+      # the carrier.
       - name: rate_gbps
         kind: Number
         parameters:
@@ -3124,9 +2758,8 @@ nodes:
             color: "#607d8b"
         optional: false
         order_weight: 1400
-      # `rejected` is what the generator writes when it refuses a service.
-      # Without it a refusal is indistinguishable from a generator that never
-      # ran.
+      # `rejected` is what a refusal writes; without it a refusal looks like nothing
+      # ran at all.
       - name: status
         kind: Dropdown
         default_value: planned
@@ -3148,8 +2781,7 @@ nodes:
             color: "#9e9e9e"
         optional: false
         order_weight: 1500
-      # The first three profiles carry a latency budget, the last two leave it
-      # null, and the impact report filters on this.
+      # The first three profiles carry a latency budget, the last two leave it null.
       - name: service_profile
         kind: Dropdown
         default_value: ip-transit
@@ -3189,28 +2821,9 @@ nodes:
         optional: true
         description: Latency budget in microseconds. Read-only, derived from max_latency_ns.
         order_weight: 1710
-      # The refusal, split in two. It was one Text attribute holding
-      # `"{code}: {detail}"`, and the code half was a Python constant that no
-      # schema knew about, so a typo in it became a seventh reason nobody read
-      # and no write refused it.
-      #
-      # Six choices, and the colours carry information the old string could not.
-      # Grey means the request was unanswerable: no route between the endpoints,
-      # or no transponder mode that meets the rate. Red means the physics
-      # refused a route that exists: the optical budget or the latency budget.
-      # Amber means the network is full: no spectrum on the corridor, or no
-      # tributary slots left in the containers. An operator reading a list of
-      # refusals learns from the colour alone whether to re-plan, to regenerate
-      # or to build.
-      #
-      # Optional, because a provisioned service carries no refusal. The pairing
-      # of a `rejected` status with an empty code is not a state the generator
-      # can reach, and `checks/provisionable.py` fails closed on it rather than
-      # reporting green for a refusal nobody can read.
-      #
-      # `tests/unit/test_schema_contract.py` asserts these six names equal the
-      # six Python constants. A code added to one and not the other would
-      # otherwise fail at write time on a live branch and nowhere earlier.
+      # A coded refusal rather than a free string, so a typo cannot become a seventh
+      # reason nobody reads. The colours group them: grey is unanswerable, red is the
+      # physics refusing a route that exists, amber is the network full.
       - name: rejection_code
         kind: Dropdown
         choices:
@@ -3241,9 +2854,8 @@ nodes:
         optional: true
         description: Why the service was refused, as one of six codes. Empty whenever a path exists.
         order_weight: 1801
-      # The prose half of the old string. 512 is what `rejection_reason`
-      # carried and what the generator already truncates to, so the cap is
-      # unchanged rather than newly imposed.
+      # The prose half of the refusal, never parsed. 512 is what the old single
+      # string carried.
       - name: rejection_detail
         kind: Text
         parameters:
@@ -3251,22 +2863,8 @@ nodes:
         optional: true
         description: What the refusal looked like in detail. The prose beside the code, never parsed.
         order_weight: 1802
-      # Only a person ever sets this to true. It is a signature on a refusal:
-      # somebody read the code and the detail, decided the demo wants the
-      # refusal recorded rather than fixed, and let the branch merge.
-      #
-      # `optional: false` with `default_value: false` is what makes it safe to
-      # add to a kind that already has rows. Mandatory with no default fails
-      # validation against every existing service and blocks the whole schema
-      # update; the default lands `false` on all of them, which is the correct
-      # reading of every service written before this feature.
-      #
-      # The generator may only clear it, and only on the path where it
-      # provisions the service, because the refusal that was signed for has
-      # ceased to exist. While the service remains refused the generator leaves
-      # it alone. Both halves matter and the natural mistake is to treat it as a
-      # third field beside the code and the detail and clear it on every rerun,
-      # which silently un-accepts a decision somebody signed.
+      # `optional: false` with `default_value: false` is what makes this safe to add
+      # to a kind that already has rows, and false is the right reading of each.
       - name: refusal_accepted
         kind: Boolean
         default_value: false
@@ -3275,8 +2873,7 @@ nodes:
         order_weight: 1803
     relationships:
       # Peered at the generic, not at OtnRouter, so a service can terminate on a
-      # transponder. Both endpoints are one-sided: "which services land on this
-      # device" is a native filter on the service side.
+      # transponder. One-sided: "which services land here" is a filter on this side.
       - name: endpoint_a
         peer: OtnGenericDevice
         kind: Attribute
@@ -3293,36 +2890,18 @@ nodes:
         identifier: otn_service__endpoint_z
         on_delete: no-action
         order_weight: 810
-      # Many, not one, because a circuit regenerated at an intermediate site is
-      # one path per wavelength and each path carries its own budget. The order
-      # is `segment_sequence` on the path, since an Infrahub relationship hands
-      # back a set.
-      #
-      # The widening is not free. The GraphQL selection shape changes from
-      # `optical_path { node { ... } }` to `optical_path { edges { node ... } }`,
-      # and every query already selecting it is broken from the moment this
-      # loads until it is migrated. Three were: service_trace.gql,
-      # service_latency.gql and srlg_exposure.gql. span_impact.gql was NOT,
-      # which was measured rather than assumed: it reached optical_path from
-      # OtnOpticalCarrier, and feature 016 had already widened that one.
+      # Many, not one, because a circuit regenerated at an intermediate site is one
+      # path per wavelength, each with its own budget. Order by segment_sequence.
       - name: optical_path
         peer: OtnOpticalPath
         kind: Attribute
-        # `schema check` cannot say any of this, because it does not execute a
-        # `.gql`. Feature 016 measured the failure this warns about: an
-        # unmigrated query fails at repository sync naming `NestedEdged<Kind>`,
-        # a type in no schema file and no documentation.
         cardinality: many
         optional: true
         identifier: otn_service__optical_path
         on_delete: no-action
         order_weight: 900
-      # Optional: a service that names no client signal is still provisionable
-      # from its rate alone.
-      #
-      # `queries/optical_service.gql` has to select it. A relationship the query
-      # does not ask for is a relationship the generator cannot see, and the
-      # failure is silent.
+      # Optional: a service naming no client signal is still provisionable from its
+      # rate alone.
       - name: client_signal
         peer: OtnClientSignal
         kind: Attribute
@@ -3331,48 +2910,21 @@ nodes:
         identifier: otn_service__client_signal
         on_delete: no-action
         order_weight: 910
-      # Two services pointing at the same group are declaring that their routes
-      # must not share a conduit.
-      #
-      # A relationship, and this node carried a Text attribute for it first, which
-      # is why the point is worth keeping. Two services were in one group only
-      # when their strings matched exactly, so `gold-pair` and `gold_pair` were
-      # two groups of one and the check passed both in silence. Silence is also
-      # what an absent group means, so nothing distinguished "no requirement
-      # declared" from "requirement declared and mistyped", and the second is the
-      # one that costs a customer a circuit. A regex narrows the ways to typo it
-      # and removes none. Feature 016 shipped the same mistake in different
-      # clothes, encoding a container's owning service in the container's name.
-      #
-      # An identifier either resolves to the group object or it fails at write
-      # time, so there is no near-miss for the check to pass in silence.
-      #
-      # Optional, and that is the whole of the design. A service with no group
-      # is not checked at all, so an exposure an operator accepted deliberately
-      # stays accepted and the check says nothing about it. The check flags a
-      # violated declaration, never a shared conduit on its own, which is what
-      # answers the objection `transforms/srlg_exposure.py` records about
-      # blocking a merge on a decision somebody already made.
+      # Two services pointing at one group declare that their routes must not share a
+      # conduit. A relationship, not a string: an identifier either resolves or the
+      # write fails. Optional, so an exposure accepted deliberately stays accepted.
       - name: diversity_group
         peer: OtnDiversityGroup
         kind: Attribute
         cardinality: one
         optional: true
         identifier: otn_diversity_group__services
-        # Matching every other cross-reference here. A group and a service are
-        # independent objects: deleting the group ends the requirement and must
-        # not delete the circuits that carried it.
+        # A group and a service are independent: deleting the group ends the
+        # requirement.
         on_delete: no-action
         order_weight: 915
-      # The client containers this circuit owns. Written from the container side,
-      # which is where the comment on `OtnContainer.service` explains why the
-      # ownership is stored rather than walked back through the carrier: a carrier
-      # holds many optical paths now, so the walk answers with every service on
-      # the wavelength.
-      #
-      # `on_delete: no-action` matches every other container relationship. A
-      # deleted service leaves its container behind, inert, the same way a
-      # reclaimed carrier leaves its line container behind.
+      # The client containers this circuit owns, written from the container side. A
+      # deleted service leaves its containers behind, inert.
       - name: containers
         peer: OtnContainer
         kind: Attribute
@@ -3382,24 +2934,12 @@ nodes:
         on_delete: no-action
         order_weight: 920
 
-  # A node, not a Text attribute and not a Dropdown, and the two rejections have
-  # different reasons.
-  #
-  # Not a Text attribute, because that is a naming convention encoding a link in
-  # a string, and the comment on the retired `OtnService.diversity_group`
-  # attribute above has the failure it produces.
-  #
-  # Small on purpose. Everything about which routes are actually disjoint is
-  # computed from the spans, so this kind holds the declaration and nothing else.
+  # A node, not a Text attribute and not a Dropdown. Small on purpose: everything
+  # about which routes are actually disjoint is computed from the spans.
   - name: DiversityGroup
     namespace: Otn
-    # Not a `Dropdown`, because a Dropdown's choices are schema. Adding a group
-    # would then be a schema migration, run against loaded data, when what an
-    # operator is doing is writing down a promise made to a customer that
-    # morning. A node makes that an object write. A Dropdown also has nowhere to
-    # put the rest of what a group is: what it is for, who asked for it, what
-    # level of diversity was sold. `description` carries that, and a `Dropdown`
-    # choice has only a label and a colour.
+    # Not a `Dropdown`: a Dropdown's choices are schema, so adding a group would be a
+    # migration, and a choice has nowhere to put what the group is for.
     description: A declared diversity requirement. The services in one group must route over disjoint conduits.
     label: Diversity group
     icon: mdi:call-split
@@ -3410,14 +2950,8 @@ nodes:
       - name__value
     display_label: name__value
     attributes:
-      # Unique, because the name is the identity an operator types and the
-      # `human_friendly_id` above resolves. Two groups of one name would make
-      # the reference ambiguous, which is the failure the Text attribute had.
-      #
-      # The same length and regex as every other name in this schema. Here the
-      # regex is cosmetic rather than load-bearing: a typo now names a group
-      # that does not exist and the write fails, instead of silently naming a
-      # new group of one.
+      # Unique: the name is the identity an operator types and the human_friendly_id
+      # resolves.
       - name: name
         kind: Text
         unique: true
@@ -3426,8 +2960,7 @@ nodes:
           regex: "^[A-Za-z0-9._-]+$"
         optional: false
         order_weight: 1000
-      # Why the group exists, in the operator's words. This is the field a
-      # string could not have carried, and it is half of why the group is a node.
+      # Why the group exists, in the operator's words: half of why this is a node.
       - name: description
         kind: Text
         parameters:
@@ -3436,16 +2969,8 @@ nodes:
         order_weight: 1100
     relationships:
       # The inverse side, sharing one explicit identifier with
-      # `OtnService.diversity_group`. Both sides carry it by hand: Infrahub keys
-      # a relationship by its identifier rather than by the two peer kinds, the
-      # auto-derived form is only safe when both sides' kind-and-peer pairs
-      # mirror each other, and it is frozen once loaded. Two diverging
-      # identifiers do not error, they split into two one-way edges that read
-      # empty from the other side.
-      #
-      # The check reads the group's services from here, in one selection, which
-      # is the other half of why this is a node: the Text attribute forced a
-      # scan of every service to reassemble a group by string equality.
+      # `OtnService.diversity_group`. Two diverging identifiers do not error, they
+      # split into two one-way edges that read empty from the other side.
       - name: services
         peer: OtnService
         kind: Attribute
@@ -3466,22 +2991,11 @@ nodes:
     order_by:
       - name__value
     display_label: name__value
-    # No two segments of one circuit carry the same sequence number. The server
-    # refuses the second write; nothing has to notice it afterwards.
-    #
-    # The shape is a relationship plus an attribute of this node, the normal
-    # case, which `OtnGenericPort` already uses as `["device", "name__value"]`.
-    # What it could not be is `["optical_path", "segment_sequence__value"]` on
-    # `OtnService`: the attribute half has to belong to the node the constraint
-    # sits on, and `segment_sequence` belongs to the path.
-    #
-    # It needs `service` to be mandatory, which it now is. The measurement that
-    # allowed that is on the `service` relationship below.
+    # No two segments of one circuit carry the same sequence number; the server
+    # refuses the second write. The attribute half has to belong to the node the
+    # constraint sits on, which is why it cannot be declared on `OtnService`.
     uniqueness_constraints:
-      # It does not cover a gap. It refuses a repeat of segment 2 and is blind
-      # to the sequence 1, 2, 4, because a schema constrains what is written and
-      # cannot notice what is missing. The completeness check owns that ground,
-      # and why is in `docs/docs/client-mapping.mdx`.
+      # It refuses a repeat of segment 2 and is blind to the sequence 1, 2, 4.
       - ["service", "segment_sequence__value"]
     attributes:
       - name: name
@@ -3498,33 +3012,18 @@ nodes:
           max_length: 256
         optional: true
         order_weight: 1100
-      # Which segment of its circuit this path is. Mandatory, and unlike
-      # OtnAmplifier.oms_sequence it carries a default, because the kinds this
-      # feature touches all have live instances and a mandatory attribute with
-      # no default fails validation against every one of them and blocks the
-      # whole schema update. Not unique on its own: segment 1 exists once per
-      # circuit, not once in the network, and the pair with the service is the
-      # `uniqueness_constraints` entry above.
+      # Which segment of its circuit this path is. Not unique on its own: segment 1
+      # exists once per circuit, so the pair with the service is the constraint above.
       - name: segment_sequence
         kind: Number
-        # 1 is not merely a value that loads. It is the correct reading of every
-        # path written before this feature: one segment of one. A path that was
-        # the whole route is segment 1, and stays it.
         default_value: 1
         parameters:
           min_value: 1
-          # A sanity ceiling in the manner of OtnPathHop.sequence, not a derived
-          # bound. Tying it to the section or the site count would make the
-          # bound wrong the moment the plant grows.
+          # A sanity ceiling, not a derived bound: tying it to the plant would date it.
           max_value: 50
         optional: false
         description: Which segment of its circuit this path is. 1 for a circuit that spans one wavelength.
         order_weight: 1200
-      # total_length_m, osnr_total_mdb, osnr_margin_mdb and latency_ns were
-      # measured over the same enumeration as total_loss_mdb below, and none of
-      # them needed moving. The extremes are 3450000 m against a cap of
-      # 10000000, OSNR 19045 to 36243 against 0 to 100000, margin -6455 to
-      # +16243 against -100000 to +100000, and 16902741 ns against 1000000000.
       - name: total_length_m
         kind: Number
         parameters:
@@ -3543,23 +3042,12 @@ nodes:
         optional: true
         description: Route length in km. Read-only, derived from total_length_m.
         order_weight: 1510
-      # 1000000 is 1000 dB, the measured worst case rounded up rather than a
-      # guess. The traversal returns routes of at most four sections, and every
-      # such route on the shipped plant was budgeted both ways: the largest loss
-      # is Madrid to Vienna at 854295, over 3450 km. The old 500000 refused that
-      # at write time with "854295 is higher than the maximum allowed value",
-      # and it already refused Madrid to Warsaw unregenerated at 737146, the
-      # route the regeneration scenario exists to fail. A cap that rejects a
-      # route the model is supposed to report as too lossy hides the negative
-      # result behind a write error.
+      # 1000000 is 1000 dB. A cap that rejects a route the model is supposed to
+      # report as too lossy would hide the negative result behind a write error.
       - name: total_loss_mdb
         kind: Number
         parameters:
           min_value: 0
-          # A regenerated route is one path per segment, each carrying its own
-          # loss, so a cut lowers the figure: Madrid to Warsaw cut at Frankfurt
-          # is 462196 and 281950. The bound comes from the unregenerated route,
-          # never from a segment.
           max_value: 1000000
         optional: false
         description: End-to-end loss in millidecibels, ageing allowance included.
@@ -3629,32 +3117,14 @@ nodes:
         description: One-way latency in microseconds. Read-only, derived from latency_ns.
         order_weight: 1910
     relationships:
-      # Mandatory. A path with no service has no meaning in this model: it is
-      # one wavelength's route chosen to answer one customer's request, and the
-      # figures on it were computed from that request's rate and mode.
-      #
-      # It was optional, on the stated grounds that a path is written before it
-      # is attached and that the generator's refusal path leaves paths behind.
-      # Both were measured false. `generators/optical_service.py` passes
-      # `"service": str(service["id"])` inside the same `client.create` call
-      # that makes the path, so a path never exists unattached even for one
-      # round trip, and feature 016 made the refusal path create nothing at all.
+      # Mandatory. A path with no service has no meaning here: it is one wavelength's
+      # route chosen to answer one customer's request, and its figures come from that.
       - name: service
         peer: OtnService
         kind: Attribute
         cardinality: one
-        # The migration was measured before the change, not reasoned about: 17
-        # OtnOpticalPath records across the seven branches on the instance, 0 of
-        # them with no service, so nothing exists for a mandatory relationship
-        # to fail against. Had any been found, this would have stayed optional
-        # and the uniqueness constraint above would not exist. See T009a.
-        #
-        # It is also what that constraint needs. A constraint naming a
-        # relationship is rejected while the relationship is optional, with
-        # `cannot use <relationship> relationship, relationship must be
-        # mandatory`. So the mandatory flag is not the schema paying for the
-        # constraint: the modelling argument stands on its own and the
-        # constraint is what it buys.
+        # Also what the uniqueness constraint above needs: a constraint naming an
+        # optional relationship is rejected with "relationship must be mandatory".
         optional: false
         identifier: otn_service__optical_path
         on_delete: no-action
@@ -3667,11 +3137,8 @@ nodes:
         identifier: otn_carrier__optical_path
         on_delete: no-action
         order_weight: 810
-      # `on_delete: cascade`, one of the two in the repository. The other is
-      # `OtnGenericDevice.ports` in `schemas/otn_base.yml`, and both are the same
-      # argument: a hop has no meaning apart from its path, a port has none apart
-      # from its device. Here the alternative is twenty-four orphans per deleted
-      # path.
+      # `on_delete: cascade`, one of two in this file, on the same argument as
+      # `OtnGenericDevice.ports`: a hop has no meaning apart from its path.
       - name: hops
         peer: OtnPathHop
         kind: Component
@@ -3727,24 +3194,13 @@ nodes:
         optional: true
         description: Kilometres travelled. Read-only, derived from cumulative_length_m.
         order_weight: 1510
-      # 1000000, the same cap as OtnOpticalPath.total_loss_mdb, and it has to be
-      # the same number rather than merely a large one. This attribute is that
-      # one's running total: the last hop's cumulative loss IS the route total,
-      # so a hop cap below the path cap refuses a write the path would accept.
-      #
-      # It was below it. T026c raised the path to 1000000 against a measured
-      # worst case of 854295 and left this at 500000, which refused 224 of the
-      # 830 route-directions the traversal can build on the shipped plant, over
-      # 122 distinct routes. The write failed on the hop rather than on the
-      # path, which is the wrong place to read the error and says nothing about
-      # the route being too lossy. `cumulative_length_m` and `total_length_m`
-      # were already paired at 10000000; only the loss pair had drifted.
+      # 1000000, the same cap as OtnOpticalPath.total_loss_mdb, and it has to be the
+      # same number: the last hop's cumulative loss IS the route total, so a lower cap
+      # here would refuse a write the path would accept.
       - name: cumulative_loss_mdb
         kind: Number
         parameters:
           min_value: 0
-          # tests/unit/test_schema_contract.py asserts the pairing, so the next
-          # change to either cap fails rather than diverging in silence.
           max_value: 1000000
         optional: false
         description: Loss accumulated at the output of this element, in millidecibels.
@@ -3759,8 +3215,7 @@ nodes:
         optional: true
         description: Accumulated loss in dB. Read-only, derived from cumulative_loss_mdb.
         order_weight: 1610
-      # Optional because OSNR is undefined until the first amplifier has added
-      # noise to measure it against. The engine returns None for those hops.
+      # Optional because OSNR is undefined until the first amplifier has added noise.
       - name: cumulative_osnr_mdb
         kind: Number
         parameters:
@@ -3805,10 +3260,8 @@ nodes:
         optional: false
         identifier: otn_path__hops
         order_weight: 800
-      # One relationship covers ROADMs, amplifiers and fiber spans. There is no
-      # ingress or egress port beside it: the loaded plant has no port-level
-      # adjacency between a span and the amplifier that feeds it, so both would
-      # be null on every span hop and read by nothing.
+      # One relationship covers ROADMs, amplifiers and fiber spans. No ingress or
+      # egress port beside it: the plant records no port-level adjacency to a span.
       - name: element
         peer: OtnOpticalElement
         kind: Attribute
@@ -3818,24 +3271,15 @@ nodes:
         on_delete: no-action
         order_weight: 810
 
-  # Six EuroHPC facilities sit on six of the fourteen PoPs. Until this kind
-  # existed the only record of that was the text after `eurohpc-` in a
-  # BuiltinTag name, read back by a helper duplicated in two transforms. The
-  # tag read was defended on a distinction that still holds: it read a tag, not
-  # a device, and nothing about an amplifier, a ROADM or a router is recovered
-  # from a name anywhere in this repository.
-  #
-  # The reversal is about something else. The failure was silent in both
-  # directions, measured on a probe branch: renaming `eurohpc-vega` dropped
-  # Vega from both maps and raised nothing, and a mistyped `eurohpc_deucalion`
-  # made a facility no map draws and no check reports. An edge fails loudly.
+  # Location.
+  # A facility on a site, as an edge rather than a suffix inside a tag name. An edge
+  # fails loudly: a renamed or mistyped tag dropped a facility and raised nothing.
   - name: Facility
     namespace: Otn
     description: A supercomputing facility hosted at a PoP.
     label: Facility
     icon: ri:cpu-line
-    # Reached through the site it sits on, like every other kind here, so it
-    # stays out of the automatic sidebar. menus/otn.yml carries the entries.
+    # Reached through the site it sits on, like every other kind here.
     include_in_menu: false
     human_friendly_id:
       - name__value
@@ -3843,21 +3287,15 @@ nodes:
       - name__value
     display_label: name__value
     attributes:
-      # The tag suffix, and it has to stay the tag suffix: mapchrome.py
-      # upper-cases this string for the caption and the committed golden holds
-      # the upper-cased suffix. So `marenostrum-5`, never `MareNostrum 5`.
+      # Lower case with hyphens, so `marenostrum-5` and never `MareNostrum 5`.
       - name: name
         kind: Text
         unique: true
         order_weight: 1000
-      # What a tag could never carry, and half the reason this is a kind.
       - name: description
         kind: Text
         optional: true
         order_weight: 1200
-    # The six `eurohpc-` tags stay on their sites. They are data an operator
-    # wrote and a sweep does not delete data. They stop being read, which was
-    # the whole finding.
     relationships:
       - name: site
         peer: LocationSite
@@ -3868,12 +3306,9 @@ nodes:
         on_delete: no-action
         order_weight: 900
 
-# LocationSite carries the OTN site fields rather than a second site kind. Three
-# of OtnSite's attributes and four of its relationships move here. Its
-# `facility` relationship is renamed `otn_facility`, because LocationSite
-# already has a `facility` Text attribute and a node cannot hold both under one
-# name. Its `CoreArtifactTarget` inheritance is dropped, because an extensions
-# block cannot add to inherit_from and this library ships no generators.
+# LocationSite carries the OTN site fields rather than a second site kind. Its
+# `facility` relationship is renamed `otn_facility`, because LocationSite already
+# has a `facility` Text attribute and a node cannot hold both under one name.
 extensions:
   nodes:
     - kind: LocationSite
