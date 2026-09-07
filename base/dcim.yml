@@ -67,7 +67,7 @@ generics:
       # Duplicated from DcimGenericDevice because generics cannot inherit generics.
       # DcimModuleBay.computed_name (extensions/device_module) renders
       # {{ device__name__value }} against peer DcimPhysicalDevice, so name must resolve here.
-      # allow_override lets DcimPatchPanel and DcimOpticalMultiplexer restate it.
+      # allow_override lets DcimPatchPanel restate it.
       - name: name
         kind: Text
         unique: true
