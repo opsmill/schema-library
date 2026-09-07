@@ -2515,12 +2515,15 @@ nodes:
         order_weight: 810
       # Many, not one, because a circuit regenerated at an intermediate site is one
       # path per wavelength, each with its own budget. Order by segment_sequence.
+      # Component, with cascade: the path is owned by its service, so removing the
+      # service does not leave a mandatory link dangling.
       - name: optical_path
         peer: OtnOpticalPath
-        kind: Attribute
+        kind: Component
         cardinality: many
         optional: true
         identifier: otn_service__optical_path
+        on_delete: cascade
         order_weight: 900
       # Optional: a service naming no client signal is still provisionable from its
       # rate alone.
@@ -2658,7 +2661,7 @@ nodes:
       # route chosen to answer one customer's request, and its figures come from that.
       - name: service
         peer: OtnService
-        kind: Attribute
+        kind: Parent
         cardinality: one
         # Also what the uniqueness constraint above needs: a constraint naming an
         # optional relationship is rejected with "relationship must be mandatory".
@@ -2672,8 +2675,8 @@ nodes:
         optional: true
         identifier: otn_carrier__optical_path
         order_weight: 810
-      # `on_delete: cascade`, one of two in this file, on the same argument as
-      # `OtnGenericDevice.ports`: a hop has no meaning apart from its path.
+      # `on_delete: cascade`, one of three in this file (with `OtnGenericDevice.ports`
+      # and `OtnService.optical_path`): a hop has no meaning apart from its path.
       - name: hops
         peer: OtnPathHop
         kind: Component
