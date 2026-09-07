@@ -494,12 +494,21 @@ generics:
         description: Nominal impedance in ohms. 120 for E1 pair, 75 for coax.
         order_weight: 1700
       - name: connector_type
-        kind: Text
+        kind: Dropdown
         default_value: RJ48
-        enum:
-          - BNC
-          - RJ48
-          - RJ45
+        choices:
+          - name: BNC
+            label: BNC
+            description: Coaxial bayonet connector, used for 75 ohm E1 and STM-1.
+            color: "#ff9800"
+          - name: RJ48
+            label: RJ48
+            description: Eight-position jack for 120 ohm balanced E1 and T1 pairs.
+            color: "#2196f3"
+          - name: RJ45
+            label: RJ45
+            description: Eight-position jack for Ethernet management and console.
+            color: "#4caf50"
         optional: false
         order_weight: 1900
 
@@ -1351,15 +1360,15 @@ nodes:
         optional: false
         description: Whether the laser can be tuned across the grid or is fixed at one wavelength.
         order_weight: 1400
-    # Mandatory: a part that runs no mode says nothing about what it can do, and
-    # transceiver_mode_support has nothing to compare the carrier against.
+    # Optional, so a part number can be recorded before the mode catalog is
+    # populated. A type with no modes says nothing about what it can run.
     relationships:
       - name: supported_modes
         peer: OtnOpticalMode
         label: Modes this part can run
         kind: Attribute
         cardinality: many
-        optional: false
+        optional: true
         identifier: otn_optical_mode__transceiver_types
         on_delete: no-action
         order_weight: 900
@@ -1601,55 +1610,11 @@ nodes:
     order_by:
       - name__value
     display_label: name__value
-    # element_class is restated to give it a default_value, and the ten choices
-    # come with it because overriding an inherited Dropdown requires the full
-    # list. Omitting the `choices` key is rejected at load; a list that is one
-    # choice short is accepted in silence and only fails when an object writes
-    # the missing value. tests/unit/test_schema_contract.py holds every
-    # restatement to the generic's list.
-    #
     # The inherited insertion_loss_mdb stays at its default of 0 on a span. A
     # span's real loss is length x attenuation plus splices plus connectors plus
     # aging margin, and the budget engine computes it on demand. The stored 0
     # does not mean the span is lossless.
     attributes:
-      - name: element_class
-        kind: Dropdown
-        default_value: fiber_span
-        choices:
-          - name: transponder
-            label: Transponder
-            color: "#2196f3"
-          - name: roadm
-            label: ROADM
-            color: "#9c27b0"
-          - name: amplifier
-            label: Amplifier
-            color: "#ff9800"
-          - name: mux_demux
-            label: Mux/demux
-            color: "#00bcd4"
-          - name: patch_panel
-            label: Patch panel
-            color: "#9e9e9e"
-          - name: fiber_span
-            label: Fiber span
-            color: "#4caf50"
-          - name: splitter
-            label: Splitter
-            color: "#8bc34a"
-          - name: attenuator
-            label: Attenuator
-            color: "#795548"
-          - name: raman_pump
-            label: Raman pump
-            color: "#e91e63"
-          - name: odu_switch
-            label: ODU switch
-            color: "#673ab7"
-        optional: false
-        description: What the optical budget engine branches on.
-        order_weight: 1800
       - name: name
         kind: Text
         unique: true
@@ -2483,44 +2448,6 @@ nodes:
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
-    attributes:
-      - name: element_class
-        kind: Dropdown
-        default_value: transponder
-        choices:
-          - name: transponder
-            label: Transponder
-            color: "#2196f3"
-          - name: roadm
-            label: ROADM
-            color: "#9c27b0"
-          - name: amplifier
-            label: Amplifier
-            color: "#ff9800"
-          - name: mux_demux
-            label: Mux/demux
-            color: "#00bcd4"
-          - name: patch_panel
-            label: Patch panel
-            color: "#9e9e9e"
-          - name: fiber_span
-            label: Fiber span
-            color: "#4caf50"
-          - name: splitter
-            label: Splitter
-            color: "#8bc34a"
-          - name: attenuator
-            label: Attenuator
-            color: "#795548"
-          - name: raman_pump
-            label: Raman pump
-            color: "#e91e63"
-          - name: odu_switch
-            label: ODU switch
-            color: "#673ab7"
-        optional: false
-        description: What the optical budget engine branches on.
-        order_weight: 1800
 
   - name: Roadm
     namespace: Otn
@@ -2531,44 +2458,6 @@ nodes:
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
-    attributes:
-      - name: element_class
-        kind: Dropdown
-        default_value: roadm
-        choices:
-          - name: transponder
-            label: Transponder
-            color: "#2196f3"
-          - name: roadm
-            label: ROADM
-            color: "#9c27b0"
-          - name: amplifier
-            label: Amplifier
-            color: "#ff9800"
-          - name: mux_demux
-            label: Mux/demux
-            color: "#00bcd4"
-          - name: patch_panel
-            label: Patch panel
-            color: "#9e9e9e"
-          - name: fiber_span
-            label: Fiber span
-            color: "#4caf50"
-          - name: splitter
-            label: Splitter
-            color: "#8bc34a"
-          - name: attenuator
-            label: Attenuator
-            color: "#795548"
-          - name: raman_pump
-            label: Raman pump
-            color: "#e91e63"
-          - name: odu_switch
-            label: ODU switch
-            color: "#673ab7"
-        optional: false
-        description: What the optical budget engine branches on.
-        order_weight: 1800
     # The inverses of OtnOpticalMultiplexSection.roadm_a and .roadm_b, each on
     # the identifier its forward side declares. A ROADM inherits site at 800 and
     # ports at 900, so these follow at 960 and 970.
@@ -2607,43 +2496,6 @@ nodes:
     # whatever sits immediately before it. OtnFiberSpan carries an explicit
     # position for the same reason.
     attributes:
-      - name: element_class
-        kind: Dropdown
-        default_value: amplifier
-        choices:
-          - name: transponder
-            label: Transponder
-            color: "#2196f3"
-          - name: roadm
-            label: ROADM
-            color: "#9c27b0"
-          - name: amplifier
-            label: Amplifier
-            color: "#ff9800"
-          - name: mux_demux
-            label: Mux/demux
-            color: "#00bcd4"
-          - name: patch_panel
-            label: Patch panel
-            color: "#9e9e9e"
-          - name: fiber_span
-            label: Fiber span
-            color: "#4caf50"
-          - name: splitter
-            label: Splitter
-            color: "#8bc34a"
-          - name: attenuator
-            label: Attenuator
-            color: "#795548"
-          - name: raman_pump
-            label: Raman pump
-            color: "#e91e63"
-          - name: odu_switch
-            label: ODU switch
-            color: "#673ab7"
-        optional: false
-        description: What the optical budget engine branches on.
-        order_weight: 1800
       # 3000 is the quantum-limited floor for an EDFA and 10000 is a bad one, so
       # the bounds bracket the whole plausible range rather than this dataset's.
       - name: noise_figure_mdb
@@ -2753,44 +2605,6 @@ nodes:
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
-    attributes:
-      - name: element_class
-        kind: Dropdown
-        default_value: mux_demux
-        choices:
-          - name: transponder
-            label: Transponder
-            color: "#2196f3"
-          - name: roadm
-            label: ROADM
-            color: "#9c27b0"
-          - name: amplifier
-            label: Amplifier
-            color: "#ff9800"
-          - name: mux_demux
-            label: Mux/demux
-            color: "#00bcd4"
-          - name: patch_panel
-            label: Patch panel
-            color: "#9e9e9e"
-          - name: fiber_span
-            label: Fiber span
-            color: "#4caf50"
-          - name: splitter
-            label: Splitter
-            color: "#8bc34a"
-          - name: attenuator
-            label: Attenuator
-            color: "#795548"
-          - name: raman_pump
-            label: Raman pump
-            color: "#e91e63"
-          - name: odu_switch
-            label: ODU switch
-            color: "#673ab7"
-        optional: false
-        description: What the optical budget engine branches on.
-        order_weight: 1800
     relationships:
       # The wavelengths a coarse multiplexer lights are a property of the device
       # rather than of the plan. Without this relationship OtnCwdmChannel is a
@@ -2814,44 +2628,6 @@ nodes:
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
-    attributes:
-      - name: element_class
-        kind: Dropdown
-        default_value: patch_panel
-        choices:
-          - name: transponder
-            label: Transponder
-            color: "#2196f3"
-          - name: roadm
-            label: ROADM
-            color: "#9c27b0"
-          - name: amplifier
-            label: Amplifier
-            color: "#ff9800"
-          - name: mux_demux
-            label: Mux/demux
-            color: "#00bcd4"
-          - name: patch_panel
-            label: Patch panel
-            color: "#9e9e9e"
-          - name: fiber_span
-            label: Fiber span
-            color: "#4caf50"
-          - name: splitter
-            label: Splitter
-            color: "#8bc34a"
-          - name: attenuator
-            label: Attenuator
-            color: "#795548"
-          - name: raman_pump
-            label: Raman pump
-            color: "#e91e63"
-          - name: odu_switch
-            label: ODU switch
-            color: "#673ab7"
-        optional: false
-        description: What the optical budget engine branches on.
-        order_weight: 1800
 
   - name: RamanPump
     namespace: Otn
@@ -2873,43 +2649,6 @@ nodes:
       - OtnGenericDevice
       - OtnOpticalElement
     attributes:
-      - name: element_class
-        kind: Dropdown
-        default_value: raman_pump
-        choices:
-          - name: transponder
-            label: Transponder
-            color: "#2196f3"
-          - name: roadm
-            label: ROADM
-            color: "#9c27b0"
-          - name: amplifier
-            label: Amplifier
-            color: "#ff9800"
-          - name: mux_demux
-            label: Mux/demux
-            color: "#00bcd4"
-          - name: patch_panel
-            label: Patch panel
-            color: "#9e9e9e"
-          - name: fiber_span
-            label: Fiber span
-            color: "#4caf50"
-          - name: splitter
-            label: Splitter
-            color: "#8bc34a"
-          - name: attenuator
-            label: Attenuator
-            color: "#795548"
-          - name: raman_pump
-            label: Raman pump
-            color: "#e91e63"
-          - name: odu_switch
-            label: ODU switch
-            color: "#673ab7"
-        optional: false
-        description: What the optical budget engine branches on.
-        order_weight: 1800
       # On-off gain: the difference in received signal power with the pump on
       # against the pump off. It reduces the effective loss of the span it sits
       # on rather than adding a stage to the chain, which is why the budget
@@ -3005,54 +2744,7 @@ nodes:
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
-    # element_class defaults to `odu_switch`, the tenth choice, added when the
-    # first object forced the decision. None of the original nine names an O-E-O
-    # device, so the alternative was defaulting to `transponder` or `roadm`,
-    # which puts a false value on the one attribute that says what a device is.
-    # Nothing in the repository reads element_class, so a wrong label costs
-    # nothing mechanically and is simply untrue in the data, which is the whole
-    # argument for paying for the tenth choice instead.
     attributes:
-      # The list now lives in eleven blocks, enumerated in otn_base.yml. A block
-      # missed is a dropdown offering different options depending on the kind you
-      # look at, and the server accepts that in silence.
-      - name: element_class
-        kind: Dropdown
-        default_value: odu_switch
-        choices:
-          - name: transponder
-            label: Transponder
-            color: "#2196f3"
-          - name: roadm
-            label: ROADM
-            color: "#9c27b0"
-          - name: amplifier
-            label: Amplifier
-            color: "#ff9800"
-          - name: mux_demux
-            label: Mux/demux
-            color: "#00bcd4"
-          - name: patch_panel
-            label: Patch panel
-            color: "#9e9e9e"
-          - name: fiber_span
-            label: Fiber span
-            color: "#4caf50"
-          - name: splitter
-            label: Splitter
-            color: "#8bc34a"
-          - name: attenuator
-            label: Attenuator
-            color: "#795548"
-          - name: raman_pump
-            label: Raman pump
-            color: "#e91e63"
-          - name: odu_switch
-            label: ODU switch
-            color: "#673ab7"
-        optional: false
-        description: What the optical budget engine branches on.
-        order_weight: 1800
       # `regenerator` is the default because it is the cheaper device and the
       # one a route that does not close needs: it carries the whole payload
       # across without looking inside it. `cross_connect` demultiplexes to
@@ -3147,43 +2839,6 @@ nodes:
       - OtnGenericDevice
       - OtnOpticalElement
     attributes:
-      - name: element_class
-        kind: Dropdown
-        default_value: attenuator
-        choices:
-          - name: transponder
-            label: Transponder
-            color: "#2196f3"
-          - name: roadm
-            label: ROADM
-            color: "#9c27b0"
-          - name: amplifier
-            label: Amplifier
-            color: "#ff9800"
-          - name: mux_demux
-            label: Mux/demux
-            color: "#00bcd4"
-          - name: patch_panel
-            label: Patch panel
-            color: "#9e9e9e"
-          - name: fiber_span
-            label: Fiber span
-            color: "#4caf50"
-          - name: splitter
-            label: Splitter
-            color: "#8bc34a"
-          - name: attenuator
-            label: Attenuator
-            color: "#795548"
-          - name: raman_pump
-            label: Raman pump
-            color: "#e91e63"
-          - name: odu_switch
-            label: ODU switch
-            color: "#673ab7"
-        optional: false
-        description: What the optical budget engine branches on.
-        order_weight: 1800
       - name: attenuation_mdb
         kind: Number
         default_value: 0
@@ -3214,43 +2869,6 @@ nodes:
       - OtnGenericDevice
       - OtnOpticalElement
     attributes:
-      - name: element_class
-        kind: Dropdown
-        default_value: attenuator
-        choices:
-          - name: transponder
-            label: Transponder
-            color: "#2196f3"
-          - name: roadm
-            label: ROADM
-            color: "#9c27b0"
-          - name: amplifier
-            label: Amplifier
-            color: "#ff9800"
-          - name: mux_demux
-            label: Mux/demux
-            color: "#00bcd4"
-          - name: patch_panel
-            label: Patch panel
-            color: "#9e9e9e"
-          - name: fiber_span
-            label: Fiber span
-            color: "#4caf50"
-          - name: splitter
-            label: Splitter
-            color: "#8bc34a"
-          - name: attenuator
-            label: Attenuator
-            color: "#795548"
-          - name: raman_pump
-            label: Raman pump
-            color: "#e91e63"
-          - name: odu_switch
-            label: ODU switch
-            color: "#673ab7"
-        optional: false
-        description: What the optical budget engine branches on.
-        order_weight: 1800
       - name: attenuation_mdb
         kind: Number
         default_value: 0
