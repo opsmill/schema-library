@@ -225,6 +225,7 @@ extensions/otn:
   dependencies:
     - base
     - extensions/location_site
+    - extensions/transceiver
   description: |
     Optical transport network schemas covering the physical plant, the wavelength catalog, optical devices and their ports, pluggable optics, carriers and end-to-end services.
   name: OTN
@@ -247,8 +248,9 @@ extensions/otn:
   use_cases:
     - Recording the ITU-T G.694.1 dense grid and G.694.2 coarse plan as separate kinds,
       so a carrier pointed at the wrong plan is refused when written.
-    - Tracking pluggable optics as inventory, by part number and by serial, and which
-      port each unit is fitted in.
+    - Tracking pluggable optics as inventory, with the part number in this extension's
+      catalog, the serial on the library's transceiver kinds from extensions/transceiver,
+      and which optical port each unit is fitted in.
     - Modelling the outside plant, including fiber types, conduits, spans and the
       optical multiplex sections built over them.
     - Provisioning a wavelength end to end, as a service with an optical path and

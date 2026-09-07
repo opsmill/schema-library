@@ -491,11 +491,12 @@ nodes:
       - OtnGenericPort
       - OtnOpticalPort
     relationships:
-      # The module fitted in this port, and the inverse of OtnTransceiver.port. Both
-      # ends are cardinality one, so a second module in one port is refused at write
-      # time. Declared only on the three concrete kinds that have a cage.
+      # The module fitted in this port, and the inverse of the `otn_port` added to
+      # DcimGenericTransceiver below. Both ends are cardinality one, so a second
+      # module in one port is refused at write time. Declared only on the three
+      # concrete kinds that have a cage.
       - name: transceiver
-        peer: OtnTransceiver
+        peer: DcimGenericTransceiver
         label: Module fitted in this port
         kind: Attribute
         cardinality: one
@@ -514,7 +515,7 @@ nodes:
       - OtnOpticalPort
     relationships:
       - name: transceiver
-        peer: OtnTransceiver
+        peer: DcimGenericTransceiver
         label: Module fitted in this port
         kind: Attribute
         cardinality: one
@@ -545,7 +546,7 @@ nodes:
         identifier: otn_carrier__line_ports
         order_weight: 850
       - name: transceiver
-        peer: OtnTransceiver
+        peer: DcimGenericTransceiver
         label: Module fitted in this port
         kind: Attribute
         cardinality: one
@@ -636,14 +637,14 @@ nodes:
       - OtnGenericPort
       - OtnCopperPort
 
-  # The catalog entry and the physical unit. Neither is racked, so neither inherits.
+  # The part catalog. The fitted unit is a DcimGenericTransceiver, extended below.
   - name: TransceiverType
     namespace: Otn
     description: A pluggable optic part number and what it can be made to do.
     label: Transceiver type
     icon: mdi:chip
     include_in_menu: true
-    menu_placement: OtnTransceiver
+    menu_placement: OtnGenericDevice
     human_friendly_id:
       - part_number__value
     order_by:
@@ -659,12 +660,6 @@ nodes:
         optional: false
         description: Vendor part number, such as QDD-400G-ZRP-S.
         order_weight: 1000
-      - name: vendor
-        kind: Text
-        parameters:
-          max_length: 64
-        optional: true
-        order_weight: 1100
       - name: description
         kind: Text
         parameters:
@@ -725,70 +720,13 @@ nodes:
         optional: true
         identifier: otn_optical_mode__transceiver_types
         order_weight: 900
-
-  - name: Transceiver
-    namespace: Otn
-    description: One physical pluggable optic, fitted in a port or sitting on a shelf.
-    label: Transceiver
-    icon: mdi:memory
-    include_in_menu: true
-    menu_placement: OtnGenericDevice
-    human_friendly_id:
-      - serial__value
-    order_by:
-      - serial__value
-    display_label: "{{ type__part_number__value }} {{ serial__value }}"
-    attributes:
-      - name: serial
-        kind: Text
-        unique: true
-        parameters:
-          max_length: 64
-          regex: "^[A-Za-z0-9._-]+$"
-        optional: false
-        description: Vendor serial number. The only thing that identifies this unit.
-        order_weight: 1000
-      - name: status
-        kind: Dropdown
-        default_value: spare
-        choices:
-          - name: in_service
-            label: In service
-            color: "#4caf50"
-          - name: spare
-            label: Spare
-            color: "#2196f3"
-          - name: rma
-            label: Returned to vendor
-            color: "#ff9800"
-          - name: decommissioned
-            label: Decommissioned
-            color: "#9e9e9e"
-        optional: false
-        order_weight: 1100
-    relationships:
-      - name: type
-        peer: OtnTransceiverType
-        label: Part this unit is
-        kind: Attribute
-        cardinality: one
-        optional: false
-        identifier: otn_transceiver_type__units
-        order_weight: 900
-      # Optional, so a spare, an RMA and a decommissioned unit stay modellable, and
-      # therefore carrying no uniqueness constraint: Infrahub refuses one on an
-      # optional relationship. The duplicate is refused by the inverse instead, since
-      # every `transceiver` on this identifier is cardinality one. This peers the
-      # generic, and a relationship to a generic cannot be filtered by peer kind, so
-      # a module written into an amplifier port is accepted. Unenforced here.
-      - name: port
-        peer: OtnOpticalPort
-        label: Port this unit is fitted in
+      - name: manufacturer
+        peer: OrganizationManufacturer
         kind: Attribute
         cardinality: one
         optional: true
-        identifier: otn_optical_port__transceiver
-        order_weight: 950
+        identifier: otn_transceiver_type__manufacturer
+        order_weight: 1100
 
   # Plant.
 
@@ -2740,3 +2678,32 @@ extensions:
           optional: true
           identifier: otn_site__facility
           order_weight: 930
+
+    # OTN records its pluggables on the library's transceiver kinds rather than a
+    # second inventory. `otn_port` is where the module is fitted, because no OTN port
+    # is a DcimEndpoint and `interface` cannot serve. The part catalog stays on the
+    # OTN side, since OtnTransceiverType references optical modes.
+    - kind: DcimGenericTransceiver
+      relationships:
+        # Optional, so a spare or decommissioned unit stays modellable, and therefore
+        # carrying no uniqueness constraint: Infrahub refuses one on an optional
+        # relationship. The duplicate is refused by the inverse instead, since every
+        # `transceiver` on this identifier is cardinality one. This peers the generic,
+        # and a relationship to a generic cannot be filtered by peer kind, so a module
+        # written into an amplifier port is accepted. Unenforced here.
+        - name: otn_port
+          peer: OtnOpticalPort
+          label: OTN port this unit is fitted in
+          kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: otn_optical_port__transceiver
+          order_weight: 1600
+        - name: otn_type
+          peer: OtnTransceiverType
+          label: OTN part this unit is
+          kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: otn_transceiver_type__units
+          order_weight: 1700

@@ -1,7 +1,8 @@
 # ---------------------------------------------------------------------------
 # Mock data for extensions/otn.
-# Depends on: base (OrganizationProvider: Lumen), extensions/location_minimal
-# (LocationSite: NYC1, SJC1).
+# Depends on: base (OrganizationManufacturer: Cisco, OrganizationProvider: Lumen),
+# extensions/location_minimal (LocationSite: NYC1, SJC1), extensions/transceiver
+# (DcimStandardTransceiver, which records the fitted pluggable).
 #
 # One facility, one span, one wavelength and one service end to end. Enough to
 # walk the model from a service down to the ports it lands on, not a
@@ -50,22 +51,10 @@ spec:
   kind: OtnTransceiverType
   data:
     - part_number: QDD-400G-DR4
-      vendor: Cisco
+      manufacturer: Cisco
       description: 400G QSFP-DD grey client optic, 500 m over parallel single mode fiber.
       form_factor: QSFP-DD
       tunable: false
-
----
-apiVersion: infrahub.app/v1
-kind: Object
-spec:
-  kind: OtnTransceiver
-  data:
-    # The port claims the transceiver, further down, rather than the other way
-    # round: `port` peers with the OtnOpticalPort generic, which has no hfid.
-    - serial: TRX-NYC1-0001
-      status: in_service
-      type: QDD-400G-DR4
 
 ---
 apiVersion: infrahub.app/v1
@@ -88,7 +77,6 @@ spec:
             oper_state: up
             connector_type: MPO-12
             polish: APC
-            transceiver: TRX-NYC1-0001
         - kind: OtnLinePort
           data:
             name: line-1/0/0
@@ -120,6 +108,30 @@ spec:
             center_frequency_mhz: 192100000
             tx_power_mdbm: 1000
             rx_sensitivity_mdbm: -25000
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimStandardTransceiver
+  data:
+    # The fitted module. This loads after the transponder above, because
+    # DcimGenericTransceiver declares no hfid, so nothing can reference it by name:
+    # the transceiver has to claim its port rather than the port claiming it.
+    - serial_number: TRX-NYC1-0001
+      transceiver_type: dr4
+      form_factor: qsfp_dd
+      status: plugged
+      manufacturer: Cisco
+      otn_type: QDD-400G-DR4
+      # `otn_port` peers the OtnOpticalPort generic, which has no hfid, so the port
+      # names its concrete kind and upserts by its uniqueness fields.
+      otn_port:
+        kind: OtnClientPort
+        data:
+          name: client-1/0/0
+          role: client
+          device: nyc1-txp01
 
 ---
 apiVersion: infrahub.app/v1
