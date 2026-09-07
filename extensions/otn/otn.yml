@@ -133,7 +133,6 @@ generics:
         cardinality: one
         optional: true
         identifier: otn_port__connected_to
-        on_delete: no-action
         order_weight: 900
 
   - name: OpticalElement
@@ -280,7 +279,6 @@ generics:
         cardinality: one
         optional: true
         identifier: otn_site__devices
-        on_delete: no-action
         order_weight: 800
       # An OTN device names the optical role; DcimPhysicalDevice names the physical
       # asset. This edge joins the two records for one box rather than duplicating
@@ -294,7 +292,6 @@ generics:
         cardinality: one
         optional: true
         identifier: otn_device__dcim_device
-        on_delete: no-action
         order_weight: 940
       - name: ports
         peer: OtnGenericPort
@@ -545,7 +542,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_optical_port__transceiver
-        on_delete: no-action
         order_weight: 960
 
   - name: ClientPort
@@ -607,7 +603,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_optical_port__transceiver
-        on_delete: no-action
         order_weight: 960
 
   - name: LinePort
@@ -673,7 +668,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_carrier__line_ports
-        on_delete: no-action
         order_weight: 850
       - name: transceiver
         peer: OtnTransceiver
@@ -682,7 +676,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_optical_port__transceiver
-        on_delete: no-action
         order_weight: 960
 
   - name: RoadmAddDropPort
@@ -864,7 +857,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_frequency_grid__mux_client_ports
-        on_delete: no-action
         order_weight: 850
       - name: cwdm_channel
         peer: OtnCwdmChannel
@@ -873,7 +865,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_cwdm_channel__mux_client_ports
-        on_delete: no-action
         order_weight: 860
 
   - name: MuxLinePort
@@ -983,7 +974,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_optical_mode__transceiver_types
-        on_delete: no-action
         order_weight: 900
 
   - name: Transceiver
@@ -1033,7 +1023,6 @@ nodes:
         cardinality: one
         optional: false
         identifier: otn_transceiver_type__units
-        on_delete: no-action
         order_weight: 900
       # Optional, so a spare, an RMA and a decommissioned unit stay modellable, and
       # therefore carrying no uniqueness constraint: Infrahub refuses one on an
@@ -1048,7 +1037,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_optical_port__transceiver
-        on_delete: no-action
         order_weight: 950
 
   # Plant.
@@ -1136,7 +1124,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_fiber_type__spans
-        on_delete: no-action
         order_weight: 900
 
   - name: Conduit
@@ -1179,7 +1166,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_conduit__spans
-        on_delete: no-action
         order_weight: 900
 
   - name: FiberSpan
@@ -1292,7 +1278,6 @@ nodes:
         cardinality: one
         optional: false
         identifier: otn_fiber_type__spans
-        on_delete: no-action
         order_weight: 800
       - name: site_a
         peer: LocationSite
@@ -1300,7 +1285,6 @@ nodes:
         cardinality: one
         optional: false
         identifier: otn_span__site_a
-        on_delete: no-action
         order_weight: 810
       - name: site_b
         peer: LocationSite
@@ -1308,7 +1292,6 @@ nodes:
         cardinality: one
         optional: false
         identifier: otn_span__site_b
-        on_delete: no-action
         order_weight: 820
       - name: conduit
         peer: OtnConduit
@@ -1316,7 +1299,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_conduit__spans
-        on_delete: no-action
         order_weight: 830
       - name: oms
         peer: OtnOpticalMultiplexSection
@@ -1324,7 +1306,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_oms__spans
-        on_delete: no-action
         order_weight: 840
       # The inverse of OtnRamanPump.span, on the same identifier. A budget walks a
       # section to its spans, so without this side no pump is visible on that walk.
@@ -1334,7 +1315,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_span__raman_pumps
-        on_delete: no-action
         order_weight: 850
       # The ports at each end of the glass. Declared on the span alone: the inverse
       # would put the field on every port kind and most ports terminate no span.
@@ -1345,7 +1325,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_span__terminating_ports
-        on_delete: no-action
         order_weight: 950
 
   - name: OpticalMultiplexSection
@@ -1383,7 +1362,6 @@ nodes:
         cardinality: one
         optional: false
         identifier: otn_oms__roadm_a
-        on_delete: no-action
         order_weight: 800
       - name: roadm_b
         peer: OtnRoadm
@@ -1391,7 +1369,6 @@ nodes:
         cardinality: one
         optional: false
         identifier: otn_oms__roadm_b
-        on_delete: no-action
         order_weight: 810
       - name: spans
         peer: OtnFiberSpan
@@ -1399,7 +1376,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_oms__spans
-        on_delete: no-action
         order_weight: 900
       # One relationship per direction of travel rather than one holding both chains,
       # so which chain an amplifier is in is stored by the graph. Both stay optional.
@@ -1409,7 +1385,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_oms__amplifiers_a2b
-        on_delete: no-action
         order_weight: 910
       - name: amplifiers_b2a
         peer: OtnAmplifier
@@ -1417,7 +1392,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_oms__amplifiers_b2a
-        on_delete: no-action
         order_weight: 920
 
   # Logical.
@@ -1471,7 +1445,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_carrier__channel
-        on_delete: no-action
         order_weight: 900
 
   # The coarse plan is a separate kind so that `OtnOpticalCarrier.channel`, which
@@ -1656,7 +1629,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_carrier__optical_mode
-        on_delete: no-action
         order_weight: 900
 
   - name: ClientSignal
@@ -1777,7 +1749,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_client_signal__containers
-        on_delete: no-action
         order_weight: 900
       # The inverse of OtnService.client_signal, on the same identifier.
       - name: services
@@ -1786,7 +1757,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_service__client_signal
-        on_delete: no-action
         order_weight: 910
 
   - name: Container
@@ -1887,7 +1857,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_carrier__containers
-        on_delete: no-action
         order_weight: 790
       - name: client_signal
         peer: OtnClientSignal
@@ -1895,7 +1864,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_client_signal__containers
-        on_delete: no-action
         order_weight: 800
       - name: parent_container
         peer: OtnContainer
@@ -1904,7 +1872,6 @@ nodes:
         optional: true
         identifier: otn_container__children
         direction: outbound
-        on_delete: no-action
         order_weight: 810
       # Only a client container carries one. A line container leaves it empty on
       # purpose: it belongs to a wavelength that several services may share.
@@ -1917,7 +1884,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_service__containers
-        on_delete: no-action
         order_weight: 820
       - name: child_containers
         peer: OtnContainer
@@ -1926,7 +1892,6 @@ nodes:
         optional: true
         identifier: otn_container__children
         direction: inbound
-        on_delete: no-action
         order_weight: 900
 
   # Devices.
@@ -1968,7 +1933,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_oms__roadm_a
-        on_delete: no-action
         order_weight: 960
       - name: sections_b
         peer: OtnOpticalMultiplexSection
@@ -1977,7 +1941,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_oms__roadm_b
-        on_delete: no-action
         order_weight: 970
 
   - name: Amplifier
@@ -2056,7 +2019,6 @@ nodes:
         # Both optional, because an amplifier is creatable before its section exists.
         optional: true
         identifier: otn_oms__amplifiers_a2b
-        on_delete: no-action
         order_weight: 950
       - name: oms_b2a
         peer: OtnOpticalMultiplexSection
@@ -2064,7 +2026,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_oms__amplifiers_b2a
-        on_delete: no-action
         order_weight: 960
 
   - name: MuxDemux
@@ -2085,7 +2046,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_mux_demux__cwdm_channels
-        on_delete: no-action
         order_weight: 1900
 
   - name: PatchPanel
@@ -2169,7 +2129,6 @@ nodes:
         cardinality: one
         optional: false
         identifier: otn_span__raman_pumps
-        on_delete: no-action
         order_weight: 850
 
   - name: OduSwitch
@@ -2223,7 +2182,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_odu_switch__carriers
-        on_delete: no-action
         order_weight: 1900
 
   # Two attenuator kinds rather than one carrying a type Dropdown and an optional
@@ -2360,7 +2318,6 @@ nodes:
         cardinality: one
         optional: false
         identifier: otn_carrier__channel
-        on_delete: no-action
         order_weight: 800
       - name: optical_mode
         peer: OtnOpticalMode
@@ -2368,7 +2325,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_carrier__optical_mode
-        on_delete: no-action
         order_weight: 810
       # Many, not one, because two services grooming into one line container both
       # ride this carrier. Each service still has exactly one path of its own. The
@@ -2381,7 +2337,6 @@ nodes:
         # Not renamed to `optical_paths`: Infrahub reads the old and the new as two
         # relationships on one identifier and refuses the load.
         identifier: otn_carrier__optical_path
-        on_delete: no-action
         order_weight: 820
       # Unordered: occupancy is set membership. Ordering along a route is on the hops.
       - name: sections
@@ -2390,7 +2345,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_carrier__sections
-        on_delete: no-action
         order_weight: 900
       # What the wavelength carries, so "what dies with this carrier" is a read of it.
       - name: containers
@@ -2399,7 +2353,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_carrier__containers
-        on_delete: no-action
         order_weight: 910
       # The inverse of OtnOduSwitch.carriers, both sides writing the identifier by
       # hand. Attachment, not termination: `line_ports` is the termination answer.
@@ -2410,7 +2363,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_odu_switch__carriers
-        on_delete: no-action
         order_weight: 920
       # The inverse of OtnLinePort.carrier, both sides writing the identifier by
       # hand. Many, because a wavelength is terminated at each of its two ends.
@@ -2422,7 +2374,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_carrier__line_ports
-        on_delete: no-action
         order_weight: 930
 
   # Service.
@@ -2554,7 +2505,6 @@ nodes:
         cardinality: one
         optional: false
         identifier: otn_service__endpoint_a
-        on_delete: no-action
         order_weight: 800
       - name: endpoint_z
         peer: OtnGenericDevice
@@ -2562,7 +2512,6 @@ nodes:
         cardinality: one
         optional: false
         identifier: otn_service__endpoint_z
-        on_delete: no-action
         order_weight: 810
       # Many, not one, because a circuit regenerated at an intermediate site is one
       # path per wavelength, each with its own budget. Order by segment_sequence.
@@ -2572,7 +2521,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_service__optical_path
-        on_delete: no-action
         order_weight: 900
       # Optional: a service naming no client signal is still provisionable from its
       # rate alone.
@@ -2582,7 +2530,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_service__client_signal
-        on_delete: no-action
         order_weight: 910
       # Two services pointing at one group declare that their routes must not share a
       # conduit. A relationship, not a string: an identifier either resolves or the
@@ -2595,7 +2542,6 @@ nodes:
         identifier: otn_diversity_group__services
         # A group and a service are independent: deleting the group ends the
         # requirement.
-        on_delete: no-action
         order_weight: 915
       # The client containers this circuit owns, written from the container side. A
       # deleted service leaves its containers behind, inert.
@@ -2605,7 +2551,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_service__containers
-        on_delete: no-action
         order_weight: 920
       # Peered at the generic, so a deployment can point at whatever organization
       # kind it has, including OrganizationTenant from extensions/tenancy, without
@@ -2617,7 +2562,6 @@ nodes:
         cardinality: one
         optional: false
         identifier: otn_service__customer
-        on_delete: no-action
         order_weight: 1200
 
   # A node, not a Text attribute and not a Dropdown. Small on purpose: everything
@@ -2663,7 +2607,6 @@ nodes:
         cardinality: many
         optional: true
         identifier: otn_diversity_group__services
-        on_delete: no-action
         order_weight: 800
 
   - name: OpticalPath
@@ -2721,7 +2664,6 @@ nodes:
         # optional relationship is rejected with "relationship must be mandatory".
         optional: false
         identifier: otn_service__optical_path
-        on_delete: no-action
         order_weight: 800
       - name: carrier
         peer: OtnOpticalCarrier
@@ -2729,7 +2671,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_carrier__optical_path
-        on_delete: no-action
         order_weight: 810
       # `on_delete: cascade`, one of two in this file, on the same argument as
       # `OtnGenericDevice.ports`: a hop has no meaning apart from its path.
@@ -2786,7 +2727,6 @@ nodes:
         cardinality: one
         optional: false
         identifier: otn_hop__element
-        on_delete: no-action
         order_weight: 810
 
   # Location.
@@ -2822,7 +2762,6 @@ nodes:
         cardinality: one
         optional: true
         identifier: otn_site__facility
-        on_delete: no-action
         order_weight: 900
 
 # LocationSite carries the OTN site fields rather than a second site kind. Its
@@ -2868,7 +2807,6 @@ extensions:
           cardinality: one
           optional: true
           identifier: otn_site__facility
-          on_delete: no-action
           order_weight: 930
         - name: devices
           peer: OtnGenericDevice
@@ -2876,7 +2814,6 @@ extensions:
           cardinality: many
           optional: true
           identifier: otn_site__devices
-          on_delete: no-action
           order_weight: 900
         - name: spans_a
           peer: OtnFiberSpan
@@ -2885,7 +2822,6 @@ extensions:
           cardinality: many
           optional: true
           identifier: otn_span__site_a
-          on_delete: no-action
           order_weight: 910
         - name: spans_b
           peer: OtnFiberSpan
@@ -2894,5 +2830,4 @@ extensions:
           cardinality: many
           optional: true
           identifier: otn_span__site_b
-          on_delete: no-action
           order_weight: 920
