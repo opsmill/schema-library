@@ -296,6 +296,22 @@ generics:
         identifier: otn_site__devices
         on_delete: no-action
         order_weight: 800
+      # An OTN device names the optical role; DcimPhysicalDevice names the
+      # physical asset. This edge joins the two records for one box, so a
+      # deployment that already tracks its routers in Dcim links them rather
+      # than duplicating them. Optional, because a deployment with no Dcim
+      # inventory is equally valid. It does not merge the two graphs: no OTN
+      # port is a DcimEndpoint, so extensions/cable still cannot terminate on
+      # optical gear, and an extensions block cannot change that.
+      - name: dcim_device
+        peer: DcimPhysicalDevice
+        label: Physical device record
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: otn_device__dcim_device
+        on_delete: no-action
+        order_weight: 940
       - name: ports
         peer: OtnGenericPort
         kind: Component
