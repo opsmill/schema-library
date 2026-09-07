@@ -2752,7 +2752,7 @@ nodes:
     description: A supercomputing facility hosted at a PoP.
     label: Facility
     icon: ri:cpu-line
-    # Reached through the site it sits on, like every other kind here.
+    # Reached through the site it sits on.
     include_in_menu: false
     human_friendly_id:
       - name__value
