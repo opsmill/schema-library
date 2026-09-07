@@ -8,6 +8,9 @@
 # Optical transport network. Ported from opsmill/infrahub-demo-otn at e98be9b.
 # Devices here are optical roles; OtnGenericDevice.dcim_device links one to its
 # DcimPhysicalDevice record. See the reference page for what is out of scope.
+# A `cardinality: one` relationship earns an inverse only where the peer's own page
+# is what the reverse list is for; otherwise use a server-side filter on the forward
+# side. An inverse must reuse the forward identifier, or it reads an empty list.
 # ---------------------------------------------------------------------------
 version: "1.0"
 
@@ -282,7 +285,8 @@ generics:
       # An OTN device names the optical role; DcimPhysicalDevice names the physical
       # asset. This edge joins the two records for one box rather than duplicating
       # it, and it does not merge the two graphs: no OTN port is a DcimEndpoint, so
-      # extensions/cable still cannot terminate on optical gear.
+      # extensions/cable still cannot terminate on optical gear. Optional, because a
+      # deployment with no Dcim inventory is equally valid.
       - name: dcim_device
         peer: DcimPhysicalDevice
         label: Physical device record
@@ -1048,9 +1052,7 @@ nodes:
         order_weight: 950
 
   # Plant.
-  # A `cardinality: one` relationship earns an inverse only where the peer's own page
-  # is what the reverse list is for; otherwise use a server-side filter on the forward
-  # side. An inverse must reuse the forward identifier, or it reads an empty list.
+
   - name: FiberType
     namespace: Otn
     description: Single-mode fiber family. Attenuation, dispersion and group index at 1550 nm.
@@ -1705,8 +1707,6 @@ nodes:
         optional: false
         description: Grouping the catalog by layer is the first thing a reader does.
         order_weight: 1200
-      # Per signal, where the rule it replaces was per layer: two rows on one layer
-      # may differ.
       - name: auto_selectable
         kind: Boolean
         # Fails closed: a row added without a decision is unreachable by the
@@ -1847,9 +1847,8 @@ nodes:
           max_length: 256
         optional: true
         order_weight: 1300
-      # Which segment of its circuit this container rides. A circuit is its
-      # containers ordered by this, as its wavelengths are its paths ordered by
-      # OtnOpticalPath.segment_sequence.
+      # A circuit is its containers ordered by this, as its wavelengths are its
+      # paths ordered by OtnOpticalPath.segment_sequence.
       - name: segment_sequence
         kind: Number
         default_value: 1
@@ -2290,8 +2289,8 @@ nodes:
         description: Attenuation in dB. Read-only, derived from attenuation_mdb.
         order_weight: 1910
       # The absolute ceiling is on the attribute, so the schema refuses a physically
-      # impossible figure at write time. It cannot refuse a setting past this device's
-      # own maximum, which is a sibling attribute's value. Unenforced here.
+      # impossible figure at write time. It cannot refuse a setting past this maximum,
+      # because the setting is a sibling attribute's value. Unenforced here.
       - name: max_attenuation_mdb
         kind: Number
         parameters:
@@ -2699,8 +2698,8 @@ nodes:
           max_length: 256
         optional: true
         order_weight: 1100
-      # Which segment of its circuit this path is. Not unique on its own: segment 1
-      # exists once per circuit, so the pair with the service is the constraint above.
+      # Not unique on its own: segment 1 exists once per circuit, so the pair with
+      # the service is the constraint above.
       - name: segment_sequence
         kind: Number
         default_value: 1
@@ -2791,6 +2790,7 @@ nodes:
         order_weight: 810
 
   # Location.
+
   # A facility on a site, as an edge rather than a suffix inside a tag name. An edge
   # fails loudly: a renamed or mistyped tag dropped a facility and raised nothing.
   - name: Facility
