@@ -13,6 +13,9 @@ version: "1.0"
 
 generics:
   # ---- from schemas/otn_base.yml ----
+  # None of them inherits from another. Infrahub's GenericSchemaWrite has no
+  # inherit_from key at all, so a generic taxonomy is composed by listing several
+  # generics on a concrete node, never by stacking them.
   - name: GenericPort
     namespace: Otn
     description: Any port on any OTN device. The connection surface of the network.
@@ -485,6 +488,14 @@ generics:
         order_weight: 1900
 
   # ---- from schemas/otn_ports.yml ----
+  # Two flat generics. Generics cannot inherit generics in Infrahub, so the
+  # concrete monitors multi-inherit both plus OtnGenericPort, which is the shape
+  # OtnAmplifierPort already uses for OtnGenericPort and OtnOpticalPort.
+  #
+  # human_friendly_id and uniqueness_constraints are not declared here. Both come
+  # from OtnGenericPort, and a constraint on a generic binds across every kind
+  # that inherits it, so (device, name) stays unique across all five monitors
+  # taken together.
   - name: Monitor
     namespace: Otn
     description: The one fact every monitoring interface carries, whatever it measures.
@@ -1410,6 +1421,14 @@ nodes:
         order_weight: 950
 
   # ---- from schemas/otn_plant.yml ----
+  # A `cardinality: one` relationship here gets an inverse when the peer is a page
+  # an operator lands on and the reverse list is what that page is for. Otherwise
+  # the reverse direction is a server-side filter on the forward side, which costs
+  # nothing and does not duplicate the fact. site_a and site_b have inverses on
+  # OtnSite in location.yml; roadm_a and roadm_b have inverses on OtnRoadm in
+  # otn_devices.yml. Every inverse reuses the identifier declared here, and an
+  # inverse on a new identifier loads without complaint and then reads an empty
+  # list.
   - name: FiberType
     namespace: Otn
     description: Single-mode fiber family. Attenuation, dispersion and group index at 1550 nm.
@@ -2953,8 +2972,7 @@ nodes:
 
   - name: OduSwitch
     namespace: Otn
-    description: O-E-O device. Terminates one wavelength and originates the next, as a
-      regenerator or an ODU cross-connect.
+    description: O-E-O device. Terminates one wavelength, originates the next, as a regenerator or ODU cross-connect.
     label: ODU switch
     icon: mdi:swap-horizontal-variant
     include_in_menu: false
