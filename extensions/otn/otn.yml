@@ -1425,10 +1425,10 @@ nodes:
   # an operator lands on and the reverse list is what that page is for. Otherwise
   # the reverse direction is a server-side filter on the forward side, which costs
   # nothing and does not duplicate the fact. site_a and site_b have inverses on
-  # OtnSite in location.yml; roadm_a and roadm_b have inverses on OtnRoadm in
-  # otn_devices.yml. Every inverse reuses the identifier declared here, and an
-  # inverse on a new identifier loads without complaint and then reads an empty
-  # list.
+  # LocationSite, added through the `extensions:` block at the end of this file;
+  # roadm_a and roadm_b have inverses on OtnRoadm, defined further down in this
+  # same file. Every inverse reuses the identifier declared here, and an inverse
+  # on a new identifier loads without complaint and then reads an empty list.
   - name: FiberType
     namespace: Otn
     description: Single-mode fiber family. Attenuation, dispersion and group index at 1550 nm.
