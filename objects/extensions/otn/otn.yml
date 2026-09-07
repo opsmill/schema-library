@@ -1,0 +1,276 @@
+# ---------------------------------------------------------------------------
+# Mock data for extensions/otn.
+# Depends on: base (OrganizationProvider: Lumen), extensions/location_minimal
+# (LocationSite: NYC1, SJC1).
+#
+# One facility, one span, one wavelength and one service end to end. Enough to
+# walk the model from a service down to the ports it lands on, not a
+# representative network.
+#
+# References use each kind's human_friendly_id: a device by name, a port by
+# device plus name. OtnFrequencyGrid is referenced with a nested kind/data
+# block instead, because its hfid is a Number.
+# ---------------------------------------------------------------------------
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnFacility
+  data:
+    # Facility names are lower case with hyphens.
+    - name: nyc1-gpu-cluster
+      description: GPU training cluster handing 400G client traffic to the NYC1 PoP.
+      site: NYC1
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnFiberType
+  data:
+    - name: smf-g652d
+      description: ITU-T G.652.D standard single mode fiber.
+      attenuation_coefficient_mdb_per_km: 190
+      dispersion_fs_per_nm_km: 17000
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnFrequencyGrid
+  data:
+    # ITU-T G.694.1 100 GHz grid, channel 21 at 192.1 THz.
+    - channel_number: 21
+      center_frequency_mhz: 192100000
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnTransceiverType
+  data:
+    - part_number: QDD-400G-DR4
+      vendor: Cisco
+      description: 400G QSFP-DD grey client optic, 500 m over parallel single mode fiber.
+      form_factor: QSFP-DD
+      tunable: false
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnTransceiver
+  data:
+    # The port claims the transceiver, further down, rather than the other way
+    # round: `port` peers with the OtnOpticalPort generic, which has no hfid.
+    - serial: TRX-NYC1-0001
+      status: in_service
+      type: QDD-400G-DR4
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnTransponder
+  data:
+    - name: nyc1-txp01
+      status: active
+      role: edge
+      element_class: transponder
+      vendor: Cisco
+      model: NCS 1004
+      site: NYC1
+      ports:
+        - kind: OtnClientPort
+          data:
+            name: client-1/0/0
+            role: client
+            oper_state: up
+            connector_type: MPO-12
+            polish: APC
+            transceiver: TRX-NYC1-0001
+        - kind: OtnLinePort
+          data:
+            name: line-1/0/0
+            role: line
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+            center_frequency_mhz: 192100000
+            tx_power_mdbm: 1000
+            rx_sensitivity_mdbm: -25000
+
+    # The far end of the wavelength. OtnService.endpoint_z is mandatory, so the
+    # SJC1 end of the span needs a device of its own.
+    - name: sjc1-txp01
+      status: active
+      role: edge
+      element_class: transponder
+      vendor: Cisco
+      model: NCS 1004
+      site: SJC1
+      ports:
+        - kind: OtnLinePort
+          data:
+            name: line-1/0/0
+            role: line
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+            center_frequency_mhz: 192100000
+            tx_power_mdbm: 1000
+            rx_sensitivity_mdbm: -25000
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnRoadm
+  data:
+    - name: nyc1-rdm01
+      status: active
+      role: core
+      element_class: roadm
+      vendor: Cisco
+      model: NCS 2006
+      insertion_loss_mdb: 5500
+      site: NYC1
+      ports:
+        - kind: OtnRoadmAddDropPort
+          data:
+            name: add-drop-1/1
+            role: add_drop
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+            # The transponder line port patches into this add/drop port.
+            connected_to: [nyc1-txp01, line-1/0/0]
+        - kind: OtnRoadmDegreePort
+          data:
+            name: degree-1
+            role: degree
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnMuxDemux
+  data:
+    - name: nyc1-mux01
+      status: active
+      role: passive
+      element_class: mux_demux
+      vendor: Cisco
+      model: NCS1K-MD-64-C
+      insertion_loss_mdb: 3500
+      site: NYC1
+      ports:
+        - kind: OtnMuxClientPort
+          data:
+            name: mux-client-1
+            role: client
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+            dwdm_channel:
+              kind: OtnFrequencyGrid
+              data:
+                channel_number: 21
+                center_frequency_mhz: 192100000
+        - kind: OtnMuxLinePort
+          data:
+            name: mux-line-1
+            role: line
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnFiberSpan
+  data:
+    # A single 82 km span stands in for the NYC1 to SJC1 route, which in a real
+    # network is many spans with amplifiers between them.
+    - name: nyc1-sjc1-span-1
+      description: Leased dark fiber between NYC1 and SJC1.
+      element_class: fiber_span
+      length_m: 82000
+      insertion_loss_mdb: 15580
+      splice_count: 20
+      fiber_type: smf-g652d
+      site_a: NYC1
+      site_b: SJC1
+      terminating_ports:
+        - [nyc1-rdm01, degree-1]
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnOpticalCarrier
+  data:
+    - name: nyc1-sjc1-ch21
+      description: 400G wavelength on channel 21 between NYC1 and SJC1.
+      status: active
+      channel:
+        kind: OtnFrequencyGrid
+        data:
+          channel_number: 21
+          center_frequency_mhz: 192100000
+      line_ports:
+        - [nyc1-txp01, line-1/0/0]
+        - [sjc1-txp01, line-1/0/0]
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnService
+  data:
+    - name: SVC-NYC1-SJC1-0001
+      description: 400G wavelength sold to Lumen between NYC1 and SJC1.
+      rate_gbps: 400
+      sla: gold
+      status: active
+      service_profile: ai-training-dci
+      max_latency_ns: 500000
+      endpoint_a: nyc1-txp01
+      endpoint_z: sjc1-txp01
+      customer: Lumen
+      optical_path:
+        kind: OtnOpticalPath
+        data:
+          - name: nyc1-sjc1-path-1
+            description: Single segment carrying the wavelength from NYC1 to SJC1.
+            segment_sequence: 1
+            carrier: nyc1-sjc1-ch21
+            hops:
+              kind: OtnPathHop
+              data:
+                # `element` peers with the OtnOpticalElement generic, which has
+                # no hfid, so each hop names the concrete kind and upserts
+                # against the object created above by its mandatory fields.
+                - name: nyc1-sjc1-hop-1
+                  sequence: 1
+                  element:
+                    kind: OtnRoadm
+                    data:
+                      name: nyc1-rdm01
+                      role: core
+                      element_class: roadm
+                - name: nyc1-sjc1-hop-2
+                  sequence: 2
+                  element:
+                    kind: OtnFiberSpan
+                    data:
+                      name: nyc1-sjc1-span-1
+                      element_class: fiber_span
+                      length_m: 82000
+                      fiber_type: smf-g652d
+                      site_a: NYC1
+                      site_b: SJC1
