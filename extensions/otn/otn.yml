@@ -477,47 +477,6 @@ generics:
         optional: false
         order_weight: 1900
 
-  # Monitor generics. The concrete monitors list both of these plus OtnGenericPort,
-  # whose (device, name) constraint then binds across all five taken together.
-  - name: Monitor
-    namespace: Otn
-    description: The one fact every monitoring interface carries, whatever it measures.
-    label: Monitor
-    icon: mdi:gauge
-    include_in_menu: false
-    attributes:
-      - name: measured_at
-        kind: DateTime
-        optional: false
-        description: When this reading was taken.
-        order_weight: 1110
-
-  - name: ChannelMonitor
-    namespace: Otn
-    description: What a device that sees a band of channels reports about that band.
-    label: Channel monitor
-    icon: mdi:chart-histogram
-    include_in_menu: false
-    # A ROADM degree and a multiplexer report the same two numbers, so they are
-    # declared once here. The kinds stay distinct so a query can say which it means.
-    attributes:
-      - name: total_power_mdbm
-        kind: Number
-        parameters:
-          min_value: -40000
-          max_value: 30000
-        optional: false
-        description: Total power across all channels present, in millidecibel-milliwatts.
-        order_weight: 1300
-      - name: channel_count
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 96
-        optional: false
-        description: How many channels the monitor currently sees.
-        order_weight: 1310
-
 nodes:
   # Ports.
   - name: RouterPort
@@ -932,233 +891,6 @@ nodes:
     inherit_from:
       - OtnGenericPort
       - OtnCopperPort
-
-  # The five monitors. Eleven of the fourteen readings belong to exactly one family,
-  # so five kinds can refuse both a missing reading and an impossible one.
-  - name: AmplifierMonitor
-    # Nothing constrains which device kind a monitor hangs off: a concrete kind
-    # cannot narrow the peer of a relationship it inherits from OtnGenericPort.
-    namespace: Otn
-    description: The last reading taken from an amplifier's monitoring interface.
-    label: Amplifier monitor
-    icon: mdi:gauge
-    include_in_menu: false
-    inherit_from:
-      - OtnGenericPort
-      - OtnMonitor
-    order_by:
-      - name__value
-    attributes:
-      - name: input_power_mdbm
-        kind: Number
-        parameters:
-          min_value: -40000
-          max_value: 30000
-        optional: false
-        description: Total input power in millidecibel-milliwatts. -3.5 dBm is -3500.
-        order_weight: 1200
-      - name: input_power_display
-        kind: Text
-        read_only: true
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: >-
-            {% if input_power_mdbm__value is not none %}{{ input_power_mdbm__value / 1000 }} dBm{% endif %}
-        optional: true
-        description: Input power in dBm. Read-only, derived from input_power_mdbm.
-        order_weight: 1210
-      - name: output_power_mdbm
-        kind: Number
-        parameters:
-          min_value: -40000
-          max_value: 30000
-        optional: false
-        description: Total output power in millidecibel-milliwatts.
-        order_weight: 1220
-      - name: output_power_display
-        kind: Text
-        read_only: true
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: >-
-            {% if output_power_mdbm__value is not none %}{{ output_power_mdbm__value / 1000 }} dBm{% endif %}
-        optional: true
-        description: Output power in dBm. Read-only, derived from output_power_mdbm.
-        order_weight: 1230
-      # Declared here and on OtnRamanMonitor rather than on OtnMonitor, which would
-      # put a gain field on the three monitor kinds that cannot produce one.
-      - name: measured_gain_mdb
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 40000
-        optional: false
-        description: Gain the amplifier is actually delivering, in millidecibels.
-        order_weight: 1240
-      - name: measured_gain_display
-        kind: Text
-        read_only: true
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: >-
-            {% if measured_gain_mdb__value is not none %}{{ measured_gain_mdb__value / 1000 }} dB{% endif %}
-        optional: true
-        description: Measured gain in dB. Read-only, derived from measured_gain_mdb.
-        order_weight: 1250
-      - name: tilt_mdb
-        kind: Number
-        parameters:
-          min_value: -5000
-          max_value: 5000
-        optional: false
-        description: Gain tilt across the band in millidecibels. Negative tilts the red end down.
-        order_weight: 1260
-
-  # No attributes of its own: both readings come from OtnChannelMonitor.
-  - name: RoadmDegreeMonitor
-    namespace: Otn
-    description: The last reading taken from a ROADM degree's monitoring interface.
-    label: ROADM degree monitor
-    icon: mdi:gauge
-    include_in_menu: false
-    inherit_from:
-      - OtnGenericPort
-      - OtnMonitor
-      - OtnChannelMonitor
-    order_by:
-      - name__value
-
-  - name: MuxDemuxMonitor
-    namespace: Otn
-    description: The last reading taken from a multiplexer's monitoring interface.
-    label: Mux/demux monitor
-    icon: mdi:gauge
-    include_in_menu: false
-    inherit_from:
-      - OtnGenericPort
-      - OtnMonitor
-      - OtnChannelMonitor
-    order_by:
-      - name__value
-
-  - name: RamanMonitor
-    namespace: Otn
-    description: The last reading taken from a Raman pump's monitoring interface.
-    label: Raman monitor
-    icon: mdi:gauge
-    include_in_menu: false
-    inherit_from:
-      - OtnGenericPort
-      - OtnMonitor
-    order_by:
-      - name__value
-    attributes:
-      - name: measured_gain_mdb
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 40000
-        optional: false
-        description: Gain the amplifier is actually delivering, in millidecibels.
-        order_weight: 1240
-      - name: measured_gain_display
-        kind: Text
-        read_only: true
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: >-
-            {% if measured_gain_mdb__value is not none %}{{ measured_gain_mdb__value / 1000 }} dB{% endif %}
-        optional: true
-        description: Measured gain in dB. Read-only, derived from measured_gain_mdb.
-        order_weight: 1250
-      - name: pump_power_mdbm
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 40000
-        optional: false
-        description: Raman pump launch power in millidecibel-milliwatts.
-        order_weight: 1400
-      - name: back_reflection_mdb
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 60000
-        optional: false
-        description: Return loss seen by the pump, in millidecibels. A safety interlock reading.
-        order_weight: 1410
-
-  - name: ReceiverMonitor
-    namespace: Otn
-    description: The last reading taken from a transponder receiver's monitoring interface.
-    label: Receiver monitor
-    icon: mdi:gauge
-    include_in_menu: false
-    inherit_from:
-      - OtnGenericPort
-      - OtnMonitor
-    order_by:
-      - name__value
-    attributes:
-      # OSNR sits on no other monitor kind: a coherent receiver's DSP computes it.
-      - name: measured_osnr_mdb
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 50000
-        optional: false
-        description: OSNR the receiver reports, in millidecibels. 24.1 dB is 24100.
-        order_weight: 1500
-      - name: measured_osnr_display
-        kind: Text
-        read_only: true
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: >-
-            {% if measured_osnr_mdb__value is not none %}{{ measured_osnr_mdb__value / 1000 }} dB{% endif %}
-        optional: true
-        description: Measured OSNR in dB. Read-only, derived from measured_osnr_mdb.
-        order_weight: 1510
-      - name: rx_power_mdbm
-        kind: Number
-        parameters:
-          min_value: -40000
-          max_value: 10000
-        optional: false
-        description: Received power at the coherent front end, in millidecibel-milliwatts.
-        order_weight: 1520
-      - name: pre_fec_ber_ppb
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 1000000000
-        optional: false
-        description: Pre-FEC bit error rate in parts per billion. 2.1e-3 is 2100000.
-        order_weight: 1530
-      - name: q_factor_mdb
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 30000
-        optional: false
-        description: Q factor in millidecibels.
-        order_weight: 1540
-      - name: cd_fs_per_nm
-        kind: Number
-        parameters:
-          min_value: -100000000
-          max_value: 100000000
-        optional: false
-        description: Chromatic dispersion the receiver compensated, in femtoseconds per nanometre.
-        order_weight: 1550
-      - name: dgd_fs
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 200000
-        optional: false
-        description: Differential group delay in femtoseconds.
-        order_weight: 1560
 
   # The catalog entry and the physical unit. Neither is racked, so neither inherits.
   - name: TransceiverType
@@ -1625,7 +1357,7 @@ nodes:
     order_by:
       - name__value
     display_label: name__value
-    # No total_length_m, no total_loss_mdb, no span_count and no hop_count.
+    # No cached total length, total loss, span_count or hop_count.
     # Every reader sums them over the spans instead.
     attributes:
       - name: name
@@ -2470,7 +2202,7 @@ nodes:
         optional: false
         description: Whether the device carries the whole payload through or demultiplexes and regroups containers.
         order_weight: 1300
-      # Nanoseconds, the unit fec_latency_ns and latency_ns already use. No paired
+      # Nanoseconds, the unit fec_latency_ns already uses. No paired
       # _display: the whole plausible range is hundreds of nanoseconds.
       - name: framing_latency_ns
         kind: Number
@@ -2723,13 +2455,6 @@ nodes:
           max_length: 256
         optional: true
         order_weight: 1100
-      - name: customer
-        kind: Text
-        parameters:
-          max_length: 64
-        optional: false
-        description: Who bought it. A Text field, because this model has no organisation kind.
-        order_weight: 1200
       # Customer intent, not a modulation format. The mode chosen to meet it lands on
       # the carrier.
       - name: rate_gbps
@@ -2821,56 +2546,6 @@ nodes:
         optional: true
         description: Latency budget in microseconds. Read-only, derived from max_latency_ns.
         order_weight: 1710
-      # A coded refusal rather than a free string, so a typo cannot become a seventh
-      # reason nobody reads. The colours group them: grey is unanswerable, red is the
-      # physics refusing a route that exists, amber is the network full.
-      - name: rejection_code
-        kind: Dropdown
-        choices:
-          - name: no-route
-            label: No route
-            description: No path exists between the two endpoints.
-            color: "#9e9e9e"
-          - name: no-mode
-            label: No mode
-            description: No transponder mode meets the requested rate.
-            color: "#757575"
-          - name: budget
-            label: Optical budget
-            description: A route exists and the OSNR margin is negative on all of them.
-            color: "#f44336"
-          - name: latency
-            label: Latency budget
-            description: A route exists and every one of them is slower than the service allows.
-            color: "#b71c1c"
-          - name: capacity
-            label: No spectrum
-            description: A route exists and no channel on it is free.
-            color: "#ff9800"
-          - name: no-slots
-            label: No tributary slots
-            description: A wavelength was found and its containers have no room for the client.
-            color: "#ffb74d"
-        optional: true
-        description: Why the service was refused, as one of six codes. Empty whenever a path exists.
-        order_weight: 1801
-      # The prose half of the refusal, never parsed. 512 is what the old single
-      # string carried.
-      - name: rejection_detail
-        kind: Text
-        parameters:
-          max_length: 512
-        optional: true
-        description: What the refusal looked like in detail. The prose beside the code, never parsed.
-        order_weight: 1802
-      # `optional: false` with `default_value: false` is what makes this safe to add
-      # to a kind that already has rows, and false is the right reading of each.
-      - name: refusal_accepted
-        kind: Boolean
-        default_value: false
-        optional: false
-        description: A person read the refusal and accepted it. Only a person sets this.
-        order_weight: 1803
     relationships:
       # Peered at the generic, not at OtnRouter, so a service can terminate on a
       # transponder. One-sided: "which services land here" is a filter on this side.
@@ -2933,6 +2608,18 @@ nodes:
         identifier: otn_service__containers
         on_delete: no-action
         order_weight: 920
+      # Peered at the generic, so a deployment can point at whatever organization
+      # kind it has, including OrganizationTenant from extensions/tenancy, without
+      # this extension depending on that one.
+      - name: customer
+        peer: OrganizationGeneric
+        label: Customer
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: otn_service__customer
+        on_delete: no-action
+        order_weight: 1200
 
   # A node, not a Text attribute and not a Dropdown. Small on purpose: everything
   # about which routes are actually disjoint is computed from the spans.
@@ -2982,7 +2669,7 @@ nodes:
 
   - name: OpticalPath
     namespace: Otn
-    description: The materialised chosen route for one service, with the budget that chose it.
+    description: The materialised chosen route for one service.
     label: Optical path
     icon: mdi:map-marker-path
     include_in_menu: false
@@ -3024,98 +2711,6 @@ nodes:
         optional: false
         description: Which segment of its circuit this path is. 1 for a circuit that spans one wavelength.
         order_weight: 1200
-      - name: total_length_m
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 10000000
-        optional: false
-        description: Route length in metres, summed over every span on the path.
-        order_weight: 1500
-      - name: total_length_display
-        kind: Text
-        read_only: true
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: >-
-            {% if total_length_m__value is not none %}{{ total_length_m__value / 1000 }} km{% endif %}
-        optional: true
-        description: Route length in km. Read-only, derived from total_length_m.
-        order_weight: 1510
-      # 1000000 is 1000 dB. A cap that rejects a route the model is supposed to
-      # report as too lossy would hide the negative result behind a write error.
-      - name: total_loss_mdb
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 1000000
-        optional: false
-        description: End-to-end loss in millidecibels, ageing allowance included.
-        order_weight: 1600
-      - name: total_loss_display
-        kind: Text
-        read_only: true
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: >-
-            {% if total_loss_mdb__value is not none %}{{ total_loss_mdb__value / 1000 }} dB{% endif %}
-        optional: true
-        description: End-to-end loss in dB. Read-only, derived from total_loss_mdb.
-        order_weight: 1610
-      - name: osnr_total_mdb
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 100000
-        optional: false
-        description: OSNR delivered at the receiver in millidecibels, over the amplifier cascade.
-        order_weight: 1700
-      - name: osnr_total_display
-        kind: Text
-        read_only: true
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: >-
-            {% if osnr_total_mdb__value is not none %}{{ osnr_total_mdb__value / 1000 }} dB{% endif %}
-        optional: true
-        description: Delivered OSNR in dB. Read-only, derived from osnr_total_mdb.
-        order_weight: 1710
-      - name: osnr_margin_mdb
-        kind: Number
-        parameters:
-          min_value: -100000
-          max_value: 100000
-        optional: false
-        description: Delivered OSNR less the mode requirement and the system margin, in millidecibels.
-        order_weight: 1800
-      - name: osnr_margin_display
-        kind: Text
-        read_only: true
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: >-
-            {% if osnr_margin_mdb__value is not none %}{{ osnr_margin_mdb__value / 1000 }} dB{% endif %}
-        optional: true
-        description: Signed OSNR margin in dB. Read-only, derived from osnr_margin_mdb.
-        order_weight: 1810
-      - name: latency_ns
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 1000000000
-        optional: false
-        description: One-way latency in nanoseconds. Propagation, node, amplifier and FEC terms.
-        order_weight: 1900
-      - name: latency_display
-        kind: Text
-        read_only: true
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: >-
-            {% if latency_ns__value is not none %}{{ latency_ns__value / 1000 }} us{% endif %}
-        optional: true
-        description: One-way latency in microseconds. Read-only, derived from latency_ns.
-        order_weight: 1910
     relationships:
       # Mandatory. A path with no service has no meaning here: it is one wavelength's
       # route chosen to answer one customer's request, and its figures come from that.
@@ -3150,7 +2745,7 @@ nodes:
 
   - name: PathHop
     namespace: Otn
-    description: One ordered element on a path, carrying the budget's running totals.
+    description: One ordered element on a path.
     label: Path hop
     icon: mdi:ray-vertex
     include_in_menu: false
@@ -3176,82 +2771,6 @@ nodes:
         optional: false
         description: Position along the path, counting from the endpoint A ROADM.
         order_weight: 1100
-      - name: cumulative_length_m
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 10000000
-        optional: false
-        description: Metres travelled at the output of this element.
-        order_weight: 1500
-      - name: cumulative_length_display
-        kind: Text
-        read_only: true
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: >-
-            {% if cumulative_length_m__value is not none %}{{ cumulative_length_m__value / 1000 }} km{% endif %}
-        optional: true
-        description: Kilometres travelled. Read-only, derived from cumulative_length_m.
-        order_weight: 1510
-      # 1000000, the same cap as OtnOpticalPath.total_loss_mdb, and it has to be the
-      # same number: the last hop's cumulative loss IS the route total, so a lower cap
-      # here would refuse a write the path would accept.
-      - name: cumulative_loss_mdb
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 1000000
-        optional: false
-        description: Loss accumulated at the output of this element, in millidecibels.
-        order_weight: 1600
-      - name: cumulative_loss_display
-        kind: Text
-        read_only: true
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: >-
-            {% if cumulative_loss_mdb__value is not none %}{{ cumulative_loss_mdb__value / 1000 }} dB{% endif %}
-        optional: true
-        description: Accumulated loss in dB. Read-only, derived from cumulative_loss_mdb.
-        order_weight: 1610
-      # Optional because OSNR is undefined until the first amplifier has added noise.
-      - name: cumulative_osnr_mdb
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 100000
-        optional: true
-        description: OSNR after this element, in millidecibels. Empty ahead of the first amplifier.
-        order_weight: 1700
-      - name: cumulative_osnr_display
-        kind: Text
-        read_only: true
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: >-
-            {% if cumulative_osnr_mdb__value is not none %}{{ cumulative_osnr_mdb__value / 1000 }} dB{% endif %}
-        optional: true
-        description: Accumulated OSNR in dB. Empty ahead of the first amplifier.
-        order_weight: 1710
-      - name: cumulative_delay_ns
-        kind: Number
-        parameters:
-          min_value: 0
-          max_value: 1000000000
-        optional: false
-        description: One-way delay at the output of this element, in nanoseconds.
-        order_weight: 1800
-      - name: cumulative_delay_display
-        kind: Text
-        read_only: true
-        computed_attribute:
-          kind: Jinja2
-          jinja2_template: >-
-            {% if cumulative_delay_ns__value is not none %}{{ cumulative_delay_ns__value / 1000 }} us{% endif %}
-        optional: true
-        description: Accumulated delay in microseconds. Read-only, derived from cumulative_delay_ns.
-        order_weight: 1810
     relationships:
       - name: path
         peer: OtnOpticalPath
