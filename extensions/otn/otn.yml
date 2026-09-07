@@ -289,7 +289,7 @@ generics:
       # Not a Parent: Parent would force optional: false, and a device has to be
       # creatable before its site record exists.
       - name: site
-        peer: OtnSite
+        peer: LocationSite
         kind: Attribute
         cardinality: one
         optional: true
@@ -1733,7 +1733,7 @@ nodes:
         on_delete: no-action
         order_weight: 800
       - name: site_a
-        peer: OtnSite
+        peer: LocationSite
         kind: Attribute
         cardinality: one
         optional: false
@@ -1741,7 +1741,7 @@ nodes:
         on_delete: no-action
         order_weight: 810
       - name: site_b
-        peer: OtnSite
+        peer: LocationSite
         kind: Attribute
         cardinality: one
         optional: false
@@ -4191,117 +4191,6 @@ nodes:
         on_delete: no-action
         order_weight: 810
 
-  # ---- from schemas/location.yml ----
-  - name: Site
-    namespace: Otn
-    description: A PoP hosting OTN equipment, or a customer site handing traffic to one.
-    label: OTN Site
-    icon: ri:building-line
-    # No menu_placement: it only positions a kind inside the auto-generated
-    # sidebar, which both this node and LocationGeneric opt out of.
-    include_in_menu: false
-    # `CoreArtifactTarget` is declared here, on the node, because `inherit_from`
-    # is the one thing a schema extension cannot add. An `extensions:` block can
-    # bolt an attribute or a relationship onto a kind it does not own; it cannot
-    # change what that kind inherits. So a site becomes an artifact target in
-    # this file or not at all.
-    #
-    # It is a core generic, not a vendored one, so it adds no fourth divergence
-    # to the three listed at the top: those are all against `LocationGeneric`,
-    # and `OtnSite` is a wholly local node. Two flat generics, neither
-    # inheriting the other.
-    inherit_from:
-      - LocationGeneric
-      - CoreArtifactTarget
-    parent: ""
-    children: ""
-    display_label: name__value
-    attributes:
-      - name: latitude_microdeg
-        kind: Number
-        parameters:
-          min_value: -90000000
-          max_value: 90000000
-        optional: true
-        description: Latitude in millionths of a degree. No Float kind exists.
-        order_weight: 1400
-      - name: longitude_microdeg
-        kind: Number
-        parameters:
-          min_value: -180000000
-          max_value: 180000000
-        optional: true
-        description: Longitude in millionths of a degree. No Float kind exists.
-        order_weight: 1500
-      # `customer` is a discriminator, not a label: the guard in
-      # `tests/unit/test_geant_dataset.py` reads it to refuse an `oms` on any
-      # span touching a customer site, which is what keeps a coarse metro tail
-      # out of the budget engine and its 1550 nm coefficient. Full reasoning in
-      # `docs/docs/schema-reference.mdx`, "site_type keeps the PoPs a
-      # filter".
-      - name: site_type
-        kind: Dropdown
-        default_value: pop
-        choices:
-          - name: pop
-            label: PoP
-            color: "#2196f3"
-          - name: customer
-            label: Customer site
-            color: "#ff9800"
-        optional: false
-        description: >-
-          A PoP or a customer site. Keeps "the fourteen PoPs" a filter rather than a
-          count. No span on a customer site may declare an oms.
-        order_weight: 1600
-    # Four inverses, each reusing the identifier its forward side declares,
-    # which is what makes them read the edges already in the graph rather than
-    # an empty list. The forward sides are OtnGenericDevice.site in
-    # otn_base.yml, OtnFiberSpan.site_a and .site_b in otn_plant.yml, and
-    # OtnFacility.site below.
-    #
-    # The two span lists cannot be merged into one: merging the identifiers
-    # would lose which end a span terminates on. The labels are what make the
-    # union readable.
-    relationships:
-      # Cardinality one, and that is a decision. Six PoPs host one facility
-      # each and none hosts two, so one is the honest reading of the network as
-      # modelled. Widening to many later is a migration a reader can see
-      # coming; narrowing from many to one is not, because it throws data away.
-      - name: facility
-        peer: OtnFacility
-        kind: Attribute
-        cardinality: one
-        optional: true
-        identifier: otn_site__facility
-        on_delete: no-action
-        order_weight: 930
-      - name: devices
-        peer: OtnGenericDevice
-        kind: Generic
-        cardinality: many
-        optional: true
-        identifier: otn_site__devices
-        on_delete: no-action
-        order_weight: 900
-      - name: spans_a
-        peer: OtnFiberSpan
-        label: Fiber spans (A end)
-        kind: Attribute
-        cardinality: many
-        optional: true
-        identifier: otn_span__site_a
-        on_delete: no-action
-        order_weight: 910
-      - name: spans_b
-        peer: OtnFiberSpan
-        label: Fiber spans (B end)
-        kind: Attribute
-        cardinality: many
-        optional: true
-        identifier: otn_span__site_b
-        on_delete: no-action
-        order_weight: 920
   # Six EuroHPC facilities sit on six of the fourteen PoPs. Until this kind
   # existed the only record of that was the text after `eurohpc-` in a
   # BuiltinTag name, read back by a helper duplicated in two transforms. The
@@ -4344,10 +4233,85 @@ nodes:
     # the whole finding.
     relationships:
       - name: site
-        peer: OtnSite
+        peer: LocationSite
         kind: Attribute
         cardinality: one
         optional: true
         identifier: otn_site__facility
         on_delete: no-action
         order_weight: 900
+
+# LocationSite carries the OTN site fields rather than a second site kind. Three
+# of OtnSite's attributes and four of its relationships move here. Its
+# `facility` relationship is renamed `otn_facility`, because LocationSite
+# already has a `facility` Text attribute and a node cannot hold both under one
+# name. Its `CoreArtifactTarget` inheritance is dropped, because an extensions
+# block cannot add to inherit_from and this library ships no generators.
+extensions:
+  nodes:
+    - kind: LocationSite
+      attributes:
+        - name: latitude_microdeg
+          kind: Number
+          parameters:
+            min_value: -90000000
+            max_value: 90000000
+          optional: true
+          description: Latitude in millionths of a degree. No Float kind exists.
+          order_weight: 1400
+        - name: longitude_microdeg
+          kind: Number
+          parameters:
+            min_value: -180000000
+            max_value: 180000000
+          optional: true
+          description: Longitude in millionths of a degree. No Float kind exists.
+          order_weight: 1500
+        - name: site_type
+          kind: Dropdown
+          default_value: pop
+          choices:
+            - name: pop
+              label: PoP
+              color: "#2196f3"
+            - name: customer
+              label: Customer site
+              color: "#ff9800"
+          optional: false
+          description: A PoP hosting OTN equipment, or a customer site handing traffic to one.
+          order_weight: 1600
+      relationships:
+        - name: otn_facility
+          peer: OtnFacility
+          kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: otn_site__facility
+          on_delete: no-action
+          order_weight: 930
+        - name: devices
+          peer: OtnGenericDevice
+          kind: Generic
+          cardinality: many
+          optional: true
+          identifier: otn_site__devices
+          on_delete: no-action
+          order_weight: 900
+        - name: spans_a
+          peer: OtnFiberSpan
+          label: Fiber spans (A end)
+          kind: Attribute
+          cardinality: many
+          optional: true
+          identifier: otn_span__site_a
+          on_delete: no-action
+          order_weight: 910
+        - name: spans_b
+          peer: OtnFiberSpan
+          label: Fiber spans (B end)
+          kind: Attribute
+          cardinality: many
+          optional: true
+          identifier: otn_span__site_b
+          on_delete: no-action
+          order_weight: 920
