@@ -217,7 +217,8 @@ generics:
     description: Anything racked at a site.
     label: Device
     icon: mdi:server
-    include_in_menu: false
+    # Carries the Devices entry in the sidebar. The ten device kinds nest under it.
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
@@ -893,7 +894,7 @@ nodes:
     description: A pluggable optic part number and what it can be made to do.
     label: Transceiver type
     icon: mdi:chip
-    include_in_menu: false
+    include_in_menu: true
     human_friendly_id:
       - part_number__value
     order_by:
@@ -981,7 +982,7 @@ nodes:
     description: One physical pluggable optic, fitted in a port or sitting on a shelf.
     label: Transceiver
     icon: mdi:memory
-    include_in_menu: false
+    include_in_menu: true
     human_friendly_id:
       - serial__value
     order_by:
@@ -1046,7 +1047,7 @@ nodes:
     description: Single-mode fiber family. Attenuation, dispersion and group index at 1550 nm.
     label: Fiber type
     icon: mdi:cable-data
-    include_in_menu: false
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
@@ -1131,7 +1132,7 @@ nodes:
     description: Shared-risk link group. Two routes through one conduit are not diverse.
     label: Conduit
     icon: mdi:pipe
-    include_in_menu: false
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
@@ -1173,7 +1174,7 @@ nodes:
     description: One amplifier-to-amplifier fiber section. Lossy, but not racked and not a device.
     label: Fiber span
     icon: mdi:vector-line
-    include_in_menu: false
+    include_in_menu: true
     inherit_from:
       - OtnOpticalElement
     human_friendly_id:
@@ -1332,7 +1333,7 @@ nodes:
     description: ROADM to ROADM. Groups the ordered spans and inline amplifiers between two degrees.
     label: Optical multiplex section
     icon: mdi:ray-start-end
-    include_in_menu: false
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
@@ -1400,7 +1401,7 @@ nodes:
     description: One ITU-T G.694.1 channel. 50 GHz fixed grid, 191.35 to 196.10 THz.
     label: Frequency grid channel
     icon: mdi:sine-wave
-    include_in_menu: false
+    include_in_menu: true
     human_friendly_id:
       - channel_number__value
     order_by:
@@ -1454,7 +1455,7 @@ nodes:
     description: One ITU-T G.694.2 coarse wavelength. 20 nm spacing, 1271 to 1611 nm.
     label: CWDM wavelength
     icon: mdi:palette-swatch-variant
-    include_in_menu: false
+    include_in_menu: true
     human_friendly_id:
       - center_wavelength_nm__value
     order_by:
@@ -1497,7 +1498,7 @@ nodes:
     description: What a transponder or coherent pluggable can do. Reach and required OSNR are data, not assumptions.
     label: Optical mode
     icon: mdi:waveform
-    include_in_menu: false
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
@@ -1636,7 +1637,7 @@ nodes:
     description: What a customer hands over, and the container it maps into.
     label: Client signal
     icon: mdi:import
-    include_in_menu: false
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
@@ -1764,7 +1765,7 @@ nodes:
     description: ODU or SDH virtual container. The digital adaptation layer between a client and a wavelength.
     label: Container
     icon: mdi:package-variant-closed
-    include_in_menu: false
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
@@ -1900,7 +1901,8 @@ nodes:
     description: IP router. Light terminates here, so it contributes no insertion loss.
     label: Router
     icon: mdi:router
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: OtnGenericDevice
     inherit_from:
       - OtnGenericDevice
 
@@ -1909,7 +1911,8 @@ nodes:
     description: Client to DWDM line adaptation.
     label: Transponder
     icon: mdi:transit-connection-variant
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: OtnGenericDevice
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
@@ -1919,7 +1922,8 @@ nodes:
     description: Reconfigurable optical add/drop multiplexer.
     label: ROADM
     icon: mdi:call-split
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: OtnGenericDevice
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
@@ -1948,7 +1952,8 @@ nodes:
     description: Inline, booster or pre-amplifier.
     label: Amplifier
     icon: mdi:amplifier
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: OtnGenericDevice
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
@@ -2033,7 +2038,8 @@ nodes:
     description: Passive multiplexer. A dense AWG on the core, a coarse thin-film filter on a tail.
     label: Mux/demux
     icon: mdi:call-merge
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: OtnGenericDevice
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
@@ -2053,7 +2059,8 @@ nodes:
     description: Optical distribution frame. Carries connector loss.
     label: Patch panel
     icon: mdi:view-grid-outline
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: OtnGenericDevice
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
@@ -2063,7 +2070,8 @@ nodes:
     description: Pump laser injecting Raman gain into one fiber span.
     label: Raman pump
     icon: mdi:laser-pointer
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: OtnGenericDevice
     # Two generics side by side: a kind that is both a racked device and something
     # light passes through has to say so twice. No attribute stores which direction
     # the pump amplifies; injection_end and propagation are what compute it.
@@ -2136,7 +2144,8 @@ nodes:
     description: O-E-O device. Terminates one wavelength, originates the next, as a regenerator or ODU cross-connect.
     label: ODU switch
     icon: mdi:swap-horizontal-variant
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: OtnGenericDevice
     # OtnOpticalElement is here because OtnPathHop.element peers that generic. The
     # inherited insertion_loss_mdb applies to the incoming segment only: this device
     # terminates the light, so the outgoing segment starts at a transmitter.
@@ -2192,7 +2201,8 @@ nodes:
     description: A pad. One fixed amount of loss, patched into a link that arrives too hot.
     label: Fixed attenuator
     icon: mdi:filter-outline
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: OtnGenericDevice
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
@@ -2222,7 +2232,8 @@ nodes:
     description: A VOA. The same loss, dialled rather than fixed, within the range the hardware has.
     label: Variable attenuator
     icon: mdi:tune-variant
-    include_in_menu: false
+    include_in_menu: true
+    menu_placement: OtnGenericDevice
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
@@ -2274,7 +2285,7 @@ nodes:
     description: One provisioned wavelength. Occupies its channel on every section it crosses.
     label: Optical carrier
     icon: mdi:waves
-    include_in_menu: false
+    include_in_menu: true
     human_friendly_id:
       - name__value
     order_by:
@@ -2382,7 +2393,7 @@ nodes:
     description: Customer intent. Two endpoints, a rate, a profile and an optional latency budget.
     label: Service
     icon: mdi:file-document-outline
-    include_in_menu: false
+    include_in_menu: true
     inherit_from:
       - CoreArtifactTarget
     human_friendly_id:
