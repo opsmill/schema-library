@@ -643,6 +643,7 @@ nodes:
     label: Transceiver type
     icon: mdi:chip
     include_in_menu: true
+    menu_placement: OtnTransceiver
     human_friendly_id:
       - part_number__value
     order_by:
@@ -796,6 +797,7 @@ nodes:
     label: Fiber type
     icon: mdi:cable-data
     include_in_menu: true
+    menu_placement: OtnFiberSpan
     human_friendly_id:
       - name__value
     order_by:
@@ -881,6 +883,7 @@ nodes:
     label: Conduit
     icon: mdi:pipe
     include_in_menu: true
+    menu_placement: OtnFiberSpan
     human_friendly_id:
       - name__value
     order_by:
@@ -1082,6 +1085,7 @@ nodes:
     label: Optical multiplex section
     icon: mdi:ray-start-end
     include_in_menu: true
+    menu_placement: OtnFiberSpan
     human_friendly_id:
       - name__value
     order_by:
@@ -1150,6 +1154,7 @@ nodes:
     label: Frequency grid channel
     icon: mdi:sine-wave
     include_in_menu: true
+    menu_placement: OtnOpticalCarrier
     human_friendly_id:
       - channel_number__value
     order_by:
@@ -1204,6 +1209,7 @@ nodes:
     label: CWDM wavelength
     icon: mdi:palette-swatch-variant
     include_in_menu: true
+    menu_placement: OtnOpticalCarrier
     human_friendly_id:
       - center_wavelength_nm__value
     order_by:
@@ -1247,6 +1253,7 @@ nodes:
     label: Optical mode
     icon: mdi:waveform
     include_in_menu: true
+    menu_placement: OtnOpticalCarrier
     human_friendly_id:
       - name__value
     order_by:
@@ -1413,6 +1420,7 @@ nodes:
     label: Client signal
     icon: mdi:import
     include_in_menu: true
+    menu_placement: OtnService
     human_friendly_id:
       - name__value
     order_by:
@@ -1592,6 +1600,7 @@ nodes:
     label: Container
     icon: mdi:package-variant-closed
     include_in_menu: true
+    menu_placement: OtnService
     human_friendly_id:
       - name__value
     order_by:
@@ -2688,7 +2697,6 @@ extensions:
           order_weight: 1700
         - name: site_type
           kind: Dropdown
-          default_value: pop
           choices:
             - name: pop
               label: PoP
