@@ -25,7 +25,7 @@
 # So a fixture that owns a relationship owns its endpoints too. This file
 # creates, and is the only file anywhere under objects/ that ever saves,
 # nyc1-rtr02 and nyc1-rtr03. It deliberately does not build the domain on
-# nyc1-rtr01: objects/extensions/rack, device_psu_module, dwdm, routing_ospf
+# nyc1-rtr01: objects/extensions/rack, device_psu_module, routing_ospf
 # and routing_pim all re-upsert that device after this file has run.
 # objects/extensions/routing_bgp and peering_ixp only reference nyc1-rtr02 by
 # human_friendly_id, which does not save it and so is safe.
