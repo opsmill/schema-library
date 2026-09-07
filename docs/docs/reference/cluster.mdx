@@ -119,8 +119,8 @@ generics:
     label: Nodes
     kind: Component
     cardinality: many
-    identifier: worker_in_cluster
     optional: true
+    identifier: worker_in_cluster
     order_weight: 1500
 extensions:
   nodes:
@@ -128,8 +128,8 @@ extensions:
     relationships:
     - name: worker_in_cluster
       peer: ClusterGenericComputeUnitNodes
-      kind: Generic
       label: Worker in cluster
+      kind: Generic
       cardinality: one
       optional: true
       identifier: worker_in_cluster

@@ -254,8 +254,8 @@ nodes:
     label: IPv6 Address
     kind: Attribute
     cardinality: one
-    identifier: ixpconn__ipv6_address
     optional: true
+    identifier: ixpconn__ipv6_address
     description: IPv6 address assigned to the connection
     order_weight: 1400
   - name: ipv4_address
@@ -263,8 +263,8 @@ nodes:
     label: IPv4 Address
     kind: Attribute
     cardinality: one
-    identifier: ixpconn__ipv4_address
     optional: true
+    identifier: ixpconn__ipv4_address
     description: IPv4 address assigned to the connection
     order_weight: 1375
   - name: internet_exchange_point
@@ -288,8 +288,8 @@ nodes:
     kind: Component
     cardinality: many
     optional: true
-    on_delete: no-action
     identifier: ixpconn__bgpsessions
+    on_delete: no-action
     description: BGP sessions established over this IXP connection
     order_weight: 1550
   - name: tags

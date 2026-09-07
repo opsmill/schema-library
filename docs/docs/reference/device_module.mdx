@@ -153,13 +153,13 @@ generics:
     kind: Text
     unique: true
     read_only: true
-    optional: false
-    allow_override: any
     computed_attribute:
       kind: Jinja2
       jinja2_template: '{{ module_bay__computed_name__value }}'
+    optional: false
     description: Name computed from the module bay; concrete module kinds may refine
       it.
+    allow_override: any
     order_weight: 1000
   - name: serial_number
     kind: Text
@@ -285,9 +285,9 @@ nodes:
     order_weight: 1000
   - name: position
     kind: Number
-    optional: true
     parameters:
       min_value: 1
+    optional: true
     description: Numeric position of the bay within the device (e.g. slot 1, 2, 3).
     order_weight: 1050
   - name: description
@@ -296,10 +296,6 @@ nodes:
     order_weight: 1100
   - name: role
     kind: Dropdown
-    optional: true
-    description: The role of the module bay, indicating the type of module it is intended
-      to receive.
-    order_weight: 1300
     choices:
     - name: supervisor
       label: Supervisor
@@ -317,6 +313,10 @@ nodes:
       label: Fan
       description: Bay intended for a fan module.
       color: '#D2B4DE'
+    optional: true
+    description: The role of the module bay, indicating the type of module it is intended
+      to receive.
+    order_weight: 1300
   relationships:
   - name: device
     peer: DcimPhysicalDevice
