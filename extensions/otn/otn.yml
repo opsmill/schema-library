@@ -182,14 +182,6 @@ generics:
           max_length: 64
         optional: true
         order_weight: 1700
-      # Adding a choice here is not enough. Every kind that overrides this
-      # attribute restates the whole list, and the server accepts a restatement
-      # that is one choice short without a word; the divergence surfaces only
-      # when an object writes the missing value. The tenth choice, `odu_switch`,
-      # cost nine blocks and the list now lives in eleven: this one, the nine
-      # overrides in otn_devices.yml, and the span's in otn_plant.yml. The pinned
-      # list in `tests/unit/test_schema_contract.py` is the only thing that will
-      # tell you a block was missed.
       - name: element_class
         kind: Dropdown
         choices:
@@ -396,8 +388,9 @@ generics:
       # generic restate the list in otn_ports.yml, and a restatement one choice
       # short is accepted in silence.
       #
-      # OtnCopperPort keeps its own connector_type as Text; no kind inherits both
-      # port generics.
+      # OtnCopperPort declares its own connector_type too, also a Dropdown, but
+      # with its own three-choice copper list. No kind inherits both port
+      # generics.
       - name: connector_type
         kind: Dropdown
         choices:
@@ -1360,9 +1353,9 @@ nodes:
         optional: false
         description: Whether the laser can be tuned across the grid or is fixed at one wavelength.
         order_weight: 1400
-    # Optional, so a part number can be recorded before the mode catalog is
-    # populated. A type with no modes says nothing about what it can run.
     relationships:
+      # Optional, so a part number can be recorded before the mode catalog is
+      # populated. A type with no modes says nothing about what it can run.
       - name: supported_modes
         peer: OtnOpticalMode
         label: Modes this part can run
