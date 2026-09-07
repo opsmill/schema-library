@@ -88,6 +88,13 @@ Out of scope, and what to reach for instead:
 - **Icon:** mdi:compass-outline
 - **Inherit From:** OtnGenericPort, OtnOpticalPort
 
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| direction | How operators label this degree. Until now the port name was the only place to say it. | Dropdown | True |  | north, south, east, west, express, local |
+| wavelength_capacity | Nameplate wavelengths this degree is rated to pass, such as 40, 80 or 96. Not a count in use. | Number | True |  |  |
+
 ### AmplifierPort
 
 - **Label:** Amplifier port
@@ -217,6 +224,7 @@ Out of scope, and what to reach for instead:
 | description |  | Text | True |  |  |
 | oms_sequence | Position of this span within its optical multiplex section, counting from the A end. | Number | True |  |  |
 | status | Lifecycle state of the span. A planned span is designed but not yet spliced through. | Dropdown | False | active | planned, active, standby, maintenance, failed, decommissioned |
+| commissioned_date | When the span was accepted into service. A recorded fact, not a reading. | DateTime | True |  |  |
 | length_m | Route length in metres, not straight-line distance. 500 km is the practical ceiling. | Number | False |  |  |
 | length_display | Route length in km. Read-only, derived from length_m. | Text | True |  |  |
 | splice_count | Fusion splices along the span. Roughly one per drum of cable. | Number | False | 0 |  |
@@ -415,6 +423,15 @@ Out of scope, and what to reach for instead:
 - **Icon:** mdi:call-split
 - **Inherit From:** OtnGenericDevice, OtnOpticalElement
 
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| channel_capacity | Nameplate channels this ROADM is rated for, such as 40, 80 or 96. Not a count in use. | Number | True |  |  |
+| colorless | Any add/drop port can take any wavelength, so assignment is not fixed per port. | Boolean | True |  |  |
+| directionless | An added wavelength can leave by any degree, so assignment does not pick a degree. | Boolean | True |  |  |
+| contentionless | The same wavelength can be added twice toward different degrees without blocking. | Boolean | True |  |  |
+
 #### Relationships
 
 | name | peer | optional | cardinality | kind |
@@ -458,6 +475,12 @@ Out of scope, and what to reach for instead:
 - **Namespace:** Otn
 - **Icon:** mdi:call-merge
 - **Inherit From:** OtnGenericDevice, OtnOpticalElement
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| channel_capacity | Nameplate channels this multiplexer is rated for, such as 8, 16, 40 or 96. Not a count in use. | Number | True |  |  |
 
 #### Relationships
 
@@ -564,6 +587,7 @@ Out of scope, and what to reach for instead:
 | name |  | Text | False |  |  |
 | description |  | Text | True |  |  |
 | status |  | Dropdown | False | active | planned, reserved, active, decommissioned |
+| provisioned_date | When the wavelength was turned up. A recorded fact, not a reading. | DateTime | True |  |  |
 
 #### Relationships
 
@@ -592,9 +616,11 @@ Out of scope, and what to reach for instead:
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name |  | Text | False |  |  |
 | description |  | Text | True |  |  |
+| external_circuit_id | The customer's or partner's own reference for this circuit, where `name` is ours. | Text | True |  |  |
 | rate_gbps | Requested client capacity in Gbps. Already whole in its natural unit. | Number | False |  |  |
 | sla |  | Dropdown | False | silver | gold, silver, bronze, best_effort |
 | status |  | Dropdown | False | planned | planned, provisioning, active, maintenance, failed, rejected, decommissioned |
+| provisioned_date | When the circuit was handed to the customer. A recorded fact, not a reading. | DateTime | True |  |  |
 | service_profile |  | Dropdown | False | ip-transit | ai-training-dci, ai-inference, hpc-research, ip-transit, legacy-sdh |
 | max_latency_ns | One-way latency budget in nanoseconds. Null on the profiles that have none. | Number | True |  |  |
 | max_latency_display | Latency budget in microseconds. Read-only, derived from max_latency_ns. | Text | True |  |  |
@@ -719,7 +745,7 @@ Out of scope, and what to reach for instead:
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name | Port identifier as the vendor labels it, such as 1/1/1. | Text | False |  |  |
-| role |  | Dropdown | False | spare | client, line, add_drop, degree, booster, preamp, tributary, spare, monitor |
+| role |  | Dropdown | False | spare | client, line, add_drop, degree, express, booster, preamp, tributary, spare, monitor |
 | enabled |  | Boolean | False | True |  |
 | admin_state | RFC 2863 ifAdminStatus. What the operator asked for. | Dropdown | False | up | up, down, testing |
 | oper_state | RFC 2863 ifOperStatus subset. What the port actually does. | Dropdown | False | down | up, down, testing, dormant, unknown |
@@ -888,6 +914,11 @@ generics:
     - name: degree
       label: Degree
       color: '#673ab7'
+    - name: express
+      label: Express
+      description: A degree-to-degree pass-through. Wavelengths cross the node without
+        adding or dropping.
+      color: '#00bcd4'
     - name: booster
       label: Booster
       color: '#ff9800'
@@ -1370,6 +1401,45 @@ nodes:
   inherit_from:
   - OtnGenericPort
   - OtnOpticalPort
+  attributes:
+  - name: direction
+    kind: Dropdown
+    choices:
+    - name: north
+      label: North
+      color: '#2196f3'
+    - name: south
+      label: South
+      color: '#4caf50'
+    - name: east
+      label: East
+      color: '#ff9800'
+    - name: west
+      label: West
+      color: '#9c27b0'
+    - name: express
+      label: Express
+      description: Faces another degree rather than the outside world. Nothing adds
+        or drops here.
+      color: '#00bcd4'
+    - name: local
+      label: Local
+      description: Faces add/drop equipment in the same building instead of a line
+        route.
+      color: '#9e9e9e'
+    optional: true
+    description: How operators label this degree. Until now the port name was the
+      only place to say it.
+    order_weight: 1500
+  - name: wavelength_capacity
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 96
+    optional: true
+    description: Nameplate wavelengths this degree is rated to pass, such as 40, 80
+      or 96. Not a count in use.
+    order_weight: 1520
 - name: AmplifierPort
   namespace: Otn
   description: Amplifier input or output.
@@ -1727,6 +1797,11 @@ nodes:
     description: Lifecycle state of the span. A planned span is designed but not yet
       spliced through.
     order_weight: 1300
+  - name: commissioned_date
+    kind: DateTime
+    optional: true
+    description: When the span was accepted into service. A recorded fact, not a reading.
+    order_weight: 1400
   - name: length_m
     kind: Number
     parameters:
@@ -2593,6 +2668,34 @@ nodes:
   inherit_from:
   - OtnGenericDevice
   - OtnOpticalElement
+  attributes:
+  - name: channel_capacity
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 96
+    optional: true
+    description: Nameplate channels this ROADM is rated for, such as 40, 80 or 96.
+      Not a count in use.
+    order_weight: 1300
+  - name: colorless
+    kind: Boolean
+    optional: true
+    description: Any add/drop port can take any wavelength, so assignment is not fixed
+      per port.
+    order_weight: 1320
+  - name: directionless
+    kind: Boolean
+    optional: true
+    description: An added wavelength can leave by any degree, so assignment does not
+      pick a degree.
+    order_weight: 1330
+  - name: contentionless
+    kind: Boolean
+    optional: true
+    description: The same wavelength can be added twice toward different degrees without
+      blocking.
+    order_weight: 1340
   relationships:
   - name: sections_a
     peer: OtnOpticalMultiplexSection
@@ -2756,6 +2859,16 @@ nodes:
   inherit_from:
   - OtnGenericDevice
   - OtnOpticalElement
+  attributes:
+  - name: channel_capacity
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 96
+    optional: true
+    description: Nameplate channels this multiplexer is rated for, such as 8, 16,
+      40 or 96. Not a count in use.
+    order_weight: 1300
   relationships:
   - name: cwdm_channels
     peer: OtnCwdmChannel
@@ -3010,6 +3123,11 @@ nodes:
       color: '#9e9e9e'
     optional: false
     order_weight: 1200
+  - name: provisioned_date
+    kind: DateTime
+    optional: true
+    description: When the wavelength was turned up. A recorded fact, not a reading.
+    order_weight: 1300
   relationships:
   - name: channel
     peer: OtnFrequencyGrid
@@ -3091,6 +3209,14 @@ nodes:
       max_length: 256
     optional: true
     order_weight: 1100
+  - name: external_circuit_id
+    kind: Text
+    parameters:
+      max_length: 64
+    optional: true
+    description: The customer's or partner's own reference for this circuit, where
+      `name` is ours.
+    order_weight: 1200
   - name: rate_gbps
     kind: Number
     parameters:
@@ -3144,6 +3270,12 @@ nodes:
       color: '#9e9e9e'
     optional: false
     order_weight: 1500
+  - name: provisioned_date
+    kind: DateTime
+    optional: true
+    description: When the circuit was handed to the customer. A recorded fact, not
+      a reading.
+    order_weight: 1520
   - name: service_profile
     kind: Dropdown
     default_value: ip-transit

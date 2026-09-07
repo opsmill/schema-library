@@ -56,6 +56,10 @@ generics:
           - name: degree
             label: Degree
             color: "#673ab7"
+          - name: express
+            label: Express
+            description: A degree-to-degree pass-through. Wavelengths cross the node without adding or dropping.
+            color: "#00bcd4"
           - name: booster
             label: Booster
             color: "#ff9800"
@@ -573,6 +577,41 @@ nodes:
     inherit_from:
       - OtnGenericPort
       - OtnOpticalPort
+    attributes:
+      - name: direction
+        kind: Dropdown
+        choices:
+          - name: north
+            label: North
+            color: "#2196f3"
+          - name: south
+            label: South
+            color: "#4caf50"
+          - name: east
+            label: East
+            color: "#ff9800"
+          - name: west
+            label: West
+            color: "#9c27b0"
+          - name: express
+            label: Express
+            description: Faces another degree rather than the outside world. Nothing adds or drops here.
+            color: "#00bcd4"
+          - name: local
+            label: Local
+            description: Faces add/drop equipment in the same building instead of a line route.
+            color: "#9e9e9e"
+        optional: true
+        description: How operators label this degree. Until now the port name was the only place to say it.
+        order_weight: 1500
+      - name: wavelength_capacity
+        kind: Number
+        parameters:
+          min_value: 1
+          max_value: 96
+        optional: true
+        description: Nameplate wavelengths this degree is rated to pass, such as 40, 80 or 96. Not a count in use.
+        order_weight: 1520
 
   - name: AmplifierPort
     namespace: Otn
@@ -949,6 +988,13 @@ nodes:
         optional: false
         description: Lifecycle state of the span. A planned span is designed but not yet spliced through.
         order_weight: 1300
+      # The extension's first DateTime. A commissioning or provisioning date is intended state,
+      # written once by a person; a measurement moves on its own and stays in the management system.
+      - name: commissioned_date
+        kind: DateTime
+        optional: true
+        description: When the span was accepted into service. A recorded fact, not a reading.
+        order_weight: 1400
       - name: length_m
         kind: Number
         parameters:
@@ -1833,6 +1879,30 @@ nodes:
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
+    attributes:
+      - name: channel_capacity
+        kind: Number
+        parameters:
+          min_value: 1
+          max_value: 96
+        optional: true
+        description: Nameplate channels this ROADM is rated for, such as 40, 80 or 96. Not a count in use.
+        order_weight: 1300
+      - name: colorless
+        kind: Boolean
+        optional: true
+        description: Any add/drop port can take any wavelength, so assignment is not fixed per port.
+        order_weight: 1320
+      - name: directionless
+        kind: Boolean
+        optional: true
+        description: An added wavelength can leave by any degree, so assignment does not pick a degree.
+        order_weight: 1330
+      - name: contentionless
+        kind: Boolean
+        optional: true
+        description: The same wavelength can be added twice toward different degrees without blocking.
+        order_weight: 1340
     # The inverses of OtnOpticalMultiplexSection.roadm_a and .roadm_b, each on the
     # identifier its forward side declares.
     relationships:
@@ -2005,6 +2075,15 @@ nodes:
     inherit_from:
       - OtnGenericDevice
       - OtnOpticalElement
+    attributes:
+      - name: channel_capacity
+        kind: Number
+        parameters:
+          min_value: 1
+          max_value: 96
+        optional: true
+        description: Nameplate channels this multiplexer is rated for, such as 8, 16, 40 or 96. Not a count in use.
+        order_weight: 1300
     relationships:
       # The wavelengths a coarse multiplexer lights are a property of the device
       # rather than of the plan.
@@ -2288,6 +2367,11 @@ nodes:
             color: "#9e9e9e"
         optional: false
         order_weight: 1200
+      - name: provisioned_date
+        kind: DateTime
+        optional: true
+        description: When the wavelength was turned up. A recorded fact, not a reading.
+        order_weight: 1300
     relationships:
       - name: channel
         peer: OtnFrequencyGrid
@@ -2382,6 +2466,13 @@ nodes:
           max_length: 256
         optional: true
         order_weight: 1100
+      - name: external_circuit_id
+        kind: Text
+        parameters:
+          max_length: 64
+        optional: true
+        description: The customer's or partner's own reference for this circuit, where `name` is ours.
+        order_weight: 1200
       # Customer intent, not a modulation format. The mode chosen to meet it lands on
       # the carrier.
       - name: rate_gbps
@@ -2439,6 +2530,11 @@ nodes:
             color: "#9e9e9e"
         optional: false
         order_weight: 1500
+      - name: provisioned_date
+        kind: DateTime
+        optional: true
+        description: When the circuit was handed to the customer. A recorded fact, not a reading.
+        order_weight: 1520
       # The first three profiles carry a latency budget, the last two leave it null.
       - name: service_profile
         kind: Dropdown
