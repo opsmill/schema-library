@@ -221,6 +221,15 @@ extensions/mlag:
 
     Not covered yet: the layer 3 overlay for MLAG interfaces (loopback, peer address ...) and surfacing MLAG interfaces on each device in the domain.
   name: MLAG
+extensions/otn:
+  dependencies:
+    - base
+    - extensions/location_site
+  description: |
+    Optical transport network schemas covering the physical plant, the
+    wavelength catalog, optical devices and their ports, pluggable optics,
+    carriers and end-to-end services.
+  name: OTN
 extensions/patch_panel:
   dependencies:
     - base
