@@ -240,7 +240,7 @@ spec:
       rate_gbps: 400
       sla: gold
       status: active
-      service_profile: ai-training-dci
+      service_type: wavelength
       max_latency_ns: 500000
       endpoint_a: nyc1-txp01
       endpoint_z: sjc1-txp01
@@ -258,15 +258,22 @@ spec:
                 # `element` peers with the OtnOpticalElement generic, which has
                 # no hfid, so each hop names the concrete kind and upserts
                 # against the object created above by its mandatory fields.
+                # The ROADM cross-connect: the carrier is added, entering on the
+                # add/drop port the transponder patches into and leaving by the
+                # degree that faces SJC1.
                 - name: nyc1-sjc1-hop-1
                   sequence: 1
+                  action: add
                   element:
                     kind: OtnRoadm
                     data:
                       name: nyc1-rdm01
                       role: core
+                  ingress_port: [nyc1-rdm01, add-drop-1/1]
+                  egress_port: [nyc1-rdm01, degree-1]
                 - name: nyc1-sjc1-hop-2
                   sequence: 2
+                  action: through
                   element:
                     kind: OtnFiberSpan
                     data:

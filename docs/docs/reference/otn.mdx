@@ -18,10 +18,10 @@ This extension covers:
 - Tracking pluggable optics as inventory, with the part number in this extension's catalog, the serial on the library's transceiver kinds from extensions/transceiver, and which optical port each unit is fitted in.
 - Modelling the outside plant, including fiber types, conduits, spans and the optical multiplex sections built over them. A section terminates on any OMS endpoint, so a fixed point-to-point system built from passive multiplexers is modellable without a ROADM.
 - Cabling optical gear with extensions/cable. Every OTN port kind inherits DcimEndpoint, so a DcimCable terminates on one for intra-site jumpers, through a DcimPatchPanel where a panel sits in the run.
-- Provisioning a wavelength end to end, as a service with an optical path and its hops through the elements the light crosses.
+- Provisioning a wavelength end to end, as a service with an optical path and its hops through the elements the light crosses. Each hop records what the element does to the carrier and across which port pair, so a ROADM cross-connect reads either from the path or from the ROADM's own ports.
 
 Out of scope, and what to reach for instead:
-- Validation of what a schema cannot express, such as which port kind may hold a pluggable, or whether a mux client port binds a channel on the same plan its multiplexer declares. This extension ships no checks; the schema comments mark each such rule.
+- Validation of what a schema cannot express, such as which port kind may hold a pluggable, whether a mux client port binds a channel on the same plan its multiplexer declares, or whether a hop's ingress and egress ports belong to that hop's own element. This extension ships no checks; the schema comments mark each such rule.
 - Device types and platforms for optical gear. Model the physical asset as a DcimPhysicalDevice and link it with OtnGenericDevice.dcim_device. That edge is also the route to a rack elevation, since the physical record carries position, rack_face and a location that may be a LocationRack. Nothing keeps OtnGenericDevice.site in agreement with the site above that rack.
 - Optical performance monitoring. The schema carries ratings and settings, such as a port's transmit power or a mode's required OSNR, but nothing that is measured, such as live power, OSNR, pre-FEC BER or an error counter. Those change continuously and belong in the network management system or a time series store.
 - Optical path budgets. OtnOpticalPath records which elements the light crosses and in what order, not the loss, OSNR margin or latency of that route. Compute those in a planning tool such as GNPy.
@@ -619,8 +619,8 @@ Out of scope, and what to reach for instead:
 | sla |  | Dropdown | False | silver | gold, silver, bronze, best_effort |
 | status |  | Dropdown | False | planned | planned, provisioning, active, maintenance, failed, rejected, decommissioned |
 | provisioned_date | When the circuit was handed to the customer. A recorded fact, not a reading. | DateTime | True |  |  |
-| service_profile |  | Dropdown | False | ip-transit | ai-training-dci, ai-inference, hpc-research, ip-transit, legacy-sdh |
-| max_latency_ns | One-way latency budget in nanoseconds. Null on the profiles that have none. | Number | True |  |  |
+| service_type | Which kind of service this is. | Dropdown | False | wavelength | wavelength, transport, ip_transit |
+| max_latency_ns | One-way latency budget in nanoseconds. Null when the service commits to none. | Number | True |  |  |
 | max_latency_display | Latency budget in microseconds. Read-only, derived from max_latency_ns. | Text | True |  |  |
 
 #### Relationships
@@ -689,6 +689,8 @@ Out of scope, and what to reach for instead:
 - **Description:** One ordered element on a path.
 - **Namespace:** Otn
 - **Icon:** mdi:ray-vertex
+- **Uniqueness Constraints:**
+    - path, sequence__value
 - **Human Friendly ID:** name__value
 
 #### Attributes
@@ -697,6 +699,7 @@ Out of scope, and what to reach for instead:
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name |  | Text | False |  |  |
 | sequence | Position along the path, counting from the endpoint A ROADM. | Number | False |  |  |
+| action | What this element does to the carrier at this hop. | Dropdown | True |  | add, drop, express, through, terminate |
 
 #### Relationships
 
@@ -704,6 +707,8 @@ Out of scope, and what to reach for instead:
 | ---- | ---- | -------- | ----------- | ---- |
 | path | OtnOpticalPath | False | one | Parent |
 | element | OtnOpticalElement | False | one | Attribute |
+| ingress_port | OtnGenericPort | True | one | Attribute |
+| egress_port | OtnGenericPort | True | one | Attribute |
 
 ### Facility
 
@@ -754,6 +759,8 @@ Out of scope, and what to reach for instead:
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | device | OtnGenericDevice | False | one | Parent |
+| hops_ingress | OtnPathHop | True | many | Attribute |
+| hops_egress | OtnPathHop | True | many | Attribute |
 
 ### OpticalElement
 
@@ -1005,6 +1012,22 @@ generics:
     optional: false
     identifier: otn_device__ports
     order_weight: 800
+  - name: hops_ingress
+    peer: OtnPathHop
+    label: Hops entering here
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_hop__ingress_port
+    order_weight: 910
+  - name: hops_egress
+    peer: OtnPathHop
+    label: Hops leaving here
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_hop__egress_port
+    order_weight: 920
 - name: OpticalElement
   namespace: Otn
   description: Anything light passes through and loses power in.
@@ -2030,8 +2053,8 @@ nodes:
     read_only: true
     computed_attribute:
       kind: Jinja2
-      jinja2_template: '{% if center_frequency_mhz__value is not none %}{{ ((center_frequency_mhz__value
-        - 191350000) // 50000) + 1 }}{% endif %}'
+      jinja2_template: '{% if center_frequency_mhz__value is not none -%} {{ ((center_frequency_mhz__value
+        - 191350000) // 50000) + 1 }} {%- endif %}'
     optional: true
     description: ITU channel number, 1 to 96. Channel 1 is 191.35 THz. Derived from
       the centre frequency.
@@ -2060,8 +2083,8 @@ nodes:
     read_only: true
     computed_attribute:
       kind: Jinja2
-      jinja2_template: '{% if center_frequency_mhz__value is not none %}{{ (299792458000
-        / center_frequency_mhz__value) | round(2) }} nm{% endif %}'
+      jinja2_template: '{% if center_frequency_mhz__value is not none -%} {{ (299792458000
+        / center_frequency_mhz__value) | round(2) }} nm {%- endif %}'
     optional: true
     description: Centre wavelength in nm, derived from the centre frequency.
     order_weight: 1520
@@ -2102,10 +2125,10 @@ nodes:
     read_only: true
     computed_attribute:
       kind: Jinja2
-      jinja2_template: '{% if center_wavelength_nm__value is not none %}{% if center_wavelength_nm__value
-        < 1360 %}O{% elif center_wavelength_nm__value < 1460 %}E{% elif center_wavelength_nm__value
-        < 1530 %}S{% elif center_wavelength_nm__value < 1565 %}C{% else %}L{% endif
-        %}{% endif %}'
+      jinja2_template: '{% if center_wavelength_nm__value is not none -%} {% if center_wavelength_nm__value
+        < 1360 -%}O {%- elif center_wavelength_nm__value < 1460 -%}E {%- elif center_wavelength_nm__value
+        < 1530 -%}S {%- elif center_wavelength_nm__value < 1565 -%}C {%- else -%}L
+        {%- endif %} {%- endif %}'
     optional: true
     description: ITU band, derived from the wavelength. Only the two C-band wavelengths
       sit in the erbium window.
@@ -3340,26 +3363,24 @@ nodes:
     description: When the circuit was handed to the customer. A recorded fact, not
       a reading.
     order_weight: 1520
-  - name: service_profile
+  - name: service_type
     kind: Dropdown
-    default_value: ip-transit
+    default_value: wavelength
     choices:
-    - name: ai-training-dci
-      label: AI training DCI
-      color: '#e91e63'
-    - name: ai-inference
-      label: AI inference
-      color: '#9c27b0'
-    - name: hpc-research
-      label: HPC research
-      color: '#3f51b5'
-    - name: ip-transit
-      label: IP transit
+    - name: wavelength
+      label: Wavelength
+      description: A whole optical carrier handed over to the customer.
       color: '#2196f3'
-    - name: legacy-sdh
-      label: Legacy SDH
-      color: '#795548'
+    - name: transport
+      label: Transport
+      description: A sub-carrier circuit, groomed into ODU containers.
+      color: '#673ab7'
+    - name: ip_transit
+      label: IP transit
+      description: IP handoff, with the transport kept internal.
+      color: '#4caf50'
     optional: false
+    description: Which kind of service this is.
     order_weight: 1600
   - name: max_latency_ns
     kind: Number
@@ -3367,8 +3388,8 @@ nodes:
       min_value: 0
       max_value: 1000000000
     optional: true
-    description: One-way latency budget in nanoseconds. Null on the profiles that
-      have none.
+    description: One-way latency budget in nanoseconds. Null when the service commits
+      to none.
     order_weight: 1700
   - name: max_latency_display
     kind: Text
@@ -3562,6 +3583,9 @@ nodes:
   order_by:
   - sequence__value
   display_label: name__value
+  uniqueness_constraints:
+  - - path
+    - sequence__value
   attributes:
   - name: name
     kind: Text
@@ -3579,6 +3603,32 @@ nodes:
     optional: false
     description: Position along the path, counting from the endpoint A ROADM.
     order_weight: 1100
+  - name: action
+    kind: Dropdown
+    choices:
+    - name: add
+      label: Add
+      description: The carrier joins the line system here.
+      color: '#4caf50'
+    - name: drop
+      label: Drop
+      description: The carrier leaves the line system here.
+      color: '#ff9800'
+    - name: express
+      label: Express
+      description: Switched degree to degree without reaching an add/drop port.
+      color: '#673ab7'
+    - name: through
+      label: Through
+      description: Crossed passively, as on a span, an amplifier or a panel.
+      color: '#607d8b'
+    - name: terminate
+      label: Terminate
+      description: The light ends here, on a transponder or a router.
+      color: '#f44336'
+    optional: true
+    description: What this element does to the carrier at this hop.
+    order_weight: 1200
   relationships:
   - name: path
     peer: OtnOpticalPath
@@ -3594,6 +3644,20 @@ nodes:
     optional: false
     identifier: otn_hop__element
     order_weight: 810
+  - name: ingress_port
+    peer: OtnGenericPort
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_hop__ingress_port
+    order_weight: 820
+  - name: egress_port
+    peer: OtnGenericPort
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_hop__egress_port
+    order_weight: 830
 - name: Facility
   namespace: Otn
   description: A supercomputing facility hosted at a PoP.

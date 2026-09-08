@@ -135,6 +135,25 @@ generics:
         optional: false
         identifier: otn_device__ports
         order_weight: 800
+      # The inverses of OtnPathHop.ingress_port and .egress_port. Together they let a
+      # ROADM's switching state be read from its ports, rather than only by walking
+      # every service's path.
+      - name: hops_ingress
+        peer: OtnPathHop
+        label: Hops entering here
+        kind: Attribute
+        cardinality: many
+        optional: true
+        identifier: otn_hop__ingress_port
+        order_weight: 910
+      - name: hops_egress
+        peer: OtnPathHop
+        label: Hops leaving here
+        kind: Attribute
+        cardinality: many
+        optional: true
+        identifier: otn_hop__egress_port
+        order_weight: 920
       # No port-to-port adjacency attribute lives here. In the G.872 layering a
       # section owns its adjacency and a port only terminates it, so intra-site
       # jumpers are a DcimCable across the `connector` every port kind inherits from
@@ -2179,6 +2198,11 @@ nodes:
         identifier: otn_mux_demux__cwdm_channels
         order_weight: 1900
 
+  # The optical side of a frame, so a panel can be a lossy hop on a path. The
+  # terminations belong on the physical side: extensions/patch_panel models the
+  # front and rear interfaces and the mapping between them, and `dcim_device` joins
+  # the two records. This kind ships no port kind of its own for that reason, so
+  # leave `ports` empty rather than filling it with ports labelled for other roles.
   - name: PatchPanel
     namespace: Otn
     description: Optical distribution frame. Carries connector loss.
@@ -2619,27 +2643,27 @@ nodes:
         optional: true
         description: When the circuit was handed to the customer. A recorded fact, not a reading.
         order_weight: 1520
-      # The first three profiles carry a latency budget, the last two leave it null.
-      - name: service_profile
+      # What is sold, not who buys it. A customer-intent taxonomy belongs in the
+      # deployment that has those customers; `sla` and `max_latency_ns` carry the
+      # commitments, and `client_signal` and `containers` carry the client layer.
+      - name: service_type
         kind: Dropdown
-        default_value: ip-transit
+        default_value: wavelength
         choices:
-          - name: ai-training-dci
-            label: AI training DCI
-            color: "#e91e63"
-          - name: ai-inference
-            label: AI inference
-            color: "#9c27b0"
-          - name: hpc-research
-            label: HPC research
-            color: "#3f51b5"
-          - name: ip-transit
-            label: IP transit
+          - name: wavelength
+            label: Wavelength
+            description: A whole optical carrier handed over to the customer.
             color: "#2196f3"
-          - name: legacy-sdh
-            label: Legacy SDH
-            color: "#795548"
+          - name: transport
+            label: Transport
+            description: A sub-carrier circuit, groomed into ODU containers.
+            color: "#673ab7"
+          - name: ip_transit
+            label: IP transit
+            description: IP handoff, with the transport kept internal.
+            color: "#4caf50"
         optional: false
+        description: Which kind of service this is.
         order_weight: 1600
       - name: max_latency_ns
         kind: Number
@@ -2647,7 +2671,7 @@ nodes:
           min_value: 0
           max_value: 1000000000
         optional: true
-        description: One-way latency budget in nanoseconds. Null on the profiles that have none.
+        description: One-way latency budget in nanoseconds. Null when the service commits to none.
         order_weight: 1700
       - name: max_latency_display
         kind: Text
@@ -2881,6 +2905,8 @@ nodes:
     order_by:
       - sequence__value
     display_label: name__value
+    uniqueness_constraints:
+      - ["path", "sequence__value"]
     attributes:
       - name: name
         kind: Text
@@ -2898,6 +2924,36 @@ nodes:
         optional: false
         description: Position along the path, counting from the endpoint A ROADM.
         order_weight: 1100
+      # What the element does to the carrier here. `add` and `drop` are the two a
+      # port pair alone cannot tell apart, since both cross an add/drop port and a
+      # degree; the direction of travel is what differs. Optional, because a span or
+      # an amplifier is simply crossed and a deployment may not track the rest.
+      - name: action
+        kind: Dropdown
+        choices:
+          - name: add
+            label: Add
+            description: The carrier joins the line system here.
+            color: "#4caf50"
+          - name: drop
+            label: Drop
+            description: The carrier leaves the line system here.
+            color: "#ff9800"
+          - name: express
+            label: Express
+            description: Switched degree to degree without reaching an add/drop port.
+            color: "#673ab7"
+          - name: through
+            label: Through
+            description: Crossed passively, as on a span, an amplifier or a panel.
+            color: "#607d8b"
+          - name: terminate
+            label: Terminate
+            description: The light ends here, on a transponder or a router.
+            color: "#f44336"
+        optional: true
+        description: What this element does to the carrier at this hop.
+        order_weight: 1200
     relationships:
       - name: path
         peer: OtnOpticalPath
@@ -2906,8 +2962,7 @@ nodes:
         optional: false
         identifier: otn_path__hops
         order_weight: 800
-      # One relationship covers ROADMs, amplifiers and fiber spans. No ingress or
-      # egress port beside it: the plant records no port-level adjacency to a span.
+      # One relationship covers ROADMs, amplifiers and fiber spans.
       - name: element
         peer: OtnOpticalElement
         kind: Attribute
@@ -2915,6 +2970,25 @@ nodes:
         optional: false
         identifier: otn_hop__element
         order_weight: 810
+      # The port pair the element carries the light across. On a ROADM this is the
+      # cross-connect: with `action` it states which degree or add/drop port the
+      # carrier entered on and which it left by. Both optional, so a hop through an
+      # element whose ports are not modelled still records the order of travel.
+      # Which ports belong to the hop's own element is unenforced here.
+      - name: ingress_port
+        peer: OtnGenericPort
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: otn_hop__ingress_port
+        order_weight: 820
+      - name: egress_port
+        peer: OtnGenericPort
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: otn_hop__egress_port
+        order_weight: 830
 
   # Location.
 

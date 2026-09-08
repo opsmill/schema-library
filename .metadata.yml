@@ -231,9 +231,10 @@ extensions/otn:
   name: OTN
   not_covered:
     - Validation of what a schema cannot express, such as which port kind may hold
-      a pluggable, or whether a mux client port binds a channel on the same plan its
-      multiplexer declares. This extension ships no checks; the schema comments mark
-      each such rule.
+      a pluggable, whether a mux client port binds a channel on the same plan its
+      multiplexer declares, or whether a hop's ingress and egress ports belong to
+      that hop's own element. This extension ships no checks; the schema comments
+      mark each such rule.
     - Device types and platforms for optical gear. Model the physical asset as a DcimPhysicalDevice
       and link it with OtnGenericDevice.dcim_device. That edge is also the route to
       a rack elevation, since the physical record carries position, rack_face and
@@ -263,7 +264,9 @@ extensions/otn:
       so a DcimCable terminates on one for intra-site jumpers, through a DcimPatchPanel
       where a panel sits in the run.
     - Provisioning a wavelength end to end, as a service with an optical path and
-      its hops through the elements the light crosses.
+      its hops through the elements the light crosses. Each hop records what the element
+      does to the carrier and across which port pair, so a ROADM cross-connect reads
+      either from the path or from the ROADM's own ports.
 extensions/patch_panel:
   dependencies:
     - base
