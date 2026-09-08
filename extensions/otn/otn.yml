@@ -40,6 +40,12 @@ generics:
         optional: false
         description: Port identifier as the vendor labels it, such as 1/1/1.
         order_weight: 1000
+      - name: description
+        kind: Text
+        parameters:
+          max_length: 256
+        optional: true
+        order_weight: 1100
       - name: role
         kind: Dropdown
         default_value: spare
@@ -129,15 +135,12 @@ generics:
         optional: false
         identifier: otn_device__ports
         order_weight: 800
-      # Symmetric and self-referencing, so both ends are the same edge. The explicit
-      # identifier stops Infrahub splitting it into two one-way links.
-      - name: connected_to
-        peer: OtnGenericPort
-        kind: Attribute
-        cardinality: one
-        optional: true
-        identifier: otn_port__connected_to
-        order_weight: 900
+      # No port-to-port adjacency attribute lives here. In the G.872 layering a
+      # section owns its adjacency and a port only terminates it, so intra-site
+      # jumpers are a DcimCable across the `connector` every port kind inherits from
+      # DcimEndpoint, inter-site plant is OtnFiberSpan.terminating_ports, and where
+      # the light goes is OtnOpticalPath. A `connected_to` edge here would be a
+      # fourth answer to a question those three already answer.
 
   - name: OpticalElement
     namespace: Otn
@@ -179,42 +182,35 @@ generics:
           max_length: 64
         optional: true
         order_weight: 1700
-      - name: element_class
-        kind: Dropdown
-        choices:
-          - name: transponder
-            label: Transponder
-            color: "#2196f3"
-          - name: roadm
-            label: ROADM
-            color: "#9c27b0"
-          - name: amplifier
-            label: Amplifier
-            color: "#ff9800"
-          - name: mux_demux
-            label: Mux/demux
-            color: "#00bcd4"
-          - name: patch_panel
-            label: Patch panel
-            color: "#9e9e9e"
-          - name: fiber_span
-            label: Fiber span
-            color: "#4caf50"
-          - name: splitter
-            label: Splitter
-            color: "#8bc34a"
-          - name: attenuator
-            label: Attenuator
-            color: "#795548"
-          - name: raman_pump
-            label: Raman pump
-            color: "#e91e63"
-          - name: odu_switch
-            label: ODU switch
-            color: "#673ab7"
-        optional: false
-        description: Which class of optical element this is. Set it to match the kind.
-        order_weight: 1800
+
+  # What an optical multiplex section is allowed to terminate on. A ROADM switches
+  # channels and a passive mux filters them, but either one bounds a section, so a
+  # fixed point-to-point DWDM system with no ROADM in it is still modellable. The
+  # generic stays a marker plus the two inverses; a device's own fields live on its
+  # kind.
+  - name: OmsEndpoint
+    namespace: Otn
+    description: A device that can terminate an optical multiplex section.
+    label: OMS endpoint
+    icon: mdi:ray-start-end
+    include_in_menu: false
+    relationships:
+      - name: sections_a
+        peer: OtnOpticalMultiplexSection
+        label: Sections (A end)
+        kind: Attribute
+        cardinality: many
+        optional: true
+        identifier: otn_oms__endpoint_a
+        order_weight: 960
+      - name: sections_b
+        peer: OtnOpticalMultiplexSection
+        label: Sections (B end)
+        kind: Attribute
+        cardinality: many
+        optional: true
+        identifier: otn_oms__endpoint_b
+        order_weight: 970
 
   - name: GenericDevice
     namespace: Otn
@@ -287,9 +283,9 @@ generics:
         order_weight: 800
       # An OTN device names the optical role; DcimPhysicalDevice names the physical
       # asset. This edge joins the two records for one box rather than duplicating
-      # it, and it does not merge the two graphs: no OTN port is a DcimEndpoint, so
-      # extensions/cable still cannot terminate on optical gear. Optional, because a
-      # deployment with no Dcim inventory is equally valid.
+      # it, and it is also the route to a rack elevation: the physical record carries
+      # `position`, `rack_face` and a `location` that may be a LocationRack. Optional,
+      # because a deployment with no Dcim inventory is equally valid.
       - name: dcim_device
         peer: DcimPhysicalDevice
         label: Physical device record
@@ -492,6 +488,7 @@ nodes:
     icon: mdi:ethernet
     include_in_menu: false
     inherit_from:
+      - DcimEndpoint
       - OtnGenericPort
       - OtnOpticalPort
     relationships:
@@ -515,6 +512,7 @@ nodes:
     icon: mdi:lan-connect
     include_in_menu: false
     inherit_from:
+      - DcimEndpoint
       - OtnGenericPort
       - OtnOpticalPort
     relationships:
@@ -534,6 +532,7 @@ nodes:
     icon: mdi:transit-connection
     include_in_menu: false
     inherit_from:
+      - DcimEndpoint
       - OtnGenericPort
       - OtnOpticalPort
     relationships:
@@ -565,6 +564,7 @@ nodes:
     icon: mdi:call-split
     include_in_menu: false
     inherit_from:
+      - DcimEndpoint
       - OtnGenericPort
       - OtnOpticalPort
 
@@ -575,6 +575,7 @@ nodes:
     icon: mdi:compass-outline
     include_in_menu: false
     inherit_from:
+      - DcimEndpoint
       - OtnGenericPort
       - OtnOpticalPort
     attributes:
@@ -620,6 +621,7 @@ nodes:
     icon: mdi:amplifier
     include_in_menu: false
     inherit_from:
+      - DcimEndpoint
       - OtnGenericPort
       - OtnOpticalPort
 
@@ -633,6 +635,7 @@ nodes:
     icon: mdi:import
     include_in_menu: false
     inherit_from:
+      - DcimEndpoint
       - OtnGenericPort
       - OtnOpticalPort
     # A channel port should bind exactly one of these two edges. Infrahub has no
@@ -663,6 +666,7 @@ nodes:
     icon: mdi:export
     include_in_menu: false
     inherit_from:
+      - DcimEndpoint
       - OtnGenericPort
       - OtnOpticalPort
 
@@ -673,6 +677,7 @@ nodes:
     icon: mdi:cable-data
     include_in_menu: false
     inherit_from:
+      - DcimEndpoint
       - OtnGenericPort
       - OtnCopperPort
 
@@ -1116,7 +1121,7 @@ nodes:
 
   - name: OpticalMultiplexSection
     namespace: Otn
-    description: ROADM to ROADM. Groups the ordered spans and inline amplifiers between two degrees.
+    description: Groups the ordered spans and inline amplifiers between two OMS endpoints.
     label: Optical multiplex section
     icon: mdi:ray-start-end
     include_in_menu: true
@@ -1169,19 +1174,19 @@ nodes:
         description: Lifecycle state of the section as a whole, not of the spans it groups.
         order_weight: 1200
     relationships:
-      - name: roadm_a
-        peer: OtnRoadm
+      - name: endpoint_a
+        peer: OtnOmsEndpoint
         kind: Attribute
         cardinality: one
         optional: false
-        identifier: otn_oms__roadm_a
+        identifier: otn_oms__endpoint_a
         order_weight: 800
-      - name: roadm_b
-        peer: OtnRoadm
+      - name: endpoint_b
+        peer: OtnOmsEndpoint
         kind: Attribute
         cardinality: one
         optional: false
-        identifier: otn_oms__roadm_b
+        identifier: otn_oms__endpoint_b
         order_weight: 810
       - name: spans
         peer: OtnFiberSpan
@@ -1216,19 +1221,26 @@ nodes:
     include_in_menu: true
     menu_placement: OtnOpticalCarrier
     human_friendly_id:
-      - channel_number__value
+      - center_frequency_mhz__value
     order_by:
-      - channel_number__value
+      - center_frequency_mhz__value
     display_label: "Ch{{ channel_number__value }}"
     attributes:
+      # Derived, not stored. In G.694.1 the frequency is normative and the channel
+      # number is a naming convention over it, so storing both invites the two to
+      # disagree. Computed attributes are Text or URL only, which is why the
+      # frequency stays the stored Number and keeps its range filter.
       - name: channel_number
-        kind: Number
-        unique: true
-        parameters:
-          min_value: 1
-          max_value: 96
-        optional: false
-        description: ITU channel number, 1 to 96. Channel 1 is 191.35 THz.
+        kind: Text
+        read_only: true
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: >-
+            {% if center_frequency_mhz__value is not none -%}
+            {{ ((center_frequency_mhz__value - 191350000) // 50000) + 1 }}
+            {%- endif %}
+        optional: true
+        description: ITU channel number, 1 to 96. Channel 1 is 191.35 THz. Derived from the centre frequency.
         order_weight: 1000
       # Stored rather than computed, so "which channel is 193.5 THz" is a range filter.
       - name: center_frequency_mhz
@@ -1250,6 +1262,20 @@ nodes:
         optional: true
         description: Centre frequency in THz. Byte-identical to the optical-port rendering.
         order_weight: 1510
+      # Operators read the dense grid in nm as often as in THz. Derived from the
+      # frequency with c = 299792458 m/s, so the two can never disagree.
+      - name: center_wavelength_display
+        kind: Text
+        read_only: true
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: >-
+            {% if center_frequency_mhz__value is not none -%}
+            {{ (299792458000 / center_frequency_mhz__value) | round(2) }} nm
+            {%- endif %}
+        optional: true
+        description: Centre wavelength in nm, derived from the centre frequency.
+        order_weight: 1520
     # The inverse of OtnOpticalCarrier.channel, on the same identifier.
     relationships:
       - name: carriers
@@ -1285,26 +1311,24 @@ nodes:
         optional: false
         description: Nominal central wavelength in nm. Wavelength n is 1271 + (n - 1) x 20.
         order_weight: 1000
+      # Derived, not stored. The ITU bands are wavelength ranges, so the band a
+      # coarse wavelength sits in follows from the wavelength itself.
       - name: band
-        kind: Dropdown
-        choices:
-          - name: o
-            label: O band
-            color: "#607d8b"
-          - name: e
-            label: E band
-            color: "#795548"
-          - name: s
-            label: S band
-            color: "#009688"
-          - name: c
-            label: C band
-            color: "#2196f3"
-          - name: l
-            label: L band
-            color: "#9c27b0"
-        optional: false
-        description: ITU band. Only the two C-band wavelengths sit in the erbium window.
+        kind: Text
+        read_only: true
+        computed_attribute:
+          kind: Jinja2
+          jinja2_template: >-
+            {% if center_wavelength_nm__value is not none -%}
+            {% if center_wavelength_nm__value < 1360 -%}O
+            {%- elif center_wavelength_nm__value < 1460 -%}E
+            {%- elif center_wavelength_nm__value < 1530 -%}S
+            {%- elif center_wavelength_nm__value < 1565 -%}C
+            {%- else -%}L
+            {%- endif %}
+            {%- endif %}
+        optional: true
+        description: ITU band, derived from the wavelength. Only the two C-band wavelengths sit in the erbium window.
         order_weight: 1100
 
   - name: OpticalMode
@@ -1850,13 +1874,16 @@ nodes:
   # Devices.
   - name: Router
     namespace: Otn
-    description: IP router. Light terminates here, so it contributes no insertion loss.
+    description: IP router. Light terminates here, so its insertion loss stays at the zero default.
     label: Router
     icon: mdi:router
     include_in_menu: true
     menu_placement: OtnGenericDevice
+    # An optical element, so an IPoDWDM path can hop through the routers on its own
+    # ends. It also picks up the vendor and model fields every other device kind has.
     inherit_from:
       - OtnGenericDevice
+      - OtnOpticalElement
 
   - name: Transponder
     namespace: Otn
@@ -1878,6 +1905,7 @@ nodes:
     menu_placement: OtnGenericDevice
     inherit_from:
       - OtnGenericDevice
+      - OtnOmsEndpoint
       - OtnOpticalElement
     attributes:
       - name: channel_capacity
@@ -1903,25 +1931,21 @@ nodes:
         optional: true
         description: The same wavelength can be added twice toward different degrees without blocking.
         order_weight: 1340
-    # The inverses of OtnOpticalMultiplexSection.roadm_a and .roadm_b, each on the
-    # identifier its forward side declares.
-    relationships:
-      - name: sections_a
-        peer: OtnOpticalMultiplexSection
-        label: Sections (A end)
-        kind: Attribute
-        cardinality: many
+      - name: technology
+        kind: Dropdown
+        choices:
+          - name: wss_lcos
+            label: WSS (LCoS)
+            color: "#673ab7"
+          - name: wss_mems
+            label: WSS (MEMS)
+            color: "#3f51b5"
+          - name: broadcast_select
+            label: Broadcast and select
+            color: "#607d8b"
         optional: true
-        identifier: otn_oms__roadm_a
-        order_weight: 960
-      - name: sections_b
-        peer: OtnOpticalMultiplexSection
-        label: Sections (B end)
-        kind: Attribute
-        cardinality: many
-        optional: true
-        identifier: otn_oms__roadm_b
-        order_weight: 970
+        description: How the switch is built. Nameplate data, often unknown.
+        order_weight: 1350
 
   - name: Amplifier
     namespace: Otn
@@ -2074,6 +2098,7 @@ nodes:
     menu_placement: OtnGenericDevice
     inherit_from:
       - OtnGenericDevice
+      - OtnOmsEndpoint
       - OtnOpticalElement
     attributes:
       - name: channel_capacity
@@ -2084,6 +2109,65 @@ nodes:
         optional: true
         description: Nameplate channels this multiplexer is rated for, such as 8, 16, 40 or 96. Not a count in use.
         order_weight: 1300
+      # Which grid this multiplexer is built for. A carrier reaches a channel through
+      # OtnMuxClientPort, whose `dwdm_channel` and `cwdm_channel` are both optional;
+      # this states which of the two a given device is supposed to use. Unenforced
+      # here, since a schema cannot compare a relationship against an attribute.
+      - name: plan
+        kind: Dropdown
+        default_value: dwdm
+        choices:
+          - name: dwdm
+            label: DWDM
+            description: ITU-T G.694.1 dense grid.
+            color: "#2196f3"
+          - name: cwdm
+            label: CWDM
+            description: ITU-T G.694.2 coarse plan.
+            color: "#ff9800"
+        optional: false
+        description: Which wavelength plan this multiplexer multiplexes.
+        order_weight: 1310
+      # Gives a fixed OADM a home. A ROADM is its own kind, because it is switched
+      # rather than filtered; everything passive lives here and differs by role.
+      - name: mux_role
+        kind: Dropdown
+        default_value: mux_demux
+        choices:
+          - name: mux
+            label: Multiplexer
+            description: Combines channels onto one common port.
+            color: "#4caf50"
+          - name: demux
+            label: Demultiplexer
+            description: Splits one common port into channels.
+            color: "#00bcd4"
+          - name: mux_demux
+            label: Mux/demux
+            description: Both directions in one device.
+            color: "#2196f3"
+          - name: oadm
+            label: Fixed OADM
+            description: Drops and adds a fixed subset, passing the rest through.
+            color: "#9c27b0"
+        optional: false
+        description: What this passive device does with the channels it carries.
+        order_weight: 1320
+      - name: technology
+        kind: Dropdown
+        choices:
+          - name: thin_film_filter
+            label: Thin-film filter
+            color: "#795548"
+          - name: awg
+            label: AWG
+            color: "#607d8b"
+          - name: interleaver
+            label: Interleaver
+            color: "#009688"
+        optional: true
+        description: How the device separates wavelengths. Nameplate data, often unknown.
+        order_weight: 1330
     relationships:
       # The wavelengths a coarse multiplexer lights are a property of the device
       # rather than of the plan.
@@ -2937,8 +3021,8 @@ extensions:
           order_weight: 930
 
     # OTN records its pluggables on the library's transceiver kinds rather than a
-    # second inventory. `otn_port` is where the module is fitted, because no OTN port
-    # is a DcimEndpoint and `interface` cannot serve. The part catalog stays on the
+    # second inventory. `otn_port` is where the module is fitted, because `interface`
+    # peers InterfacePhysical and no OTN port is one. The part catalog stays on the
     # OTN side, since OtnTransceiverType references optical modes.
     - kind: DcimGenericTransceiver
       relationships:

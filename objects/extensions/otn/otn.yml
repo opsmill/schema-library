@@ -10,7 +10,7 @@
 #
 # References use each kind's human_friendly_id: a device by name, a port by
 # device plus name. OtnFrequencyGrid is referenced with a nested kind/data
-# block instead, because its hfid is a Number.
+# block instead, because its hfid is a Number, the centre frequency in MHz.
 # ---------------------------------------------------------------------------
 ---
 apiVersion: infrahub.app/v1
@@ -40,9 +40,9 @@ kind: Object
 spec:
   kind: OtnFrequencyGrid
   data:
-    # ITU-T G.694.1 100 GHz grid, channel 21 at 192.1 THz.
-    - channel_number: 21
-      center_frequency_mhz: 192100000
+    # ITU-T G.694.1, 192.1 THz. On the 50 GHz plan this extension models, that is
+    # channel 16, which `channel_number` derives rather than storing.
+    - center_frequency_mhz: 192100000
 
 ---
 apiVersion: infrahub.app/v1
@@ -65,7 +65,6 @@ spec:
     - name: nyc1-txp01
       status: active
       role: edge
-      element_class: transponder
       vendor: Cisco
       model: NCS 1004
       site: NYC1
@@ -93,7 +92,6 @@ spec:
     - name: sjc1-txp01
       status: active
       role: edge
-      element_class: transponder
       vendor: Cisco
       model: NCS 1004
       site: SJC1
@@ -142,7 +140,6 @@ spec:
     - name: nyc1-rdm01
       status: active
       role: core
-      element_class: roadm
       vendor: Cisco
       model: NCS 2006
       insertion_loss_mdb: 5500
@@ -155,8 +152,6 @@ spec:
             oper_state: up
             connector_type: LC
             polish: UPC
-            # The transponder line port patches into this add/drop port.
-            connected_to: [nyc1-txp01, line-1/0/0]
         - kind: OtnRoadmDegreePort
           data:
             name: degree-1
@@ -174,7 +169,6 @@ spec:
     - name: nyc1-mux01
       status: active
       role: passive
-      element_class: mux_demux
       vendor: Cisco
       model: NCS1K-MD-64-C
       insertion_loss_mdb: 3500
@@ -190,7 +184,6 @@ spec:
             dwdm_channel:
               kind: OtnFrequencyGrid
               data:
-                channel_number: 21
                 center_frequency_mhz: 192100000
         - kind: OtnMuxLinePort
           data:
@@ -210,7 +203,6 @@ spec:
     # network is many spans with amplifiers between them.
     - name: nyc1-sjc1-span-1
       description: Leased dark fiber between NYC1 and SJC1.
-      element_class: fiber_span
       length_m: 82000
       insertion_loss_mdb: 15580
       splice_count: 20
@@ -226,13 +218,12 @@ kind: Object
 spec:
   kind: OtnOpticalCarrier
   data:
-    - name: nyc1-sjc1-ch21
+    - name: nyc1-sjc1-ch16
       description: 400G wavelength on channel 21 between NYC1 and SJC1.
       status: active
       channel:
         kind: OtnFrequencyGrid
         data:
-          channel_number: 21
           center_frequency_mhz: 192100000
       line_ports:
         - [nyc1-txp01, line-1/0/0]
@@ -260,7 +251,7 @@ spec:
           - name: nyc1-sjc1-path-1
             description: Single segment carrying the wavelength from NYC1 to SJC1.
             segment_sequence: 1
-            carrier: nyc1-sjc1-ch21
+            carrier: nyc1-sjc1-ch16
             hops:
               kind: OtnPathHop
               data:
@@ -274,15 +265,38 @@ spec:
                     data:
                       name: nyc1-rdm01
                       role: core
-                      element_class: roadm
                 - name: nyc1-sjc1-hop-2
                   sequence: 2
                   element:
                     kind: OtnFiberSpan
                     data:
                       name: nyc1-sjc1-span-1
-                      element_class: fiber_span
                       length_m: 82000
                       fiber_type: smf-g652d
                       site_a: NYC1
                       site_b: SJC1
+
+---
+# The intra-site jumper from the transponder line port into the ROADM add/drop
+# port. Every OTN port kind inherits DcimEndpoint, so extensions/cable records
+# this run. `connected_endpoints` peers the DcimEndpoint generic, which has no
+# hfid, so each end names its concrete kind and upserts against the port
+# created above by device plus name.
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: DcimCable
+  data:
+    - label: nyc1-txp01-line-1/0/0--nyc1-rdm01-add-drop-1/1
+      status: connected
+      cable_type: smf_os2
+      length: 3
+      connected_endpoints:
+        - kind: OtnLinePort
+          data:
+            name: line-1/0/0
+            device: nyc1-txp01
+        - kind: OtnRoadmAddDropPort
+          data:
+            name: add-drop-1/1
+            device: nyc1-rdm01

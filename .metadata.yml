@@ -230,14 +230,15 @@ extensions/otn:
     Optical transport network schemas covering the physical plant, the wavelength catalog, optical devices and their ports, pluggable optics, carriers and end-to-end services.
   name: OTN
   not_covered:
-    - Cabling between optical devices. No OTN port is a DcimEndpoint, so extensions/cable
-      cannot terminate on optical gear. Fiber is modelled as OtnFiberSpan and OtnConduit
-      instead.
     - Validation of what a schema cannot express, such as which port kind may hold
-      a pluggable, or whether a mux client port binds exactly one channel. This extension
-      ships no checks; the schema comments mark each such rule.
-    - Rack elevations, device types and platforms for optical gear. Model the physical
-      asset as a DcimPhysicalDevice and link it with OtnGenericDevice.dcim_device.
+      a pluggable, or whether a mux client port binds a channel on the same plan its
+      multiplexer declares. This extension ships no checks; the schema comments mark
+      each such rule.
+    - Device types and platforms for optical gear. Model the physical asset as a DcimPhysicalDevice
+      and link it with OtnGenericDevice.dcim_device. That edge is also the route to
+      a rack elevation, since the physical record carries position, rack_face and
+      a location that may be a LocationRack. Nothing keeps OtnGenericDevice.site in
+      agreement with the site above that rack.
     - Optical performance monitoring. The schema carries ratings and settings, such
       as a port's transmit power or a mode's required OSNR, but nothing that is measured,
       such as live power, OSNR, pre-FEC BER or an error counter. Those change continuously
@@ -255,7 +256,12 @@ extensions/otn:
       catalog, the serial on the library's transceiver kinds from extensions/transceiver,
       and which optical port each unit is fitted in.
     - Modelling the outside plant, including fiber types, conduits, spans and the
-      optical multiplex sections built over them.
+      optical multiplex sections built over them. A section terminates on any OMS
+      endpoint, so a fixed point-to-point system built from passive multiplexers is
+      modellable without a ROADM.
+    - Cabling optical gear with extensions/cable. Every OTN port kind inherits DcimEndpoint,
+      so a DcimCable terminates on one for intra-site jumpers, through a DcimPatchPanel
+      where a panel sits in the run.
     - Provisioning a wavelength end to end, as a service with an optical path and
       its hops through the elements the light crosses.
 extensions/patch_panel:

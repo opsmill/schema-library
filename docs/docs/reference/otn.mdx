@@ -16,13 +16,13 @@ Optical transport network schemas covering the physical plant, the wavelength ca
 This extension covers:
 - Recording the ITU-T G.694.1 dense grid and G.694.2 coarse plan as separate kinds, so a carrier pointed at the wrong plan is refused when written.
 - Tracking pluggable optics as inventory, with the part number in this extension's catalog, the serial on the library's transceiver kinds from extensions/transceiver, and which optical port each unit is fitted in.
-- Modelling the outside plant, including fiber types, conduits, spans and the optical multiplex sections built over them.
+- Modelling the outside plant, including fiber types, conduits, spans and the optical multiplex sections built over them. A section terminates on any OMS endpoint, so a fixed point-to-point system built from passive multiplexers is modellable without a ROADM.
+- Cabling optical gear with extensions/cable. Every OTN port kind inherits DcimEndpoint, so a DcimCable terminates on one for intra-site jumpers, through a DcimPatchPanel where a panel sits in the run.
 - Provisioning a wavelength end to end, as a service with an optical path and its hops through the elements the light crosses.
 
 Out of scope, and what to reach for instead:
-- Cabling between optical devices. No OTN port is a DcimEndpoint, so extensions/cable cannot terminate on optical gear. Fiber is modelled as OtnFiberSpan and OtnConduit instead.
-- Validation of what a schema cannot express, such as which port kind may hold a pluggable, or whether a mux client port binds exactly one channel. This extension ships no checks; the schema comments mark each such rule.
-- Rack elevations, device types and platforms for optical gear. Model the physical asset as a DcimPhysicalDevice and link it with OtnGenericDevice.dcim_device.
+- Validation of what a schema cannot express, such as which port kind may hold a pluggable, or whether a mux client port binds a channel on the same plan its multiplexer declares. This extension ships no checks; the schema comments mark each such rule.
+- Device types and platforms for optical gear. Model the physical asset as a DcimPhysicalDevice and link it with OtnGenericDevice.dcim_device. That edge is also the route to a rack elevation, since the physical record carries position, rack_face and a location that may be a LocationRack. Nothing keeps OtnGenericDevice.site in agreement with the site above that rack.
 - Optical performance monitoring. The schema carries ratings and settings, such as a port's transmit power or a mode's required OSNR, but nothing that is measured, such as live power, OSNR, pre-FEC BER or an error counter. Those change continuously and belong in the network management system or a time series store.
 - Optical path budgets. OtnOpticalPath records which elements the light crosses and in what order, not the loss, OSNR margin or latency of that route. Compute those in a planning tool such as GNPy.
 - Frequency plans other than one fixed dense grid. OtnFrequencyGrid models a single ITU-T G.694.1 fixed 50 GHz plan across the C band, from 191.35 to 196.10 THz. L band, C plus L systems, flexgrid and other channel spacings are out of scope.
@@ -35,7 +35,7 @@ Out of scope, and what to reach for instead:
 - **Description:** Grey optics on an IP router. Not on the C-band grid.
 - **Namespace:** Otn
 - **Icon:** mdi:ethernet
-- **Inherit From:** OtnGenericPort, OtnOpticalPort
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
 
 #### Relationships
 
@@ -49,7 +49,7 @@ Out of scope, and what to reach for instead:
 - **Description:** Transponder client side. Where grey light arrives.
 - **Namespace:** Otn
 - **Icon:** mdi:lan-connect
-- **Inherit From:** OtnGenericPort, OtnOpticalPort
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
 
 #### Relationships
 
@@ -63,7 +63,7 @@ Out of scope, and what to reach for instead:
 - **Description:** Transponder DWDM line side. Where coloured light leaves.
 - **Namespace:** Otn
 - **Icon:** mdi:transit-connection
-- **Inherit From:** OtnGenericPort, OtnOpticalPort
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
 
 #### Relationships
 
@@ -78,7 +78,7 @@ Out of scope, and what to reach for instead:
 - **Description:** Local add and drop on a ROADM.
 - **Namespace:** Otn
 - **Icon:** mdi:call-split
-- **Inherit From:** OtnGenericPort, OtnOpticalPort
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
 
 ### RoadmDegreePort
 
@@ -86,7 +86,7 @@ Out of scope, and what to reach for instead:
 - **Description:** Line-facing degree on a ROADM. One per direction.
 - **Namespace:** Otn
 - **Icon:** mdi:compass-outline
-- **Inherit From:** OtnGenericPort, OtnOpticalPort
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
 
 #### Attributes
 
@@ -101,7 +101,7 @@ Out of scope, and what to reach for instead:
 - **Description:** Amplifier input or output.
 - **Namespace:** Otn
 - **Icon:** mdi:amplifier
-- **Inherit From:** OtnGenericPort, OtnOpticalPort
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
 
 ### MuxClientPort
 
@@ -109,7 +109,7 @@ Out of scope, and what to reach for instead:
 - **Description:** One channel of a multiplexer. The side facing the transponder or router that lights it.
 - **Namespace:** Otn
 - **Icon:** mdi:import
-- **Inherit From:** OtnGenericPort, OtnOpticalPort
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
 
 #### Relationships
 
@@ -124,7 +124,7 @@ Out of scope, and what to reach for instead:
 - **Description:** The common side of a multiplexer, where the whole band leaves.
 - **Namespace:** Otn
 - **Icon:** mdi:export
-- **Inherit From:** OtnGenericPort, OtnOpticalPort
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
 
 ### TributaryPort
 
@@ -132,7 +132,7 @@ Out of scope, and what to reach for instead:
 - **Description:** E1 or T1 G.703 electrical tributary. The only copper port here.
 - **Namespace:** Otn
 - **Icon:** mdi:cable-data
-- **Inherit From:** OtnGenericPort, OtnCopperPort
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnCopperPort
 
 ### TransceiverType
 
@@ -248,7 +248,7 @@ Out of scope, and what to reach for instead:
 ### OpticalMultiplexSection
 
 - **Label:** Optical multiplex section
-- **Description:** ROADM to ROADM. Groups the ordered spans and inline amplifiers between two degrees.
+- **Description:** Groups the ordered spans and inline amplifiers between two OMS endpoints.
 - **Namespace:** Otn
 - **Icon:** mdi:ray-start-end
 - **Human Friendly ID:** name__value
@@ -265,8 +265,8 @@ Out of scope, and what to reach for instead:
 
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
-| roadm_a | OtnRoadm | False | one | Attribute |
-| roadm_b | OtnRoadm | False | one | Attribute |
+| endpoint_a | OtnOmsEndpoint | False | one | Attribute |
+| endpoint_b | OtnOmsEndpoint | False | one | Attribute |
 | spans | OtnFiberSpan | True | many | Attribute |
 | amplifiers_a2b | OtnAmplifier | True | many | Attribute |
 | amplifiers_b2a | OtnAmplifier | True | many | Attribute |
@@ -277,15 +277,16 @@ Out of scope, and what to reach for instead:
 - **Description:** One ITU-T G.694.1 channel. 50 GHz fixed grid, 191.35 to 196.10 THz.
 - **Namespace:** Otn
 - **Icon:** mdi:sine-wave
-- **Human Friendly ID:** channel_number__value
+- **Human Friendly ID:** center_frequency_mhz__value
 
 #### Attributes
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
-| channel_number | ITU channel number, 1 to 96. Channel 1 is 191.35 THz. | Number | False |  |  |
+| channel_number | ITU channel number, 1 to 96. Channel 1 is 191.35 THz. Derived from the centre frequency. | Text | True |  |  |
 | center_frequency_mhz | Centre frequency in MHz. Channel n is 191350000 + (n - 1) x 50000. | Number | False |  |  |
 | center_frequency_display | Centre frequency in THz. Byte-identical to the optical-port rendering. | Text | True |  |  |
+| center_wavelength_display | Centre wavelength in nm, derived from the centre frequency. | Text | True |  |  |
 
 #### Relationships
 
@@ -306,7 +307,7 @@ Out of scope, and what to reach for instead:
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | center_wavelength_nm | Nominal central wavelength in nm. Wavelength n is 1271 + (n - 1) x 20. | Number | False |  |  |
-| band | ITU band. Only the two C-band wavelengths sit in the erbium window. | Dropdown | False |  | o, e, s, c, l |
+| band | ITU band, derived from the wavelength. Only the two C-band wavelengths sit in the erbium window. | Text | True |  |  |
 
 ### OpticalMode
 
@@ -402,10 +403,10 @@ Out of scope, and what to reach for instead:
 ### Router
 
 - **Label:** Router
-- **Description:** IP router. Light terminates here, so it contributes no insertion loss.
+- **Description:** IP router. Light terminates here, so its insertion loss stays at the zero default.
 - **Namespace:** Otn
 - **Icon:** mdi:router
-- **Inherit From:** OtnGenericDevice
+- **Inherit From:** OtnGenericDevice, OtnOpticalElement
 
 ### Transponder
 
@@ -421,7 +422,7 @@ Out of scope, and what to reach for instead:
 - **Description:** Reconfigurable optical add/drop multiplexer.
 - **Namespace:** Otn
 - **Icon:** mdi:call-split
-- **Inherit From:** OtnGenericDevice, OtnOpticalElement
+- **Inherit From:** OtnGenericDevice, OtnOmsEndpoint, OtnOpticalElement
 
 #### Attributes
 
@@ -431,13 +432,7 @@ Out of scope, and what to reach for instead:
 | colorless | Any add/drop port can take any wavelength, so assignment is not fixed per port. | Boolean | True |  |  |
 | directionless | An added wavelength can leave by any degree, so assignment does not pick a degree. | Boolean | True |  |  |
 | contentionless | The same wavelength can be added twice toward different degrees without blocking. | Boolean | True |  |  |
-
-#### Relationships
-
-| name | peer | optional | cardinality | kind |
-| ---- | ---- | -------- | ----------- | ---- |
-| sections_a | OtnOpticalMultiplexSection | True | many | Attribute |
-| sections_b | OtnOpticalMultiplexSection | True | many | Attribute |
+| technology | How the switch is built. Nameplate data, often unknown. | Dropdown | True |  | wss_lcos, wss_mems, broadcast_select |
 
 ### Amplifier
 
@@ -474,13 +469,16 @@ Out of scope, and what to reach for instead:
 - **Description:** Passive multiplexer. A dense AWG on the core, a coarse thin-film filter on a tail.
 - **Namespace:** Otn
 - **Icon:** mdi:call-merge
-- **Inherit From:** OtnGenericDevice, OtnOpticalElement
+- **Inherit From:** OtnGenericDevice, OtnOmsEndpoint, OtnOpticalElement
 
 #### Attributes
 
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | channel_capacity | Nameplate channels this multiplexer is rated for, such as 8, 16, 40 or 96. Not a count in use. | Number | True |  |  |
+| plan | Which wavelength plan this multiplexer multiplexes. | Dropdown | False | dwdm | dwdm, cwdm |
+| mux_role | What this passive device does with the channels it carries. | Dropdown | False | mux_demux | mux, demux, mux_demux, oadm |
+| technology | How the device separates wavelengths. Nameplate data, often unknown. | Dropdown | True |  | thin_film_filter, awg, interleaver |
 
 #### Relationships
 
@@ -745,6 +743,7 @@ Out of scope, and what to reach for instead:
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | name | Port identifier as the vendor labels it, such as 1/1/1. | Text | False |  |  |
+| description |  | Text | True |  |  |
 | role |  | Dropdown | False | spare | client, line, add_drop, degree, express, booster, preamp, tributary, spare, monitor |
 | enabled |  | Boolean | False | True |  |
 | admin_state | RFC 2863 ifAdminStatus. What the operator asked for. | Dropdown | False | up | up, down, testing |
@@ -755,7 +754,6 @@ Out of scope, and what to reach for instead:
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | device | OtnGenericDevice | False | one | Parent |
-| connected_to | OtnGenericPort | True | one | Attribute |
 
 ### OpticalElement
 
@@ -772,7 +770,20 @@ Out of scope, and what to reach for instead:
 | insertion_loss_display | Insertion loss in dB. Read-only, derived from insertion_loss_mdb. | Text | True |  |  |
 | vendor |  | Text | True |  |  |
 | model |  | Text | True |  |  |
-| element_class | Which class of optical element this is. Set it to match the kind. | Dropdown | False |  | transponder, roadm, amplifier, mux_demux, patch_panel, fiber_span, splitter, attenuator, raman_pump, odu_switch |
+
+### OmsEndpoint
+
+- **Label:** OMS endpoint
+- **Description:** A device that can terminate an optical multiplex section.
+- **Namespace:** Otn
+- **Icon:** mdi:ray-start-end
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| sections_a | OtnOpticalMultiplexSection | True | many | Attribute |
+| sections_b | OtnOpticalMultiplexSection | True | many | Attribute |
 
 ### GenericDevice
 
@@ -898,6 +909,12 @@ generics:
     optional: false
     description: Port identifier as the vendor labels it, such as 1/1/1.
     order_weight: 1000
+  - name: description
+    kind: Text
+    parameters:
+      max_length: 256
+    optional: true
+    order_weight: 1100
   - name: role
     kind: Dropdown
     default_value: spare
@@ -988,13 +1005,6 @@ generics:
     optional: false
     identifier: otn_device__ports
     order_weight: 800
-  - name: connected_to
-    peer: OtnGenericPort
-    kind: Attribute
-    cardinality: one
-    optional: true
-    identifier: otn_port__connected_to
-    order_weight: 900
 - name: OpticalElement
   namespace: Otn
   description: Anything light passes through and loses power in.
@@ -1033,42 +1043,29 @@ generics:
       max_length: 64
     optional: true
     order_weight: 1700
-  - name: element_class
-    kind: Dropdown
-    choices:
-    - name: transponder
-      label: Transponder
-      color: '#2196f3'
-    - name: roadm
-      label: ROADM
-      color: '#9c27b0'
-    - name: amplifier
-      label: Amplifier
-      color: '#ff9800'
-    - name: mux_demux
-      label: Mux/demux
-      color: '#00bcd4'
-    - name: patch_panel
-      label: Patch panel
-      color: '#9e9e9e'
-    - name: fiber_span
-      label: Fiber span
-      color: '#4caf50'
-    - name: splitter
-      label: Splitter
-      color: '#8bc34a'
-    - name: attenuator
-      label: Attenuator
-      color: '#795548'
-    - name: raman_pump
-      label: Raman pump
-      color: '#e91e63'
-    - name: odu_switch
-      label: ODU switch
-      color: '#673ab7'
-    optional: false
-    description: Which class of optical element this is. Set it to match the kind.
-    order_weight: 1800
+- name: OmsEndpoint
+  namespace: Otn
+  description: A device that can terminate an optical multiplex section.
+  label: OMS endpoint
+  icon: mdi:ray-start-end
+  include_in_menu: false
+  relationships:
+  - name: sections_a
+    peer: OtnOpticalMultiplexSection
+    label: Sections (A end)
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_oms__endpoint_a
+    order_weight: 960
+  - name: sections_b
+    peer: OtnOpticalMultiplexSection
+    label: Sections (B end)
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_oms__endpoint_b
+    order_weight: 970
 - name: GenericDevice
   namespace: Otn
   description: Anything racked at a site.
@@ -1328,6 +1325,7 @@ nodes:
   icon: mdi:ethernet
   include_in_menu: false
   inherit_from:
+  - DcimEndpoint
   - OtnGenericPort
   - OtnOpticalPort
   relationships:
@@ -1346,6 +1344,7 @@ nodes:
   icon: mdi:lan-connect
   include_in_menu: false
   inherit_from:
+  - DcimEndpoint
   - OtnGenericPort
   - OtnOpticalPort
   relationships:
@@ -1364,6 +1363,7 @@ nodes:
   icon: mdi:transit-connection
   include_in_menu: false
   inherit_from:
+  - DcimEndpoint
   - OtnGenericPort
   - OtnOpticalPort
   relationships:
@@ -1390,6 +1390,7 @@ nodes:
   icon: mdi:call-split
   include_in_menu: false
   inherit_from:
+  - DcimEndpoint
   - OtnGenericPort
   - OtnOpticalPort
 - name: RoadmDegreePort
@@ -1399,6 +1400,7 @@ nodes:
   icon: mdi:compass-outline
   include_in_menu: false
   inherit_from:
+  - DcimEndpoint
   - OtnGenericPort
   - OtnOpticalPort
   attributes:
@@ -1447,6 +1449,7 @@ nodes:
   icon: mdi:amplifier
   include_in_menu: false
   inherit_from:
+  - DcimEndpoint
   - OtnGenericPort
   - OtnOpticalPort
 - name: MuxClientPort
@@ -1457,6 +1460,7 @@ nodes:
   icon: mdi:import
   include_in_menu: false
   inherit_from:
+  - DcimEndpoint
   - OtnGenericPort
   - OtnOpticalPort
   relationships:
@@ -1483,6 +1487,7 @@ nodes:
   icon: mdi:export
   include_in_menu: false
   inherit_from:
+  - DcimEndpoint
   - OtnGenericPort
   - OtnOpticalPort
 - name: TributaryPort
@@ -1492,6 +1497,7 @@ nodes:
   icon: mdi:cable-data
   include_in_menu: false
   inherit_from:
+  - DcimEndpoint
   - OtnGenericPort
   - OtnCopperPort
 - name: TransceiverType
@@ -1920,8 +1926,7 @@ nodes:
     order_weight: 950
 - name: OpticalMultiplexSection
   namespace: Otn
-  description: ROADM to ROADM. Groups the ordered spans and inline amplifiers between
-    two degrees.
+  description: Groups the ordered spans and inline amplifiers between two OMS endpoints.
   label: Optical multiplex section
   icon: mdi:ray-start-end
   include_in_menu: true
@@ -1972,19 +1977,19 @@ nodes:
     description: Lifecycle state of the section as a whole, not of the spans it groups.
     order_weight: 1200
   relationships:
-  - name: roadm_a
-    peer: OtnRoadm
+  - name: endpoint_a
+    peer: OtnOmsEndpoint
     kind: Attribute
     cardinality: one
     optional: false
-    identifier: otn_oms__roadm_a
+    identifier: otn_oms__endpoint_a
     order_weight: 800
-  - name: roadm_b
-    peer: OtnRoadm
+  - name: endpoint_b
+    peer: OtnOmsEndpoint
     kind: Attribute
     cardinality: one
     optional: false
-    identifier: otn_oms__roadm_b
+    identifier: otn_oms__endpoint_b
     order_weight: 810
   - name: spans
     peer: OtnFiberSpan
@@ -2015,19 +2020,21 @@ nodes:
   include_in_menu: true
   menu_placement: OtnOpticalCarrier
   human_friendly_id:
-  - channel_number__value
+  - center_frequency_mhz__value
   order_by:
-  - channel_number__value
+  - center_frequency_mhz__value
   display_label: Ch{{ channel_number__value }}
   attributes:
   - name: channel_number
-    kind: Number
-    unique: true
-    parameters:
-      min_value: 1
-      max_value: 96
-    optional: false
-    description: ITU channel number, 1 to 96. Channel 1 is 191.35 THz.
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if center_frequency_mhz__value is not none %}{{ ((center_frequency_mhz__value
+        - 191350000) // 50000) + 1 }}{% endif %}'
+    optional: true
+    description: ITU channel number, 1 to 96. Channel 1 is 191.35 THz. Derived from
+      the centre frequency.
     order_weight: 1000
   - name: center_frequency_mhz
     kind: Number
@@ -2048,6 +2055,16 @@ nodes:
     optional: true
     description: Centre frequency in THz. Byte-identical to the optical-port rendering.
     order_weight: 1510
+  - name: center_wavelength_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if center_frequency_mhz__value is not none %}{{ (299792458000
+        / center_frequency_mhz__value) | round(2) }} nm{% endif %}'
+    optional: true
+    description: Centre wavelength in nm, derived from the centre frequency.
+    order_weight: 1520
   relationships:
   - name: carriers
     peer: OtnOpticalCarrier
@@ -2081,25 +2098,17 @@ nodes:
       x 20.
     order_weight: 1000
   - name: band
-    kind: Dropdown
-    choices:
-    - name: o
-      label: O band
-      color: '#607d8b'
-    - name: e
-      label: E band
-      color: '#795548'
-    - name: s
-      label: S band
-      color: '#009688'
-    - name: c
-      label: C band
-      color: '#2196f3'
-    - name: l
-      label: L band
-      color: '#9c27b0'
-    optional: false
-    description: ITU band. Only the two C-band wavelengths sit in the erbium window.
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if center_wavelength_nm__value is not none %}{% if center_wavelength_nm__value
+        < 1360 %}O{% elif center_wavelength_nm__value < 1460 %}E{% elif center_wavelength_nm__value
+        < 1530 %}S{% elif center_wavelength_nm__value < 1565 %}C{% else %}L{% endif
+        %}{% endif %}'
+    optional: true
+    description: ITU band, derived from the wavelength. Only the two C-band wavelengths
+      sit in the erbium window.
     order_weight: 1100
 - name: OpticalMode
   namespace: Otn
@@ -2641,13 +2650,15 @@ nodes:
     order_weight: 900
 - name: Router
   namespace: Otn
-  description: IP router. Light terminates here, so it contributes no insertion loss.
+  description: IP router. Light terminates here, so its insertion loss stays at the
+    zero default.
   label: Router
   icon: mdi:router
   include_in_menu: true
   menu_placement: OtnGenericDevice
   inherit_from:
   - OtnGenericDevice
+  - OtnOpticalElement
 - name: Transponder
   namespace: Otn
   description: Client to DWDM line adaptation.
@@ -2667,6 +2678,7 @@ nodes:
   menu_placement: OtnGenericDevice
   inherit_from:
   - OtnGenericDevice
+  - OtnOmsEndpoint
   - OtnOpticalElement
   attributes:
   - name: channel_capacity
@@ -2696,23 +2708,21 @@ nodes:
     description: The same wavelength can be added twice toward different degrees without
       blocking.
     order_weight: 1340
-  relationships:
-  - name: sections_a
-    peer: OtnOpticalMultiplexSection
-    label: Sections (A end)
-    kind: Attribute
-    cardinality: many
+  - name: technology
+    kind: Dropdown
+    choices:
+    - name: wss_lcos
+      label: WSS (LCoS)
+      color: '#673ab7'
+    - name: wss_mems
+      label: WSS (MEMS)
+      color: '#3f51b5'
+    - name: broadcast_select
+      label: Broadcast and select
+      color: '#607d8b'
     optional: true
-    identifier: otn_oms__roadm_a
-    order_weight: 960
-  - name: sections_b
-    peer: OtnOpticalMultiplexSection
-    label: Sections (B end)
-    kind: Attribute
-    cardinality: many
-    optional: true
-    identifier: otn_oms__roadm_b
-    order_weight: 970
+    description: How the switch is built. Nameplate data, often unknown.
+    order_weight: 1350
 - name: Amplifier
   namespace: Otn
   description: Inline, booster or pre-amplifier.
@@ -2858,6 +2868,7 @@ nodes:
   menu_placement: OtnGenericDevice
   inherit_from:
   - OtnGenericDevice
+  - OtnOmsEndpoint
   - OtnOpticalElement
   attributes:
   - name: channel_capacity
@@ -2869,6 +2880,59 @@ nodes:
     description: Nameplate channels this multiplexer is rated for, such as 8, 16,
       40 or 96. Not a count in use.
     order_weight: 1300
+  - name: plan
+    kind: Dropdown
+    default_value: dwdm
+    choices:
+    - name: dwdm
+      label: DWDM
+      description: ITU-T G.694.1 dense grid.
+      color: '#2196f3'
+    - name: cwdm
+      label: CWDM
+      description: ITU-T G.694.2 coarse plan.
+      color: '#ff9800'
+    optional: false
+    description: Which wavelength plan this multiplexer multiplexes.
+    order_weight: 1310
+  - name: mux_role
+    kind: Dropdown
+    default_value: mux_demux
+    choices:
+    - name: mux
+      label: Multiplexer
+      description: Combines channels onto one common port.
+      color: '#4caf50'
+    - name: demux
+      label: Demultiplexer
+      description: Splits one common port into channels.
+      color: '#00bcd4'
+    - name: mux_demux
+      label: Mux/demux
+      description: Both directions in one device.
+      color: '#2196f3'
+    - name: oadm
+      label: Fixed OADM
+      description: Drops and adds a fixed subset, passing the rest through.
+      color: '#9c27b0'
+    optional: false
+    description: What this passive device does with the channels it carries.
+    order_weight: 1320
+  - name: technology
+    kind: Dropdown
+    choices:
+    - name: thin_film_filter
+      label: Thin-film filter
+      color: '#795548'
+    - name: awg
+      label: AWG
+      color: '#607d8b'
+    - name: interleaver
+      label: Interleaver
+      color: '#009688'
+    optional: true
+    description: How the device separates wavelengths. Nameplate data, often unknown.
+    order_weight: 1330
   relationships:
   - name: cwdm_channels
     peer: OtnCwdmChannel
