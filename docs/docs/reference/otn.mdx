@@ -19,13 +19,16 @@ This extension covers:
 - Modelling the outside plant, including fiber types, conduits, spans and the optical multiplex sections built over them. A section terminates on any OMS endpoint, so a fixed point-to-point system built from passive multiplexers is modellable without a ROADM.
 - Cabling optical gear with extensions/cable. Every OTN port kind inherits DcimEndpoint, so a DcimCable terminates on one for intra-site jumpers, through a DcimPatchPanel where a panel sits in the run.
 - Provisioning a wavelength end to end, as a service with an optical path and its hops through the elements the light crosses. Each hop records what the element does to the carrier and across which port pair, so a ROADM cross-connect reads either from the path or from the ROADM's own ports.
+- Modelling optical protection, with a working and a protect path on one service, a diversity group that keeps two services off shared plant, and OtnSplitter for the coupler that feeds both legs.
 
 Out of scope, and what to reach for instead:
 - Validation of what a schema cannot express, such as which port kind may hold a pluggable, whether a mux client port binds a channel on the same plan its multiplexer declares, or whether a hop's ingress and egress ports belong to that hop's own element. This extension ships no checks; the schema comments mark each such rule.
-- Device types and platforms for optical gear. Model the physical asset as a DcimPhysicalDevice and link it with OtnGenericDevice.dcim_device. That edge is also the route to a rack elevation, since the physical record carries position, rack_face and a location that may be a LocationRack. Nothing keeps OtnGenericDevice.site in agreement with the site above that rack.
+- Device types, platforms and rack elevations for optical gear, as native OTN fields. Model the physical asset as a DcimPhysicalDevice and link it with OtnGenericDevice.dcim_device; that edge reaches device_type, platform, position and rack_face, and a location that may be a LocationRack. Nothing keeps OtnGenericDevice.site in agreement with the site above that rack.
 - Optical performance monitoring. The schema carries ratings and settings, such as a port's transmit power or a mode's required OSNR, but nothing that is measured, such as live power, OSNR, pre-FEC BER or an error counter. Those change continuously and belong in the network management system or a time series store.
-- Optical path budgets. OtnOpticalPath records which elements the light crosses and in what order, not the loss, OSNR margin or latency of that route. Compute those in a planning tool such as GNPy.
+- Optical path budgets, including the record of design. OtnOpticalPath records which elements the light crosses, in what order and across which ports, but carries no loss, OSNR margin or latency for that route, so a turn-up figure has nowhere to live. OtnService.max_latency_ns is a commitment on the service, not a measurement of a path. Compute budgets in a planning tool such as GNPy.
 - Frequency plans other than one fixed dense grid. OtnFrequencyGrid models a single ITU-T G.694.1 fixed 50 GHz plan across the C band, from 191.35 to 196.10 THz. L band, C plus L systems, flexgrid and other channel spacings are out of scope.
+- Protection mechanisms. OtnOpticalPath.path_role marks a path as working or protect and OtnDiversityGroup keeps two services apart, but nothing states the scheme, so 1+1, 1:1, optical line protection, OMS protection and ODU SNCP are indistinguishable. Switching thresholds and hold-off timers are out of scope with it. OtnSplitter models the coupler such a scheme is built from.
+- The OTU and OPU layers of ITU-T G.709. The model goes from the optical channel, OtnOpticalCarrier, straight to the ODU, OtnContainer. Forward error correction lives on OtnOpticalMode, so what an OTU would add is its section monitoring and framing overhead, which are not modelled.
 
 ## Nodes
 
@@ -102,6 +105,20 @@ Out of scope, and what to reach for instead:
 - **Namespace:** Otn
 - **Icon:** mdi:amplifier
 - **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
+
+### SplitterPort
+
+- **Label:** Splitter port
+- **Description:** The common side of a splitter, or one of its output legs.
+- **Namespace:** Otn
+- **Icon:** mdi:call-split
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| leg | Whether this port is the common side or an output leg. | Dropdown | False | output | common, output |
 
 ### MuxClientPort
 
@@ -452,7 +469,7 @@ Out of scope, and what to reach for instead:
 | noise_figure_display | Noise figure in dB. Read-only, derived from noise_figure_mdb. | Text | True |  |  |
 | gain_mdb | Gain in millidecibels. 22.0 dB is 22000. Must cover the loss ahead of the input. | Number | False | 22000 |  |
 | gain_display | Gain in dB. Read-only, derived from gain_mdb. | Text | True |  |  |
-| oms_sequence | Position in this amplifier's own chain, counting along the direction it amplifies. | Number | False |  |  |
+| oms_sequence | Position in this amplifier's own chain, counting along the direction it amplifies. | Number | True |  |  |
 | max_total_output_power_mdbm | Rated total output power in milli-dBm, 0 to +30 dBm. A nameplate ceiling, not a reading. | Number | True |  |  |
 | max_total_output_power_display | Rated total output power in dBm. Read-only, derived from max_total_output_power_mdbm. | Text | True |  |  |
 
@@ -537,6 +554,22 @@ Out of scope, and what to reach for instead:
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | carriers | OtnOpticalCarrier | True | many | Attribute |
+
+### Splitter
+
+- **Label:** Splitter
+- **Description:** Passive splitter or coupler. Divides one carrier across several legs.
+- **Namespace:** Otn
+- **Icon:** mdi:call-split
+- **Inherit From:** OtnGenericDevice, OtnOpticalElement
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| split_type | How the input is divided across the output legs. | Dropdown | False | even | even, tap |
+| output_count | Number of output legs, such as 2 for a 1:2 or 8 for a 1:8. | Number | False | 2 |  |
+| tap_ratio_percent | Share taken by the tap leg, as a percentage. 10 is a 90/10 tap. Null on an even split. | Number | True |  |  |
 
 ### FixedAttenuator
 
@@ -1475,6 +1508,32 @@ nodes:
   - DcimEndpoint
   - OtnGenericPort
   - OtnOpticalPort
+- name: SplitterPort
+  namespace: Otn
+  description: The common side of a splitter, or one of its output legs.
+  label: Splitter port
+  icon: mdi:call-split
+  include_in_menu: false
+  inherit_from:
+  - DcimEndpoint
+  - OtnGenericPort
+  - OtnOpticalPort
+  attributes:
+  - name: leg
+    kind: Dropdown
+    default_value: output
+    choices:
+    - name: common
+      label: Common
+      description: The single side that carries the whole carrier.
+      color: '#2196f3'
+    - name: output
+      label: Output
+      description: One of the divided legs.
+      color: '#4caf50'
+    optional: false
+    description: Whether this port is the common side or an output leg.
+    order_weight: 1500
 - name: MuxClientPort
   namespace: Otn
   description: One channel of a multiplexer. The side facing the transponder or router
@@ -2843,7 +2902,7 @@ nodes:
     parameters:
       min_value: 1
       max_value: 51
-    optional: false
+    optional: true
     description: Position in this amplifier's own chain, counting along the direction
       it amplifies.
     order_weight: 1560
@@ -3084,6 +3143,50 @@ nodes:
     optional: true
     identifier: otn_odu_switch__carriers
     order_weight: 1900
+- name: Splitter
+  namespace: Otn
+  description: Passive splitter or coupler. Divides one carrier across several legs.
+  label: Splitter
+  icon: mdi:call-split
+  include_in_menu: true
+  menu_placement: OtnGenericDevice
+  inherit_from:
+  - OtnGenericDevice
+  - OtnOpticalElement
+  attributes:
+  - name: split_type
+    kind: Dropdown
+    default_value: even
+    choices:
+    - name: even
+      label: Even
+      description: Every output leg receives the same share.
+      color: '#2196f3'
+    - name: tap
+      label: Tap
+      description: One leg takes a small share for monitoring, the rest passes on.
+      color: '#ff9800'
+    optional: false
+    description: How the input is divided across the output legs.
+    order_weight: 1900
+  - name: output_count
+    kind: Number
+    default_value: 2
+    parameters:
+      min_value: 2
+      max_value: 64
+    optional: false
+    description: Number of output legs, such as 2 for a 1:2 or 8 for a 1:8.
+    order_weight: 1910
+  - name: tap_ratio_percent
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 50
+    optional: true
+    description: Share taken by the tap leg, as a percentage. 10 is a 90/10 tap. Null
+      on an even split.
+    order_weight: 1920
 - name: FixedAttenuator
   namespace: Otn
   description: A pad. One fixed amount of loss, patched into a link that arrives too

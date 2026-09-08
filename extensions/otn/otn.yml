@@ -644,6 +644,35 @@ nodes:
       - OtnGenericPort
       - OtnOpticalPort
 
+  - name: SplitterPort
+    namespace: Otn
+    description: The common side of a splitter, or one of its output legs.
+    label: Splitter port
+    icon: mdi:call-split
+    include_in_menu: false
+    inherit_from:
+      - DcimEndpoint
+      - OtnGenericPort
+      - OtnOpticalPort
+    attributes:
+      # Which side of the split this port is on. `role` on OtnGenericPort names what
+      # the port is for in the network; this names its place inside the device.
+      - name: leg
+        kind: Dropdown
+        default_value: output
+        choices:
+          - name: common
+            label: Common
+            description: The single side that carries the whole carrier.
+            color: "#2196f3"
+          - name: output
+            label: Output
+            description: One of the divided legs.
+            color: "#4caf50"
+        optional: false
+        description: Whether this port is the common side or an output leg.
+        order_weight: 1500
+
   # One multiplexer channel and the common side it shares. Neither declares an
   # insertion loss: that belongs to the device, so a per-port figure would double
   # count.
@@ -2067,7 +2096,10 @@ nodes:
           max_value: 51
         # No default_value on purpose: a default of 1 would let a new amplifier take
         # a silent position at the head of its chain and sort into a wrong answer.
-        optional: false
+        # Optional for the same reason oms_sequence is optional on OtnFiberSpan: both
+        # oms_a2b and oms_b2a are optional, so an amplifier that sits in no chain yet
+        # should not have to claim a position in one.
+        optional: true
         description: Position in this amplifier's own chain, counting along the direction it amplifies.
         order_weight: 1560
       - name: max_total_output_power_mdbm
@@ -2345,6 +2377,54 @@ nodes:
   # Two attenuator kinds rather than one carrying a type Dropdown and an optional
   # range: a pad with a maximum is a field that should not exist. Neither declares
   # ports; both inherit `ports` from OtnGenericDevice and hold none.
+  # A passive coupler, used to feed a working and a protect leg from one carrier in
+  # optical line protection, and to tap a small fraction off for monitoring. The
+  # split loss itself belongs in insertion_loss_mdb from OtnOpticalElement, since a
+  # ratio alone does not give it: an even two-way split costs about 3.5 dB.
+  - name: Splitter
+    namespace: Otn
+    description: Passive splitter or coupler. Divides one carrier across several legs.
+    label: Splitter
+    icon: mdi:call-split
+    include_in_menu: true
+    menu_placement: OtnGenericDevice
+    inherit_from:
+      - OtnGenericDevice
+      - OtnOpticalElement
+    attributes:
+      - name: split_type
+        kind: Dropdown
+        default_value: even
+        choices:
+          - name: even
+            label: Even
+            description: Every output leg receives the same share.
+            color: "#2196f3"
+          - name: tap
+            label: Tap
+            description: One leg takes a small share for monitoring, the rest passes on.
+            color: "#ff9800"
+        optional: false
+        description: How the input is divided across the output legs.
+        order_weight: 1900
+      - name: output_count
+        kind: Number
+        default_value: 2
+        parameters:
+          min_value: 2
+          max_value: 64
+        optional: false
+        description: Number of output legs, such as 2 for a 1:2 or 8 for a 1:8.
+        order_weight: 1910
+      - name: tap_ratio_percent
+        kind: Number
+        parameters:
+          min_value: 1
+          max_value: 50
+        optional: true
+        description: Share taken by the tap leg, as a percentage. 10 is a 90/10 tap. Null on an even split.
+        order_weight: 1920
+
   - name: FixedAttenuator
     namespace: Otn
     description: A pad. One fixed amount of loss, patched into a link that arrives too hot.

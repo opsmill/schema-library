@@ -159,6 +159,15 @@ spec:
             oper_state: up
             connector_type: LC
             polish: UPC
+            direction: west
+        - kind: OtnRoadmDegreePort
+          data:
+            name: degree-2
+            role: degree
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+            direction: south
 
 ---
 apiVersion: infrahub.app/v1
@@ -194,6 +203,189 @@ spec:
             polish: UPC
 
 ---
+# Two conduits on separate routes. Diversity is a property of the plant, so the
+# protect path earns its name by riding a span in the other one.
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnConduit
+  data:
+    - name: nyc1-sjc1-conduit-north
+      description: Northern duct route between NYC1 and SJC1.
+      owner: Lumen
+    - name: nyc1-sjc1-conduit-south
+      description: Southern duct route between NYC1 and SJC1.
+      owner: Colt
+
+---
+# The far-end ROADM. Without it the wavelength had nowhere to be dropped, and a
+# section had only one end that could terminate it.
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnRoadm
+  data:
+    - name: sjc1-rdm01
+      status: active
+      role: core
+      vendor: Cisco
+      model: NCS 2006
+      insertion_loss_mdb: 5500
+      technology: wss_lcos
+      channel_capacity: 96
+      colorless: true
+      directionless: true
+      contentionless: false
+      site: SJC1
+      ports:
+        - kind: OtnRoadmAddDropPort
+          data:
+            name: add-drop-1/1
+            role: add_drop
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+        - kind: OtnRoadmDegreePort
+          data:
+            name: degree-1
+            role: degree
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+            direction: east
+        - kind: OtnRoadmDegreePort
+          data:
+            name: degree-2
+            role: degree
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+            direction: north
+
+---
+# A fixed coarse pair, with no ROADM at either end. The section between these two
+# is what OtnOmsEndpoint exists for: before it, a passive point-to-point system
+# could not carry a multiplex section at all.
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnMuxDemux
+  data:
+    - name: nyc1-cwdm01
+      status: active
+      role: passive
+      vendor: Cisco
+      model: NCS1K-MD-CWDM
+      insertion_loss_mdb: 2800
+      plan: cwdm
+      mux_role: mux_demux
+      technology: thin_film_filter
+      channel_capacity: 8
+      site: NYC1
+      cwdm_channels:
+        kind: OtnCwdmChannel
+        data:
+          - center_wavelength_nm: 1471
+          - center_wavelength_nm: 1491
+      ports:
+        - kind: OtnMuxClientPort
+          data:
+            name: cwdm-client-1471
+            role: client
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+            cwdm_channel:
+              kind: OtnCwdmChannel
+              data:
+                center_wavelength_nm: 1471
+        - kind: OtnMuxLinePort
+          data:
+            name: cwdm-line-1
+            role: line
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+    - name: sjc1-cwdm01
+      status: active
+      role: passive
+      vendor: Cisco
+      model: NCS1K-MD-CWDM
+      insertion_loss_mdb: 2800
+      plan: cwdm
+      mux_role: mux_demux
+      technology: thin_film_filter
+      channel_capacity: 8
+      site: SJC1
+      cwdm_channels:
+        kind: OtnCwdmChannel
+        data:
+          - center_wavelength_nm: 1471
+          - center_wavelength_nm: 1491
+      ports:
+        - kind: OtnMuxClientPort
+          data:
+            name: cwdm-client-1471
+            role: client
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+            cwdm_channel:
+              kind: OtnCwdmChannel
+              data:
+                center_wavelength_nm: 1471
+        - kind: OtnMuxLinePort
+          data:
+            name: cwdm-line-1
+            role: line
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+
+---
+# The coupler that feeds the working and the protect leg. The scheme it serves,
+# 1+1 or 1:1, is not modelled; see the not_covered note on protection mechanisms.
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnSplitter
+  data:
+    - name: nyc1-olp01
+      status: active
+      role: passive
+      vendor: Cisco
+      model: NCS1K-OLP
+      split_type: even
+      output_count: 2
+      insertion_loss_mdb: 3500
+      site: NYC1
+      ports:
+        - kind: OtnSplitterPort
+          data:
+            name: common
+            leg: common
+            role: line
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+        - kind: OtnSplitterPort
+          data:
+            name: out-1
+            leg: output
+            role: line
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+        - kind: OtnSplitterPort
+          data:
+            name: out-2
+            leg: output
+            role: line
+            oper_state: up
+            connector_type: LC
+            polish: UPC
+
+---
 apiVersion: infrahub.app/v1
 kind: Object
 spec:
@@ -202,15 +394,145 @@ spec:
     # A single 82 km span stands in for the NYC1 to SJC1 route, which in a real
     # network is many spans with amplifiers between them.
     - name: nyc1-sjc1-span-1
-      description: Leased dark fiber between NYC1 and SJC1.
+      description: Leased dark fiber between NYC1 and SJC1, north route.
       length_m: 82000
       insertion_loss_mdb: 15580
       splice_count: 20
       fiber_type: smf-g652d
       site_a: NYC1
       site_b: SJC1
+      conduit: nyc1-sjc1-conduit-north
+      oms_sequence: 1
       terminating_ports:
         - [nyc1-rdm01, degree-1]
+        - [sjc1-rdm01, degree-1]
+    # The diverse route the protect path takes. Longer, so its budget differs, and in
+    # a different conduit, which is what makes the two paths genuinely diverse.
+    - name: nyc1-sjc1-span-2
+      description: Leased dark fiber between NYC1 and SJC1, south route.
+      length_m: 104000
+      insertion_loss_mdb: 19760
+      splice_count: 26
+      fiber_type: smf-g652d
+      site_a: NYC1
+      site_b: SJC1
+      conduit: nyc1-sjc1-conduit-south
+      oms_sequence: 1
+      terminating_ports:
+        - [nyc1-rdm01, degree-2]
+        - [sjc1-rdm01, degree-2]
+    # The passive CWDM tail. Its own span, because a span belongs to one section.
+    - name: nyc1-sjc1-span-3
+      description: Dark fiber carrying the coarse tail between NYC1 and SJC1.
+      length_m: 41000
+      insertion_loss_mdb: 8200
+      splice_count: 9
+      fiber_type: smf-g652d
+      site_a: NYC1
+      site_b: SJC1
+      oms_sequence: 1
+      terminating_ports:
+        - [nyc1-cwdm01, cwdm-line-1]
+        - [sjc1-cwdm01, cwdm-line-1]
+
+---
+# Three sections. Two ROADM to ROADM on the diverse routes, and one between the
+# passive coarse pair, which is only expressible because a section terminates on
+# any OtnOmsEndpoint rather than on a ROADM.
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnOpticalMultiplexSection
+  data:
+    # `endpoint_a` and `endpoint_b` peer the OtnOmsEndpoint generic, which declares
+    # no hfid, so each end names its concrete kind and upserts by its own fields.
+    - name: nyc1-sjc1-oms-north
+      description: North route section, amplified in the NYC1 to SJC1 direction.
+      endpoint_a:
+        kind: OtnRoadm
+        data:
+          name: nyc1-rdm01
+          role: core
+      endpoint_b:
+        kind: OtnRoadm
+        data:
+          name: sjc1-rdm01
+          role: core
+      spans:
+        - nyc1-sjc1-span-1
+    - name: nyc1-sjc1-oms-south
+      description: South route section, unamplified.
+      endpoint_a:
+        kind: OtnRoadm
+        data:
+          name: nyc1-rdm01
+          role: core
+      endpoint_b:
+        kind: OtnRoadm
+        data:
+          name: sjc1-rdm01
+          role: core
+      spans:
+        - nyc1-sjc1-span-2
+    - name: nyc1-sjc1-oms-cwdm
+      description: Coarse section between two passive multiplexers, no ROADM at either end.
+      endpoint_a:
+        kind: OtnMuxDemux
+        data:
+          name: nyc1-cwdm01
+          role: passive
+      endpoint_b:
+        kind: OtnMuxDemux
+        data:
+          name: sjc1-cwdm01
+          role: passive
+      spans:
+        - nyc1-sjc1-span-3
+
+---
+# The amplifier chain on the north section, in the A to B direction only. Position 1
+# is the booster leaving NYC1 and position 2 the pre-amplifier arriving at SJC1, which
+# is what oms_sequence orders. The return direction is left unamplified here.
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnAmplifier
+  data:
+    - name: nyc1-amp01
+      status: active
+      role: core
+      vendor: Cisco
+      model: NCS1K-EDFA
+      amplifier_type: edfa
+      stage: booster
+      gain_mdb: 17000
+      noise_figure_mdb: 5000
+      max_total_output_power_mdbm: 23000
+      site: NYC1
+      oms_a2b: nyc1-sjc1-oms-north
+      oms_sequence: 1
+    - name: sjc1-amp01
+      status: active
+      role: core
+      vendor: Cisco
+      model: NCS1K-EDFA
+      amplifier_type: edfa
+      stage: preamp
+      gain_mdb: 21000
+      noise_figure_mdb: 4500
+      max_total_output_power_mdbm: 20000
+      site: SJC1
+      oms_a2b: nyc1-sjc1-oms-north
+      oms_sequence: 2
+
+---
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnDiversityGroup
+  data:
+    - name: dg-lumen-east
+      description: Services that must not share plant with each other.
 
 ---
 apiVersion: infrahub.app/v1
@@ -219,7 +541,7 @@ spec:
   kind: OtnOpticalCarrier
   data:
     - name: nyc1-sjc1-ch16
-      description: 400G wavelength on channel 21 between NYC1 and SJC1.
+      description: 400G wavelength on channel 16 between NYC1 and SJC1.
       status: active
       channel:
         kind: OtnFrequencyGrid
@@ -245,12 +567,14 @@ spec:
       endpoint_a: nyc1-txp01
       endpoint_z: sjc1-txp01
       customer: Lumen
+      diversity_group: dg-lumen-east
       optical_path:
         kind: OtnOpticalPath
         data:
           - name: nyc1-sjc1-path-1
-            description: Single segment carrying the wavelength from NYC1 to SJC1.
+            description: Working route, north, carrying the wavelength from NYC1 to SJC1.
             segment_sequence: 1
+            path_role: working
             carrier: nyc1-sjc1-ch16
             hops:
               kind: OtnPathHop
@@ -282,6 +606,61 @@ spec:
                       fiber_type: smf-g652d
                       site_a: NYC1
                       site_b: SJC1
+                # The far end of the working route, where the carrier leaves the line
+                # system. `drop` is the mirror of hop 1: same kind of port pair, other
+                # direction of travel, which is the distinction `action` records.
+                - name: nyc1-sjc1-hop-3
+                  sequence: 3
+                  action: drop
+                  element:
+                    kind: OtnRoadm
+                    data:
+                      name: sjc1-rdm01
+                      role: core
+                  ingress_port: [sjc1-rdm01, degree-1]
+                  egress_port: [sjc1-rdm01, add-drop-1/1]
+          # The protect route, south. It shares the service and the segment position
+          # with the working path and differs only in path_role, which is the third
+          # term of the uniqueness constraint that lets both exist.
+          - name: nyc1-sjc1-path-2
+            description: Protect route, south, over the diverse conduit.
+            segment_sequence: 1
+            path_role: protect
+            carrier: nyc1-sjc1-ch16
+            hops:
+              kind: OtnPathHop
+              data:
+                - name: nyc1-sjc1-protect-hop-1
+                  sequence: 1
+                  action: add
+                  element:
+                    kind: OtnRoadm
+                    data:
+                      name: nyc1-rdm01
+                      role: core
+                  ingress_port: [nyc1-rdm01, add-drop-1/1]
+                  egress_port: [nyc1-rdm01, degree-2]
+                - name: nyc1-sjc1-protect-hop-2
+                  sequence: 2
+                  action: through
+                  element:
+                    kind: OtnFiberSpan
+                    data:
+                      name: nyc1-sjc1-span-2
+                      length_m: 104000
+                      fiber_type: smf-g652d
+                      site_a: NYC1
+                      site_b: SJC1
+                - name: nyc1-sjc1-protect-hop-3
+                  sequence: 3
+                  action: drop
+                  element:
+                    kind: OtnRoadm
+                    data:
+                      name: sjc1-rdm01
+                      role: core
+                  ingress_port: [sjc1-rdm01, degree-2]
+                  egress_port: [sjc1-rdm01, add-drop-1/1]
 
 ---
 # The intra-site jumper from the transponder line port into the ROADM add/drop
