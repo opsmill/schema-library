@@ -6,10 +6,11 @@
 # pluggable). LocationRack and DcimDeviceType are created here rather than
 # declared as a dependency, which is what the other extensions' object files do.
 #
-# Two sites, three spans in two conduits, and one protected wavelength beside a
-# passive coarse tail. Enough to walk the model from a service down to the ports
-# it lands on and back up from a port to the ROADM switching it, not a
-# representative network.
+# Two sites, three spans in two conduits, and one protected 400G transport service
+# beside a passive coarse tail. Its payload is groomed two levels deep into ODU
+# containers. Enough to walk the model from a service down to the ports it lands on,
+# back up from a port to the ROADM switching it, and down again from a wavelength to
+# the client signals inside it. Not a representative network.
 #
 # The line system is Ciena and the transponders sit on it, with a passive coarse
 # pair from Adtran and a Cisco grey client pluggable. Real platform names, at
@@ -65,6 +66,64 @@ spec:
     - center_frequency_mhz: 192100000
 
 ---
+# The client signals this network grooms. Rates are the nominal line rates from
+# G.709 and G.707, in kbps, and `default_container_type` is the first step of the
+# mapping chain rather than the last.
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnClientSignal
+  data:
+    - name: 100GBASE-LR4
+      description: 100 Gigabit Ethernet over four wavelengths, 10 km.
+      layer: ethernet
+      auto_selectable: true
+      bit_rate_kbps: 103100000
+      default_container_type: ODU4
+      default_mapping: GMP
+    - name: STM-64
+      alias: OC-192
+      description: SDH at 9.95 Gbit/s, still carried on plenty of transport networks.
+      layer: sdh
+      auto_selectable: true
+      bit_rate_kbps: 9953280
+      default_container_type: ODU2
+      default_mapping: BMP
+
+---
+# What the line side can do. The transponder mode is what generates the carrier on
+# this network; the 400ZR mode belongs to a pluggable and is here so a coherent
+# QSFP-DD has a mode to declare. Reach and required OSNR are vendor figures, a
+# starting point for a budget rather than a guarantee.
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnOpticalMode
+  data:
+    - name: wl5e-400g-dp16qam
+      description: Coherent 400G on the transponder line side, long haul.
+      mode_class: transponder
+      modulation: DP-16QAM
+      line_rate_gbps: 400
+      baud_mbaud: 56000
+      required_osnr_mdb: 25000
+      cd_tolerance_fs_per_nm: 50000000
+      nominal_reach_m: 1000000
+      fec_type: SD-FEC
+      fec_latency_ns: 5000
+    - name: 400zr-dp16qam
+      description: OIF 400ZR in a pluggable, for a metro or campus reach.
+      mode_class: pluggable
+      modulation: DP-16QAM
+      line_rate_gbps: 400
+      baud_mbaud: 59840
+      required_osnr_mdb: 26000
+      cd_tolerance_fs_per_nm: 2400000
+      nominal_reach_m: 120000
+      fec_type: cFEC
+      fec_latency_ns: 100
+
+---
 apiVersion: infrahub.app/v1
 kind: Object
 spec:
@@ -75,6 +134,15 @@ spec:
       description: 400G QSFP-DD grey client optic, 500 m over parallel single mode fiber.
       form_factor: QSFP-DD
       tunable: false
+    # A coherent pluggable, so the catalogue carries something that names a mode. It
+    # is tunable, which is what lets it sit on the dense grid at all.
+    - part_number: QDD-400G-ZR
+      manufacturer: Cisco
+      description: 400ZR coherent QSFP-DD, tunable across the C band.
+      form_factor: QSFP-DD
+      tunable: true
+      supported_modes:
+        - 400zr-dp16qam
 
 ---
 apiVersion: infrahub.app/v1
@@ -597,6 +665,55 @@ spec:
       site: SJC1
       oms_a2b: nyc1-sjc1-oms-north
       oms_sequence: 2
+    # The return direction. `oms_b2a` is a separate relationship from `oms_a2b`, so
+    # which chain an amplifier is in is stored by the graph rather than by a flag,
+    # and oms_sequence counts along the direction that chain amplifies.
+    - name: sjc1-amp02
+      status: active
+      role: core
+      vendor: Ciena
+      model: 6500 SLA
+      amplifier_type: edfa
+      stage: booster
+      gain_mdb: 17000
+      noise_figure_mdb: 5000
+      max_total_output_power_mdbm: 23000
+      site: SJC1
+      oms_b2a: nyc1-sjc1-oms-north
+      oms_sequence: 1
+    - name: nyc1-amp02
+      status: active
+      role: core
+      vendor: Ciena
+      model: 6500 SLA
+      amplifier_type: edfa
+      stage: preamp
+      gain_mdb: 21000
+      noise_figure_mdb: 4500
+      max_total_output_power_mdbm: 20000
+      site: NYC1
+      oms_b2a: nyc1-sjc1-oms-north
+      oms_sequence: 2
+
+---
+# Distributed Raman on the long south span, injected at the SJC1 end and firing
+# back against the signal, which is what counter-propagating means. It pumps the
+# fiber itself rather than sitting in line, so it points at the span.
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnRamanPump
+  data:
+    - name: sjc1-raman01
+      status: active
+      role: core
+      vendor: Ciena
+      model: 6500 SLA
+      on_off_gain_mdb: 9000
+      injection_end: site_b
+      propagation: counter
+      site: SJC1
+      span: nyc1-sjc1-span-2
 
 ---
 apiVersion: infrahub.app/v1
@@ -620,6 +737,12 @@ spec:
         kind: OtnFrequencyGrid
         data:
           center_frequency_mhz: 192100000
+      optical_mode: wl5e-400g-dp16qam
+      # Both sections, because the working and the protect path each cross one and
+      # the carrier is the same wavelength on either route.
+      sections:
+        - nyc1-sjc1-oms-north
+        - nyc1-sjc1-oms-south
       line_ports:
         - [nyc1-txp01, line-1/0/0]
         - [sjc1-txp01, line-1/0/0]
@@ -631,11 +754,12 @@ spec:
   kind: OtnService
   data:
     - name: SVC-NYC1-SJC1-0001
-      description: 400G wavelength sold to Lumen between NYC1 and SJC1.
+      description: 400G transport sold to Lumen between NYC1 and SJC1, groomed into ODU containers.
       rate_gbps: 400
       sla: gold
       status: active
-      service_type: wavelength
+      service_type: transport
+      client_signal: 100GBASE-LR4
       max_latency_ns: 500000
       endpoint_a: nyc1-txp01
       endpoint_z: sjc1-txp01
@@ -759,3 +883,76 @@ spec:
           data:
             name: add-drop-1/1
             device: nyc1-rdm01
+
+---
+# The ODU hierarchy riding the 400G wavelength. The ODUC4 is the whole line
+# payload; it offers 320 tributary slots, four ODU4 worth. One ODU4 carries a
+# 100GbE client directly by GMP. The other multiplexes a lower-order ODU2, which
+# carries an STM-64 by BMP, so the parent and child edges are exercised two levels
+# deep. Slot counts are the G.709 figures: an ODU4 takes 80 slots in an ODUC4 and
+# offers 80 to its own children; an ODU2 takes 8 of those.
+#
+# The parent is first in the list on purpose, since each child names it.
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnContainer
+  data:
+    - name: oduc4-nyc1-sjc1
+      description: Line payload of the 400G wavelength.
+      odu_type: ODUC4
+      mapping_mode: GMP
+      segment_sequence: 1
+      tributary_slots: 0
+      tributary_slot_capacity: 320
+      carrier: nyc1-sjc1-ch16
+      service: SVC-NYC1-SJC1-0001
+    - name: odu4-nyc1-sjc1-1
+      description: Carries the 100GbE client directly.
+      odu_type: ODU4
+      mapping_mode: GMP
+      segment_sequence: 1
+      tributary_slots: 80
+      tributary_slot_capacity: 0
+      parent_container: oduc4-nyc1-sjc1
+      client_signal: 100GBASE-LR4
+      service: SVC-NYC1-SJC1-0001
+    - name: odu4-nyc1-sjc1-2
+      description: Multiplexes lower-order containers rather than carrying a client.
+      odu_type: ODU4
+      mapping_mode: GMP
+      segment_sequence: 1
+      tributary_slots: 80
+      tributary_slot_capacity: 80
+      parent_container: oduc4-nyc1-sjc1
+      service: SVC-NYC1-SJC1-0001
+    - name: odu2-nyc1-sjc1-1
+      description: Carries the STM-64 client, bit-synchronously mapped.
+      odu_type: ODU2
+      mapping_mode: BMP
+      segment_sequence: 1
+      tributary_slots: 8
+      tributary_slot_capacity: 0
+      parent_container: odu4-nyc1-sjc1-2
+      client_signal: STM-64
+      service: SVC-NYC1-SJC1-0001
+
+---
+# An ODU cross-connect at the far end, which demultiplexes the line payload and
+# regroups containers rather than passing the whole thing through. That is the
+# difference `switching_mode` records.
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OtnOduSwitch
+  data:
+    - name: sjc1-odusw01
+      status: active
+      role: core
+      vendor: Ciena
+      model: 6500-T12
+      switching_mode: cross_connect
+      framing_latency_ns: 12000
+      site: SJC1
+      carriers:
+        - nyc1-sjc1-ch16
