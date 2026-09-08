@@ -1,17 +1,37 @@
 # ---------------------------------------------------------------------------
 # Mock data for extensions/otn.
-# Depends on: base (OrganizationManufacturer: Cisco, OrganizationProvider: Lumen),
-# extensions/location_minimal (LocationSite: NYC1, SJC1), extensions/transceiver
-# (DcimStandardTransceiver, which records the fitted pluggable).
+# Depends on: base (OrganizationManufacturer: Cisco, OrganizationProvider: Lumen
+# and Colt), extensions/location_minimal (LocationSite: NYC1, SJC1),
+# extensions/transceiver (DcimStandardTransceiver, which records the fitted
+# pluggable). LocationRack and DcimDeviceType are created here rather than
+# declared as a dependency, which is what the other extensions' object files do.
 #
-# One facility, one span, one wavelength and one service end to end. Enough to
-# walk the model from a service down to the ports it lands on, not a
+# Two sites, three spans in two conduits, and one protected wavelength beside a
+# passive coarse tail. Enough to walk the model from a service down to the ports
+# it lands on and back up from a port to the ROADM switching it, not a
 # representative network.
+#
+# The line system is Ciena and the transponders sit on it, with a passive coarse
+# pair from Adtran and a Cisco grey client pluggable. Real platform names, at
+# platform granularity rather than invented card codes.
 #
 # References use each kind's human_friendly_id: a device by name, a port by
 # device plus name. OtnFrequencyGrid is referenced with a nested kind/data
 # block instead, because its hfid is a Number, the centre frequency in MHz.
 # ---------------------------------------------------------------------------
+---
+# The optical vendors this sample uses. base ships Cisco only, which stays on the
+# grey client pluggable, where a third-party optic is ordinary.
+apiVersion: infrahub.app/v1
+kind: Object
+spec:
+  kind: OrganizationManufacturer
+  data:
+    - name: Ciena
+      description: Ciena Corporation.
+    - name: Adtran
+      description: Adtran Holdings, Inc., which now carries the ADVA FSP line.
+
 ---
 apiVersion: infrahub.app/v1
 kind: Object
@@ -65,8 +85,8 @@ spec:
     - name: nyc1-txp01
       status: active
       role: edge
-      vendor: Cisco
-      model: NCS 1004
+      vendor: Ciena
+      model: Waveserver 5
       site: NYC1
       ports:
         - kind: OtnClientPort
@@ -92,8 +112,8 @@ spec:
     - name: sjc1-txp01
       status: active
       role: edge
-      vendor: Cisco
-      model: NCS 1004
+      vendor: Ciena
+      model: Waveserver 5
       site: SJC1
       ports:
         - kind: OtnLinePort
@@ -140,10 +160,36 @@ spec:
     - name: nyc1-rdm01
       status: active
       role: core
-      vendor: Cisco
-      model: NCS 2006
+      vendor: Ciena
+      model: 6500-T12
       insertion_loss_mdb: 5500
       site: NYC1
+      # The physical asset for the same box. `dcim_device` peers the
+      # DcimPhysicalDevice generic, which declares no hfid, so the record names its
+      # concrete kind. It is the route to a rack elevation and to a device type, which
+      # this extension reaches on the Dcim side rather than modelling natively:
+      # `position` and `rack_face` sit on the record and its `location` is a
+      # LocationRack. The name is shared with the OTN device on purpose, since both
+      # records describe one box.
+      dcim_device:
+        kind: DcimDevice
+        data:
+          name: nyc1-rdm01
+          position: 14
+          rack_face: front
+          device_type:
+            kind: DcimDeviceType
+            data:
+              name: 6500-T12
+              manufacturer: Ciena
+          location:
+            kind: LocationRack
+            data:
+              name: NYC1-RACK-01
+              site:
+                kind: LocationSite
+                data:
+                  name: NYC1
       ports:
         - kind: OtnRoadmAddDropPort
           data:
@@ -178,9 +224,10 @@ spec:
     - name: nyc1-mux01
       status: active
       role: passive
-      vendor: Cisco
-      model: NCS1K-MD-64-C
+      vendor: Ciena
+      model: 6500 CMD44
       insertion_loss_mdb: 3500
+      channel_capacity: 44
       site: NYC1
       ports:
         - kind: OtnMuxClientPort
@@ -228,8 +275,8 @@ spec:
     - name: sjc1-rdm01
       status: active
       role: core
-      vendor: Cisco
-      model: NCS 2006
+      vendor: Ciena
+      model: 6500-T12
       insertion_loss_mdb: 5500
       technology: wss_lcos
       channel_capacity: 96
@@ -237,6 +284,32 @@ spec:
       directionless: true
       contentionless: false
       site: SJC1
+      # The physical asset for the same box. `dcim_device` peers the
+      # DcimPhysicalDevice generic, which declares no hfid, so the record names its
+      # concrete kind. It is the route to a rack elevation and to a device type, which
+      # this extension reaches on the Dcim side rather than modelling natively:
+      # `position` and `rack_face` sit on the record and its `location` is a
+      # LocationRack. The name is shared with the OTN device on purpose, since both
+      # records describe one box.
+      dcim_device:
+        kind: DcimDevice
+        data:
+          name: sjc1-rdm01
+          position: 14
+          rack_face: front
+          device_type:
+            kind: DcimDeviceType
+            data:
+              name: 6500-T12
+              manufacturer: Ciena
+          location:
+            kind: LocationRack
+            data:
+              name: SJC1-RACK-01
+              site:
+                kind: LocationSite
+                data:
+                  name: SJC1
       ports:
         - kind: OtnRoadmAddDropPort
           data:
@@ -274,8 +347,8 @@ spec:
     - name: nyc1-cwdm01
       status: active
       role: passive
-      vendor: Cisco
-      model: NCS1K-MD-CWDM
+      vendor: Adtran
+      model: FSP 3000
       insertion_loss_mdb: 2800
       plan: cwdm
       mux_role: mux_demux
@@ -309,8 +382,8 @@ spec:
     - name: sjc1-cwdm01
       status: active
       role: passive
-      vendor: Cisco
-      model: NCS1K-MD-CWDM
+      vendor: Adtran
+      model: FSP 3000
       insertion_loss_mdb: 2800
       plan: cwdm
       mux_role: mux_demux
@@ -353,8 +426,8 @@ spec:
     - name: nyc1-olp01
       status: active
       role: passive
-      vendor: Cisco
-      model: NCS1K-OLP
+      vendor: Adtran
+      model: FSP 3000
       split_type: even
       output_count: 2
       insertion_loss_mdb: 3500
@@ -501,8 +574,8 @@ spec:
     - name: nyc1-amp01
       status: active
       role: core
-      vendor: Cisco
-      model: NCS1K-EDFA
+      vendor: Ciena
+      model: 6500 SLA
       amplifier_type: edfa
       stage: booster
       gain_mdb: 17000
@@ -514,8 +587,8 @@ spec:
     - name: sjc1-amp01
       status: active
       role: core
-      vendor: Cisco
-      model: NCS1K-EDFA
+      vendor: Ciena
+      model: 6500 SLA
       amplifier_type: edfa
       stage: preamp
       gain_mdb: 21000
