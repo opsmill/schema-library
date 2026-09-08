@@ -113,6 +113,9 @@ def _generate_schema_reference_content(schema_key: str, schema_metadata: dict) -
         "name": schema_metadata.get("name", ""),
         "description": schema_metadata.get("description", ""),
         "attribution": schema_metadata.get("attribution", ""),
+        # Optional. Extensions that omit these render no "Use cases" section at all.
+        "use_cases": schema_metadata.get("use_cases", []),
+        "not_covered": schema_metadata.get("not_covered", []),
     }
 
     # Compute link for dependencies

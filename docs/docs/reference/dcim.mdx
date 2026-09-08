@@ -287,8 +287,8 @@ generics:
   - name: name
     kind: Text
     unique: true
-    allow_override: any
     optional: false
+    allow_override: any
     order_weight: 1000
   - name: position
     kind: Number
@@ -598,8 +598,8 @@ nodes:
     peer: OrganizationManufacturer
     kind: Attribute
     cardinality: one
-    identifier: manufacturer__platform
     optional: true
+    identifier: manufacturer__platform
     order_weight: 1300
 - name: Device
   namespace: Dcim
@@ -693,8 +693,8 @@ nodes:
     peer: InterfaceHasSubInterface
     kind: Attribute
     cardinality: one
-    identifier: sub__interface
     optional: true
+    identifier: sub__interface
     description: Parent interface to which this sub-interface belongs
     order_weight: 1600
 

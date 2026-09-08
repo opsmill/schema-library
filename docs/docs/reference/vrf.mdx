@@ -111,10 +111,10 @@ nodes:
   - name: enforce_unique
     kind: Boolean
     label: Enforce Unique
-    description: Declares the intent that prefixes and addresses be unique in this
-      VRF. Infrahub does not enforce it; use a check or generator.
     default_value: true
     optional: true
+    description: Declares the intent that prefixes and addresses be unique in this
+      VRF. Infrahub does not enforce it; use a check or generator.
     order_weight: 1200
   - name: description
     kind: Text
@@ -162,16 +162,16 @@ nodes:
   relationships:
   - name: import_vrf
     peer: IpamVRF
-    kind: Generic
     label: Imported by VRFs
+    kind: Generic
     cardinality: many
     optional: true
     identifier: vrf__import
     order_weight: 1300
   - name: export_vrf
     peer: IpamVRF
-    kind: Generic
     label: Exported by VRFs
+    kind: Generic
     cardinality: many
     optional: true
     identifier: vrf__export
