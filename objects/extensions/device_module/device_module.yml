@@ -41,7 +41,7 @@ spec:
     # match the existing nyc1-rtr01 fixture exactly, so this upserts/matches
     # it instead of creating a duplicate.
     - name: "slot 1"
-      position: 1
+      position: "1"
       description: "Primary route processor slot."
       device: &nyc1_rtr01
         kind: DcimDevice
@@ -54,12 +54,12 @@ spec:
               site: NYC1
 
     - name: "slot 2"
-      position: 2
+      position: "2"
       description: "Secondary route processor slot."
       device: *nyc1_rtr01
 
     - name: "fan tray 1"
-      position: 3
+      position: "3"
       description: "Fan tray slot."
       device: *nyc1_rtr01
 

@@ -111,6 +111,18 @@ generics:
         optional: true
         description: "Part number of the module."
         order_weight: 1200
+      - name: weight_grams
+        label: Weight (g)
+        kind: Number
+        optional: true
+        # Grams, not kilograms. Infrahub has no float attribute kind, so a
+        # weight is a whole number or nothing, and modules are exactly the
+        # light hardware that integer kilograms destroy: a transceiver or a
+        # supervisor rounds to 0 kg, which reads as data rather than as a
+        # missing value. Grams keep every published module weight distinct
+        # and sortable.
+        description: "Weight of the module in grams."
+        order_weight: 1300
     relationships:
       - name: manufacturer
         peer: OrganizationManufacturer
@@ -154,12 +166,25 @@ nodes:
         description: "Name of the bay, e.g. 'slot 1' or 'psu 1'."
         order_weight: 1000
       - name: position
-        kind: Number
-        parameters:
-          min_value: 1
+        kind: Text
         optional: true
-        description: "Numeric position of the bay within the device (e.g. slot 1, 2, 3)."
+        # Text, not Number: bay positions are free-form. A DCS-7508N uses
+        # '1'..'10' but also 'F1'..'F6' and 'PSU-1'..'PSU-8', so a Number
+        # attribute would reject 14 of its 24 bays.
+        description: "Position of the bay within the device, e.g. '1', 'F3' or 'PSU-2'."
         order_weight: 1050
+      - name: bay_label
+        label: Bay Label
+        kind: Text
+        optional: true
+        # NOT named `label`. Infrahub auto-populates an attribute literally
+        # named `label` from `name` when it is unset - and title-cases it, so
+        # "no label supplied" becomes indistinguishable from "the label equals
+        # the name". On a DCS-7508N only 10 of 24 bays carry one, so the
+        # distinction is worth keeping. Free text, unlike `role` below, which
+        # enumerates the bay's purpose.
+        description: "What the bay is for, for example 'Supervisor' or 'Line Card'."
+        order_weight: 1060
       - name: description
         kind: Text
         optional: true

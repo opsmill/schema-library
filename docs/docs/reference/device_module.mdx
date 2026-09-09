@@ -29,7 +29,8 @@ It ships a ready-to-use Module and Module Type pair, plus the generic Module and
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | computed_name | Name computed from the device and bay name. | Text | False |  |  |
 | name | Name of the bay, e.g. 'slot 1' or 'psu 1'. | Text | False |  |  |
-| position | Numeric position of the bay within the device (e.g. slot 1, 2, 3). | Number | True |  |  |
+| position | Position of the bay within the device, e.g. '1', 'F3' or 'PSU-2'. | Text | True |  |  |
+| bay_label | What the bay is for, for example 'Supervisor' or 'Line Card'. | Text | True |  |  |
 | description |  | Text | True |  |  |
 | role | The role of the module bay, indicating the type of module it is intended to receive. | Dropdown | True |  | supervisor, line_card, power_supply, fan |
 
@@ -110,6 +111,7 @@ It ships a ready-to-use Module and Module Type pair, plus the generic Module and
 | name | Name of the module type. | Text | False |  |  |
 | description | Description of the module type. | Text | True |  |  |
 | part_number | Part number of the module. | Text | True |  |  |
+| weight_grams | Weight of the module in grams. | Number | True |  |  |
 
 #### Relationships
 
@@ -241,6 +243,12 @@ generics:
     optional: true
     description: Part number of the module.
     order_weight: 1200
+  - name: weight_grams
+    label: Weight (g)
+    kind: Number
+    optional: true
+    description: Weight of the module in grams.
+    order_weight: 1300
   relationships:
   - name: manufacturer
     peer: OrganizationManufacturer
@@ -284,12 +292,16 @@ nodes:
     description: Name of the bay, e.g. 'slot 1' or 'psu 1'.
     order_weight: 1000
   - name: position
-    kind: Number
-    parameters:
-      min_value: 1
+    kind: Text
     optional: true
-    description: Numeric position of the bay within the device (e.g. slot 1, 2, 3).
+    description: Position of the bay within the device, e.g. '1', 'F3' or 'PSU-2'.
     order_weight: 1050
+  - name: bay_label
+    label: Bay Label
+    kind: Text
+    optional: true
+    description: What the bay is for, for example 'Supervisor' or 'Line Card'.
+    order_weight: 1060
   - name: description
     kind: Text
     optional: true
