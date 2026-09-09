@@ -1,0 +1,153 @@
+---
+title: Module Port
+---
+
+This schema extension adds module ports: the ports a module provides, as declared by its module type - what NetBox module-type definitions list under `interfaces`, `console-ports` and `power-ports`.
+
+These are deliberately not DcimInterface objects. DcimInterface.device is a mandatory Parent, and Infrahub requires the relationships used in a uniqueness constraint to be mandatory, so an interface cannot hang off a module instead of a device. A DcimModulePort is a declaration parented by the module, carrying the port name, its category (interface, console, power, front, rear), the NetBox type slug, and power draw.
+
+NOTE: port names keep NetBox's `{module}` bay-position token verbatim, because a template is not bound to a bay. Substituting it and creating the real device interfaces is a generator step once the module is installed.
+
+## Details
+
+- **Dependencies:**
+    - [base](dcim)
+    - [extensions/device_module](device_module)
+
+## Nodes
+
+### ModulePort
+
+- **Label:** Module Port
+- **Description:** A port provided by a module, as declared by its module type.
+- **Namespace:** Dcim
+- **Icon:** mdi:ethernet
+- **Uniqueness Constraints:**
+    - module, name__value
+- **Human Friendly ID:** module__computed_name__value, name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name | Port name as declared by the module type, e.g. `Ethernet{module}/1`. | Text | False |  |  |
+| category | Which NetBox component list this port came from. | Dropdown |  | interface | interface, console, power, front, rear |
+| port_type | NetBox type slug, e.g. '1000base-t', 'rj-45', 'iec-60320-c14'. | Text | True |  |  |
+| mgmt_only | Whether the port is reserved for out-of-band management. | Boolean |  | False |  |
+| maximum_draw | Maximum power draw, for power ports. | Number | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| module | DcimGenericModule | False | one | Parent |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### DcimGenericModule
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| ports | DcimModulePort | True | many | Component |
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: ModulePort
+  namespace: Dcim
+  label: Module Port
+  description: A port provided by a module, as declared by its module type.
+  icon: mdi:ethernet
+  include_in_menu: false
+  menu_placement: DcimGenericModule
+  display_label: name__value
+  order_by:
+  - module__computed_name__value
+  - name__value
+  human_friendly_id:
+  - module__computed_name__value
+  - name__value
+  uniqueness_constraints:
+  - - module
+    - name__value
+  attributes:
+  - name: name
+    kind: Text
+    optional: false
+    description: Port name as declared by the module type, e.g. `Ethernet{module}/1`.
+    order_weight: 1000
+  - name: category
+    kind: Dropdown
+    description: Which NetBox component list this port came from.
+    default_value: interface
+    order_weight: 1100
+    choices:
+    - name: interface
+      label: Interface
+      description: A network interface.
+      color: '#A9CCE3'
+    - name: console
+      label: Console Port
+      description: A console port.
+      color: '#E2D4C6'
+    - name: power
+      label: Power Port
+      description: A power inlet.
+      color: '#F4CCCC'
+    - name: front
+      label: Front Port
+      description: A front-facing pass-through port.
+      color: '#D2B4DE'
+    - name: rear
+      label: Rear Port
+      description: A rear-facing pass-through port.
+      color: '#B4E0DC'
+  - name: port_type
+    label: Port Type
+    kind: Text
+    optional: true
+    description: NetBox type slug, e.g. '1000base-t', 'rj-45', 'iec-60320-c14'.
+    order_weight: 1200
+  - name: mgmt_only
+    label: Management Only
+    kind: Boolean
+    default_value: false
+    description: Whether the port is reserved for out-of-band management.
+    order_weight: 1300
+  - name: maximum_draw
+    label: Maximum Draw (W)
+    kind: Number
+    optional: true
+    description: Maximum power draw, for power ports.
+    order_weight: 1400
+  relationships:
+  - name: module
+    peer: DcimGenericModule
+    identifier: module__port
+    optional: false
+    cardinality: one
+    kind: Parent
+    order_weight: 1050
+extensions:
+  nodes:
+  - kind: DcimGenericModule
+    relationships:
+    - name: ports
+      peer: DcimModulePort
+      identifier: module__port
+      optional: true
+      cardinality: many
+      kind: Component
+      order_weight: 1600
+
+```

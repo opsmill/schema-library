@@ -221,6 +221,17 @@ extensions/mlag:
 
     Not covered yet: the layer 3 overlay for MLAG interfaces (loopback, peer address ...) and surfacing MLAG interfaces on each device in the domain.
   name: MLAG
+extensions/module_port:
+  dependencies:
+    - base
+    - extensions/device_module
+  description: |
+    This schema extension adds module ports: the ports a module provides, as declared by its module type - what NetBox module-type definitions list under `interfaces`, `console-ports` and `power-ports`.
+
+    These are deliberately not DcimInterface objects. DcimInterface.device is a mandatory Parent, and Infrahub requires the relationships used in a uniqueness constraint to be mandatory, so an interface cannot hang off a module instead of a device. A DcimModulePort is a declaration parented by the module, carrying the port name, its category (interface, console, power, front, rear), the NetBox type slug, and power draw.
+
+    NOTE: port names keep NetBox's `{module}` bay-position token verbatim, because a template is not bound to a bay. Substituting it and creating the real device interfaces is a generator step once the module is installed.
+  name: Module Port
 extensions/otn:
   dependencies:
     - base

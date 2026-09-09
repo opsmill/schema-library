@@ -50,7 +50,7 @@ spec:
     # New bays, distinct from the existing "slot 1"/"slot 2"/"fan tray 1"
     # (already occupied), used below to install the PSU modules.
     - name: "PSU slot 1"
-      position: 4
+      position: "4"
       description: "Primary power supply slot."
       device: &nyc1_rtr01
         kind: DcimDevice
@@ -63,7 +63,7 @@ spec:
               site: NYC1
 
     - name: "PSU slot 2"
-      position: 5
+      position: "5"
       description: "Secondary power supply slot."
       device: *nyc1_rtr01
 

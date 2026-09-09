@@ -1,0 +1,149 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
+#
+# Module ports — the ports a module provides, as declared by its module type.
+#
+# Why these are NOT DcimInterface:
+#   DcimInterface.device is a mandatory Parent, and Infrahub requires the
+#   relationships used in uniqueness_constraints to be mandatory. Relaxing it
+#   so an interface could hang off a module instead fails outright with
+#   "DcimInterface.uniqueness_constraints: cannot use device relationship,
+#   relationship must be mandatory", and would also break the
+#   device__name__value human_friendly_id. So a module's ports cannot be
+#   modelled as device interfaces.
+#
+# What this is instead: a declaration. A module port records the port a module
+# provides, parented by the module. It carries NetBox's `{module}` token
+# verbatim in `name` — a template is not bound to a bay, so the token cannot
+# be resolved at import time. Materialising these as real InterfacePhysical
+# objects on the device, with `{module}` replaced by the bay position, is a
+# generator's job at install time; see the note at the bottom.
+
+version: "1.0"
+
+nodes:
+  - name: ModulePort
+    namespace: Dcim
+    label: Module Port
+    description: "A port provided by a module, as declared by its module type."
+    icon: mdi:ethernet
+    include_in_menu: false
+    menu_placement: DcimGenericModule
+    display_label: name__value
+    order_by:
+      - module__computed_name__value
+      - name__value
+    human_friendly_id:
+      # Keyed on the module's computed_name, not its serial_number:
+      # DcimGenericModule.serial_number is optional and not unique, so it
+      # cannot key anything. computed_name is unique and mandatory.
+      - module__computed_name__value
+      - name__value
+    uniqueness_constraints:
+      - [module, name__value]
+    attributes:
+      - name: name
+        kind: Text
+        optional: false
+        # The `{module}` token stays inside backticks: this description is
+        # rendered verbatim into a Markdown table in the generated MDX, and
+        # MDX parses a bare {...} as a JSX expression - `module` resolves to
+        # the MDX module object and the docs build fails with "Objects are
+        # not valid as a React child".
+        description: "Port name as declared by the module type, e.g. `Ethernet{module}/1`."
+        order_weight: 1000
+      - name: category
+        kind: Dropdown
+        description: "Which NetBox component list this port came from."
+        default_value: interface
+        order_weight: 1100
+        choices:
+          - name: interface
+            label: Interface
+            description: "A network interface."
+            color: "#A9CCE3"
+          - name: console
+            label: Console Port
+            description: "A console port."
+            color: "#E2D4C6"
+          - name: power
+            label: Power Port
+            description: "A power inlet."
+            color: "#F4CCCC"
+          - name: front
+            label: Front Port
+            description: "A front-facing pass-through port."
+            color: "#D2B4DE"
+          - name: rear
+            label: Rear Port
+            description: "A rear-facing pass-through port."
+            color: "#B4E0DC"
+      - name: port_type
+        label: Port Type
+        kind: Text
+        optional: true
+        # Text, not Dropdown. NetBox uses well over a hundred type slugs
+        # across interfaces, console and power ports (1000base-t, rj-45,
+        # iec-60320-c14, ...). A Dropdown would fail the load on every slug
+        # not enumerated; Text trades UI validation for coverage.
+        description: "NetBox type slug, e.g. '1000base-t', 'rj-45', 'iec-60320-c14'."
+        order_weight: 1200
+      - name: mgmt_only
+        label: Management Only
+        kind: Boolean
+        default_value: false
+        description: "Whether the port is reserved for out-of-band management."
+        order_weight: 1300
+      - name: maximum_draw
+        label: Maximum Draw (W)
+        kind: Number
+        optional: true
+        description: "Maximum power draw, for power ports."
+        order_weight: 1400
+    relationships:
+      - name: module
+        peer: DcimGenericModule
+        identifier: module__port
+        optional: false
+        cardinality: one
+        kind: Parent
+        order_weight: 1050
+
+extensions:
+  nodes:
+    # The Component half. On the DcimGenericModule generic so every concrete
+    # module kind (DcimModule, DeviceLinecard, DevicePsuModule and any
+    # sibling) gets ports, and so any of them that declares generate_template
+    # gets a TemplateDcimModulePort to nest under its module template.
+    - kind: DcimGenericModule
+      relationships:
+        - name: ports
+          peer: DcimModulePort
+          identifier: module__port
+          optional: true
+          cardinality: many
+          kind: Component
+          order_weight: 1600
+
+# Resolving {module}
+# ------------------
+# A DcimModulePort keeps the token form. Turning it into real ports on a
+# device needs the bay position, which is only known once the module is
+# installed, so it is a generator step rather than a template one:
+#
+#   for bay in device.module_bays:
+#       module = bay.installed_module
+#       for port in module.ports:
+#           if port.category == "interface":
+#               create InterfacePhysical(
+#                   device=device,
+#                   name=port.name.replace("{module}", bay.position),
+#                   ...)
+#
+# That keeps DcimInterface's invariants intact: the created interfaces belong
+# to the device, exactly as every other interface does.

@@ -30,11 +30,18 @@ nodes:
     label: "Linecard"
     icon: "bi:pci-card"
     menu_placement: DcimGenericModule
+    # Generates TemplateDeviceLinecard, so a NetBox module type can be
+    # imported as a reusable blueprint rather than as an installed card.
+    generate_template: true
     inherit_from:
       - DcimGenericModule
     attributes:
       - name: slot
         kind: Number
+        # Optional: a NetBox module type describes a model, not an installed
+        # card, so it carries no slot. A mandatory slot makes every imported
+        # module type unloadable.
+        optional: true
         description: "The slot number where the Linecard is installed within the device"
         order_weight: 1050
       - name: bng_enabled
