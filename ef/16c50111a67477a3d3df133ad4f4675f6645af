@@ -1,0 +1,35 @@
+.github/labels.yml
+  s_e814976895190a::t_27a9222a580b65 141-147
+.github/workflows/changelog-check.yml
+  s_e814976895190a::t_e571e1d9af15b8 1-106
+.markdownlintignore
+  s_e814976895190a::t_9fc18e1898dee7 3-8
+CHANGELOG.md
+  s_e814976895190a::t_32f144a904b1a4 1-5
+changelog/+towncrier.housekeeping.md
+  s_e814976895190a::t_54c5a2d6019b98 1-5
+changelog/.gitignore
+  s_e814976895190a::t_fb5ccb400ef8e9 1
+changelog/towncrier.md.template
+  s_e814976895190a::t_08166ff56dd473 1-53
+pyproject.toml
+  s_e814976895190a::t_6b22759357290b 21,66-116
+uv.lock
+  s_e814976895190a::t_92b6075c58ab48 801,820,878-891
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ef16c50111a67477a3d3df133ad4f4675f6645af",
+  "prompts": {},
+  "sessions": {
+    "s_e814976895190a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f38e30c4-8c78-42ea-9268-f3396fdc0b01",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Benoit Kohler <Kohler.benoit@bearchitek.com>"
+    }
+  }
+}
