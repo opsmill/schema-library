@@ -138,3 +138,10 @@
 - name: "state/wont-fix"
   description: "Issue has been closed and won't be fix/implemented."
   color: "eeeeee"
+
+# ----------------------------------
+# CI
+# ----------------------------------
+- name: "ci/skip-changelog"
+  description: "No changelog fragment required"
+  color: "ededed"
