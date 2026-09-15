@@ -17,6 +17,7 @@ dev = [
     "mypy>=1.19.1",
     "pylint>=4.0.4",
     "vale>=3.13.0.0",
+    "rumdl>=0.1.68",
     "types-pyyaml>=6.0.12.20250915",
     "towncrier>=24.8,<27",
     # Covers the docs-generation helpers in tasks/, whose escaping rules are
@@ -63,6 +64,36 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.rumdl]
+# Markdown linting, replacing markdownlint-cli (which needed a global npm install in CI).
+# Rules mirror the previous .markdownlint.yaml one for one.
+# MD013: line length is not enforced, for readability in prose.
+# MD033: inline HTML is allowed, for MDX React components.
+disable = ["MD013", "MD033"]
+
+# Generated, vendored, or non-standalone Markdown. `changelog/` holds towncrier news
+# fragments: prose snippets with no top-level heading (MD041), because towncrier splices
+# them under generated section headings at release time.
+exclude = [
+    "docs/node_modules",
+    "docs/build",
+    "docs/docs/reference",
+    "changelog",
+    ".venv",
+]
+
+# MD007: unordered list indentation
+[tool.rumdl.MD007]
+indent = 4
+
+# MD024: allow duplicate headings among siblings only
+[tool.rumdl.MD024]
+siblings-only = true
+
+# MD025: don't treat the frontmatter title as an H1
+[tool.rumdl.MD025]
+front-matter-title = ""
 
 [tool.towncrier]
 # `schema-library` is a repository of schema files, not an importable package

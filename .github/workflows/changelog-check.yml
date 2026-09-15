@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:truthy
 name: Changelog
 
 # A release is assembled from news fragments, so every pull request that
@@ -27,7 +26,7 @@ jobs:
     name: News fragment present
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Require a news fragment
         env:

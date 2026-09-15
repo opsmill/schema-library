@@ -1,6 +1,5 @@
 ---
-# yamllint disable rule:truthy rule:truthy rule:line-length
-
+# yamllint disable rule:line-length
 name: "CI"
 on:
   pull_request:
@@ -12,15 +11,22 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Least-privilege default; jobs elevate only what they need.
+permissions:
+  contents: read
+
 env:
   GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
-  VALE_VERSION: "3.7.1"
+  VALE_VERSION: "3.13.0"
 
 jobs:
   files-changed:
     name: Detect which file has changed
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read  # paths-filter reads changed files via the API on pull_request
     outputs:
       documentation: ${{ steps.changes.outputs.documentation_all }}
       markdown: ${{ steps.changes.outputs.markdown_all }}
@@ -29,7 +35,7 @@ jobs:
       yaml: ${{ steps.changes.outputs.yaml_all }}
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v7"
       - name: Check for file changes
         uses: opsmill/paths-filter@v3.0.2
         id: changes
@@ -44,13 +50,13 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v7"
       - name: "Set up Python"
-        uses: "actions/setup-python@v5"
+        uses: "actions/setup-python@v7"
         with:
           python-version: "3.12"
       - name: "Install uv"
-        uses: "astral-sh/setup-uv@v5"
+        uses: "astral-sh/setup-uv@v7"
         with:
           version: "0.9.18"
       - name: "Install dependencies"
@@ -74,13 +80,13 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v7"
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: "Install uv"
-        uses: "astral-sh/setup-uv@v5"
+        uses: "astral-sh/setup-uv@v7"
         with:
           version: "0.9.18"
       - name: Install dependencies
@@ -96,15 +102,20 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v4"
-      - name: "Setup Node.js"
-        uses: "actions/setup-node@v4"
+        uses: "actions/checkout@v7"
+      - name: "Set up Python"
+        uses: "actions/setup-python@v7"
         with:
-          node-version: "20"
-      - name: "Install markdownlint-cli"
-        run: "npm install -g markdownlint-cli"
-      - name: "Linting: markdownlint"
-        run: "markdownlint '**/*.md' '**/*.mdx'"
+          python-version: "3.12"
+      - name: "Install uv"
+        uses: "astral-sh/setup-uv@v7"
+        with:
+          version: "0.9.18"
+      - name: "Install dependencies"
+        run: "uv sync --group dev"
+      # Rules and exclusions live in [tool.rumdl] in pyproject.toml.
+      - name: "Linting: rumdl"
+        run: "uv run rumdl check ."
 
   schema-test:
     name: Test all schema files
@@ -123,15 +134,15 @@ jobs:
       INFRAHUB_VERSION: latest
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: true
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: "Install uv"
-        uses: "astral-sh/setup-uv@v5"
+        uses: "astral-sh/setup-uv@v7"
         with:
           version: "0.9.18"
       - name: Install dependencies
@@ -176,17 +187,21 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v7"
         with:
           submodules: true
-      - name: Install NodeJS
-        uses: actions/setup-node@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
         with:
-          node-version: 20
-          cache: "npm"
-          cache-dependency-path: docs/package-lock.json
+          version: 11.6.0
+      - name: Install NodeJS
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22  # pnpm 11 requires Node >= 22.13
+          cache: "pnpm"
+          cache-dependency-path: docs/pnpm-lock.yaml
       - name: "Install uv"
-        uses: "astral-sh/setup-uv@v5"
+        uses: "astral-sh/setup-uv@v7"
         with:
           version: "0.9.18"
       - name: "Install Python dependencies"
@@ -200,7 +215,7 @@ jobs:
         working-directory: ./
       - name: "Check for outdated documentation"
         run: |
-          if ! git diff --exit-code -- docs/reference/; then
+          if ! git diff --exit-code -- docs/docs/reference/; then
             echo "::error::Generated documentation is out of date. Please run 'invoke docs.generate' locally and commit the changes."
             exit 1
           fi
@@ -217,17 +232,21 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v7"
         with:
           submodules: true
-      - name: Install NodeJS
-        uses: actions/setup-node@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
         with:
-          node-version: 20
-          cache: "npm"
-          cache-dependency-path: docs/package-lock.json
+          version: 11.6.0
+      - name: Install NodeJS
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22  # pnpm 11 requires Node >= 22.13
+          cache: "pnpm"
+          cache-dependency-path: docs/pnpm-lock.yaml
       - name: "Install uv"
-        uses: "astral-sh/setup-uv@v5"
+        uses: "astral-sh/setup-uv@v7"
         with:
           version: "0.9.18"
       - name: "Install Python dependencies"
