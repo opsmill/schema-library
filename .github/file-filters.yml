@@ -8,17 +8,22 @@ github_workflows: &github_workflows
 
 doc_files: &doc_files
   - "docs/**"
-  - package.json
-  - package-lock.json
 
 python_all: &python_all
   - "**/*.py"
+  # Linter settings and the resolved linter versions CI installs. Without these,
+  # a dependency bump can change what `ruff check .` reports while python-lint
+  # never runs on the PR that makes the change.
+  - "pyproject.toml"
+  - "uv.lock"
 
 yaml_all: &yaml_all
   - "**/*.{yml,yaml}"
 
 markdown_all: &markdown_all
   - "**/*.{md,mdx}"
+  # [tool.rumdl] lives here, so a rule change has to rerun markdown-lint.
+  - "pyproject.toml"
 
 schema_all: &schema_all
   - "base/**/*.{yml,yaml}"

@@ -1,0 +1,6 @@
+---
+# core-js's postinstall only prints a funding message and needs no build step.
+# Declaring the decision here keeps `pnpm install --frozen-lockfile` non-interactive
+# and exit-0 in CI (pnpm blocks unapproved dependency build scripts by default).
+allowBuilds:
+  core-js: false
