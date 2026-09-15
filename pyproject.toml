@@ -18,6 +18,7 @@ dev = [
     "pylint>=4.0.4",
     "vale>=3.13.0.0",
     "types-pyyaml>=6.0.12.20250915",
+    "towncrier>=24.8,<27",
     # Covers the docs-generation helpers in tasks/, whose escaping rules are
     # subtle enough to regress without being noticed until a docs build fails.
     "pytest>=8.3.0",
@@ -62,3 +63,54 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.towncrier]
+# `schema-library` is a repository of schema files, not an importable package
+# exposing `__version__`, and `[project] version` is unrelated to the published
+# tags. `package` is therefore intentionally omitted; pass `--version X.Y.Z` to
+# `towncrier build` at release time.
+directory = "changelog"
+filename = "CHANGELOG.md"
+start_string = "<!-- towncrier release notes start -->\n"
+underlines = ["", "", ""]
+# Releases are tagged `vX.Y.Z` here, so the tree link carries the `v` while
+# `--version` is passed without it.
+title_format = "## [Schema Library - v{version}](https://github.com/opsmill/schema-library/tree/v{version}) - {project_date}"
+issue_format = "[#{issue}](https://github.com/opsmill/schema-library/issues/{issue})"
+orphan_prefix = "+"
+template = "changelog/towncrier.md.template"
+
+[[tool.towncrier.type]]
+directory = "security"
+name = "Security"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "removed"
+name = "Removed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "deprecated"
+name = "Deprecated"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "added"
+name = "Added"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "changed"
+name = "Changed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "fixed"
+name = "Fixed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "housekeeping"
+name = "Housekeeping"
+showcontent = true

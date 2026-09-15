@@ -1,0 +1,106 @@
+---
+# yamllint disable rule:truthy
+name: Changelog
+
+# A release is assembled from news fragments, so every pull request that
+# changes behaviour must carry one. Failing here — rather than at release
+# time, the way the shared platform does — puts the cost on the author while
+# they still have the context, instead of on whoever cuts the release.
+#
+# Scoped to `main`: that is the only long-lived branch here, and the one
+# releases are tagged from.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  fragment:
+    name: News fragment present
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Require a news fragment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          set -euo pipefail
+
+          # Trivial changes (dependency bumps, typo fixes) opt out. The
+          # platform's rule is at least one fragment per *release*, not per
+          # PR, so skipping here still satisfies it.
+          case ",${LABELS}," in
+            *,ci/skip-changelog,*)
+              echo "ci/skip-changelog is set — no fragment required."
+              exit 0
+              ;;
+          esac
+
+          # This repository has no .github/dependabot.yml yet, so nothing
+          # applies ci/skip-changelog to a bump automatically. Dependabot's
+          # PRs are dependency bumps by construction; exempt the author so
+          # enabling it later does not immediately block on this check.
+          # Compared as a string, not as a `case` pattern: `[bot]` in a glob
+          # is a character class and would not match the literal login. Only
+          # this one bot is exempt — humans still need a fragment.
+          if [ "${AUTHOR}" = "dependabot[bot]" ]; then
+            echo "Opened by ${AUTHOR} — dependency update, no fragment required."
+            exit 0
+          fi
+
+          # towncrier only assembles direct children of changelog/ whose name
+          # is <id>.<type>.md, where <type> is one of the types configured in
+          # pyproject.toml. "+" marks an orphan fragment (no issue number) and
+          # the optional numeric segment is the counter towncrier appends when
+          # a name collides. Anything else — a nested path, a missing or
+          # unknown type — is ignored at release time, so it must fail here
+          # rather than silently vanish from the changelog.
+          #
+          # `[^/]+` is deliberately permissive. towncrier scans the
+          # dot-separated parts of the name from the right and takes the last
+          # one that is a configured type as the category, folding everything
+          # before it into the issue id. `123.unknown.fixed.md` is therefore a
+          # real `fixed` fragment whose id is `123.unknown`, so narrowing this
+          # would reject a file that does reach the changelog.
+          TYPES="security|removed|deprecated|added|changed|fixed|housekeeping"
+          FRAGMENT="^changelog/[^/]+\.(${TYPES})(\.[0-9]+)?\.md$"
+
+          # Ask the API which files the PR adds rather than diffing locally:
+          # no dependence on checkout depth or on which commit is HEAD. The
+          # REST endpoint is the paginated one: `gh pr view --json files`
+          # returns only the first page, so a fragment in a large pull
+          # request would go unseen and the check would fail a PR that has
+          # one. Note the REST field is `.filename`, not `.path`.
+          ADDED=$(gh api --paginate \
+            "repos/${GITHUB_REPOSITORY}/pulls/${PR}/files?per_page=100" \
+            --jq '.[] | select(.additions > 0) | .filename' \
+            | { grep -E "${FRAGMENT}" || true; } \
+            | { grep -v '^changelog/towncrier\.md\.template$' || true; })
+
+          if [ -z "${ADDED}" ]; then
+            MSG="No news fragment found. Add one directly under changelog/,"
+            MSG="${MSG} named <id>.<type>.md, e.g. uv run --group dev"
+            MSG="${MSG} towncrier create -c"
+            MSG="${MSG} \"What changed\" ${PR}.fixed.md — types: security,"
+            MSG="${MSG} removed, deprecated, added, changed, fixed,"
+            MSG="${MSG} housekeeping. Nested paths and unknown types are not"
+            MSG="${MSG} read by towncrier. Label the PR ci/skip-changelog if"
+            MSG="${MSG} it genuinely needs no entry."
+            echo "::error::${MSG}"
+            exit 1
+          fi
+
+          echo "Found news fragment(s):"
+          echo "${ADDED}"

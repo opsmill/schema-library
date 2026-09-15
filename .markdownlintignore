@@ -1,3 +1,8 @@
 docs/node_modules/
 .venv/
 docs/docs/reference
+
+# towncrier news fragments are prose snippets rather than standalone
+# documents: they carry no top-level heading (MD041) because towncrier
+# splices them under generated section headings at release time.
+changelog/
