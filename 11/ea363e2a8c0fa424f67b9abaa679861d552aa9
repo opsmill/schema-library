@@ -1,0 +1,59 @@
+.github/workflows/ci.yml
+  s_2d456208ee7e9a::t_922b855cde99ea 14-17,20,27-29,106,108-110,112-118,193-196,200-202,218,238-241,245-247
+  s_2d456208ee7e9a::t_da80da536b82b4 2
+  s_2d456208ee7e9a::t_58b1ea0c647d1f 38,53,55,59,83,85,89,105,107,111,137,141,145,190,198,204,235,243,249
+docs/docs/home.mdx
+  s_2d456208ee7e9a::t_9dba5983cad90c 6
+docs/pnpm-workspace.yaml
+  s_2d456208ee7e9a::t_96772c1f6043a7 5
+  s_2d456208ee7e9a::t_a620cf769ae045 1-4,6
+pyproject.toml
+  s_2d456208ee7e9a::t_b460c075f80f37 20,68-96
+  s_2d456208ee7e9a::t_e6c860e55279bb 97
+.nvmrc
+  s_2d456208ee7e9a::t_f60672a9c41651 1
+.yamllint.yml
+  s_2d456208ee7e9a::t_60f148686b6cf3 14-15
+  s_2d456208ee7e9a::t_4bf8a802c44cc8 9
+.github/workflows/sync-docs.yml
+  s_2d456208ee7e9a::t_58b1ea0c647d1f 17,22
+  s_2d456208ee7e9a::t_60f148686b6cf3 1,38-41
+changelog/+pnpm-rumdl.housekeeping.md
+  s_2d456208ee7e9a::t_073c54d5062ea9 1-5
+.github/workflows/changelog-check.yml
+  s_2d456208ee7e9a::t_58b1ea0c647d1f 29
+docs/package.json
+  s_2d456208ee7e9a::t_f60672a9c41651 5
+.github/file-filters.yml
+  s_2d456208ee7e9a::t_3de071217ddf1c 14-18,25-26
+docs/_templates/home_page.j2
+  s_2d456208ee7e9a::t_9dba5983cad90c 6
+docs/.nvmrc
+  s_2d456208ee7e9a::t_f60672a9c41651 1
+.github/build-docs.sh
+  s_2d456208ee7e9a::t_f60672a9c41651 3
+tasks/docs.py
+  s_2d456208ee7e9a::t_f60672a9c41651 261,273,286
+docs/.gitignore
+  s_2d456208ee7e9a::t_073c54d5062ea9 19
+docs/pnpm-lock.yaml
+  s_2d456208ee7e9a::t_debf448c418a0c 1-11941
+uv.lock
+  s_2d456208ee7e9a::t_27018942d8e78e 785-799,816,836
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "11ea363e2a8c0fa424f67b9abaa679861d552aa9",
+  "prompts": {},
+  "sessions": {
+    "s_2d456208ee7e9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bda853ba-41a5-4473-8b2e-ebfcdb7ea4af",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Bearchitek <benoit@opsmill.com>"
+    }
+  }
+}
