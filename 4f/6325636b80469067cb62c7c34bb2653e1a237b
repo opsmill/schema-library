@@ -1,0 +1,44 @@
+docs/sidebars.ts
+  s_2d456208ee7e9a::t_7429e82ebf22e9 17-27
+docs/docs/release-notes/v2.0.0.mdx
+  s_2d456208ee7e9a::t_2823bb12e4cded 6,63-64,100,105,110,122
+  s_2d456208ee7e9a::t_90d34d499f7204 1-5,7-62,65-99,101-104,106-109,111-121,123-158
+CHANGELOG.md
+  s_2d456208ee7e9a::t_4222ea138938ac 9-18
+  s_2d456208ee7e9a::t_36b73d7db587ab 8
+  s_2d456208ee7e9a::t_7a33d0bea8fd9c 6-7,19-32,36-43,45-46,48-56,59-79
+  s_2d456208ee7e9a::t_b64661bf2f3ea5 34
+  s_2d456208ee7e9a::t_5ba5cf538ffb55 35,44
+  s_2d456208ee7e9a::t_6f52476607b504 33,47,57-58
+.vale/styles/spelling-exceptions.txt
+  s_2d456208ee7e9a::t_2823bb12e4cded 286
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4f6325636b80469067cb62c7c34bb2653e1a237b",
+  "prompts": {
+    "e3492962355b7c4c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6d87a8f1-69fc-4640-b4b2-9a00edda249d",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Bearchitek <benoit@opsmill.com>",
+      "total_additions": 184,
+      "total_deletions": 0,
+      "accepted_lines": 184,
+      "overriden_lines": 0
+    }
+  },
+  "sessions": {
+    "s_2d456208ee7e9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bda853ba-41a5-4473-8b2e-ebfcdb7ea4af",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Bearchitek <benoit@opsmill.com>"
+    }
+  }
+}
