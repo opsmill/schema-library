@@ -1,0 +1,3875 @@
+---
+title: OTN
+---
+
+Optical transport network schemas covering the physical plant, the wavelength catalog, optical devices and their ports, pluggable optics, carriers and end-to-end services.
+
+## Details
+
+- **Dependencies:**
+    - [base](dcim)
+    - [extensions/location_site](location_site)
+    - [extensions/transceiver](transceiver)
+
+## Use cases
+
+This extension covers:
+- Recording the ITU-T G.694.1 dense grid and G.694.2 coarse plan as separate kinds, so a carrier pointed at the wrong plan is refused when written.
+- Tracking pluggable optics as inventory, with the part number in this extension's catalog, the serial on the library's transceiver kinds from extensions/transceiver, and which optical port each unit is fitted in.
+- Modelling the outside plant, including fiber types, conduits, spans and the optical multiplex sections built over them. A section terminates on any OMS endpoint, so a fixed point-to-point system built from passive multiplexers is modellable without a ROADM.
+- Cabling optical gear with extensions/cable. Every OTN port kind inherits DcimEndpoint, so a DcimCable terminates on one for intra-site jumpers, through a DcimPatchPanel where a panel sits in the run.
+- Provisioning a wavelength end to end, as a service with an optical path and its hops through the elements the light crosses. Each hop records what the element does to the carrier and across which port pair, so a ROADM cross-connect reads either from the path or from the ROADM's own ports.
+- Modelling optical protection, with a working and a protect path on one service, a diversity group that keeps two services off shared plant, and OtnSplitter for the coupler that feeds both legs.
+
+Out of scope, and what to reach for instead:
+- Validation of what a schema cannot express, such as which port kind may hold a pluggable, whether a mux client port binds a channel on the same plan its multiplexer declares, or whether a hop's ingress and egress ports belong to that hop's own element. This extension ships no checks; the schema comments mark each such rule.
+- Device types, platforms and rack elevations for optical gear, as native OTN fields. Model the physical asset as a DcimPhysicalDevice and link it with OtnGenericDevice.dcim_device; that edge reaches device_type, platform, position and rack_face, and a location that may be a LocationRack. Nothing keeps OtnGenericDevice.site in agreement with the site above that rack.
+- Optical performance monitoring. The schema carries ratings and settings, such as a port's transmit power or a mode's required OSNR, but nothing that is measured, such as live power, OSNR, pre-FEC BER or an error counter. Those change continuously and belong in the network management system or a time series store.
+- Optical path budgets, including the record of design. OtnOpticalPath records which elements the light crosses, in what order and across which ports, but carries no loss, OSNR margin or latency for that route, so a turn-up figure has nowhere to live. OtnService.max_latency_ns is a commitment on the service, not a measurement of a path. Compute budgets in a planning tool such as GNPy.
+- Frequency plans other than one fixed dense grid. OtnFrequencyGrid models a single ITU-T G.694.1 fixed 50 GHz plan across the C band, from 191.35 to 196.10 THz. L band, C plus L systems, flexgrid and other channel spacings are out of scope.
+- Protection mechanisms. OtnOpticalPath.path_role marks a path as working or protect and OtnDiversityGroup keeps two services apart, but nothing states the scheme, so 1+1, 1:1, optical line protection, OMS protection and ODU SNCP are indistinguishable. Switching thresholds and hold-off timers are out of scope with it. OtnSplitter models the coupler such a scheme is built from.
+- The OTU and OPU layers of ITU-T G.709. The model goes from the optical channel, OtnOpticalCarrier, straight to the ODU, OtnContainer. Forward error correction lives on OtnOpticalMode, so what an OTU would add is its section monitoring and framing overhead, which are not modelled.
+
+## Nodes
+
+### RouterPort
+
+- **Label:** Router port
+- **Description:** Grey optics on an IP router. Not on the C-band grid.
+- **Namespace:** Otn
+- **Icon:** mdi:ethernet
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| transceiver | DcimGenericTransceiver | True | one | Attribute |
+
+### ClientPort
+
+- **Label:** Client port
+- **Description:** Transponder client side. Where grey light arrives.
+- **Namespace:** Otn
+- **Icon:** mdi:lan-connect
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| transceiver | DcimGenericTransceiver | True | one | Attribute |
+
+### LinePort
+
+- **Label:** Line port
+- **Description:** Transponder DWDM line side. Where coloured light leaves.
+- **Namespace:** Otn
+- **Icon:** mdi:transit-connection
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| carrier | OtnOpticalCarrier | True | one | Attribute |
+| transceiver | DcimGenericTransceiver | True | one | Attribute |
+
+### RoadmAddDropPort
+
+- **Label:** ROADM add/drop port
+- **Description:** Local add and drop on a ROADM.
+- **Namespace:** Otn
+- **Icon:** mdi:call-split
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
+
+### RoadmDegreePort
+
+- **Label:** ROADM degree port
+- **Description:** Line-facing degree on a ROADM. One per direction.
+- **Namespace:** Otn
+- **Icon:** mdi:compass-outline
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| direction | How operators label this degree. Until now the port name was the only place to say it. | Dropdown | True |  | north, south, east, west, express, local |
+| wavelength_capacity | Nameplate wavelengths this degree is rated to pass, such as 40, 80 or 96. Not a count in use. | Number | True |  |  |
+
+### AmplifierPort
+
+- **Label:** Amplifier port
+- **Description:** Amplifier input or output.
+- **Namespace:** Otn
+- **Icon:** mdi:amplifier
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
+
+### SplitterPort
+
+- **Label:** Splitter port
+- **Description:** The common side of a splitter, or one of its output legs.
+- **Namespace:** Otn
+- **Icon:** mdi:call-split
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| leg | Whether this port is the common side or an output leg. | Dropdown | False | output | common, output |
+
+### MuxClientPort
+
+- **Label:** Mux client port
+- **Description:** One channel of a multiplexer. The side facing the transponder or router that lights it.
+- **Namespace:** Otn
+- **Icon:** mdi:import
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| dwdm_channel | OtnFrequencyGrid | True | one | Attribute |
+| cwdm_channel | OtnCwdmChannel | True | one | Attribute |
+
+### MuxLinePort
+
+- **Label:** Mux line port
+- **Description:** The common side of a multiplexer, where the whole band leaves.
+- **Namespace:** Otn
+- **Icon:** mdi:export
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnOpticalPort
+
+### TributaryPort
+
+- **Label:** Tributary port
+- **Description:** E1 or T1 G.703 electrical tributary. The only copper port here.
+- **Namespace:** Otn
+- **Icon:** mdi:cable-data
+- **Inherit From:** DcimEndpoint, OtnGenericPort, OtnCopperPort
+
+### TransceiverType
+
+- **Label:** Transceiver type
+- **Description:** A pluggable optic part number and what it can be made to do.
+- **Namespace:** Otn
+- **Icon:** mdi:chip
+- **Human Friendly ID:** part_number__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| part_number | Vendor part number, such as QDD-400G-ZRP-S. | Text | False |  |  |
+| description |  | Text | True |  |  |
+| form_factor | The cage this part fits. It decides which ports can hold it. | Dropdown | False |  | QSFP-DD, QSFP28, OSFP, CFP2-DCO, CFP2-ACO, SFP28, SFP+ |
+| tunable | Whether the laser can be tuned across the grid or is fixed at one wavelength. | Boolean | False | False |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| supported_modes | OtnOpticalMode | True | many | Attribute |
+| manufacturer | OrganizationManufacturer | True | one | Attribute |
+
+### FiberType
+
+- **Label:** Fiber type
+- **Description:** Single-mode fiber family. Attenuation, dispersion and group index at 1550 nm.
+- **Namespace:** Otn
+- **Icon:** mdi:cable-data
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name | ITU-T designation, such as G.652.D. | Text | False |  |  |
+| description |  | Text | True |  |  |
+| attenuation_coefficient_mdb_per_km | Attenuation at 1550 nm in millidecibels per kilometre. 0.20 dB/km is 200. Wrong for CWDM. | Number | False |  |  |
+| attenuation_coefficient_display | Attenuation in dB/km. Read-only, derived from attenuation_coefficient_mdb_per_km. | Text | True |  |  |
+| dispersion_fs_per_nm_km | Chromatic dispersion at 1550 nm in femtoseconds per nm per km. 17 ps/nm/km is 17000. | Number | False |  |  |
+| dispersion_display | Dispersion in ps/nm/km. Read-only, derived from dispersion_fs_per_nm_km. | Text | True |  |  |
+| group_index_milli | Group index at 1550 nm in milli-units. 1.468 is 1468. Sets propagation delay. | Number | False | 1468 |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| spans | OtnFiberSpan | True | many | Attribute |
+
+### Conduit
+
+- **Label:** Conduit
+- **Description:** Shared-risk link group. Two routes through one conduit are not diverse.
+- **Namespace:** Otn
+- **Icon:** mdi:pipe
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| owner | Who owns the trench. Often not the network operator. | Text | True |  |  |
+| description |  | Text | True |  |  |
+| status | Lifecycle state of the duct itself, independent of the spans pulled through it. | Dropdown | False | active | planned, active, standby, maintenance, failed, decommissioned |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| spans | OtnFiberSpan | True | many | Attribute |
+
+### FiberSpan
+
+- **Label:** Fiber span
+- **Description:** One amplifier-to-amplifier fiber section. Lossy, but not racked and not a device.
+- **Namespace:** Otn
+- **Icon:** mdi:vector-line
+- **Human Friendly ID:** name__value
+- **Inherit From:** OtnOpticalElement
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| description |  | Text | True |  |  |
+| oms_sequence | Position of this span within its optical multiplex section, counting from the A end. | Number | True |  |  |
+| status | Lifecycle state of the span. A planned span is designed but not yet spliced through. | Dropdown | False | active | planned, active, standby, maintenance, failed, decommissioned |
+| commissioned_date | When the span was accepted into service. A recorded fact, not a reading. | DateTime | True |  |  |
+| length_m | Route length in metres, not straight-line distance. 500 km is the practical ceiling. | Number | False |  |  |
+| length_display | Route length in km. Read-only, derived from length_m. | Text | True |  |  |
+| splice_count | Fusion splices along the span. Roughly one per drum of cable. | Number | False | 0 |  |
+| splice_loss_mdb | Loss per splice in millidecibels. 0.05 dB is 50. | Number | False | 50 |  |
+| connector_count | Mated connector pairs on the span, normally one at each end. | Number | False | 2 |  |
+| connector_loss_mdb | Loss per mated connector pair in millidecibels. 0.3 dB is 300. | Number | False | 300 |  |
+| aging_margin_mdb | Reserved margin for repairs and ageing, in millidecibels. 1.5 dB is 1500. | Number | False | 1500 |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| fiber_type | OtnFiberType | False | one | Attribute |
+| site_a | LocationSite | False | one | Attribute |
+| site_b | LocationSite | False | one | Attribute |
+| conduit | OtnConduit | True | one | Attribute |
+| oms | OtnOpticalMultiplexSection | True | one | Attribute |
+| raman_pumps | OtnRamanPump | True | many | Attribute |
+| terminating_ports | OtnGenericPort | True | many | Attribute |
+
+### OpticalMultiplexSection
+
+- **Label:** Optical multiplex section
+- **Description:** Groups the ordered spans and inline amplifiers between two OMS endpoints.
+- **Namespace:** Otn
+- **Icon:** mdi:ray-start-end
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| description |  | Text | True |  |  |
+| status | Lifecycle state of the section as a whole, not of the spans it groups. | Dropdown | False | active | planned, active, standby, maintenance, failed, decommissioned |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| endpoint_a | OtnOmsEndpoint | False | one | Attribute |
+| endpoint_b | OtnOmsEndpoint | False | one | Attribute |
+| spans | OtnFiberSpan | True | many | Attribute |
+| amplifiers_a2b | OtnAmplifier | True | many | Attribute |
+| amplifiers_b2a | OtnAmplifier | True | many | Attribute |
+
+### FrequencyGrid
+
+- **Label:** Frequency grid channel
+- **Description:** One ITU-T G.694.1 channel. 50 GHz fixed grid, 191.35 to 196.10 THz.
+- **Namespace:** Otn
+- **Icon:** mdi:sine-wave
+- **Human Friendly ID:** center_frequency_mhz__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| channel_number | ITU channel number, 1 to 96. Channel 1 is 191.35 THz. Derived from the centre frequency. | Text | True |  |  |
+| center_frequency_mhz | Centre frequency in MHz. Channel n is 191350000 + (n - 1) x 50000. | Number | False |  |  |
+| center_frequency_display | Centre frequency in THz. Byte-identical to the optical-port rendering. | Text | True |  |  |
+| center_wavelength_display | Centre wavelength in nm, derived from the centre frequency. | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| carriers | OtnOpticalCarrier | True | many | Attribute |
+
+### CwdmChannel
+
+- **Label:** CWDM wavelength
+- **Description:** One ITU-T G.694.2 coarse wavelength. 20 nm spacing, 1271 to 1611 nm.
+- **Namespace:** Otn
+- **Icon:** mdi:palette-swatch-variant
+- **Human Friendly ID:** center_wavelength_nm__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| center_wavelength_nm | Nominal central wavelength in nm. Wavelength n is 1271 + (n - 1) x 20. | Number | False |  |  |
+| band | ITU band, derived from the wavelength. Only the two C-band wavelengths sit in the erbium window. | Text | True |  |  |
+
+### OpticalMode
+
+- **Label:** Optical mode
+- **Description:** What a transponder or coherent pluggable can do. Reach and required OSNR are data, not assumptions.
+- **Namespace:** Otn
+- **Icon:** mdi:waveform
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| mode_class | Two values, and the pluggable-reach report filters on it. | Dropdown | False | transponder | transponder, pluggable |
+| modulation |  | Dropdown | False |  | DP-QPSK, DP-8QAM, DP-16QAM, DP-64QAM |
+| description |  | Text | True |  |  |
+| line_rate_gbps | Client-side capacity in Gbps. Already a whole number in its natural unit. | Number | False |  |  |
+| baud_mbaud | Symbol rate in megabaud. 59.84 GBd is 59840. Sets the spectral width. | Number | False |  |  |
+| required_osnr_mdb | OSNR needed at the receiver, in millidecibels. 26 dB is 26000. | Number | False |  |  |
+| required_osnr_display | Required OSNR in dB. Read-only, derived from required_osnr_mdb. | Text | True |  |  |
+| cd_tolerance_fs_per_nm | Chromatic dispersion the receiver compensates, in fs/nm. 100000 ps/nm is 100000000. | Number | False |  |  |
+| nominal_reach_m | Vendor-quoted reach in metres. A starting point for the budget, not a guarantee. | Number | False |  |  |
+| nominal_reach_display | Nominal reach in km. Read-only, derived from nominal_reach_m. | Text | True |  |  |
+| fec_type |  | Dropdown | False | SD-FEC | none, GFEC, SD-FEC, cFEC, oFEC |
+| fec_latency_ns | Encoder and decoder latency in nanoseconds. Small next to propagation, but not zero. | Number | False | 0 |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| carriers | OtnOpticalCarrier | True | many | Attribute |
+
+### ClientSignal
+
+- **Label:** Client signal
+- **Description:** What a customer hands over, and the container it maps into.
+- **Namespace:** Otn
+- **Icon:** mdi:import
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| alias | The SONET name where one exists. STM-16 is OC-48. | Text | True |  |  |
+| layer | Grouping the catalog by layer is the first thing a reader does. | Dropdown | False |  | ethernet, sdh, pdh, fibre_channel, infiniband |
+| auto_selectable | May the rate rule pick this signal when a service states none. | Boolean | False | False |  |
+| description |  | Text | True |  |  |
+| bit_rate_kbps | Nominal line rate in kbps. E1 is 2048, 100GBASE-LR4 is 103100000. | Number | False |  |  |
+| bit_rate_display | Bit rate in Mbps below one gigabit, Gbps at or above it. | Text | True |  |  |
+| default_container_type | The first step of the mapping chain, not the last. E1 maps into VC-12, not ODU1. | Dropdown | False |  | ODU0, ODU1, ODU2, ODU2e, ODU3, ODU4, ODUC1, ODUC2, ODUC3, ODUC4, ODUflex, VC-12, VC-4, STM-N |
+| default_mapping | ITU-T G.709 mapping procedure. Generic, bit-synchronous or asynchronous. | Dropdown | False |  | GMP, BMP, AMP |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| containers | OtnContainer | True | many | Attribute |
+| services | OtnService | True | many | Attribute |
+
+### Container
+
+- **Label:** Container
+- **Description:** ODU or SDH virtual container. The digital adaptation layer between a client and a wavelength.
+- **Namespace:** Otn
+- **Icon:** mdi:package-variant-closed
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| odu_type |  | Dropdown | False |  | ODU0, ODU1, ODU2, ODU2e, ODU3, ODU4, ODUC1, ODUC2, ODUC3, ODUC4, ODUC6, ODUC8, ODUflex, VC-12, VC-4, STM-N |
+| mapping_mode |  | Dropdown | False | GMP | GMP, BMP, AMP |
+| description |  | Text | True |  |  |
+| segment_sequence | Which segment of its circuit this container rides. 1 for a circuit that spans one wavelength. | Number | False | 1 |  |
+| tributary_slots | Slots this container occupies in its parent. An ODU2 in an ODU4 takes 8. | Number | False | 0 |  |
+| tributary_slot_capacity | Slots this container offers to its children. An ODU4 offers 80. | Number | False | 0 |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| carrier | OtnOpticalCarrier | True | one | Attribute |
+| client_signal | OtnClientSignal | True | one | Attribute |
+| parent_container | OtnContainer | True | one | Attribute |
+| service | OtnService | True | one | Attribute |
+| child_containers | OtnContainer | True | many | Attribute |
+
+### Router
+
+- **Label:** Router
+- **Description:** IP router. Light terminates here, so its insertion loss stays at the zero default.
+- **Namespace:** Otn
+- **Icon:** mdi:router
+- **Inherit From:** OtnGenericDevice, OtnOpticalElement
+
+### Transponder
+
+- **Label:** Transponder
+- **Description:** Client to DWDM line adaptation.
+- **Namespace:** Otn
+- **Icon:** mdi:transit-connection-variant
+- **Inherit From:** OtnGenericDevice, OtnOpticalElement
+
+### Roadm
+
+- **Label:** ROADM
+- **Description:** Reconfigurable optical add/drop multiplexer.
+- **Namespace:** Otn
+- **Icon:** mdi:call-split
+- **Inherit From:** OtnGenericDevice, OtnOmsEndpoint, OtnOpticalElement
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| channel_capacity | Nameplate channels this ROADM is rated for, such as 40, 80 or 96. Not a count in use. | Number | True |  |  |
+| colorless | Any add/drop port can take any wavelength, so assignment is not fixed per port. | Boolean | True |  |  |
+| directionless | An added wavelength can leave by any degree, so assignment does not pick a degree. | Boolean | True |  |  |
+| contentionless | The same wavelength can be added twice toward different degrees without blocking. | Boolean | True |  |  |
+| technology | How the switch is built. Nameplate data, often unknown. | Dropdown | True |  | wss_lcos, wss_mems, broadcast_select |
+
+### Amplifier
+
+- **Label:** Amplifier
+- **Description:** Inline, booster or pre-amplifier.
+- **Namespace:** Otn
+- **Icon:** mdi:amplifier
+- **Inherit From:** OtnGenericDevice, OtnOpticalElement
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| amplifier_type | Nameplate amplifier technology. A Raman-only pump is its own kind, OtnRamanPump. | Dropdown | True |  | edfa, soa, hybrid |
+| stage | Nameplate stage this amplifier is built for, not a position derived from the plant. | Dropdown | True |  | booster, inline, preamp |
+| noise_figure_mdb | Noise figure in millidecibels. 4.0 dB is 4000. Sets the ASE this stage adds. | Number | False | 4000 |  |
+| noise_figure_display | Noise figure in dB. Read-only, derived from noise_figure_mdb. | Text | True |  |  |
+| gain_mdb | Gain in millidecibels. 22.0 dB is 22000. Must cover the loss ahead of the input. | Number | False | 22000 |  |
+| gain_display | Gain in dB. Read-only, derived from gain_mdb. | Text | True |  |  |
+| oms_sequence | Position in this amplifier's own chain, counting along the direction it amplifies. | Number | True |  |  |
+| max_total_output_power_mdbm | Rated total output power in milli-dBm, 0 to +30 dBm. A nameplate ceiling, not a reading. | Number | True |  |  |
+| max_total_output_power_display | Rated total output power in dBm. Read-only, derived from max_total_output_power_mdbm. | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| oms_a2b | OtnOpticalMultiplexSection | True | one | Attribute |
+| oms_b2a | OtnOpticalMultiplexSection | True | one | Attribute |
+
+### MuxDemux
+
+- **Label:** Mux/demux
+- **Description:** Passive multiplexer. A dense AWG on the core, a coarse thin-film filter on a tail.
+- **Namespace:** Otn
+- **Icon:** mdi:call-merge
+- **Inherit From:** OtnGenericDevice, OtnOmsEndpoint, OtnOpticalElement
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| channel_capacity | Nameplate channels this multiplexer is rated for, such as 8, 16, 40 or 96. Not a count in use. | Number | True |  |  |
+| plan | Which wavelength plan this multiplexer multiplexes. | Dropdown | False | dwdm | dwdm, cwdm |
+| mux_role | What this passive device does with the channels it carries. | Dropdown | False | mux_demux | mux, demux, mux_demux, oadm |
+| technology | How the device separates wavelengths. Nameplate data, often unknown. | Dropdown | True |  | thin_film_filter, awg, interleaver |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| cwdm_channels | OtnCwdmChannel | True | many | Attribute |
+
+### PatchPanel
+
+- **Label:** Patch panel
+- **Description:** Optical distribution frame. Carries connector loss.
+- **Namespace:** Otn
+- **Icon:** mdi:view-grid-outline
+- **Inherit From:** OtnGenericDevice, OtnOpticalElement
+
+### RamanPump
+
+- **Label:** Raman pump
+- **Description:** Pump laser injecting Raman gain into one fiber span.
+- **Namespace:** Otn
+- **Icon:** mdi:laser-pointer
+- **Inherit From:** OtnGenericDevice, OtnOpticalElement
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| on_off_gain_mdb | Raman on-off gain in millidecibels. 10.0 dB is 10000. | Number | False | 10000 |  |
+| on_off_gain_display | On-off gain in dB. Read-only, derived from on_off_gain_mdb. | Text | True |  |  |
+| injection_end | Which end of its span the pump is injected at, named against the span's own site_a and site_b. | Dropdown | False | site_b | site_a, site_b |
+| propagation | Whether the pump fires against the signal or with it. | Dropdown | False | counter | counter, co |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| span | OtnFiberSpan | False | one | Attribute |
+
+### OduSwitch
+
+- **Label:** ODU switch
+- **Description:** O-E-O device. Terminates one wavelength, originates the next, as a regenerator or ODU cross-connect.
+- **Namespace:** Otn
+- **Icon:** mdi:swap-horizontal-variant
+- **Inherit From:** OtnGenericDevice, OtnOpticalElement
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| switching_mode | Whether the device carries the whole payload through or demultiplexes and regroups containers. | Dropdown | False | regenerator | regenerator, cross_connect |
+| framing_latency_ns | Delay this device adds in nanoseconds, from framing and from the electrical crossing. | Number | False | 0 |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| carriers | OtnOpticalCarrier | True | many | Attribute |
+
+### Splitter
+
+- **Label:** Splitter
+- **Description:** Passive splitter or coupler. Divides one carrier across several legs.
+- **Namespace:** Otn
+- **Icon:** mdi:call-split
+- **Inherit From:** OtnGenericDevice, OtnOpticalElement
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| split_type | How the input is divided across the output legs. | Dropdown | False | even | even, tap |
+| output_count | Number of output legs, such as 2 for a 1:2 or 8 for a 1:8. | Number | False | 2 |  |
+| tap_ratio_percent | Share taken by the tap leg, as a percentage. 10 is a 90/10 tap. Null on an even split. | Number | True |  |  |
+
+### FixedAttenuator
+
+- **Label:** Fixed attenuator
+- **Description:** A pad. One fixed amount of loss, patched into a link that arrives too hot.
+- **Namespace:** Otn
+- **Icon:** mdi:filter-outline
+- **Inherit From:** OtnGenericDevice, OtnOpticalElement
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| attenuation_mdb | Attenuation the pad is set to, in millidecibels. 5.0 dB is 5000. | Number | False | 0 |  |
+| attenuation_display | Attenuation in dB. Read-only, derived from attenuation_mdb. | Text | True |  |  |
+
+### VariableAttenuator
+
+- **Label:** Variable attenuator
+- **Description:** A VOA. The same loss, dialled rather than fixed, within the range the hardware has.
+- **Namespace:** Otn
+- **Icon:** mdi:tune-variant
+- **Inherit From:** OtnGenericDevice, OtnOpticalElement
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| attenuation_mdb | Attenuation the pad is set to, in millidecibels. 5.0 dB is 5000. | Number | False | 0 |  |
+| attenuation_display | Attenuation in dB. Read-only, derived from attenuation_mdb. | Text | True |  |  |
+| max_attenuation_mdb | Largest attenuation this device can be dialled to, in millidecibels. | Number | False |  |  |
+| max_attenuation_display | Maximum attenuation in dB. Read-only, derived from max_attenuation_mdb. | Text | True |  |  |
+
+### OpticalCarrier
+
+- **Label:** Optical carrier
+- **Description:** One provisioned wavelength. Occupies its channel on every section it crosses.
+- **Namespace:** Otn
+- **Icon:** mdi:waves
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| description |  | Text | True |  |  |
+| status |  | Dropdown | False | active | planned, reserved, active, decommissioned |
+| provisioned_date | When the wavelength was turned up. A recorded fact, not a reading. | DateTime | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| channel | OtnFrequencyGrid | False | one | Attribute |
+| optical_mode | OtnOpticalMode | True | one | Attribute |
+| optical_path | OtnOpticalPath | True | many | Attribute |
+| sections | OtnOpticalMultiplexSection | True | many | Attribute |
+| containers | OtnContainer | True | many | Attribute |
+| odu_switches | OtnOduSwitch | True | many | Attribute |
+| line_ports | OtnLinePort | True | many | Attribute |
+
+### Service
+
+- **Label:** Service
+- **Description:** Customer intent. Two endpoints, a rate, a profile and an optional latency budget.
+- **Namespace:** Otn
+- **Icon:** mdi:file-document-outline
+- **Human Friendly ID:** name__value
+- **Inherit From:** CoreArtifactTarget
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| description |  | Text | True |  |  |
+| external_circuit_id | The customer's or partner's own reference for this circuit, where `name` is ours. | Text | True |  |  |
+| rate_gbps | Requested client capacity in Gbps. Already whole in its natural unit. | Number | False |  |  |
+| sla |  | Dropdown | False | silver | gold, silver, bronze, best_effort |
+| status |  | Dropdown | False | planned | planned, provisioning, active, maintenance, failed, rejected, decommissioned |
+| provisioned_date | When the circuit was handed to the customer. A recorded fact, not a reading. | DateTime | True |  |  |
+| service_type | Which kind of service this is. | Dropdown | False | wavelength | wavelength, transport, ip_transit |
+| max_latency_ns | One-way latency budget in nanoseconds. Null when the service commits to none. | Number | True |  |  |
+| max_latency_display | Latency budget in microseconds. Read-only, derived from max_latency_ns. | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| endpoint_a | OtnGenericDevice | False | one | Attribute |
+| endpoint_z | OtnGenericDevice | False | one | Attribute |
+| optical_path | OtnOpticalPath | True | many | Component |
+| client_signal | OtnClientSignal | True | one | Attribute |
+| diversity_group | OtnDiversityGroup | True | one | Attribute |
+| containers | OtnContainer | True | many | Attribute |
+| customer | OrganizationGeneric | False | one | Attribute |
+
+### DiversityGroup
+
+- **Label:** Diversity group
+- **Description:** A declared diversity requirement. The services in one group must route over disjoint conduits.
+- **Namespace:** Otn
+- **Icon:** mdi:call-split
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| description |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| services | OtnService | True | many | Attribute |
+
+### OpticalPath
+
+- **Label:** Optical path
+- **Description:** The materialised chosen route for one service.
+- **Namespace:** Otn
+- **Icon:** mdi:map-marker-path
+- **Uniqueness Constraints:**
+    - service, segment_sequence__value, path_role__value
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| description |  | Text | True |  |  |
+| segment_sequence | Which segment of its circuit this path is. 1 for a circuit that spans one wavelength. | Number | False | 1 |  |
+| path_role | Which role this path plays for its service, working, protect or express. | Dropdown | False | working | working, protect, express |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| service | OtnService | False | one | Parent |
+| carrier | OtnOpticalCarrier | True | one | Attribute |
+| hops | OtnPathHop | True | many | Component |
+
+### PathHop
+
+- **Label:** Path hop
+- **Description:** One ordered element on a path.
+- **Namespace:** Otn
+- **Icon:** mdi:ray-vertex
+- **Uniqueness Constraints:**
+    - path, sequence__value
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| sequence | Position along the path, counting from the endpoint A ROADM. | Number | False |  |  |
+| action | What this element does to the carrier at this hop. | Dropdown | True |  | add, drop, express, through, terminate |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| path | OtnOpticalPath | False | one | Parent |
+| element | OtnOpticalElement | False | one | Attribute |
+| ingress_port | OtnGenericPort | True | one | Attribute |
+| egress_port | OtnGenericPort | True | one | Attribute |
+
+### Facility
+
+- **Label:** Facility
+- **Description:** A supercomputing facility hosted at a PoP.
+- **Namespace:** Otn
+- **Icon:** ri:cpu-line
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text |  |  |  |
+| description |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| site | LocationSite | True | one | Attribute |
+
+## Generics
+
+### GenericPort
+
+- **Label:** Port
+- **Description:** Any port on any OTN device. The connection surface of the network.
+- **Namespace:** Otn
+- **Icon:** mdi:ethernet
+- **Uniqueness Constraints:**
+    - device, name__value
+- **Human Friendly ID:** device__name__value, name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name | Port identifier as the vendor labels it, such as 1/1/1. | Text | False |  |  |
+| description |  | Text | True |  |  |
+| role |  | Dropdown | False | spare | client, line, add_drop, degree, express, booster, preamp, tributary, spare, monitor |
+| enabled |  | Boolean | False | True |  |
+| admin_state | RFC 2863 ifAdminStatus. What the operator asked for. | Dropdown | False | up | up, down, testing |
+| oper_state | RFC 2863 ifOperStatus subset. What the port actually does. | Dropdown | False | down | up, down, testing, dormant, unknown |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| device | OtnGenericDevice | False | one | Parent |
+| hops_ingress | OtnPathHop | True | many | Attribute |
+| hops_egress | OtnPathHop | True | many | Attribute |
+
+### OpticalElement
+
+- **Label:** Optical element
+- **Description:** Anything light passes through and loses power in.
+- **Namespace:** Otn
+- **Icon:** mdi:blur-linear
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| insertion_loss_mdb | Insertion loss in millidecibels, 0 to 60 dB. No Float kind exists. | Number | False | 0 |  |
+| insertion_loss_display | Insertion loss in dB. Read-only, derived from insertion_loss_mdb. | Text | True |  |  |
+| vendor |  | Text | True |  |  |
+| model |  | Text | True |  |  |
+
+### OmsEndpoint
+
+- **Label:** OMS endpoint
+- **Description:** A device that can terminate an optical multiplex section.
+- **Namespace:** Otn
+- **Icon:** mdi:ray-start-end
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| sections_a | OtnOpticalMultiplexSection | True | many | Attribute |
+| sections_b | OtnOpticalMultiplexSection | True | many | Attribute |
+
+### GenericDevice
+
+- **Label:** Device
+- **Description:** Anything racked at a site.
+- **Namespace:** Otn
+- **Icon:** mdi:server
+- **Human Friendly ID:** name__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| status |  | Dropdown | False | active | planned, provisioning, active, maintenance, decommissioned |
+| role |  | Dropdown | False |  | core, edge, access, passive |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| site | LocationSite | True | one | Attribute |
+| dcim_device | DcimPhysicalDevice | True | one | Attribute |
+| ports | OtnGenericPort | True | many | Component |
+
+### OpticalPort
+
+- **Label:** Optical port
+- **Description:** Optical-specific port properties.
+- **Namespace:** Otn
+- **Icon:** mdi:lightbulb-on-outline
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| center_frequency_mhz | ITU-T G.694.1 centre frequency in MHz. No Float kind exists. | Number | True |  |  |
+| center_frequency_display | Centre frequency in THz. Empty on a grey port, which has none. | Text | True |  |  |
+| tx_power_mdbm | Transmit power in milli-dBm, -30 to +30 dBm. | Number | True |  |  |
+| tx_power_display | Transmit power in dBm. Read-only, derived from tx_power_mdbm. | Text | True |  |  |
+| rx_sensitivity_mdbm | Receiver sensitivity in milli-dBm, -40 to +10 dBm. | Number | True |  |  |
+| rx_sensitivity_display | Receiver sensitivity in dBm. Derived from rx_sensitivity_mdbm. | Text | True |  |  |
+| connector_type |  | Dropdown | True |  | LC, SC, MPO-12, MPO-16, FC, E2000, MU, CS, splice |
+| polish | Endface polish. Mating an APC to a UPC costs about 0.5 dB and reflects. | Dropdown | True |  | UPC, APC, PC, none |
+
+### CopperPort
+
+- **Label:** Copper port
+- **Description:** Electrical port properties for G.703 tributaries.
+- **Namespace:** Otn
+- **Icon:** mdi:cable-data
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| speed_kbps | Line rate in kbps. E1 is 2048, T1 is 1544, STM-1 is 155520. | Number | False | 2048 |  |
+| impedance_ohm | Nominal impedance in ohms. 120 for E1 pair, 75 for coax. | Number | False | 120 |  |
+| connector_type |  | Dropdown | False | RJ48 | BNC, RJ48, RJ45 |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### LocationSite
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| latitude_microdeg | Latitude in millionths of a degree. No Float kind exists. | Number | True |  |  |
+| longitude_microdeg | Longitude in millionths of a degree. No Float kind exists. | Number | True |  |  |
+| site_type | A PoP hosting OTN equipment, or a customer site handing traffic to one. | Dropdown | True |  | pop, customer |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| otn_devices | OtnGenericDevice | True | many | Generic |
+| spans_a | OtnFiberSpan | True | many | Attribute |
+| spans_b | OtnFiberSpan | True | many | Attribute |
+| otn_facility | OtnFacility | True | one | Attribute |
+
+### DcimGenericTransceiver
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| otn_port | OtnOpticalPort | True | one | Attribute |
+| otn_type | OtnTransceiverType | True | one | Attribute |
+
+## Code
+
+```yaml
+version: '1.0'
+generics:
+- name: GenericPort
+  namespace: Otn
+  description: Any port on any OTN device. The connection surface of the network.
+  label: Port
+  icon: mdi:ethernet
+  include_in_menu: false
+  human_friendly_id:
+  - device__name__value
+  - name__value
+  order_by:
+  - name__value
+  display_label: '{{ device__name__value }} {{ name__value }}'
+  uniqueness_constraints:
+  - - device
+    - name__value
+  attributes:
+  - name: name
+    kind: Text
+    parameters:
+      max_length: 64
+      regex: ^[A-Za-z0-9._/-]+$
+    optional: false
+    description: Port identifier as the vendor labels it, such as 1/1/1.
+    order_weight: 1000
+  - name: description
+    kind: Text
+    parameters:
+      max_length: 256
+    optional: true
+    order_weight: 1100
+  - name: role
+    kind: Dropdown
+    default_value: spare
+    choices:
+    - name: client
+      label: Client
+      color: '#4caf50'
+    - name: line
+      label: Line
+      color: '#2196f3'
+    - name: add_drop
+      label: Add/drop
+      color: '#9c27b0'
+    - name: degree
+      label: Degree
+      color: '#673ab7'
+    - name: express
+      label: Express
+      description: A degree-to-degree pass-through. Wavelengths cross the node without
+        adding or dropping.
+      color: '#00bcd4'
+    - name: booster
+      label: Booster
+      color: '#ff9800'
+    - name: preamp
+      label: Pre-amplifier
+      color: '#ffc107'
+    - name: tributary
+      label: Tributary
+      color: '#795548'
+    - name: spare
+      label: Spare
+      color: '#9e9e9e'
+    - name: monitor
+      label: Monitor
+      description: A monitoring interface, not a traffic-carrying port.
+      color: '#607d8b'
+    optional: false
+    order_weight: 1100
+  - name: enabled
+    kind: Boolean
+    default_value: true
+    optional: false
+    order_weight: 1200
+  - name: admin_state
+    kind: Dropdown
+    default_value: up
+    choices:
+    - name: up
+      label: Up
+      color: '#4caf50'
+    - name: down
+      label: Down
+      color: '#f44336'
+    - name: testing
+      label: Testing
+      color: '#ff9800'
+    optional: false
+    description: RFC 2863 ifAdminStatus. What the operator asked for.
+    order_weight: 1300
+  - name: oper_state
+    kind: Dropdown
+    default_value: down
+    choices:
+    - name: up
+      label: Up
+      color: '#4caf50'
+    - name: down
+      label: Down
+      color: '#f44336'
+    - name: testing
+      label: Testing
+      color: '#ff9800'
+    - name: dormant
+      label: Dormant
+      color: '#2196f3'
+    - name: unknown
+      label: Unknown
+      color: '#9e9e9e'
+    optional: false
+    description: RFC 2863 ifOperStatus subset. What the port actually does.
+    order_weight: 1400
+  relationships:
+  - name: device
+    peer: OtnGenericDevice
+    kind: Parent
+    cardinality: one
+    optional: false
+    identifier: otn_device__ports
+    order_weight: 800
+  - name: hops_ingress
+    peer: OtnPathHop
+    label: Hops entering here
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_hop__ingress_port
+    order_weight: 910
+  - name: hops_egress
+    peer: OtnPathHop
+    label: Hops leaving here
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_hop__egress_port
+    order_weight: 920
+- name: OpticalElement
+  namespace: Otn
+  description: Anything light passes through and loses power in.
+  label: Optical element
+  icon: mdi:blur-linear
+  include_in_menu: false
+  attributes:
+  - name: insertion_loss_mdb
+    kind: Number
+    default_value: 0
+    parameters:
+      min_value: 0
+      max_value: 60000
+    optional: false
+    description: Insertion loss in millidecibels, 0 to 60 dB. No Float kind exists.
+    order_weight: 1500
+  - name: insertion_loss_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if insertion_loss_mdb__value is not none %}{{ insertion_loss_mdb__value
+        / 1000 }} dB{% endif %}'
+    optional: true
+    description: Insertion loss in dB. Read-only, derived from insertion_loss_mdb.
+    order_weight: 1510
+  - name: vendor
+    kind: Text
+    parameters:
+      max_length: 64
+    optional: true
+    order_weight: 1600
+  - name: model
+    kind: Text
+    parameters:
+      max_length: 64
+    optional: true
+    order_weight: 1700
+- name: OmsEndpoint
+  namespace: Otn
+  description: A device that can terminate an optical multiplex section.
+  label: OMS endpoint
+  icon: mdi:ray-start-end
+  include_in_menu: false
+  relationships:
+  - name: sections_a
+    peer: OtnOpticalMultiplexSection
+    label: Sections (A end)
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_oms__endpoint_a
+    order_weight: 960
+  - name: sections_b
+    peer: OtnOpticalMultiplexSection
+    label: Sections (B end)
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_oms__endpoint_b
+    order_weight: 970
+- name: GenericDevice
+  namespace: Otn
+  description: Anything racked at a site.
+  label: Device
+  icon: mdi:server
+  include_in_menu: true
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    parameters:
+      max_length: 64
+      regex: ^[A-Za-z0-9._-]+$
+    optional: false
+    order_weight: 1000
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: planned
+      label: Planned
+      color: '#2196f3'
+    - name: provisioning
+      label: Provisioning
+      color: '#ff9800'
+    - name: active
+      label: Active
+      color: '#4caf50'
+    - name: maintenance
+      label: Maintenance
+      color: '#ffc107'
+    - name: decommissioned
+      label: Decommissioned
+      color: '#9e9e9e'
+    optional: false
+    order_weight: 1100
+  - name: role
+    kind: Dropdown
+    choices:
+    - name: core
+      label: Core
+      color: '#3f51b5'
+    - name: edge
+      label: Edge
+      color: '#2196f3'
+    - name: access
+      label: Access
+      color: '#00bcd4'
+    - name: passive
+      label: Passive
+      color: '#9e9e9e'
+    optional: false
+    order_weight: 1200
+  relationships:
+  - name: site
+    peer: LocationSite
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_site__devices
+    order_weight: 800
+  - name: dcim_device
+    peer: DcimPhysicalDevice
+    label: Physical device record
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_device__dcim_device
+    order_weight: 940
+  - name: ports
+    peer: OtnGenericPort
+    kind: Component
+    cardinality: many
+    optional: true
+    identifier: otn_device__ports
+    on_delete: cascade
+    order_weight: 900
+- name: OpticalPort
+  namespace: Otn
+  description: Optical-specific port properties.
+  label: Optical port
+  icon: mdi:lightbulb-on-outline
+  include_in_menu: false
+  attributes:
+  - name: center_frequency_mhz
+    kind: Number
+    parameters:
+      min_value: 191350000
+      max_value: 196100000
+    optional: true
+    description: ITU-T G.694.1 centre frequency in MHz. No Float kind exists.
+    order_weight: 1600
+  - name: center_frequency_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if center_frequency_mhz__value is not none %}{{ center_frequency_mhz__value
+        / 1000000 }} THz{% endif %}'
+    optional: true
+    description: Centre frequency in THz. Empty on a grey port, which has none.
+    order_weight: 1610
+  - name: tx_power_mdbm
+    kind: Number
+    parameters:
+      min_value: -30000
+      max_value: 30000
+    optional: true
+    description: Transmit power in milli-dBm, -30 to +30 dBm.
+    order_weight: 1700
+  - name: tx_power_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if tx_power_mdbm__value is not none %}{{ tx_power_mdbm__value
+        / 1000 }} dBm{% endif %}'
+    optional: true
+    description: Transmit power in dBm. Read-only, derived from tx_power_mdbm.
+    order_weight: 1710
+  - name: rx_sensitivity_mdbm
+    kind: Number
+    parameters:
+      min_value: -40000
+      max_value: 10000
+    optional: true
+    description: Receiver sensitivity in milli-dBm, -40 to +10 dBm.
+    order_weight: 1800
+  - name: rx_sensitivity_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if rx_sensitivity_mdbm__value is not none %}{{ rx_sensitivity_mdbm__value
+        / 1000 }} dBm{% endif %}'
+    optional: true
+    description: Receiver sensitivity in dBm. Derived from rx_sensitivity_mdbm.
+    order_weight: 1810
+  - name: connector_type
+    kind: Dropdown
+    choices:
+    - name: LC
+      label: LC
+      description: Small-form duplex latch. What transponder and pluggable optics
+        take.
+      color: '#2196f3'
+    - name: SC
+      label: SC
+      description: Push-pull square ferrule, common on older distribution frames.
+      color: '#4caf50'
+    - name: MPO-12
+      label: MPO-12
+      description: Twelve-fibre ribbon ferrule for parallel optics.
+      color: '#9c27b0'
+    - name: MPO-16
+      label: MPO-16
+      description: Sixteen-fibre ribbon ferrule for 400G parallel optics.
+      color: '#673ab7'
+    - name: FC
+      label: FC
+      description: Threaded ferrule. Still found on test sets and metro equipment.
+      color: '#ff9800'
+    - name: E2000
+      label: E2000
+      description: Shuttered push-pull connector, widespread on European carrier plant.
+      color: '#00bcd4'
+    - name: MU
+      label: MU
+      description: Miniature unibody connector, half the footprint of an SC.
+      color: '#8bc34a'
+    - name: CS
+      label: CS
+      description: Narrow-pitch duplex connector, used for QSFP-DD breakout.
+      color: '#e91e63'
+    - name: splice
+      label: Splice
+      description: Fusion splice rather than a mated pair. No connector loss and no
+        polish.
+      color: '#9e9e9e'
+    optional: true
+    order_weight: 1900
+  - name: polish
+    kind: Dropdown
+    choices:
+    - name: UPC
+      label: UPC
+      description: Ultra physical contact. Blue housing, about 50 dB return loss.
+      color: '#2196f3'
+    - name: APC
+      label: APC
+      description: Angled physical contact. Green housing, about 65 dB return loss.
+      color: '#4caf50'
+    - name: PC
+      label: PC
+      description: Physical contact. The oldest polish, about 35 dB return loss.
+      color: '#ff9800'
+    - name: none
+      label: None
+      description: No polished endface, such as a fusion splice.
+      color: '#9e9e9e'
+    optional: true
+    description: Endface polish. Mating an APC to a UPC costs about 0.5 dB and reflects.
+    order_weight: 1910
+- name: CopperPort
+  namespace: Otn
+  description: Electrical port properties for G.703 tributaries.
+  label: Copper port
+  icon: mdi:cable-data
+  include_in_menu: false
+  attributes:
+  - name: speed_kbps
+    kind: Number
+    default_value: 2048
+    parameters:
+      min_value: 64
+      max_value: 400000000
+    optional: false
+    description: Line rate in kbps. E1 is 2048, T1 is 1544, STM-1 is 155520.
+    order_weight: 1600
+  - name: impedance_ohm
+    kind: Number
+    default_value: 120
+    parameters:
+      min_value: 50
+      max_value: 600
+    optional: false
+    description: Nominal impedance in ohms. 120 for E1 pair, 75 for coax.
+    order_weight: 1700
+  - name: connector_type
+    kind: Dropdown
+    default_value: RJ48
+    choices:
+    - name: BNC
+      label: BNC
+      description: Coaxial bayonet connector, used for 75 ohm E1 and STM-1.
+      color: '#ff9800'
+    - name: RJ48
+      label: RJ48
+      description: Eight-position jack for 120 ohm balanced E1 and T1 pairs.
+      color: '#2196f3'
+    - name: RJ45
+      label: RJ45
+      description: Eight-position jack for Ethernet management and console.
+      color: '#4caf50'
+    optional: false
+    order_weight: 1900
+nodes:
+- name: RouterPort
+  namespace: Otn
+  description: Grey optics on an IP router. Not on the C-band grid.
+  label: Router port
+  icon: mdi:ethernet
+  include_in_menu: false
+  inherit_from:
+  - DcimEndpoint
+  - OtnGenericPort
+  - OtnOpticalPort
+  relationships:
+  - name: transceiver
+    peer: DcimGenericTransceiver
+    label: Module fitted in this port
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_optical_port__transceiver
+    order_weight: 960
+- name: ClientPort
+  namespace: Otn
+  description: Transponder client side. Where grey light arrives.
+  label: Client port
+  icon: mdi:lan-connect
+  include_in_menu: false
+  inherit_from:
+  - DcimEndpoint
+  - OtnGenericPort
+  - OtnOpticalPort
+  relationships:
+  - name: transceiver
+    peer: DcimGenericTransceiver
+    label: Module fitted in this port
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_optical_port__transceiver
+    order_weight: 960
+- name: LinePort
+  namespace: Otn
+  description: Transponder DWDM line side. Where coloured light leaves.
+  label: Line port
+  icon: mdi:transit-connection
+  include_in_menu: false
+  inherit_from:
+  - DcimEndpoint
+  - OtnGenericPort
+  - OtnOpticalPort
+  relationships:
+  - name: carrier
+    peer: OtnOpticalCarrier
+    label: Wavelength this port terminates
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_carrier__line_ports
+    order_weight: 850
+  - name: transceiver
+    peer: DcimGenericTransceiver
+    label: Module fitted in this port
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_optical_port__transceiver
+    order_weight: 960
+- name: RoadmAddDropPort
+  namespace: Otn
+  description: Local add and drop on a ROADM.
+  label: ROADM add/drop port
+  icon: mdi:call-split
+  include_in_menu: false
+  inherit_from:
+  - DcimEndpoint
+  - OtnGenericPort
+  - OtnOpticalPort
+- name: RoadmDegreePort
+  namespace: Otn
+  description: Line-facing degree on a ROADM. One per direction.
+  label: ROADM degree port
+  icon: mdi:compass-outline
+  include_in_menu: false
+  inherit_from:
+  - DcimEndpoint
+  - OtnGenericPort
+  - OtnOpticalPort
+  attributes:
+  - name: direction
+    kind: Dropdown
+    choices:
+    - name: north
+      label: North
+      color: '#2196f3'
+    - name: south
+      label: South
+      color: '#4caf50'
+    - name: east
+      label: East
+      color: '#ff9800'
+    - name: west
+      label: West
+      color: '#9c27b0'
+    - name: express
+      label: Express
+      description: Faces another degree rather than the outside world. Nothing adds
+        or drops here.
+      color: '#00bcd4'
+    - name: local
+      label: Local
+      description: Faces add/drop equipment in the same building instead of a line
+        route.
+      color: '#9e9e9e'
+    optional: true
+    description: How operators label this degree. Until now the port name was the
+      only place to say it.
+    order_weight: 1500
+  - name: wavelength_capacity
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 96
+    optional: true
+    description: Nameplate wavelengths this degree is rated to pass, such as 40, 80
+      or 96. Not a count in use.
+    order_weight: 1520
+- name: AmplifierPort
+  namespace: Otn
+  description: Amplifier input or output.
+  label: Amplifier port
+  icon: mdi:amplifier
+  include_in_menu: false
+  inherit_from:
+  - DcimEndpoint
+  - OtnGenericPort
+  - OtnOpticalPort
+- name: SplitterPort
+  namespace: Otn
+  description: The common side of a splitter, or one of its output legs.
+  label: Splitter port
+  icon: mdi:call-split
+  include_in_menu: false
+  inherit_from:
+  - DcimEndpoint
+  - OtnGenericPort
+  - OtnOpticalPort
+  attributes:
+  - name: leg
+    kind: Dropdown
+    default_value: output
+    choices:
+    - name: common
+      label: Common
+      description: The single side that carries the whole carrier.
+      color: '#2196f3'
+    - name: output
+      label: Output
+      description: One of the divided legs.
+      color: '#4caf50'
+    optional: false
+    description: Whether this port is the common side or an output leg.
+    order_weight: 1500
+- name: MuxClientPort
+  namespace: Otn
+  description: One channel of a multiplexer. The side facing the transponder or router
+    that lights it.
+  label: Mux client port
+  icon: mdi:import
+  include_in_menu: false
+  inherit_from:
+  - DcimEndpoint
+  - OtnGenericPort
+  - OtnOpticalPort
+  relationships:
+  - name: dwdm_channel
+    peer: OtnFrequencyGrid
+    label: Dense channel this port carries
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_frequency_grid__mux_client_ports
+    order_weight: 850
+  - name: cwdm_channel
+    peer: OtnCwdmChannel
+    label: Coarse wavelength this port carries
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_cwdm_channel__mux_client_ports
+    order_weight: 860
+- name: MuxLinePort
+  namespace: Otn
+  description: The common side of a multiplexer, where the whole band leaves.
+  label: Mux line port
+  icon: mdi:export
+  include_in_menu: false
+  inherit_from:
+  - DcimEndpoint
+  - OtnGenericPort
+  - OtnOpticalPort
+- name: TributaryPort
+  namespace: Otn
+  description: E1 or T1 G.703 electrical tributary. The only copper port here.
+  label: Tributary port
+  icon: mdi:cable-data
+  include_in_menu: false
+  inherit_from:
+  - DcimEndpoint
+  - OtnGenericPort
+  - OtnCopperPort
+- name: TransceiverType
+  namespace: Otn
+  description: A pluggable optic part number and what it can be made to do.
+  label: Transceiver type
+  icon: mdi:chip
+  include_in_menu: true
+  menu_placement: OtnGenericDevice
+  human_friendly_id:
+  - part_number__value
+  order_by:
+  - part_number__value
+  display_label: part_number__value
+  attributes:
+  - name: part_number
+    kind: Text
+    unique: true
+    parameters:
+      max_length: 64
+      regex: ^[A-Za-z0-9._/+-]+$
+    optional: false
+    description: Vendor part number, such as QDD-400G-ZRP-S.
+    order_weight: 1000
+  - name: description
+    kind: Text
+    parameters:
+      max_length: 256
+    optional: true
+    order_weight: 1200
+  - name: form_factor
+    kind: Dropdown
+    choices:
+    - name: QSFP-DD
+      label: QSFP-DD
+      description: Eight-lane double-density cage. What a coherent 400G pluggable
+        takes.
+      color: '#2196f3'
+    - name: QSFP28
+      label: QSFP28
+      description: Four-lane cage, 100G grey optics.
+      color: '#4caf50'
+    - name: OSFP
+      label: OSFP
+      description: Eight-lane cage with a larger thermal budget than QSFP-DD.
+      color: '#9c27b0'
+    - name: CFP2-DCO
+      label: CFP2-DCO
+      description: Digital coherent optic. The DSP is in the module.
+      color: '#ff9800'
+    - name: CFP2-ACO
+      label: CFP2-ACO
+      description: Analogue coherent optic. The DSP is on the host card.
+      color: '#ffc107'
+    - name: SFP28
+      label: SFP28
+      description: Single-lane 25G cage.
+      color: '#00bcd4'
+    - name: SFP+
+      label: SFP+
+      description: Single-lane 10G cage.
+      color: '#9e9e9e'
+    optional: false
+    description: The cage this part fits. It decides which ports can hold it.
+    order_weight: 1300
+  - name: tunable
+    kind: Boolean
+    default_value: false
+    optional: false
+    description: Whether the laser can be tuned across the grid or is fixed at one
+      wavelength.
+    order_weight: 1400
+  relationships:
+  - name: supported_modes
+    peer: OtnOpticalMode
+    label: Modes this part can run
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_optical_mode__transceiver_types
+    order_weight: 900
+  - name: manufacturer
+    peer: OrganizationManufacturer
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_transceiver_type__manufacturer
+    order_weight: 1100
+- name: FiberType
+  namespace: Otn
+  description: Single-mode fiber family. Attenuation, dispersion and group index at
+    1550 nm.
+  label: Fiber type
+  icon: mdi:cable-data
+  include_in_menu: true
+  menu_placement: OtnFiberSpan
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    parameters:
+      max_length: 32
+      regex: ^[A-Za-z0-9.-]+$
+    optional: false
+    description: ITU-T designation, such as G.652.D.
+    order_weight: 1000
+  - name: description
+    kind: Text
+    parameters:
+      max_length: 256
+    optional: true
+    order_weight: 1100
+  - name: attenuation_coefficient_mdb_per_km
+    kind: Number
+    parameters:
+      min_value: 150
+      max_value: 400
+    optional: false
+    description: Attenuation at 1550 nm in millidecibels per kilometre. 0.20 dB/km
+      is 200. Wrong for CWDM.
+    order_weight: 1500
+  - name: attenuation_coefficient_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if attenuation_coefficient_mdb_per_km__value is not none
+        %}{{ attenuation_coefficient_mdb_per_km__value / 1000 }} dB/km{% endif %}'
+    optional: true
+    description: Attenuation in dB/km. Read-only, derived from attenuation_coefficient_mdb_per_km.
+    order_weight: 1510
+  - name: dispersion_fs_per_nm_km
+    kind: Number
+    parameters:
+      min_value: 0
+      max_value: 30000
+    optional: false
+    description: Chromatic dispersion at 1550 nm in femtoseconds per nm per km. 17
+      ps/nm/km is 17000.
+    order_weight: 1600
+  - name: dispersion_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if dispersion_fs_per_nm_km__value is not none %}{{ dispersion_fs_per_nm_km__value
+        / 1000 }} ps/nm/km{% endif %}'
+    optional: true
+    description: Dispersion in ps/nm/km. Read-only, derived from dispersion_fs_per_nm_km.
+    order_weight: 1610
+  - name: group_index_milli
+    kind: Number
+    default_value: 1468
+    parameters:
+      min_value: 1400
+      max_value: 1500
+    optional: false
+    description: Group index at 1550 nm in milli-units. 1.468 is 1468. Sets propagation
+      delay.
+    order_weight: 1700
+  relationships:
+  - name: spans
+    peer: OtnFiberSpan
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_fiber_type__spans
+    order_weight: 900
+- name: Conduit
+  namespace: Otn
+  description: Shared-risk link group. Two routes through one conduit are not diverse.
+  label: Conduit
+  icon: mdi:pipe
+  include_in_menu: true
+  menu_placement: OtnFiberSpan
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    parameters:
+      max_length: 64
+      regex: ^[A-Za-z0-9._-]+$
+    optional: false
+    order_weight: 1000
+  - name: owner
+    kind: Text
+    parameters:
+      max_length: 64
+    optional: true
+    description: Who owns the trench. Often not the network operator.
+    order_weight: 1100
+  - name: description
+    kind: Text
+    parameters:
+      max_length: 256
+    optional: true
+    order_weight: 1200
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: planned
+      label: Planned
+      color: '#2196f3'
+    - name: active
+      label: Active
+      color: '#4caf50'
+    - name: standby
+      label: Standby
+      color: '#00bcd4'
+    - name: maintenance
+      label: Maintenance
+      color: '#ffc107'
+    - name: failed
+      label: Failed
+      color: '#ff5722'
+    - name: decommissioned
+      label: Decommissioned
+      color: '#9e9e9e'
+    optional: false
+    description: Lifecycle state of the duct itself, independent of the spans pulled
+      through it.
+    order_weight: 1300
+  relationships:
+  - name: spans
+    peer: OtnFiberSpan
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_conduit__spans
+    order_weight: 900
+- name: FiberSpan
+  namespace: Otn
+  description: One amplifier-to-amplifier fiber section. Lossy, but not racked and
+    not a device.
+  label: Fiber span
+  icon: mdi:vector-line
+  include_in_menu: true
+  inherit_from:
+  - OtnOpticalElement
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    parameters:
+      max_length: 64
+      regex: ^[A-Za-z0-9._-]+$
+    optional: false
+    order_weight: 1000
+  - name: description
+    kind: Text
+    parameters:
+      max_length: 256
+    optional: true
+    order_weight: 1100
+  - name: oms_sequence
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 50
+    optional: true
+    description: Position of this span within its optical multiplex section, counting
+      from the A end.
+    order_weight: 1200
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: planned
+      label: Planned
+      color: '#2196f3'
+    - name: active
+      label: Active
+      color: '#4caf50'
+    - name: standby
+      label: Standby
+      color: '#00bcd4'
+    - name: maintenance
+      label: Maintenance
+      color: '#ffc107'
+    - name: failed
+      label: Failed
+      color: '#ff5722'
+    - name: decommissioned
+      label: Decommissioned
+      color: '#9e9e9e'
+    optional: false
+    description: Lifecycle state of the span. A planned span is designed but not yet
+      spliced through.
+    order_weight: 1300
+  - name: commissioned_date
+    kind: DateTime
+    optional: true
+    description: When the span was accepted into service. A recorded fact, not a reading.
+    order_weight: 1400
+  - name: length_m
+    kind: Number
+    parameters:
+      min_value: 0
+      max_value: 500000
+    optional: false
+    description: Route length in metres, not straight-line distance. 500 km is the
+      practical ceiling.
+    order_weight: 1500
+  - name: length_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if length_m__value is not none %}{{ length_m__value / 1000
+        }} km{% endif %}'
+    optional: true
+    description: Route length in km. Read-only, derived from length_m.
+    order_weight: 1510
+  - name: splice_count
+    kind: Number
+    default_value: 0
+    parameters:
+      min_value: 0
+      max_value: 500
+    optional: false
+    description: Fusion splices along the span. Roughly one per drum of cable.
+    order_weight: 1600
+  - name: splice_loss_mdb
+    kind: Number
+    default_value: 50
+    parameters:
+      min_value: 0
+      max_value: 1000
+    optional: false
+    description: Loss per splice in millidecibels. 0.05 dB is 50.
+    order_weight: 1610
+  - name: connector_count
+    kind: Number
+    default_value: 2
+    parameters:
+      min_value: 0
+      max_value: 20
+    optional: false
+    description: Mated connector pairs on the span, normally one at each end.
+    order_weight: 1700
+  - name: connector_loss_mdb
+    kind: Number
+    default_value: 300
+    parameters:
+      min_value: 0
+      max_value: 2000
+    optional: false
+    description: Loss per mated connector pair in millidecibels. 0.3 dB is 300.
+    order_weight: 1710
+  - name: aging_margin_mdb
+    kind: Number
+    default_value: 1500
+    parameters:
+      min_value: 0
+      max_value: 5000
+    optional: false
+    description: Reserved margin for repairs and ageing, in millidecibels. 1.5 dB
+      is 1500.
+    order_weight: 1720
+  relationships:
+  - name: fiber_type
+    peer: OtnFiberType
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: otn_fiber_type__spans
+    order_weight: 800
+  - name: site_a
+    peer: LocationSite
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: otn_span__site_a
+    order_weight: 810
+  - name: site_b
+    peer: LocationSite
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: otn_span__site_b
+    order_weight: 820
+  - name: conduit
+    peer: OtnConduit
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_conduit__spans
+    order_weight: 830
+  - name: oms
+    peer: OtnOpticalMultiplexSection
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_oms__spans
+    order_weight: 840
+  - name: raman_pumps
+    peer: OtnRamanPump
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_span__raman_pumps
+    order_weight: 850
+  - name: terminating_ports
+    peer: OtnGenericPort
+    label: Ports at the ends of this span
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_span__terminating_ports
+    order_weight: 950
+- name: OpticalMultiplexSection
+  namespace: Otn
+  description: Groups the ordered spans and inline amplifiers between two OMS endpoints.
+  label: Optical multiplex section
+  icon: mdi:ray-start-end
+  include_in_menu: true
+  menu_placement: OtnFiberSpan
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    parameters:
+      max_length: 64
+      regex: ^[A-Za-z0-9._-]+$
+    optional: false
+    order_weight: 1000
+  - name: description
+    kind: Text
+    parameters:
+      max_length: 256
+    optional: true
+    order_weight: 1100
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: planned
+      label: Planned
+      color: '#2196f3'
+    - name: active
+      label: Active
+      color: '#4caf50'
+    - name: standby
+      label: Standby
+      color: '#00bcd4'
+    - name: maintenance
+      label: Maintenance
+      color: '#ffc107'
+    - name: failed
+      label: Failed
+      color: '#ff5722'
+    - name: decommissioned
+      label: Decommissioned
+      color: '#9e9e9e'
+    optional: false
+    description: Lifecycle state of the section as a whole, not of the spans it groups.
+    order_weight: 1200
+  relationships:
+  - name: endpoint_a
+    peer: OtnOmsEndpoint
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: otn_oms__endpoint_a
+    order_weight: 800
+  - name: endpoint_b
+    peer: OtnOmsEndpoint
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: otn_oms__endpoint_b
+    order_weight: 810
+  - name: spans
+    peer: OtnFiberSpan
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_oms__spans
+    order_weight: 900
+  - name: amplifiers_a2b
+    peer: OtnAmplifier
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_oms__amplifiers_a2b
+    order_weight: 910
+  - name: amplifiers_b2a
+    peer: OtnAmplifier
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_oms__amplifiers_b2a
+    order_weight: 920
+- name: FrequencyGrid
+  namespace: Otn
+  description: One ITU-T G.694.1 channel. 50 GHz fixed grid, 191.35 to 196.10 THz.
+  label: Frequency grid channel
+  icon: mdi:sine-wave
+  include_in_menu: true
+  menu_placement: OtnOpticalCarrier
+  human_friendly_id:
+  - center_frequency_mhz__value
+  order_by:
+  - center_frequency_mhz__value
+  display_label: Ch{{ channel_number__value }}
+  attributes:
+  - name: channel_number
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if center_frequency_mhz__value is not none -%} {{ ((center_frequency_mhz__value
+        - 191350000) // 50000) + 1 }} {%- endif %}'
+    optional: true
+    description: ITU channel number, 1 to 96. Channel 1 is 191.35 THz. Derived from
+      the centre frequency.
+    order_weight: 1000
+  - name: center_frequency_mhz
+    kind: Number
+    unique: true
+    parameters:
+      min_value: 191350000
+      max_value: 196100000
+    optional: false
+    description: Centre frequency in MHz. Channel n is 191350000 + (n - 1) x 50000.
+    order_weight: 1500
+  - name: center_frequency_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if center_frequency_mhz__value is not none %}{{ center_frequency_mhz__value
+        / 1000000 }} THz{% endif %}'
+    optional: true
+    description: Centre frequency in THz. Byte-identical to the optical-port rendering.
+    order_weight: 1510
+  - name: center_wavelength_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if center_frequency_mhz__value is not none -%} {{ (299792458000
+        / center_frequency_mhz__value) | round(2) }} nm {%- endif %}'
+    optional: true
+    description: Centre wavelength in nm, derived from the centre frequency.
+    order_weight: 1520
+  relationships:
+  - name: carriers
+    peer: OtnOpticalCarrier
+    label: Carriers on this channel
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_carrier__channel
+    order_weight: 900
+- name: CwdmChannel
+  namespace: Otn
+  description: One ITU-T G.694.2 coarse wavelength. 20 nm spacing, 1271 to 1611 nm.
+  label: CWDM wavelength
+  icon: mdi:palette-swatch-variant
+  include_in_menu: true
+  menu_placement: OtnOpticalCarrier
+  human_friendly_id:
+  - center_wavelength_nm__value
+  order_by:
+  - center_wavelength_nm__value
+  display_label: '{{ center_wavelength_nm__value }} nm'
+  attributes:
+  - name: center_wavelength_nm
+    kind: Number
+    unique: true
+    parameters:
+      min_value: 1271
+      max_value: 1611
+    optional: false
+    description: Nominal central wavelength in nm. Wavelength n is 1271 + (n - 1)
+      x 20.
+    order_weight: 1000
+  - name: band
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if center_wavelength_nm__value is not none -%} {% if center_wavelength_nm__value
+        < 1360 -%}O {%- elif center_wavelength_nm__value < 1460 -%}E {%- elif center_wavelength_nm__value
+        < 1530 -%}S {%- elif center_wavelength_nm__value < 1565 -%}C {%- else -%}L
+        {%- endif %} {%- endif %}'
+    optional: true
+    description: ITU band, derived from the wavelength. Only the two C-band wavelengths
+      sit in the erbium window.
+    order_weight: 1100
+- name: OpticalMode
+  namespace: Otn
+  description: What a transponder or coherent pluggable can do. Reach and required
+    OSNR are data, not assumptions.
+  label: Optical mode
+  icon: mdi:waveform
+  include_in_menu: true
+  menu_placement: OtnOpticalCarrier
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    parameters:
+      max_length: 64
+      regex: ^[A-Za-z0-9 .+/_-]+$
+    optional: false
+    order_weight: 1000
+  - name: mode_class
+    kind: Dropdown
+    default_value: transponder
+    choices:
+    - name: transponder
+      label: Transponder
+      color: '#2196f3'
+    - name: pluggable
+      label: Coherent pluggable
+      color: '#4caf50'
+    optional: false
+    description: Two values, and the pluggable-reach report filters on it.
+    order_weight: 1100
+  - name: modulation
+    kind: Dropdown
+    choices:
+    - name: DP-QPSK
+      label: DP-QPSK
+      description: Dual-polarisation QPSK. Four bits per symbol, the longest reach
+        of the four.
+      color: '#2196f3'
+    - name: DP-8QAM
+      label: DP-8QAM
+      description: Dual-polarisation 8QAM. Six bits per symbol.
+      color: '#4caf50'
+    - name: DP-16QAM
+      label: DP-16QAM
+      description: Dual-polarisation 16QAM. Eight bits per symbol.
+      color: '#ff9800'
+    - name: DP-64QAM
+      label: DP-64QAM
+      description: Dual-polarisation 64QAM. Twelve bits per symbol, the shortest reach.
+      color: '#e91e63'
+    optional: false
+    order_weight: 1200
+  - name: description
+    kind: Text
+    parameters:
+      max_length: 256
+    optional: true
+    order_weight: 1300
+  - name: line_rate_gbps
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 1600
+    optional: false
+    description: Client-side capacity in Gbps. Already a whole number in its natural
+      unit.
+    order_weight: 1500
+  - name: baud_mbaud
+    kind: Number
+    parameters:
+      min_value: 1000
+      max_value: 200000
+    optional: false
+    description: Symbol rate in megabaud. 59.84 GBd is 59840. Sets the spectral width.
+    order_weight: 1600
+  - name: required_osnr_mdb
+    kind: Number
+    parameters:
+      min_value: 5000
+      max_value: 40000
+    optional: false
+    description: OSNR needed at the receiver, in millidecibels. 26 dB is 26000.
+    order_weight: 1700
+  - name: required_osnr_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if required_osnr_mdb__value is not none %}{{ required_osnr_mdb__value
+        / 1000 }} dB{% endif %}'
+    optional: true
+    description: Required OSNR in dB. Read-only, derived from required_osnr_mdb.
+    order_weight: 1710
+  - name: cd_tolerance_fs_per_nm
+    kind: Number
+    parameters:
+      min_value: 0
+      max_value: 200000000
+    optional: false
+    description: Chromatic dispersion the receiver compensates, in fs/nm. 100000 ps/nm
+      is 100000000.
+    order_weight: 1800
+  - name: nominal_reach_m
+    kind: Number
+    parameters:
+      min_value: 0
+      max_value: 5000000
+    optional: false
+    description: Vendor-quoted reach in metres. A starting point for the budget, not
+      a guarantee.
+    order_weight: 1900
+  - name: nominal_reach_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if nominal_reach_m__value is not none %}{{ nominal_reach_m__value
+        / 1000 }} km{% endif %}'
+    optional: true
+    description: Nominal reach in km. Read-only, derived from nominal_reach_m.
+    order_weight: 1910
+  - name: fec_type
+    kind: Dropdown
+    default_value: SD-FEC
+    choices:
+    - name: none
+      label: None
+      description: No forward error correction.
+      color: '#9e9e9e'
+    - name: GFEC
+      label: GFEC
+      description: The G.709 Reed-Solomon code. Hard decision, about 7 percent overhead.
+      color: '#2196f3'
+    - name: SD-FEC
+      label: SD-FEC
+      description: Soft-decision FEC. More coding gain than a hard-decision code,
+        at more latency.
+      color: '#4caf50'
+    - name: cFEC
+      label: cFEC
+      description: Concatenated FEC from OIF 400ZR. Less coding gain and less power
+        than oFEC.
+      color: '#00bcd4'
+    - name: oFEC
+      label: oFEC
+      description: Open FEC from OpenROADM and OpenZR+. More coding gain, for longer
+        reach.
+      color: '#9c27b0'
+    optional: false
+    order_weight: 1950
+  - name: fec_latency_ns
+    kind: Number
+    default_value: 0
+    parameters:
+      min_value: 0
+      max_value: 100000
+    optional: false
+    description: Encoder and decoder latency in nanoseconds. Small next to propagation,
+      but not zero.
+    order_weight: 1960
+  relationships:
+  - name: carriers
+    peer: OtnOpticalCarrier
+    label: Carriers using this mode
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_carrier__optical_mode
+    order_weight: 900
+- name: ClientSignal
+  namespace: Otn
+  description: What a customer hands over, and the container it maps into.
+  label: Client signal
+  icon: mdi:import
+  include_in_menu: true
+  menu_placement: OtnService
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    parameters:
+      max_length: 32
+      regex: ^[A-Za-z0-9./_-]+$
+    optional: false
+    order_weight: 1000
+  - name: alias
+    kind: Text
+    parameters:
+      max_length: 32
+    optional: true
+    description: The SONET name where one exists. STM-16 is OC-48.
+    order_weight: 1100
+  - name: layer
+    kind: Dropdown
+    choices:
+    - name: ethernet
+      label: Ethernet
+      color: '#2196f3'
+    - name: sdh
+      label: SDH / SONET
+      color: '#9c27b0'
+    - name: pdh
+      label: PDH
+      color: '#795548'
+    - name: fibre_channel
+      label: Fibre Channel
+      color: '#ff9800'
+    - name: infiniband
+      label: InfiniBand
+      color: '#673ab7'
+    optional: false
+    description: Grouping the catalog by layer is the first thing a reader does.
+    order_weight: 1200
+  - name: auto_selectable
+    kind: Boolean
+    default_value: false
+    optional: false
+    description: May the rate rule pick this signal when a service states none.
+    order_weight: 1250
+  - name: description
+    kind: Text
+    parameters:
+      max_length: 256
+    optional: true
+    order_weight: 1300
+  - name: bit_rate_kbps
+    kind: Number
+    parameters:
+      min_value: 64
+      max_value: 1600000000
+    optional: false
+    description: Nominal line rate in kbps. E1 is 2048, 100GBASE-LR4 is 103100000.
+    order_weight: 1500
+  - name: bit_rate_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if bit_rate_kbps__value is none %}{% elif bit_rate_kbps__value
+        >= 1000000 %}{{ bit_rate_kbps__value / 1000000 }} Gbps{% else %}{{ bit_rate_kbps__value
+        / 1000 }} Mbps{% endif %}'
+    optional: true
+    description: Bit rate in Mbps below one gigabit, Gbps at or above it.
+    order_weight: 1510
+  - name: default_container_type
+    kind: Dropdown
+    choices:
+    - name: ODU0
+      label: ODU0
+      description: About 1.25 Gbps. Sized for a gigabit Ethernet client.
+      color: '#2196f3'
+    - name: ODU1
+      label: ODU1
+      description: About 2.5 Gbps, the original G.709 tributary rate.
+      color: '#2196f3'
+    - name: ODU2
+      label: ODU2
+      description: About 10 Gbps. Takes 10G Ethernet at its WAN rate.
+      color: '#2196f3'
+    - name: ODU2e
+      label: ODU2e
+      description: About 10.4 Gbps, sized for the 10GBASE-R LAN rate.
+      color: '#2196f3'
+    - name: ODU3
+      label: ODU3
+      description: About 40 Gbps.
+      color: '#2196f3'
+    - name: ODU4
+      label: ODU4
+      description: About 100 Gbps. Takes 100G Ethernet.
+      color: '#2196f3'
+    - name: ODUC1
+      label: ODUC1
+      description: ODUCn at n=1. About 100 Gbps.
+      color: '#673ab7'
+    - name: ODUC2
+      label: ODUC2
+      description: ODUCn at n=2. About 200 Gbps.
+      color: '#673ab7'
+    - name: ODUC3
+      label: ODUC3
+      description: ODUCn at n=3. About 300 Gbps.
+      color: '#673ab7'
+    - name: ODUC4
+      label: ODUC4
+      description: ODUCn at n=4. About 400 Gbps.
+      color: '#673ab7'
+    - name: ODUflex
+      label: ODUflex
+      description: Sized to the client rather than to a fixed rate.
+      color: '#00bcd4'
+    - name: VC-12
+      label: VC-12
+      description: SDH virtual container carrying a 2 Mbps E1.
+      color: '#ff9800'
+    - name: VC-4
+      label: VC-4
+      description: SDH virtual container carrying the 140 Mbps STM-1 payload.
+      color: '#ff9800'
+    - name: STM-N
+      label: STM-N
+      description: A whole SDH aggregate carried transparently.
+      color: '#ff9800'
+    optional: false
+    description: The first step of the mapping chain, not the last. E1 maps into VC-12,
+      not ODU1.
+    order_weight: 1600
+  - name: default_mapping
+    kind: Dropdown
+    choices:
+    - name: GMP
+      label: GMP
+      description: Generic mapping procedure. Rate agnostic, and what a modern client
+        uses.
+      color: '#2196f3'
+    - name: BMP
+      label: BMP
+      description: Bit-synchronous mapping procedure. Client and container clocks
+        are locked.
+      color: '#4caf50'
+    - name: AMP
+      label: AMP
+      description: Asynchronous mapping procedure. Justification bytes absorb the
+        clock offset.
+      color: '#ff9800'
+    optional: false
+    description: ITU-T G.709 mapping procedure. Generic, bit-synchronous or asynchronous.
+    order_weight: 1700
+  relationships:
+  - name: containers
+    peer: OtnContainer
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_client_signal__containers
+    order_weight: 900
+  - name: services
+    peer: OtnService
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_service__client_signal
+    order_weight: 910
+- name: Container
+  namespace: Otn
+  description: ODU or SDH virtual container. The digital adaptation layer between
+    a client and a wavelength.
+  label: Container
+  icon: mdi:package-variant-closed
+  include_in_menu: true
+  menu_placement: OtnService
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    parameters:
+      max_length: 64
+      regex: ^[A-Za-z0-9._-]+$
+    optional: false
+    order_weight: 1000
+  - name: odu_type
+    kind: Dropdown
+    choices:
+    - name: ODU0
+      label: ODU0
+      description: About 1.25 Gbps. Sized for a gigabit Ethernet client.
+      color: '#2196f3'
+    - name: ODU1
+      label: ODU1
+      description: About 2.5 Gbps, the original G.709 tributary rate.
+      color: '#2196f3'
+    - name: ODU2
+      label: ODU2
+      description: About 10 Gbps. Takes 10G Ethernet at its WAN rate.
+      color: '#2196f3'
+    - name: ODU2e
+      label: ODU2e
+      description: About 10.4 Gbps, sized for the 10GBASE-R LAN rate.
+      color: '#2196f3'
+    - name: ODU3
+      label: ODU3
+      description: About 40 Gbps.
+      color: '#2196f3'
+    - name: ODU4
+      label: ODU4
+      description: About 100 Gbps. Takes 100G Ethernet.
+      color: '#2196f3'
+    - name: ODUC1
+      label: ODUC1
+      description: ODUCn at n=1. About 100 Gbps.
+      color: '#673ab7'
+    - name: ODUC2
+      label: ODUC2
+      description: ODUCn at n=2. About 200 Gbps.
+      color: '#673ab7'
+    - name: ODUC3
+      label: ODUC3
+      description: ODUCn at n=3. About 300 Gbps.
+      color: '#673ab7'
+    - name: ODUC4
+      label: ODUC4
+      description: ODUCn at n=4. About 400 Gbps.
+      color: '#673ab7'
+    - name: ODUC6
+      label: ODUC6
+      description: ODUCn at n=6. About 600 Gbps.
+      color: '#673ab7'
+    - name: ODUC8
+      label: ODUC8
+      description: ODUCn at n=8. About 800 Gbps.
+      color: '#673ab7'
+    - name: ODUflex
+      label: ODUflex
+      description: Sized to the client rather than to a fixed rate.
+      color: '#00bcd4'
+    - name: VC-12
+      label: VC-12
+      description: SDH virtual container carrying a 2 Mbps E1.
+      color: '#ff9800'
+    - name: VC-4
+      label: VC-4
+      description: SDH virtual container carrying the 140 Mbps STM-1 payload.
+      color: '#ff9800'
+    - name: STM-N
+      label: STM-N
+      description: A whole SDH aggregate carried transparently.
+      color: '#ff9800'
+    optional: false
+    order_weight: 1100
+  - name: mapping_mode
+    kind: Dropdown
+    default_value: GMP
+    choices:
+    - name: GMP
+      label: GMP
+      description: Generic mapping procedure. Rate agnostic, and what a modern client
+        uses.
+      color: '#2196f3'
+    - name: BMP
+      label: BMP
+      description: Bit-synchronous mapping procedure. Client and container clocks
+        are locked.
+      color: '#4caf50'
+    - name: AMP
+      label: AMP
+      description: Asynchronous mapping procedure. Justification bytes absorb the
+        clock offset.
+      color: '#ff9800'
+    optional: false
+    order_weight: 1200
+  - name: description
+    kind: Text
+    parameters:
+      max_length: 256
+    optional: true
+    order_weight: 1300
+  - name: segment_sequence
+    kind: Number
+    default_value: 1
+    parameters:
+      min_value: 1
+      max_value: 50
+    optional: false
+    description: Which segment of its circuit this container rides. 1 for a circuit
+      that spans one wavelength.
+    order_weight: 1400
+  - name: tributary_slots
+    kind: Number
+    default_value: 0
+    parameters:
+      min_value: 0
+      max_value: 640
+    optional: false
+    description: Slots this container occupies in its parent. An ODU2 in an ODU4 takes
+      8.
+    order_weight: 1500
+  - name: tributary_slot_capacity
+    kind: Number
+    default_value: 0
+    parameters:
+      min_value: 0
+      max_value: 640
+    optional: false
+    description: Slots this container offers to its children. An ODU4 offers 80.
+    order_weight: 1600
+  relationships:
+  - name: carrier
+    peer: OtnOpticalCarrier
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_carrier__containers
+    order_weight: 790
+  - name: client_signal
+    peer: OtnClientSignal
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_client_signal__containers
+    order_weight: 800
+  - name: parent_container
+    peer: OtnContainer
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_container__children
+    direction: outbound
+    order_weight: 810
+  - name: service
+    peer: OtnService
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_service__containers
+    order_weight: 820
+  - name: child_containers
+    peer: OtnContainer
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_container__children
+    direction: inbound
+    order_weight: 900
+- name: Router
+  namespace: Otn
+  description: IP router. Light terminates here, so its insertion loss stays at the
+    zero default.
+  label: Router
+  icon: mdi:router
+  include_in_menu: true
+  menu_placement: OtnGenericDevice
+  inherit_from:
+  - OtnGenericDevice
+  - OtnOpticalElement
+- name: Transponder
+  namespace: Otn
+  description: Client to DWDM line adaptation.
+  label: Transponder
+  icon: mdi:transit-connection-variant
+  include_in_menu: true
+  menu_placement: OtnGenericDevice
+  inherit_from:
+  - OtnGenericDevice
+  - OtnOpticalElement
+- name: Roadm
+  namespace: Otn
+  description: Reconfigurable optical add/drop multiplexer.
+  label: ROADM
+  icon: mdi:call-split
+  include_in_menu: true
+  menu_placement: OtnGenericDevice
+  inherit_from:
+  - OtnGenericDevice
+  - OtnOmsEndpoint
+  - OtnOpticalElement
+  attributes:
+  - name: channel_capacity
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 96
+    optional: true
+    description: Nameplate channels this ROADM is rated for, such as 40, 80 or 96.
+      Not a count in use.
+    order_weight: 1300
+  - name: colorless
+    kind: Boolean
+    optional: true
+    description: Any add/drop port can take any wavelength, so assignment is not fixed
+      per port.
+    order_weight: 1320
+  - name: directionless
+    kind: Boolean
+    optional: true
+    description: An added wavelength can leave by any degree, so assignment does not
+      pick a degree.
+    order_weight: 1330
+  - name: contentionless
+    kind: Boolean
+    optional: true
+    description: The same wavelength can be added twice toward different degrees without
+      blocking.
+    order_weight: 1340
+  - name: technology
+    kind: Dropdown
+    choices:
+    - name: wss_lcos
+      label: WSS (LCoS)
+      color: '#673ab7'
+    - name: wss_mems
+      label: WSS (MEMS)
+      color: '#3f51b5'
+    - name: broadcast_select
+      label: Broadcast and select
+      color: '#607d8b'
+    optional: true
+    description: How the switch is built. Nameplate data, often unknown.
+    order_weight: 1350
+- name: Amplifier
+  namespace: Otn
+  description: Inline, booster or pre-amplifier.
+  label: Amplifier
+  icon: mdi:amplifier
+  include_in_menu: true
+  menu_placement: OtnGenericDevice
+  inherit_from:
+  - OtnGenericDevice
+  - OtnOpticalElement
+  attributes:
+  - name: amplifier_type
+    kind: Dropdown
+    choices:
+    - name: edfa
+      label: EDFA
+      description: Erbium-doped fibre amplifier. The usual choice on a C band line
+        system.
+      color: '#2196f3'
+    - name: soa
+      label: SOA
+      description: Semiconductor optical amplifier. Compact, noisier, found in access
+        gear.
+      color: '#ff9800'
+    - name: hybrid
+      label: Hybrid
+      description: An erbium stage combined with distributed Raman gain in one box.
+      color: '#673ab7'
+    optional: true
+    description: Nameplate amplifier technology. A Raman-only pump is its own kind,
+      OtnRamanPump.
+    order_weight: 1300
+  - name: stage
+    kind: Dropdown
+    choices:
+    - name: booster
+      label: Booster
+      description: First stage after the transmitter, lifting power into the span.
+      color: '#ff9800'
+    - name: inline
+      label: Inline
+      description: A mid-route stage that recovers span loss and passes the light
+        on.
+      color: '#4caf50'
+    - name: preamp
+      label: Pre-amplifier
+      description: Last stage before the receiver, raising power to its sensitivity.
+      color: '#ffc107'
+    optional: true
+    description: Nameplate stage this amplifier is built for, not a position derived
+      from the plant.
+    order_weight: 1400
+  - name: noise_figure_mdb
+    kind: Number
+    default_value: 4000
+    parameters:
+      min_value: 3000
+      max_value: 10000
+    optional: false
+    description: Noise figure in millidecibels. 4.0 dB is 4000. Sets the ASE this
+      stage adds.
+    order_weight: 1520
+  - name: noise_figure_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if noise_figure_mdb__value is not none %}{{ noise_figure_mdb__value
+        / 1000 }} dB{% endif %}'
+    optional: true
+    description: Noise figure in dB. Read-only, derived from noise_figure_mdb.
+    order_weight: 1530
+  - name: gain_mdb
+    kind: Number
+    default_value: 22000
+    parameters:
+      min_value: 0
+      max_value: 40000
+    optional: false
+    description: Gain in millidecibels. 22.0 dB is 22000. Must cover the loss ahead
+      of the input.
+    order_weight: 1540
+  - name: gain_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if gain_mdb__value is not none %}{{ gain_mdb__value / 1000
+        }} dB{% endif %}'
+    optional: true
+    description: Gain in dB. Read-only, derived from gain_mdb.
+    order_weight: 1550
+  - name: oms_sequence
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 51
+    optional: true
+    description: Position in this amplifier's own chain, counting along the direction
+      it amplifies.
+    order_weight: 1560
+  - name: max_total_output_power_mdbm
+    kind: Number
+    parameters:
+      min_value: 0
+      max_value: 30000
+    optional: true
+    description: Rated total output power in milli-dBm, 0 to +30 dBm. A nameplate
+      ceiling, not a reading.
+    order_weight: 1570
+  - name: max_total_output_power_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if max_total_output_power_mdbm__value is not none %}{{
+        max_total_output_power_mdbm__value / 1000 }} dBm{% endif %}'
+    optional: true
+    description: Rated total output power in dBm. Read-only, derived from max_total_output_power_mdbm.
+    order_weight: 1580
+  relationships:
+  - name: oms_a2b
+    peer: OtnOpticalMultiplexSection
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_oms__amplifiers_a2b
+    order_weight: 950
+  - name: oms_b2a
+    peer: OtnOpticalMultiplexSection
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_oms__amplifiers_b2a
+    order_weight: 960
+- name: MuxDemux
+  namespace: Otn
+  description: Passive multiplexer. A dense AWG on the core, a coarse thin-film filter
+    on a tail.
+  label: Mux/demux
+  icon: mdi:call-merge
+  include_in_menu: true
+  menu_placement: OtnGenericDevice
+  inherit_from:
+  - OtnGenericDevice
+  - OtnOmsEndpoint
+  - OtnOpticalElement
+  attributes:
+  - name: channel_capacity
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 96
+    optional: true
+    description: Nameplate channels this multiplexer is rated for, such as 8, 16,
+      40 or 96. Not a count in use.
+    order_weight: 1300
+  - name: plan
+    kind: Dropdown
+    default_value: dwdm
+    choices:
+    - name: dwdm
+      label: DWDM
+      description: ITU-T G.694.1 dense grid.
+      color: '#2196f3'
+    - name: cwdm
+      label: CWDM
+      description: ITU-T G.694.2 coarse plan.
+      color: '#ff9800'
+    optional: false
+    description: Which wavelength plan this multiplexer multiplexes.
+    order_weight: 1310
+  - name: mux_role
+    kind: Dropdown
+    default_value: mux_demux
+    choices:
+    - name: mux
+      label: Multiplexer
+      description: Combines channels onto one common port.
+      color: '#4caf50'
+    - name: demux
+      label: Demultiplexer
+      description: Splits one common port into channels.
+      color: '#00bcd4'
+    - name: mux_demux
+      label: Mux/demux
+      description: Both directions in one device.
+      color: '#2196f3'
+    - name: oadm
+      label: Fixed OADM
+      description: Drops and adds a fixed subset, passing the rest through.
+      color: '#9c27b0'
+    optional: false
+    description: What this passive device does with the channels it carries.
+    order_weight: 1320
+  - name: technology
+    kind: Dropdown
+    choices:
+    - name: thin_film_filter
+      label: Thin-film filter
+      color: '#795548'
+    - name: awg
+      label: AWG
+      color: '#607d8b'
+    - name: interleaver
+      label: Interleaver
+      color: '#009688'
+    optional: true
+    description: How the device separates wavelengths. Nameplate data, often unknown.
+    order_weight: 1330
+  relationships:
+  - name: cwdm_channels
+    peer: OtnCwdmChannel
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_mux_demux__cwdm_channels
+    order_weight: 1900
+- name: PatchPanel
+  namespace: Otn
+  description: Optical distribution frame. Carries connector loss.
+  label: Patch panel
+  icon: mdi:view-grid-outline
+  include_in_menu: true
+  menu_placement: OtnGenericDevice
+  inherit_from:
+  - OtnGenericDevice
+  - OtnOpticalElement
+- name: RamanPump
+  namespace: Otn
+  description: Pump laser injecting Raman gain into one fiber span.
+  label: Raman pump
+  icon: mdi:laser-pointer
+  include_in_menu: true
+  menu_placement: OtnGenericDevice
+  inherit_from:
+  - OtnGenericDevice
+  - OtnOpticalElement
+  attributes:
+  - name: on_off_gain_mdb
+    kind: Number
+    default_value: 10000
+    parameters:
+      min_value: 0
+      max_value: 15000
+    optional: false
+    description: Raman on-off gain in millidecibels. 10.0 dB is 10000.
+    order_weight: 1520
+  - name: on_off_gain_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if on_off_gain_mdb__value is not none %}{{ on_off_gain_mdb__value
+        / 1000 }} dB{% endif %}'
+    optional: true
+    description: On-off gain in dB. Read-only, derived from on_off_gain_mdb.
+    order_weight: 1530
+  - name: injection_end
+    kind: Dropdown
+    default_value: site_b
+    choices:
+    - name: site_a
+      label: Site A end
+      color: '#2196f3'
+    - name: site_b
+      label: Site B end
+      color: '#ff5722'
+    optional: false
+    description: Which end of its span the pump is injected at, named against the
+      span's own site_a and site_b.
+    order_weight: 1540
+  - name: propagation
+    kind: Dropdown
+    default_value: counter
+    choices:
+    - name: counter
+      label: Counter-propagating
+      color: '#3f51b5'
+    - name: co
+      label: Co-propagating
+      color: '#009688'
+    optional: false
+    description: Whether the pump fires against the signal or with it.
+    order_weight: 1550
+  relationships:
+  - name: span
+    peer: OtnFiberSpan
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: otn_span__raman_pumps
+    order_weight: 850
+- name: OduSwitch
+  namespace: Otn
+  description: O-E-O device. Terminates one wavelength, originates the next, as a
+    regenerator or ODU cross-connect.
+  label: ODU switch
+  icon: mdi:swap-horizontal-variant
+  include_in_menu: true
+  menu_placement: OtnGenericDevice
+  inherit_from:
+  - OtnGenericDevice
+  - OtnOpticalElement
+  attributes:
+  - name: switching_mode
+    kind: Dropdown
+    default_value: regenerator
+    choices:
+    - name: regenerator
+      label: Regenerator
+      color: '#3f51b5'
+    - name: cross_connect
+      label: ODU cross-connect
+      color: '#009688'
+    optional: false
+    description: Whether the device carries the whole payload through or demultiplexes
+      and regroups containers.
+    order_weight: 1300
+  - name: framing_latency_ns
+    kind: Number
+    default_value: 0
+    parameters:
+      min_value: 0
+      max_value: 100000
+    optional: false
+    description: Delay this device adds in nanoseconds, from framing and from the
+      electrical crossing.
+    order_weight: 1520
+  relationships:
+  - name: carriers
+    peer: OtnOpticalCarrier
+    label: Carriers patched to this shelf
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_odu_switch__carriers
+    order_weight: 1900
+- name: Splitter
+  namespace: Otn
+  description: Passive splitter or coupler. Divides one carrier across several legs.
+  label: Splitter
+  icon: mdi:call-split
+  include_in_menu: true
+  menu_placement: OtnGenericDevice
+  inherit_from:
+  - OtnGenericDevice
+  - OtnOpticalElement
+  attributes:
+  - name: split_type
+    kind: Dropdown
+    default_value: even
+    choices:
+    - name: even
+      label: Even
+      description: Every output leg receives the same share.
+      color: '#2196f3'
+    - name: tap
+      label: Tap
+      description: One leg takes a small share for monitoring, the rest passes on.
+      color: '#ff9800'
+    optional: false
+    description: How the input is divided across the output legs.
+    order_weight: 1900
+  - name: output_count
+    kind: Number
+    default_value: 2
+    parameters:
+      min_value: 2
+      max_value: 64
+    optional: false
+    description: Number of output legs, such as 2 for a 1:2 or 8 for a 1:8.
+    order_weight: 1910
+  - name: tap_ratio_percent
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 50
+    optional: true
+    description: Share taken by the tap leg, as a percentage. 10 is a 90/10 tap. Null
+      on an even split.
+    order_weight: 1920
+- name: FixedAttenuator
+  namespace: Otn
+  description: A pad. One fixed amount of loss, patched into a link that arrives too
+    hot.
+  label: Fixed attenuator
+  icon: mdi:filter-outline
+  include_in_menu: true
+  menu_placement: OtnGenericDevice
+  inherit_from:
+  - OtnGenericDevice
+  - OtnOpticalElement
+  attributes:
+  - name: attenuation_mdb
+    kind: Number
+    default_value: 0
+    parameters:
+      min_value: 0
+      max_value: 30000
+    optional: false
+    description: Attenuation the pad is set to, in millidecibels. 5.0 dB is 5000.
+    order_weight: 1900
+  - name: attenuation_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if attenuation_mdb__value is not none %}{{ attenuation_mdb__value
+        / 1000 }} dB{% endif %}'
+    optional: true
+    description: Attenuation in dB. Read-only, derived from attenuation_mdb.
+    order_weight: 1910
+- name: VariableAttenuator
+  namespace: Otn
+  description: A VOA. The same loss, dialled rather than fixed, within the range the
+    hardware has.
+  label: Variable attenuator
+  icon: mdi:tune-variant
+  include_in_menu: true
+  menu_placement: OtnGenericDevice
+  inherit_from:
+  - OtnGenericDevice
+  - OtnOpticalElement
+  attributes:
+  - name: attenuation_mdb
+    kind: Number
+    default_value: 0
+    parameters:
+      min_value: 0
+      max_value: 30000
+    optional: false
+    description: Attenuation the pad is set to, in millidecibels. 5.0 dB is 5000.
+    order_weight: 1900
+  - name: attenuation_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if attenuation_mdb__value is not none %}{{ attenuation_mdb__value
+        / 1000 }} dB{% endif %}'
+    optional: true
+    description: Attenuation in dB. Read-only, derived from attenuation_mdb.
+    order_weight: 1910
+  - name: max_attenuation_mdb
+    kind: Number
+    parameters:
+      min_value: 0
+      max_value: 30000
+    optional: false
+    description: Largest attenuation this device can be dialled to, in millidecibels.
+    order_weight: 1920
+  - name: max_attenuation_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if max_attenuation_mdb__value is not none %}{{ max_attenuation_mdb__value
+        / 1000 }} dB{% endif %}'
+    optional: true
+    description: Maximum attenuation in dB. Read-only, derived from max_attenuation_mdb.
+    order_weight: 1930
+- name: OpticalCarrier
+  namespace: Otn
+  description: One provisioned wavelength. Occupies its channel on every section it
+    crosses.
+  label: Optical carrier
+  icon: mdi:waves
+  include_in_menu: true
+  menu_placement: OtnService
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    parameters:
+      max_length: 64
+      regex: ^[A-Za-z0-9._-]+$
+    optional: false
+    order_weight: 1000
+  - name: description
+    kind: Text
+    parameters:
+      max_length: 256
+    optional: true
+    order_weight: 1100
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: planned
+      label: Planned
+      color: '#2196f3'
+    - name: reserved
+      label: Reserved
+      color: '#ff9800'
+    - name: active
+      label: Active
+      color: '#4caf50'
+    - name: decommissioned
+      label: Decommissioned
+      color: '#9e9e9e'
+    optional: false
+    order_weight: 1200
+  - name: provisioned_date
+    kind: DateTime
+    optional: true
+    description: When the wavelength was turned up. A recorded fact, not a reading.
+    order_weight: 1300
+  relationships:
+  - name: channel
+    peer: OtnFrequencyGrid
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: otn_carrier__channel
+    order_weight: 800
+  - name: optical_mode
+    peer: OtnOpticalMode
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_carrier__optical_mode
+    order_weight: 810
+  - name: optical_path
+    peer: OtnOpticalPath
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_carrier__optical_path
+    order_weight: 820
+  - name: sections
+    peer: OtnOpticalMultiplexSection
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_carrier__sections
+    order_weight: 900
+  - name: containers
+    peer: OtnContainer
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_carrier__containers
+    order_weight: 910
+  - name: odu_switches
+    peer: OtnOduSwitch
+    label: ODU switches this carrier is patched to
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_odu_switch__carriers
+    order_weight: 920
+  - name: line_ports
+    peer: OtnLinePort
+    label: Line ports terminating this wavelength
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_carrier__line_ports
+    order_weight: 930
+- name: Service
+  namespace: Otn
+  description: Customer intent. Two endpoints, a rate, a profile and an optional latency
+    budget.
+  label: Service
+  icon: mdi:file-document-outline
+  include_in_menu: true
+  inherit_from:
+  - CoreArtifactTarget
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    parameters:
+      max_length: 64
+      regex: ^[A-Za-z0-9._-]+$
+    optional: false
+    order_weight: 1000
+  - name: description
+    kind: Text
+    parameters:
+      max_length: 256
+    optional: true
+    order_weight: 1100
+  - name: external_circuit_id
+    kind: Text
+    parameters:
+      max_length: 64
+    optional: true
+    description: The customer's or partner's own reference for this circuit, where
+      `name` is ours.
+    order_weight: 1200
+  - name: rate_gbps
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 1600
+    optional: false
+    description: Requested client capacity in Gbps. Already whole in its natural unit.
+    order_weight: 1300
+  - name: sla
+    kind: Dropdown
+    default_value: silver
+    choices:
+    - name: gold
+      label: Gold
+      color: '#ffc107'
+    - name: silver
+      label: Silver
+      color: '#9e9e9e'
+    - name: bronze
+      label: Bronze
+      color: '#795548'
+    - name: best_effort
+      label: Best effort
+      color: '#607d8b'
+    optional: false
+    order_weight: 1400
+  - name: status
+    kind: Dropdown
+    default_value: planned
+    choices:
+    - name: planned
+      label: Planned
+      color: '#2196f3'
+    - name: provisioning
+      label: Provisioning
+      color: '#ff9800'
+    - name: active
+      label: Active
+      color: '#4caf50'
+    - name: maintenance
+      label: Maintenance
+      color: '#ffc107'
+    - name: failed
+      label: Failed
+      color: '#ff5722'
+    - name: rejected
+      label: Rejected
+      color: '#f44336'
+    - name: decommissioned
+      label: Decommissioned
+      color: '#9e9e9e'
+    optional: false
+    order_weight: 1500
+  - name: provisioned_date
+    kind: DateTime
+    optional: true
+    description: When the circuit was handed to the customer. A recorded fact, not
+      a reading.
+    order_weight: 1520
+  - name: service_type
+    kind: Dropdown
+    default_value: wavelength
+    choices:
+    - name: wavelength
+      label: Wavelength
+      description: A whole optical carrier handed over to the customer.
+      color: '#2196f3'
+    - name: transport
+      label: Transport
+      description: A sub-carrier circuit, groomed into ODU containers.
+      color: '#673ab7'
+    - name: ip_transit
+      label: IP transit
+      description: IP handoff, with the transport kept internal.
+      color: '#4caf50'
+    optional: false
+    description: Which kind of service this is.
+    order_weight: 1600
+  - name: max_latency_ns
+    kind: Number
+    parameters:
+      min_value: 0
+      max_value: 1000000000
+    optional: true
+    description: One-way latency budget in nanoseconds. Null when the service commits
+      to none.
+    order_weight: 1700
+  - name: max_latency_display
+    kind: Text
+    read_only: true
+    computed_attribute:
+      kind: Jinja2
+      jinja2_template: '{% if max_latency_ns__value is not none %}{{ max_latency_ns__value
+        / 1000 }} us{% endif %}'
+    optional: true
+    description: Latency budget in microseconds. Read-only, derived from max_latency_ns.
+    order_weight: 1710
+  relationships:
+  - name: endpoint_a
+    peer: OtnGenericDevice
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: otn_service__endpoint_a
+    order_weight: 800
+  - name: endpoint_z
+    peer: OtnGenericDevice
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: otn_service__endpoint_z
+    order_weight: 810
+  - name: optical_path
+    peer: OtnOpticalPath
+    kind: Component
+    cardinality: many
+    optional: true
+    identifier: otn_service__optical_path
+    on_delete: cascade
+    order_weight: 900
+  - name: client_signal
+    peer: OtnClientSignal
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_service__client_signal
+    order_weight: 910
+  - name: diversity_group
+    peer: OtnDiversityGroup
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_diversity_group__services
+    order_weight: 915
+  - name: containers
+    peer: OtnContainer
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_service__containers
+    order_weight: 920
+  - name: customer
+    peer: OrganizationGeneric
+    label: Customer
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: otn_service__customer
+    order_weight: 1200
+- name: DiversityGroup
+  namespace: Otn
+  description: A declared diversity requirement. The services in one group must route
+    over disjoint conduits.
+  label: Diversity group
+  icon: mdi:call-split
+  include_in_menu: false
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    parameters:
+      max_length: 64
+      regex: ^[A-Za-z0-9._-]+$
+    optional: false
+    order_weight: 1000
+  - name: description
+    kind: Text
+    parameters:
+      max_length: 256
+    optional: true
+    order_weight: 1100
+  relationships:
+  - name: services
+    peer: OtnService
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: otn_diversity_group__services
+    order_weight: 800
+- name: OpticalPath
+  namespace: Otn
+  description: The materialised chosen route for one service.
+  label: Optical path
+  icon: mdi:map-marker-path
+  include_in_menu: false
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  uniqueness_constraints:
+  - - service
+    - segment_sequence__value
+    - path_role__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    parameters:
+      max_length: 64
+      regex: ^[A-Za-z0-9._-]+$
+    optional: false
+    order_weight: 1000
+  - name: description
+    kind: Text
+    parameters:
+      max_length: 256
+    optional: true
+    order_weight: 1100
+  - name: segment_sequence
+    kind: Number
+    default_value: 1
+    parameters:
+      min_value: 1
+      max_value: 50
+    optional: false
+    description: Which segment of its circuit this path is. 1 for a circuit that spans
+      one wavelength.
+    order_weight: 1200
+  - name: path_role
+    kind: Dropdown
+    default_value: working
+    choices:
+    - name: working
+      label: Working
+      description: The route the service takes while nothing on it has failed.
+      color: '#4caf50'
+    - name: protect
+      label: Protect
+      description: The standby route the service switches to when its working one
+        fails.
+      color: '#2196f3'
+    - name: express
+      label: Express
+      description: A route passing a site optically, with nothing added or dropped
+        there.
+      color: '#9c27b0'
+    optional: false
+    description: Which role this path plays for its service, working, protect or express.
+    order_weight: 1300
+  relationships:
+  - name: service
+    peer: OtnService
+    kind: Parent
+    cardinality: one
+    optional: false
+    identifier: otn_service__optical_path
+    order_weight: 800
+  - name: carrier
+    peer: OtnOpticalCarrier
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_carrier__optical_path
+    order_weight: 810
+  - name: hops
+    peer: OtnPathHop
+    kind: Component
+    cardinality: many
+    optional: true
+    identifier: otn_path__hops
+    on_delete: cascade
+    order_weight: 900
+- name: PathHop
+  namespace: Otn
+  description: One ordered element on a path.
+  label: Path hop
+  icon: mdi:ray-vertex
+  include_in_menu: false
+  human_friendly_id:
+  - name__value
+  order_by:
+  - sequence__value
+  display_label: name__value
+  uniqueness_constraints:
+  - - path
+    - sequence__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    parameters:
+      max_length: 96
+      regex: ^[A-Za-z0-9._-]+$
+    optional: false
+    order_weight: 1000
+  - name: sequence
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 1000
+    optional: false
+    description: Position along the path, counting from the endpoint A ROADM.
+    order_weight: 1100
+  - name: action
+    kind: Dropdown
+    choices:
+    - name: add
+      label: Add
+      description: The carrier joins the line system here.
+      color: '#4caf50'
+    - name: drop
+      label: Drop
+      description: The carrier leaves the line system here.
+      color: '#ff9800'
+    - name: express
+      label: Express
+      description: Switched degree to degree without reaching an add/drop port.
+      color: '#673ab7'
+    - name: through
+      label: Through
+      description: Crossed passively, as on a span, an amplifier or a panel.
+      color: '#607d8b'
+    - name: terminate
+      label: Terminate
+      description: The light ends here, on a transponder or a router.
+      color: '#f44336'
+    optional: true
+    description: What this element does to the carrier at this hop.
+    order_weight: 1200
+  relationships:
+  - name: path
+    peer: OtnOpticalPath
+    kind: Parent
+    cardinality: one
+    optional: false
+    identifier: otn_path__hops
+    order_weight: 800
+  - name: element
+    peer: OtnOpticalElement
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: otn_hop__element
+    order_weight: 810
+  - name: ingress_port
+    peer: OtnGenericPort
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_hop__ingress_port
+    order_weight: 820
+  - name: egress_port
+    peer: OtnGenericPort
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_hop__egress_port
+    order_weight: 830
+- name: Facility
+  namespace: Otn
+  description: A supercomputing facility hosted at a PoP.
+  label: Facility
+  icon: ri:cpu-line
+  include_in_menu: false
+  human_friendly_id:
+  - name__value
+  order_by:
+  - name__value
+  display_label: name__value
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    order_weight: 1000
+  - name: description
+    kind: Text
+    optional: true
+    order_weight: 1200
+  relationships:
+  - name: site
+    peer: LocationSite
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: otn_site__facility
+    order_weight: 900
+extensions:
+  nodes:
+  - kind: LocationSite
+    attributes:
+    - name: latitude_microdeg
+      kind: Number
+      parameters:
+        min_value: -90000000
+        max_value: 90000000
+      optional: true
+      description: Latitude in millionths of a degree. No Float kind exists.
+      order_weight: 1600
+    - name: longitude_microdeg
+      kind: Number
+      parameters:
+        min_value: -180000000
+        max_value: 180000000
+      optional: true
+      description: Longitude in millionths of a degree. No Float kind exists.
+      order_weight: 1700
+    - name: site_type
+      kind: Dropdown
+      choices:
+      - name: pop
+        label: PoP
+        color: '#2196f3'
+      - name: customer
+        label: Customer site
+        color: '#ff9800'
+      optional: true
+      description: A PoP hosting OTN equipment, or a customer site handing traffic
+        to one.
+      order_weight: 1800
+    relationships:
+    - name: otn_devices
+      peer: OtnGenericDevice
+      kind: Generic
+      cardinality: many
+      optional: true
+      identifier: otn_site__devices
+      order_weight: 900
+    - name: spans_a
+      peer: OtnFiberSpan
+      label: Fiber spans (A end)
+      kind: Attribute
+      cardinality: many
+      optional: true
+      identifier: otn_span__site_a
+      order_weight: 910
+    - name: spans_b
+      peer: OtnFiberSpan
+      label: Fiber spans (B end)
+      kind: Attribute
+      cardinality: many
+      optional: true
+      identifier: otn_span__site_b
+      order_weight: 920
+    - name: otn_facility
+      peer: OtnFacility
+      kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: otn_site__facility
+      order_weight: 930
+  - kind: DcimGenericTransceiver
+    relationships:
+    - name: otn_port
+      peer: OtnOpticalPort
+      label: OTN port this unit is fitted in
+      kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: otn_optical_port__transceiver
+      order_weight: 1600
+    - name: otn_type
+      peer: OtnTransceiverType
+      label: OTN part this unit is
+      kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: otn_transceiver_type__units
+      order_weight: 1700
+
+```
