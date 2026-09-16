@@ -8,10 +8,15 @@ name: Changelog
 #
 # Scoped to `main`: that is the only long-lived branch here, and the one
 # releases are tagged from.
+# ROLLBACK 2026-09-16: the news-fragment gate is disabled while the towncrier
+# rollout is reconsidered. The check below is left intact — only its trigger is
+# commented out. To restore: uncomment the `pull_request:` block and drop
+# `workflow_dispatch:`.
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
-    branches: [main]
+  workflow_dispatch:
+  # pull_request:
+  #   types: [opened, synchronize, reopened, labeled, unlabeled]
+  #   branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
