@@ -17,6 +17,7 @@ nodes:
       - IpamGenericVLAN
     uniqueness_constraints:
       - [vlan_id__value, vlan_group]
+      - [name__value]
     relationships:
       - name: cvlan
         peer: IpamCVLAN
