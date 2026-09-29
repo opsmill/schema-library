@@ -1,0 +1,621 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished
+# production model. Adapting it for your environment typically requires
+# architectural review, see docs.infrahub.app, or reach out to OpsMill for help.
+#
+# Facility electrical path (utility → panel → breaker → drop → device).
+# Complements rack-level PDU outlet ↔ device power-port cabling when those
+# kinds exist in your environment; this package lands drops on DcimDevice so
+# it loads against stock schema-library base + extensions/rack.
+#
+# Do not confuse with extensions/circuit (telecom). Do not load together with
+# experimental/location_extended if you use extensions/rack for LocationRack.
+# ---------------------------------------------------------------------------
+---
+version: "1.0"
+
+generics:
+  - name: Asset
+    namespace: Power
+    description: Shared fields for facility electrical assets.
+    label: Power
+    icon: mdi:flash
+    include_in_menu: true
+    attributes:
+      # Uniqueness is per concrete kind (HFID), not on this generic — a unique
+      # attribute on a generic is enforced across all implementers.
+      - name: name
+        kind: Text
+        order_weight: 1000
+      - name: description
+        kind: Text
+        optional: true
+        order_weight: 2000
+      - name: status
+        kind: Dropdown
+        optional: false
+        default_value: active
+        order_weight: 1100
+        choices:
+          - name: active
+            label: Active
+            color: "#7fbf7f"
+          - name: provisioning
+            label: Provisioning
+            color: "#ffff7f"
+          - name: maintenance
+            label: Maintenance
+            color: "#ffd27f"
+          - name: drained
+            label: Drained
+            color: "#bfbfbf"
+      - name: redundancy_side
+        label: Redundancy Side
+        kind: Dropdown
+        optional: true
+        order_weight: 1200
+        choices:
+          - name: a
+            label: A
+            description: Primary / A feed path
+            color: "#5E81AC"
+          - name: b
+            label: B
+            description: Secondary / B feed path
+            color: "#D08770"
+          - name: shared
+            label: Shared
+            description: Not dedicated to a single A/B path
+            color: "#88C0D0"
+
+  - name: ElectricalRating
+    namespace: Power
+    description: >-
+      Numeric electrical magnitudes with selectable SI units (n / µ / m /
+      base / k / M).
+    label: Electrical Rating
+    include_in_menu: false
+    attributes:
+      - name: voltage
+        kind: Number
+        optional: true
+        order_weight: 1400
+      - name: voltage_unit
+        label: Voltage Unit
+        kind: Dropdown
+        optional: true
+        default_value: V
+        order_weight: 1405
+        choices:
+          - name: nV
+            label: nV
+          - name: uV
+            label: µV
+          - name: mV
+            label: mV
+          - name: V
+            label: V
+          - name: kV
+            label: kV
+          - name: MV
+            label: MV
+      - name: current
+        label: Current
+        kind: Number
+        optional: true
+        description: Amperage / current magnitude (breaker, bus, or feed rating).
+        order_weight: 1410
+      - name: current_unit
+        label: Current Unit
+        kind: Dropdown
+        optional: true
+        default_value: A
+        order_weight: 1415
+        choices:
+          - name: nA
+            label: nA
+          - name: uA
+            label: µA
+          - name: mA
+            label: mA
+          - name: A
+            label: A
+          - name: kA
+            label: kA
+          - name: MA
+            label: MA
+      - name: power
+        kind: Number
+        optional: true
+        description: Rated or allocated power magnitude.
+        order_weight: 1420
+      - name: power_unit
+        label: Power Unit
+        kind: Dropdown
+        optional: true
+        default_value: W
+        order_weight: 1425
+        choices:
+          - name: nW
+            label: nW
+          - name: uW
+            label: µW
+          - name: mW
+            label: mW
+          - name: W
+            label: W
+          - name: kW
+            label: kW
+          - name: MW
+            label: MW
+
+nodes:
+  # -------------------------------------------------------------------------
+  # City / utility delivery into the facility
+  # -------------------------------------------------------------------------
+  - name: UtilityFeed
+    namespace: Power
+    label: Utility Feed
+    description: Utility (city) electrical service entering the facility.
+    icon: mdi:transmission-tower
+    include_in_menu: true
+    menu_placement: PowerAsset
+    display_label: name__value
+    human_friendly_id:
+      - name__value
+    uniqueness_constraints:
+      - [name__value]
+    order_by:
+      - name__value
+    inherit_from:
+      - PowerAsset
+      - PowerElectricalRating
+    branch: aware
+    attributes:
+      - name: utility_account
+        label: Utility Account
+        kind: Text
+        optional: true
+        order_weight: 1300
+      - name: service_id
+        label: Service ID
+        kind: Text
+        optional: true
+        description: Utility meter / service identifier
+        order_weight: 1310
+      - name: phases
+        kind: Dropdown
+        optional: true
+        order_weight: 1430
+        choices:
+          - name: single
+            label: Single-phase
+          - name: three
+            label: Three-phase
+      - name: feed_type
+        kind: Dropdown
+        optional: true
+        order_weight: 1440
+        choices:
+          - name: utility
+            label: Utility / City
+          - name: generator
+            label: Generator
+          - name: other
+            label: Other
+    relationships:
+      - name: provider
+        peer: OrganizationProvider
+        optional: true
+        cardinality: one
+        kind: Attribute
+        label: Utility Provider
+        identifier: power_utility_feed__provider
+        order_weight: 1250
+      - name: location
+        peer: LocationHosting
+        optional: true
+        cardinality: one
+        kind: Attribute
+        identifier: power_utility_feed__location
+        order_weight: 1260
+      - name: downstream_panels
+        peer: PowerPanel
+        optional: true
+        cardinality: many
+        kind: Component
+        identifier: utility_feed__panels
+        order_weight: 1500
+
+  # -------------------------------------------------------------------------
+  # Distribution panels / switchboards / RPPs
+  # -------------------------------------------------------------------------
+  - name: Panel
+    namespace: Power
+    label: Power Panel
+    description: >-
+      Switchboard, panelboard, or remote power panel (RPP) that hosts
+      breakers / circuits.
+    icon: mdi:fuse-box
+    include_in_menu: true
+    menu_placement: PowerAsset
+    display_label: name__value
+    human_friendly_id:
+      - name__value
+    uniqueness_constraints:
+      - [name__value]
+    order_by:
+      - name__value
+    inherit_from:
+      - PowerAsset
+      - PowerElectricalRating
+    branch: aware
+    attributes:
+      - name: panel_type
+        kind: Dropdown
+        optional: true
+        order_weight: 1300
+        choices:
+          - name: main_switchboard
+            label: Main Switchboard (MSB)
+          - name: subpanel
+            label: Subpanel
+          - name: rpp
+            label: Remote Power Panel (RPP)
+          - name: ats
+            label: Automatic Transfer Switch (ATS)
+          - name: transformer
+            label: Transformer
+          - name: other
+            label: Other
+      - name: phases
+        kind: Dropdown
+        optional: true
+        order_weight: 1430
+        choices:
+          - name: single
+            label: Single-phase
+          - name: three
+            label: Three-phase
+    relationships:
+      - name: location
+        peer: LocationHosting
+        optional: true
+        cardinality: one
+        kind: Attribute
+        identifier: power_panel__location
+        order_weight: 1250
+      - name: upstream_feed
+        peer: PowerUtilityFeed
+        optional: true
+        cardinality: one
+        kind: Attribute
+        label: Upstream Utility Feed
+        identifier: utility_feed__panels
+        order_weight: 1260
+      - name: upstream_panel
+        peer: PowerPanel
+        optional: true
+        cardinality: one
+        kind: Attribute
+        label: Upstream Panel
+        description: Parent panel when this panel is fed from another panel's circuit space.
+        identifier: power_panel__downstream_panels
+        direction: outbound
+        order_weight: 1270
+      # Attribute (not Component): peer panels are siblings in a feed tree, not owned children.
+      - name: downstream_panels
+        peer: PowerPanel
+        optional: true
+        cardinality: many
+        kind: Attribute
+        label: Downstream Panels
+        identifier: power_panel__downstream_panels
+        direction: inbound
+        order_weight: 1280
+      - name: upstream_circuit
+        peer: PowerCircuit
+        optional: true
+        cardinality: one
+        kind: Attribute
+        label: Upstream Circuit
+        description: Breaker on an upstream panel that feeds this panel.
+        identifier: power_circuit__downstream_panel
+        order_weight: 1290
+      - name: circuits
+        peer: PowerCircuit
+        optional: true
+        cardinality: many
+        kind: Component
+        identifier: power_panel__circuits
+        order_weight: 1500
+
+  # -------------------------------------------------------------------------
+  # Breaker / circuit on a panel
+  # -------------------------------------------------------------------------
+  - name: Circuit
+    namespace: Power
+    label: Power Circuit
+    description: Breaker position / circuit leaving a power panel.
+    icon: mdi:lightning-bolt
+    include_in_menu: true
+    menu_placement: PowerAsset
+    display_label: "{{ panel__name__value }} / {{ name__value }}"
+    human_friendly_id:
+      - panel__name__value
+      - name__value
+    uniqueness_constraints:
+      - [panel, name__value]
+    order_by:
+      - panel__name__value
+      - name__value
+    inherit_from:
+      - PowerAsset
+      - PowerElectricalRating
+    branch: aware
+    attributes:
+      - name: poles
+        kind: Number
+        optional: true
+        description: Number of poles (1/2/3).
+        order_weight: 1435
+      - name: phase
+        kind: Dropdown
+        optional: true
+        order_weight: 1440
+        choices:
+          - name: a
+            label: Phase A
+          - name: b
+            label: Phase B
+          - name: c
+            label: Phase C
+          - name: ab
+            label: Phases A-B
+          - name: bc
+            label: Phases B-C
+          - name: ca
+            label: Phases C-A
+          - name: abc
+            label: Phases A-B-C
+    relationships:
+      - name: panel
+        peer: PowerPanel
+        optional: false
+        cardinality: one
+        kind: Parent
+        identifier: power_panel__circuits
+        order_weight: 900
+      - name: downstream_panel
+        peer: PowerPanel
+        optional: true
+        cardinality: one
+        kind: Attribute
+        label: Feeds Panel
+        description: Downstream panel fed by this breaker (panel-to-panel).
+        identifier: power_circuit__downstream_panel
+        order_weight: 1500
+      - name: power_drops
+        peer: PowerDrop
+        optional: true
+        cardinality: many
+        kind: Component
+        label: Power Drops
+        description: Whips / extension runs from this breaker to racks or equipment.
+        identifier: power_circuit__drops
+        order_weight: 1510
+
+  # -------------------------------------------------------------------------
+  # Power drop (whip / extension) between breaker and PDU / equipment
+  # -------------------------------------------------------------------------
+  - name: Drop
+    namespace: Power
+    label: Power Drop
+    description: Whip or extension from a panel circuit to a rack, floor box, or PDU/UPS.
+    icon: mdi:cable-data
+    include_in_menu: true
+    menu_placement: PowerAsset
+    display_label: name__value
+    human_friendly_id:
+      - name__value
+    uniqueness_constraints:
+      - [name__value]
+    order_by:
+      - name__value
+    inherit_from:
+      - PowerAsset
+      - PowerElectricalRating
+    branch: aware
+    attributes:
+      - name: drop_label
+        label: Field Label
+        kind: Text
+        optional: true
+        description: Label on the cord, floor box, or whip (if different from name).
+        order_weight: 1300
+      - name: length_meters
+        label: Length (m)
+        kind: Number
+        optional: true
+        order_weight: 1390
+      - name: connector_type
+        label: Connector Type
+        kind: Text
+        optional: true
+        description: End connector (e.g. iec-60320-c19, l6-30p, cs8365).
+        order_weight: 1430
+      - name: landing_location
+        label: Landing Location
+        kind: Text
+        optional: true
+        description: >-
+          Where the drop lands in the room (rack U, floor box ID, basket,
+          under-floor location, etc.).
+        order_weight: 1440
+    relationships:
+      - name: circuit
+        peer: PowerCircuit
+        optional: false
+        cardinality: one
+        kind: Parent
+        label: Upstream Circuit
+        identifier: power_circuit__drops
+        order_weight: 900
+      - name: location
+        peer: LocationHosting
+        optional: true
+        cardinality: one
+        kind: Attribute
+        description: Room / floor / row where the drop lands (optional).
+        identifier: power_drop__location
+        order_weight: 1250
+      - name: rack
+        peer: LocationRack
+        optional: true
+        cardinality: one
+        kind: Attribute
+        label: Destination Rack
+        description: Rack this drop is intended to serve (when known).
+        identifier: power_drop__rack
+        order_weight: 1260
+      # Primary landing: devices (PDUs, UPS, ATS). Per-inlet peers (e.g. DcimPowerPort)
+      # are intentionally omitted so this package loads on stock schema-library base.
+      - name: devices
+        peer: DcimDevice
+        optional: true
+        cardinality: many
+        min_count: 0
+        max_count: 3
+        kind: Attribute
+        label: Plugged Devices / PDUs
+        description: >-
+          PDU or other device plugged into this drop (1–3). Use one peer per
+          phase on multi-phase drops when inlets are not modelled separately.
+        identifier: power_drop__devices
+        order_weight: 1510
+
+  # -------------------------------------------------------------------------
+  # Logical A/B (or N+1) power path for documentation / queries
+  # -------------------------------------------------------------------------
+  - name: Path
+    namespace: Power
+    label: Power Path
+    description: >-
+      Named redundant power path (e.g. SITE-A, SITE-B) grouping feeds, panels,
+      and circuits for facility documentation.
+    icon: mdi:graph-outline
+    include_in_menu: true
+    menu_placement: PowerAsset
+    display_label: name__value
+    human_friendly_id:
+      - name__value
+    uniqueness_constraints:
+      - [name__value]
+    order_by:
+      - name__value
+    inherit_from:
+      - PowerAsset
+    branch: aware
+    relationships:
+      - name: location
+        peer: LocationHosting
+        optional: true
+        cardinality: one
+        kind: Attribute
+        identifier: power_path__location
+        order_weight: 1250
+      - name: utility_feeds
+        peer: PowerUtilityFeed
+        optional: true
+        cardinality: many
+        kind: Attribute
+        identifier: power_path__utility_feeds
+        order_weight: 1500
+      - name: panels
+        peer: PowerPanel
+        optional: true
+        cardinality: many
+        kind: Attribute
+        identifier: power_path__panels
+        order_weight: 1510
+      - name: circuits
+        peer: PowerCircuit
+        optional: true
+        cardinality: many
+        kind: Attribute
+        identifier: power_path__circuits
+        order_weight: 1520
+      - name: power_drops
+        peer: PowerDrop
+        optional: true
+        cardinality: many
+        kind: Attribute
+        identifier: power_path__drops
+        order_weight: 1530
+
+extensions:
+  nodes:
+    - kind: DcimDevice
+      relationships:
+        - name: power_drops
+          peer: PowerDrop
+          optional: true
+          cardinality: many
+          kind: Attribute
+          label: Plugged Into Drops
+          description: Facility power drop(s) this PDU/device is plugged into (e.g. A/B).
+          identifier: power_drop__devices
+          order_weight: 1650
+
+    - kind: LocationHosting
+      relationships:
+        - name: power_utility_feeds
+          peer: PowerUtilityFeed
+          optional: true
+          cardinality: many
+          kind: Attribute
+          identifier: power_utility_feed__location
+          order_weight: 1800
+        - name: power_panels
+          peer: PowerPanel
+          optional: true
+          cardinality: many
+          kind: Attribute
+          identifier: power_panel__location
+          order_weight: 1810
+        - name: power_paths
+          peer: PowerPath
+          optional: true
+          cardinality: many
+          kind: Attribute
+          identifier: power_path__location
+          order_weight: 1820
+        - name: power_drops
+          peer: PowerDrop
+          optional: true
+          cardinality: many
+          kind: Attribute
+          identifier: power_drop__location
+          order_weight: 1830
+
+    - kind: LocationRack
+      relationships:
+        - name: power_drops
+          peer: PowerDrop
+          optional: true
+          cardinality: many
+          kind: Attribute
+          label: Power Drops
+          identifier: power_drop__rack
+          order_weight: 1800
+
+    - kind: OrganizationProvider
+      relationships:
+        - name: power_utility_feeds
+          peer: PowerUtilityFeed
+          optional: true
+          cardinality: many
+          kind: Attribute
+          identifier: power_utility_feed__provider
+          order_weight: 1800
