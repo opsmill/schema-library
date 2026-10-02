@@ -1,0 +1,158 @@
+---
+title: Schema Library 2.0.0
+description: What changes in your modelling workflow when you move from Schema Library 1.x to 2.0.0.
+---
+
+Version 2.0.0 is a full pass over the base DCIM and IPAM schemas and most extensions, rather than an incremental update. After upgrading you can track swappable hardware as installed inventory, import the NetBox device-type library without losing bay positions or module ports, and record which registry assigned a block of address space. Attribute and relationship names, types, and cardinality change across the base schemas and most extensions, so data built on a 1.x schema has to be migrated before it will load.
+
+:::warning Breaking changes in this release
+
+Loading 2.0.0 over data created with a 1.x schema fails, or silently drops data, on the attributes and relationships that changed shape.
+
+- Plan a migration rather than an upgrade in place.
+- Re-point anything that loaded `extensions/modules` at `extensions/device_module`, and anything that loaded `extensions/topology` at `experimental/topology`. `extensions/users` has no replacement.
+- Update renamed paths: `extensions/sfp` to `extensions/transceiver`, `extensions/dwdm` to `extensions/optical_multiplexer`, and `extensions/firewall_policer` to `experimental/firewall_policer`.
+- Re-case stored values for the enumerations that became dropdowns, for example `EXTERNAL` to `external`.
+
+See [Upgrade notes](#upgrade-notes) for the full list.
+
+:::
+
+## Release highlights
+
+- **Track modules and power supplies as device inventory.** `extensions/modules` shipped two generics and no node you could create a record with. `extensions/device_module` now ships `DcimModuleBay`, `DcimModule`, and `DcimModuleType`, and `extensions/device_module_psu` adds `DcimPSUModule` and `DcimPSUModuleType`. See [Track swappable hardware as installed inventory](#track-swappable-hardware-as-installed-inventory).
+- **Import the NetBox device-type library without dropping module detail.** Bay positions were a number with a minimum of 1, which rejected every non-numeric bay, and the ports a module type declares had nowhere to go. Positions are now text, and `extensions/module_port` records the declared ports. See [Import the NetBox device-type library](#import-the-netbox-device-type-library).
+- **Record which registry assigned a block of address space.** Top-level space could only be marked with a role on an ordinary prefix. `extensions/ipam_aggregate` adds an `Aggregate` node tied to an `RIR`. See [Model address space and VLANs closer to industry practice](#model-address-space-and-vlans-closer-to-industry-practice).
+- **Attach a prefix to whatever owns it through one relationship.** A prefix carried separate `organization`, `location`, and `gateway` relationships. It now carries a single `scope` relationship, which any node inheriting `IpamPrefixScope` can satisfy. See [Model address space and VLANs closer to industry practice](#model-address-space-and-vlans-closer-to-industry-practice).
+- **Model racks and standalone sites without a full location hierarchy.** A rack existed only as the bottom tier of `extensions/location_minimal`, and a site always needed the tiers above it. `extensions/rack` and `extensions/location_site` can each be loaded on their own. See [Model locations and tenancy at the level your network needs](#model-locations-and-tenancy-at-the-level-your-network-needs).
+- **Scope tenancy to devices, prefixes, and locations.** The experimental tenancy schema linked a tenant to buildings and circuits only. `extensions/tenancy` now wires a tenant directly to devices, prefixes, addresses, and hosted locations. See [Model locations and tenancy at the level your network needs](#model-locations-and-tenancy-at-the-level-your-network-needs).
+
+## Track swappable hardware as installed inventory
+
+Devices with swappable hardware, such as fan trays, line cards, and power supplies, can be modelled as modules installed in a slot rather than as static attributes on the device. A module is tracked once it is installed in a bay; spares awaiting installation are not modelled.
+
+What changed:
+
+- Load `extensions/device_module` to get `DcimModuleBay`, a physical slot on a device, together with the `DcimModule` and `DcimModuleType` pair that installs into a bay. It replaces `extensions/modules`, which defined only the `DeviceGenericModule` and `DeviceGenericModuleType` generics and left you to build the concrete nodes yourself.
+- Load `extensions/device_module_psu` alongside it to model power supplies as `DcimPSUModule` and `DcimPSUModuleType`, with `wattage` and `hot_swappable` recorded on the type.
+- Track a patch panel's modules through the same `DcimModuleBay` mechanism as any other device. `extensions/patch_panel` no longer defines its own `DcimPatchPanelModule` node.
+- Point `experimental/modules_linecards` and `experimental/modules_routing_engine` at `extensions/device_module`, which they now depend on.
+
+## Import the NetBox device-type library
+
+The NetBox device-type library describes a chassis in more detail than the 1.x model could hold, and a batch of module types failed to load outright. Importing that library now preserves bay positions, bay labels, module weights, and the ports a module type declares.
+
+What changed:
+
+- `DcimModuleBay.position` is text rather than a number with a minimum of 1. Bay positions in that library are free-form: an Arista DCS-7508N uses `F1` to `F6` and `PSU-1` to `PSU-8` alongside `1` to `10`, and an A9K-AC-PEM-V3 starts its bays at `0`.
+- `DcimModuleBay.bay_label` carries the label NetBox supplies. An attribute named `label` is populated from `name` and title-cased when it is unset, so a separate attribute is what keeps "no label supplied" distinct from "label equals name".
+- `DcimGenericModuleType.weight_grams` records a module weight in grams. Infrahub has no float attribute kind, so a weight in whole kilograms rounds a transceiver or a supervisor to `0`, which reads as data rather than as a missing value.
+- Load `extensions/module_port` to record the ports a module type declares, which NetBox lists under `interfaces`, `console-ports`, and `power-ports`. A `DcimModulePort` is a declaration parented by the module, carrying `name`, `category`, `port_type`, `mgmt_only`, and `maximum_draw`, gathered in one `DcimGenericModule.ports` collection. Port names keep the `{module}` token verbatim, because a template is not bound to a bay; resolving the token and creating the real device interfaces is a generator step once the module is installed.
+- Import a line card as a reusable blueprint: `DeviceLinecard` in `experimental/modules_linecards` enables `generate_template`, and its `slot` is optional, because a module type describes a model and carries no slot.
+
+## Model address space and VLANs closer to industry practice
+
+Address space, VLANs, and VRFs pick up the structure that industry practice assumes, and several values that could not previously be expressed at all.
+
+What changed:
+
+- Load `extensions/ipam_aggregate` to record top-level IPv4 and IPv6 blocks as `Aggregate` nodes tied to an `RIR`, which carries a `private` flag for space assigned by a private authority.
+- Attach a prefix to its owner through the single `scope` relationship on `IpamPrefix`, replacing the separate `organization`, `location`, and `gateway` relationships. A location extension satisfies it by inheriting `IpamPrefixScope`.
+- Choose a prefix role from `management`, `link`, `customer`, `backbone`, or none. The previous set of `loopback`, `management`, `public`, `server`, `supernet`, `technical`, and `loopback-vtep` is fully replaced.
+- Import and export more than one route target per VRF. `IpamVRF.import_rt` and `export_rt` move from a cardinality of one to many, and the matching relationship on `IpamRouteTarget` splits into `import_vrf` and `export_vrf`.
+- Model QinQ as dedicated node types rather than a role on an ordinary VLAN. `extensions/qinq` is rebuilt around `IpamSVLAN` and `IpamCVLAN` on the new `IpamGenericVLAN` generic, and the name of a customer VLAN is computed from its parent service VLAN and its VLAN ID.
+- Group VLANs with `IpamVLANGroup`, which replaces `IpamL2Domain` and is scoped to a location by inheriting `IpamVLANGroupScope`.
+- Set an interface MTU that reflects the IP payload: `DcimInterface.mtu` defaults to `1500` rather than `1514`, and is now optional.
+
+## Model locations and tenancy at the level your network needs
+
+Racks and sites are no longer tied to one location hierarchy, and a tenant can own the infrastructure it is responsible for rather than only the buildings and circuits around it.
+
+What changed:
+
+- Load `extensions/rack` on its own to model racks. `LocationRack` moves out of `extensions/location_minimal` and relates to a site through an explicit `site` and `racks` relationship instead of hierarchical nesting, and it gains `status`, `serial_number`, and `asset_tag`.
+- Load `extensions/location_site` to model a site with no region or country above it. It defines the same `Location.Site` node as `extensions/location_minimal`, so load one or the other.
+- The `extensions/location_minimal` hierarchy is now `Region`, `Country`, `Metro`, `Site`, adding a region tier above country, and `Site.facility_id` is renamed to `facility`.
+- Load `extensions/tenancy`, promoted out of `experimental/`, to wire a `Tenant` to `DcimGenericDevice`, `IpamPrefix`, `IpamIPAddress`, and `LocationHosting`. It no longer depends on `extensions/circuit`; extending tenancy onto circuits is documented in `tenancy.yml` as a pattern to apply yourself.
+- `LocationGeneric` and `LocationHosting` drop `shortname`, and their human friendly ID is built from `name`.
+
+## Model optical transport and circuit commercials
+
+Two areas the library did not cover before: optical transport networks, and the commercial terms attached to a circuit.
+
+What changed:
+
+- Load `experimental/optical_transport` to model an optical network across four layers: wavelength (the ITU-T G.694.1 grid, optical bands, DWDM channels, channel assignments, and fiber mappings), topology (logical optical nodes, passive multiplexers, and fiber links as a graph), equipment (transponder, amplifier, and ROADM modules, ROADM degrees, WSS cross-connects, and cable mappings), and service (end-to-end optical services, optical paths, and path segments).
+- Load `extensions/circuit_contract` to record `contract_start`, `contract_end`, `monthly_cost`, and `currency` against the circuit a contract covers.
+- Record a circuit's location on its endpoints. `DcimCircuit` drops its own `location` relationship, and `DcimCircuitEndpoint.location` is where a circuit is tied to a `LocationHosting`.
+- `DcimCircuitEndpoint.name` is computed from the circuit ID and the side, replacing free text, and `side` is chosen from `a` or `z`.
+
+## Bug fixes
+
+- The Infrahub sidebar no longer shows two top-level entries pointing at the same records. `DcimGenericDevice`, `DcimChannelMapping`, and `DcimOpticalDevice` are abstract generics whose concrete descendants already render their own entries, so all three are hidden from the generated menu.
+- `experimental/security` loads again. It referenced kinds from the old `Infra` namespace and aborted with `SecurityFirewall Unable to find the generic InfraGenericDevice`. `SecurityFirewall` also inherits `DcimPhysicalDevice` now, matching `DcimDevice`.
+- A BGP session's routing policies are no longer conflated with a peer group's. `RoutingBGPSession.import_routing_policies` and `export_routing_policies` reused the identifiers already used by `RoutingBGPPeerGroup`; both now point at `RoutingPolicyBGP` and use their own identifiers.
+- `IpamIPAddress.interface` and `InterfaceLayer3.ip_addresses` carry a matching identifier, so both sides resolve as one relationship.
+- `DcimCircuit.enpoints` is corrected to `endpoints`.
+
+## Minor changes
+
+### Documentation
+
+- Every base and extension schema file carries a header noting that it is a starting point rather than a finished production model, and pointing to `docs.infrahub.app` or OpsMill for architectural review.
+- The schema reference pages are regenerated for the 2.0.0 model, with new pages for the extensions added in this release.
+
+### Developer experience
+
+- The changelog is assembled from news fragments with towncrier, and a CI check fails a pull request that carries none.
+- Every node and generic declares a single `display_label` string rather than a `display_labels` list.
+
+### Reliability
+
+- `invoke load-all-schemas` no longer refuses mutually exclusive extension pairs. The `exclusive_with` key is gone from `.metadata.yml`, so the overlap between `extensions/rack` and `experimental/location_extended`, and between `extensions/location_minimal` and `extensions/location_site`, is advisory.
+
+## Upgrade notes
+
+### Existing 1.x data
+
+If: you have data created with a 1.x schema.
+
+Then: migrate that data before loading 2.0.0.
+
+Notes: attribute and relationship names, types, and cardinality changed across `base/dcim.yml`, `base/ipam.yml`, `base/location.yml`, and most extensions. Loading 2.0.0 in place fails, or silently drops data, on everything listed above.
+
+### Removed and relocated extensions
+
+If: your schema loads `extensions/modules`, `extensions/topology`, `extensions/users`, `extensions/sfp`, `extensions/dwdm`, or `extensions/firewall_policer`.
+
+Then: update the path, or drop the extension.
+
+Notes: `extensions/modules` becomes `extensions/device_module`, `extensions/topology` becomes `experimental/topology`, `extensions/sfp` becomes `extensions/transceiver`, `extensions/dwdm` becomes `extensions/optical_multiplexer`, and `extensions/firewall_policer` becomes `experimental/firewall_policer`. `extensions/users` is removed with no replacement.
+
+### Enumerations that became dropdowns
+
+If: you store values for `BGPSession.session_type`, `SnmpCommunityV2.access`, `SnmpCommunityV3.auth_protocol`, or `SnmpCommunityV3.privacy_protocol`.
+
+Then: re-case the stored values.
+
+Notes: `EXTERNAL` becomes `external`, `Read-Only` becomes `read_only`, `MD5` becomes `md5`, and `DES` becomes `des`. The attribute kind moves from text with an enumeration to a dropdown.
+
+### Choices that were removed
+
+If: you store `lag` on `DcimInterface.role`, `deleted` or `outage` on `DcimInterface.status`, `drained` on `DcimDevice.status`, `upstream` on `DcimCircuit.circuit_type`, or any prefix role other than `management`.
+
+Then: map those values to a choice that still exists.
+
+Notes: `cust` on `DcimInterface.role` is renamed to `customer`, and `upstream` on `DcimCircuit.circuit_type` is replaced by `internet_access`. `DcimInterface.status` is also mandatory now, so every interface needs a value.
+
+### Overlapping location extensions
+
+If: you load `extensions/location_minimal` together with `extensions/location_site`, or `extensions/rack` together with `experimental/location_extended`.
+
+Then: load one of each pair.
+
+Notes: each pair defines the same node, and `invoke load-all-schemas` no longer stops you from loading both.
+
+## Full changelog
+
+The complete list of changes, with a link to the pull request behind each one, is in [CHANGELOG.md](https://github.com/opsmill/schema-library/blob/main/CHANGELOG.md). The commit range is [v1.4.11...v2.0.0](https://github.com/opsmill/schema-library/compare/v1.4.11...v2.0.0).

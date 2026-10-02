@@ -283,6 +283,7 @@ subtyping
 sudo
 supernet
 supernets
+swappable
 SVIs
 Telecom
 template_path
