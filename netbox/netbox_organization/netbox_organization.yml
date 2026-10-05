@@ -1,0 +1,694 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
+# NetBox organization, mapped to Infrahub: the nodes of the Organization section of the NetBox
+# navigation menu, which are regions, site groups, sites, locations, tenants and contacts.
+# Source: the NetBox 4.7 database tables dcim_region, dcim_sitegroup, dcim_site, dcim_location and
+# tenancy_*, and the NetBox model documentation.
+#
+# Load this schema first. Besides the organization nodes, it defines the generics that the other
+# netbox/ schemas inherit:
+#   - NetboxGeneric: the description, comments and tags fields that most NetBox objects share.
+#   - NetboxTenantAssignable: the tenant relationship (NetBox TenancyMixin).
+#   - NetboxContactAssignable: the contact assignments (NetBox ContactsMixin).
+#   - NetboxPrefixScope, NetboxVLANGroupScope and NetboxASNAssignable, which netbox/netbox_ipam
+#     completes, and NetboxCircuitTerminationPoint, which netbox/netbox_circuits completes. They are
+#     empty here. Infrahub cannot add a generic to a node after the node is loaded, so regions, site
+#     groups, sites and locations declare these generics even when the schema that uses them is not
+#     loaded.
+#
+# Regions, site groups, locations, tenant groups and contact groups are trees: each inherits its own
+# hierarchical generic (for example NetboxRegionHierarchy), which gives it the parent, children,
+# ancestors and descendants fields. The parent and children of each tree are its hierarchical generic,
+# not the node itself: the Infrahub 1.11 web interface stops responding on the list page of a node
+# that is its own parent.
+#
+# The schemas that define devices, racks, power panels and cooling sources add their relationships to
+# sites and locations.
+#
+# Latitude and longitude are text, because Infrahub has no decimal attribute kind.
+# NetBox fields that are not mapped: owner (users app), custom_field_data (use schema attributes
+# instead), and the tree columns path and sort_path (the hierarchy replaces them).
+version: "1.0"
+
+generics:
+  - name: Generic
+    namespace: Netbox
+    description: 'Fields that most NetBox objects share: a short description, free-form comments and tags.'
+    label: NetBox Object
+    include_in_menu: false
+    attributes:
+      - name: description
+        kind: Text
+        optional: true
+        order_weight: 2000
+      - name: comments
+        kind: TextArea
+        optional: true
+        description: Free-form notes. NetBox renders them as Markdown.
+        order_weight: 2900
+    relationships:
+      - name: tags
+        peer: BuiltinTag
+        kind: Attribute
+        cardinality: many
+        optional: true
+        order_weight: 3000
+
+  - name: TenantAssignable
+    namespace: Netbox
+    description: An object that can be assigned to a tenant. Mirrors the NetBox TenancyMixin.
+    label: Tenant Assignable
+    include_in_menu: false
+    relationships:
+      - name: tenant
+        peer: NetboxTenant
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_tenant__assigned_object
+        order_weight: 2800
+
+  - name: ContactAssignable
+    namespace: Netbox
+    description: >-
+      An object that contacts can be assigned to, each with a role and a priority. Mirrors the NetBox ContactsMixin.
+    label: Contact Assignable
+    include_in_menu: false
+    relationships:
+      - name: contact_assignments
+        peer: NetboxContactAssignment
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_contact_assignment__assigned_object
+        order_weight: 3900
+
+  - name: PrefixScope
+    namespace: Netbox
+    description: Region, site group, site or location that can scope a prefix. netbox/netbox_ipam adds the relationship.
+    label: Prefix Scope
+    include_in_menu: false
+
+  - name: VLANGroupScope
+    namespace: Netbox
+    description: >-
+      Region, site group, site, location, rack group or rack that can scope a VLAN group. Completed by netbox_ipam.
+    label: VLAN Group Scope
+    include_in_menu: false
+
+  - name: CircuitTerminationPoint
+    namespace: Netbox
+    description: >-
+      Region, site group, site, location or provider network a circuit can end on. Completed by netbox_circuits.
+    label: Circuit Termination Point
+    include_in_menu: false
+
+  - name: ASNAssignable
+    namespace: Netbox
+    description: Site or provider that ASNs can be assigned to. netbox/netbox_ipam adds the relationship.
+    label: ASN Assignable
+    include_in_menu: false
+
+  - name: RegionHierarchy
+    namespace: Netbox
+    description: >-
+      Lets a region have a parent region, as in NetBox. Adds the parent, children, ancestors and descendants fields.
+    label: Region Hierarchy
+    include_in_menu: false
+    hierarchical: true
+
+  - name: SiteGroupHierarchy
+    namespace: Netbox
+    description: >-
+      Lets a site group have a parent site group, as in NetBox. Adds the parent, children, ancestors and descendants
+      fields.
+    label: Site Group Hierarchy
+    include_in_menu: false
+    hierarchical: true
+
+  - name: LocationHierarchy
+    namespace: Netbox
+    description: >-
+      Lets a location have a parent location, as in NetBox. Adds the parent, children, ancestors and descendants fields.
+    label: Location Hierarchy
+    include_in_menu: false
+    hierarchical: true
+
+  - name: TenantGroupHierarchy
+    namespace: Netbox
+    description: >-
+      Lets a tenant group have a parent tenant group, as in NetBox. Adds the parent, children, ancestors and descendants
+      fields.
+    label: Tenant Group Hierarchy
+    include_in_menu: false
+    hierarchical: true
+
+  - name: ContactGroupHierarchy
+    namespace: Netbox
+    description: >-
+      Lets a contact group have a parent contact group, as in NetBox. Adds the parent, children, ancestors and
+      descendants fields.
+    label: Contact Group Hierarchy
+    include_in_menu: false
+    hierarchical: true
+
+nodes:
+  - name: Region
+    namespace: Netbox
+    description: >-
+      Arranges sites geographically, for example by continent, country, city or campus. Regions can be nested.
+    icon: mdi:earth
+    include_in_menu: true
+    menu_placement: NetboxSite
+    inherit_from:
+      - NetboxGeneric
+      - NetboxContactAssignable
+      - NetboxPrefixScope
+      - NetboxVLANGroupScope
+      - NetboxCircuitTerminationPoint
+      - NetboxRegionHierarchy
+    parent: NetboxRegionHierarchy
+    children: NetboxRegionHierarchy
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        description: Unique in Infrahub. NetBox makes it unique only within the parent region.
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+    relationships:
+      - name: sites
+        peer: NetboxSite
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_region__site
+        order_weight: 3100
+
+  - name: SiteGroup
+    namespace: Netbox
+    description: Organizes sites by role or function rather than by geography. Site groups can be nested.
+    label: Site Group
+    icon: mdi:folder-marker
+    include_in_menu: true
+    menu_placement: NetboxSite
+    inherit_from:
+      - NetboxGeneric
+      - NetboxContactAssignable
+      - NetboxPrefixScope
+      - NetboxVLANGroupScope
+      - NetboxCircuitTerminationPoint
+      - NetboxSiteGroupHierarchy
+    parent: NetboxSiteGroupHierarchy
+    children: NetboxSiteGroupHierarchy
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        description: Unique in Infrahub. NetBox makes it unique only within the parent group.
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+    relationships:
+      - name: sites
+        peer: NetboxSite
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_site_group__site
+        order_weight: 3100
+
+  - name: Site
+    namespace: Netbox
+    description: >-
+      A site generally equates to a building or campus, for example a branch office, a headquarters or a colocation
+      facility.
+    icon: mdi:office-building-marker
+    include_in_menu: true
+    inherit_from:
+      - NetboxGeneric
+      - NetboxTenantAssignable
+      - NetboxContactAssignable
+      - NetboxPrefixScope
+      - NetboxVLANGroupScope
+      - NetboxCircuitTerminationPoint
+      - NetboxASNAssignable
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: planned
+            label: Planned
+            description: Planned for future deployment
+            color: '#00bcd4'
+          - name: staging
+            label: Staging
+            description: Being prepared for deployment
+            color: '#2196f3'
+          - name: active
+            label: Active
+            description: Currently in service
+            color: '#4caf50'
+          - name: decommissioning
+            label: Decommissioning
+            description: Being removed from service
+            color: '#ffeb3b'
+          - name: retired
+            label: Retired
+            description: No longer in service
+            color: '#f44336'
+        optional: false
+        order_weight: 1200
+      - name: facility
+        kind: Text
+        optional: true
+        description: Data center provider and facility, for example Equinix NY7.
+        order_weight: 2100
+      - name: time_zone
+        kind: Text
+        label: Time Zone
+        optional: true
+        description: IANA time zone, for example Europe/Paris.
+        order_weight: 2160
+      - name: physical_address
+        kind: TextArea
+        label: Physical Address
+        optional: true
+        order_weight: 2220
+      - name: shipping_address
+        kind: TextArea
+        label: Shipping Address
+        optional: true
+        order_weight: 2280
+      - name: latitude
+        kind: Text
+        label: Latitude (decimal degrees)
+        parameters:
+          regex: ^-?\d{1,3}(\.\d{1,6})?$
+        optional: true
+        description: >-
+          GPS coordinate in decimal degrees (-90 to 90). Stored as text because Infrahub has no decimal attribute kind.
+        order_weight: 2340
+      - name: longitude
+        kind: Text
+        label: Longitude (decimal degrees)
+        parameters:
+          regex: ^-?\d{1,3}(\.\d{1,6})?$
+        optional: true
+        description: >-
+          GPS coordinate in decimal degrees (-180 to 180). Stored as text because Infrahub has no decimal attribute
+          kind.
+        order_weight: 2400
+    relationships:
+      - name: region
+        peer: NetboxRegion
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_region__site
+        order_weight: 1300
+      - name: group
+        peer: NetboxSiteGroup
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_site_group__site
+        order_weight: 1400
+      - name: locations
+        peer: NetboxLocation
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_location__site
+        order_weight: 3100
+
+  - name: Location
+    namespace: Netbox
+    description: >-
+      A floor, room, cage or similar unit within a site that groups racks and devices. Locations can be nested.
+    icon: mdi:map-marker
+    include_in_menu: true
+    menu_placement: NetboxSite
+    inherit_from:
+      - NetboxGeneric
+      - NetboxTenantAssignable
+      - NetboxContactAssignable
+      - NetboxPrefixScope
+      - NetboxVLANGroupScope
+      - NetboxCircuitTerminationPoint
+      - NetboxLocationHierarchy
+    parent: NetboxLocationHierarchy
+    children: NetboxLocationHierarchy
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        optional: false
+        description: Not unique in Infrahub. NetBox makes it unique within the site and parent location.
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: planned
+            label: Planned
+            description: Planned for future deployment
+            color: '#00bcd4'
+          - name: staging
+            label: Staging
+            description: Being prepared for deployment
+            color: '#2196f3'
+          - name: active
+            label: Active
+            description: Currently in service
+            color: '#4caf50'
+          - name: decommissioning
+            label: Decommissioning
+            description: Being removed from service
+            color: '#ffeb3b'
+          - name: retired
+            label: Retired
+            description: No longer in service
+            color: '#f44336'
+        optional: false
+        order_weight: 1200
+      - name: facility
+        kind: Text
+        optional: true
+        description: Facility designation, for example a cage or suite number.
+        order_weight: 2100
+    relationships:
+      - name: site
+        peer: NetboxSite
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_location__site
+        order_weight: 800
+
+  - name: TenantGroup
+    namespace: Netbox
+    description: Groups tenants, for example one group for customers and one for internal departments.
+    label: Tenant Group
+    icon: mdi:account-group
+    include_in_menu: true
+    menu_placement: NetboxTenant
+    inherit_from:
+      - NetboxGeneric
+      - NetboxTenantGroupHierarchy
+    parent: NetboxTenantGroupHierarchy
+    children: NetboxTenantGroupHierarchy
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+    relationships:
+      - name: tenants
+        peer: NetboxTenant
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_tenant_group__tenant
+        order_weight: 3100
+
+  - name: Tenant
+    namespace: Netbox
+    description: >-
+      A discrete grouping of resources for administrative purposes, typically a customer or an internal department.
+    icon: mdi:domain
+    include_in_menu: true
+    inherit_from:
+      - NetboxGeneric
+      - NetboxContactAssignable
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        description: Unique in Infrahub. NetBox makes it unique only within the group.
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+    relationships:
+      - name: group
+        peer: NetboxTenantGroup
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_tenant_group__tenant
+        order_weight: 1200
+      - name: assigned_objects
+        peer: NetboxTenantAssignable
+        label: Assigned Objects
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_tenant__assigned_object
+        description: Every object from any netbox/ schema that is assigned to this tenant.
+        order_weight: 3100
+
+  - name: ContactGroup
+    namespace: Netbox
+    description: >-
+      Contacts can be organized into arbitrary groups. These groups can be recursively nested for convenience.
+    label: Contact Group
+    icon: mdi:account-multiple
+    include_in_menu: true
+    menu_placement: NetboxContact
+    inherit_from:
+      - NetboxGeneric
+      - NetboxContactGroupHierarchy
+    parent: NetboxContactGroupHierarchy
+    children: NetboxContactGroupHierarchy
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        description: Unique in Infrahub. NetBox makes it unique only within the parent group.
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+    relationships:
+      - name: contacts
+        peer: NetboxContact
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_contact__group
+        order_weight: 3100
+
+  - name: ContactRole
+    namespace: Netbox
+    description: A functional role for contacts, for example administrative, operational or emergency.
+    label: Contact Role
+    icon: mdi:account-tie
+    include_in_menu: true
+    menu_placement: NetboxContact
+    inherit_from:
+      - NetboxGeneric
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+    relationships:
+      - name: contact_assignments
+        peer: NetboxContactAssignment
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_contact_assignment__role
+        order_weight: 3100
+
+  - name: Contact
+    namespace: Netbox
+    description: >-
+      An individual or group associated with objects for administrative reasons, for example the operational contact of
+      a site.
+    icon: mdi:card-account-details
+    include_in_menu: true
+    inherit_from:
+      - NetboxGeneric
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        optional: false
+        description: 'Not unique: NetBox allows several contacts with the same name.'
+        order_weight: 1000
+      - name: title
+        kind: Text
+        optional: true
+        order_weight: 1100
+      - name: phone
+        kind: Text
+        optional: true
+        order_weight: 1200
+      - name: email
+        kind: Email
+        optional: true
+        order_weight: 1300
+      - name: address
+        kind: Text
+        optional: true
+        order_weight: 1400
+      - name: link
+        kind: URL
+        optional: true
+        order_weight: 1500
+    relationships:
+      - name: groups
+        peer: NetboxContactGroup
+        kind: Attribute
+        cardinality: many
+        optional: true
+        identifier: netbox_contact__group
+        order_weight: 1600
+      - name: contact_assignments
+        peer: NetboxContactAssignment
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_contact_assignment__contact
+        order_weight: 3100
+
+  - name: ContactAssignment
+    namespace: Netbox
+    description: Assigns a contact to an object, with a role and an optional priority.
+    label: Contact Assignment
+    icon: mdi:account-arrow-right
+    include_in_menu: true
+    menu_placement: NetboxContact
+    display_label: '{{ contact__name__value }} ({{ role__name__value }})'
+    uniqueness_constraints:
+      - [assigned_object, contact, role]
+    attributes:
+      - name: priority
+        kind: Dropdown
+        choices:
+          - name: primary
+            label: Primary
+          - name: secondary
+            label: Secondary
+          - name: tertiary
+            label: Tertiary
+          - name: inactive
+            label: Inactive
+        optional: true
+        order_weight: 1000
+    relationships:
+      - name: assigned_object
+        peer: NetboxContactAssignable
+        label: Object
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_contact_assignment__assigned_object
+        order_weight: 800
+      - name: contact
+        peer: NetboxContact
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_contact_assignment__contact
+        order_weight: 810
+      - name: role
+        peer: NetboxContactRole
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_contact_assignment__role
+        order_weight: 820
+      - name: tags
+        peer: BuiltinTag
+        kind: Attribute
+        cardinality: many
+        optional: true
+        order_weight: 3000

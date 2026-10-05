@@ -1,0 +1,220 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/menu/latest.json
+#
+# Menu for the netbox_ipam schema: the IPAM section of the NetBox 4.7 navigation menu.
+# Load it after the schema. To arrange the whole sidebar like NetBox, also load the menus of the
+# schemas it requires:
+#
+#   infrahubctl menu load menus/netbox/netbox_organization.yml menus/netbox/netbox_devices.yml \
+#     menus/netbox/netbox_ipam.yml
+#
+# When this library is connected to Infrahub as a Git repository, register the files in .infrahub.yml:
+#
+#   menus:
+#     - menus/netbox/netbox_organization.yml
+#     - menus/netbox/netbox_devices.yml
+#     - menus/netbox/netbox_ipam.yml
+#
+# Each menu item that opens a list has the namespace and name of its node (Netbox + Device for
+# NetboxDevice). Infrahub leaves a node out of its generated menu when a menu item with the same
+# namespace and name exists, so the nodes keep include_in_menu: true without being listed twice, and
+# they still appear in the generated menu when this file is not loaded.
+---
+apiVersion: infrahub.app/v1
+kind: Menu
+spec:
+  data:
+    - namespace: Netbox
+      name: IPAddressesMenu
+      label: IP Addresses and Ranges
+      icon: mdi:ip
+      parent:
+        - Builtin
+        - IPAM
+      order_weight: 4000
+      children:
+        data:
+          - namespace: Netbox
+            name: IPAddress
+            label: IP Addresses
+            kind: NetboxIPAddress
+            icon: mdi:ip
+            order_weight: 1000
+
+          - namespace: Netbox
+            name: IPRange
+            label: IP Ranges
+            kind: NetboxIPRange
+            icon: mdi:arrow-expand-horizontal
+            order_weight: 2000
+
+    - namespace: Netbox
+      name: PrefixesMenu
+      label: Prefixes
+      icon: mdi:ip-network
+      parent:
+        - Builtin
+        - IPAM
+      order_weight: 5000
+      children:
+        data:
+          - namespace: Netbox
+            name: Prefix
+            label: Prefixes
+            kind: NetboxPrefix
+            icon: mdi:ip-network
+            order_weight: 1000
+
+          - namespace: Netbox
+            name: IPAMRole
+            label: Prefix & VLAN Roles
+            kind: NetboxIPAMRole
+            icon: mdi:tag
+            order_weight: 2000
+
+    - namespace: Netbox
+      name: ASNsMenu
+      label: ASNs
+      icon: mdi:numeric
+      parent:
+        - Builtin
+        - IPAM
+      order_weight: 6000
+      children:
+        data:
+          - namespace: Netbox
+            name: ASNRange
+            label: ASN Ranges
+            kind: NetboxASNRange
+            icon: mdi:numeric-9-plus-box-multiple
+            order_weight: 1000
+
+          - namespace: Netbox
+            name: ASN
+            label: ASNs
+            kind: NetboxASN
+            icon: mdi:numeric
+            order_weight: 2000
+
+    - namespace: Netbox
+      name: AggregatesMenu
+      label: Aggregates
+      icon: mdi:ip-network-outline
+      parent:
+        - Builtin
+        - IPAM
+      order_weight: 7000
+      children:
+        data:
+          - namespace: Netbox
+            name: Aggregate
+            label: Aggregates
+            kind: NetboxAggregate
+            icon: mdi:ip-network-outline
+            order_weight: 1000
+
+          - namespace: Netbox
+            name: RIR
+            label: RIRs
+            kind: NetboxRIR
+            icon: mdi:bank
+            order_weight: 2000
+
+    - namespace: Netbox
+      name: VRFsMenu
+      label: VRFs
+      icon: mdi:router
+      parent:
+        - Builtin
+        - IPAM
+      order_weight: 8000
+      children:
+        data:
+          - namespace: Netbox
+            name: VRF
+            label: VRFs
+            kind: NetboxVRF
+            icon: mdi:router
+            order_weight: 1000
+
+          - namespace: Netbox
+            name: RouteTarget
+            label: Route Targets
+            kind: NetboxRouteTarget
+            icon: mdi:target
+            order_weight: 2000
+
+    - namespace: Netbox
+      name: VLANsMenu
+      label: VLANs
+      icon: mdi:lan-connect
+      parent:
+        - Builtin
+        - IPAM
+      order_weight: 9000
+      children:
+        data:
+          - namespace: Netbox
+            name: VLAN
+            label: VLANs
+            kind: NetboxVLAN
+            icon: mdi:lan-connect
+            order_weight: 1000
+
+          - namespace: Netbox
+            name: VLANGroup
+            label: VLAN Groups
+            kind: NetboxVLANGroup
+            icon: mdi:lan
+            order_weight: 2000
+
+          - namespace: Netbox
+            name: VLANTranslationPolicy
+            label: VLAN Translation Policies
+            kind: NetboxVLANTranslationPolicy
+            icon: mdi:swap-horizontal-bold
+            order_weight: 3000
+
+          - namespace: Netbox
+            name: VLANTranslationRule
+            label: VLAN Translation Rules
+            kind: NetboxVLANTranslationRule
+            icon: mdi:swap-horizontal
+            order_weight: 4000
+
+    - namespace: Netbox
+      name: FHRPAndServicesMenu
+      label: FHRP and Services
+      icon: mdi:router-network
+      parent:
+        - Builtin
+        - IPAM
+      order_weight: 10000
+      children:
+        data:
+          - namespace: Netbox
+            name: FHRPGroup
+            label: FHRP Groups
+            kind: NetboxFHRPGroup
+            icon: mdi:router-network
+            order_weight: 1000
+
+          - namespace: Netbox
+            name: FHRPGroupAssignment
+            label: FHRP Group Assignments
+            kind: NetboxFHRPGroupAssignment
+            icon: mdi:router-network
+            order_weight: 2000
+
+          - namespace: Netbox
+            name: ServiceTemplate
+            label: Application Service Templates
+            kind: NetboxServiceTemplate
+            icon: mdi:application-brackets-outline
+            order_weight: 3000
+
+          - namespace: Netbox
+            name: Service
+            label: Application Services
+            kind: NetboxService
+            icon: mdi:application-brackets
+            order_weight: 4000

@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/menu/latest.json
+#
+# Menu for the netbox_connections schema: the Connections section of the NetBox 4.7 navigation menu.
+# Load it after the schema. To arrange the whole sidebar like NetBox, also load the menus of the
+# schemas it requires:
+#
+#   infrahubctl menu load menus/netbox/netbox_organization.yml menus/netbox/netbox_devices.yml \
+#     menus/netbox/netbox_connections.yml
+#
+# When this library is connected to Infrahub as a Git repository, register the files in .infrahub.yml:
+#
+#   menus:
+#     - menus/netbox/netbox_organization.yml
+#     - menus/netbox/netbox_devices.yml
+#     - menus/netbox/netbox_connections.yml
+#
+# Each menu item that opens a list has the namespace and name of its node (Netbox + Device for
+# NetboxDevice). Infrahub leaves a node out of its generated menu when a menu item with the same
+# namespace and name exists, so the nodes keep include_in_menu: true without being listed twice, and
+# they still appear in the generated menu when this file is not loaded.
+---
+apiVersion: infrahub.app/v1
+kind: Menu
+spec:
+  data:
+    - namespace: Netbox
+      name: ConnectionsMenu
+      label: Connections
+      icon: mdi:connection
+      order_weight: 9400
+      children:
+        data:
+          - namespace: Netbox
+            name: Cable
+            label: Cables
+            kind: NetboxCable
+            icon: mdi:cable-data
+            order_weight: 1000
+
+          - namespace: Netbox
+            name: CableBundle
+            label: Cable Bundles
+            kind: NetboxCableBundle
+            icon: mdi:cable-data
+            order_weight: 2000

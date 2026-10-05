@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/menu/latest.json
+#
+# Menu for the netbox_organization schema: the Organization section of the NetBox 4.7 navigation menu.
+# Load it after the schema:
+#
+#   infrahubctl menu load menus/netbox/netbox_organization.yml
+#
+# When this library is connected to Infrahub as a Git repository, register the files in .infrahub.yml:
+#
+#   menus:
+#     - menus/netbox/netbox_organization.yml
+#
+# Each menu item that opens a list has the namespace and name of its node (Netbox + Device for
+# NetboxDevice). Infrahub leaves a node out of its generated menu when a menu item with the same
+# namespace and name exists, so the nodes keep include_in_menu: true without being listed twice, and
+# they still appear in the generated menu when this file is not loaded.
+---
+apiVersion: infrahub.app/v1
+kind: Menu
+spec:
+  data:
+    - namespace: Netbox
+      name: OrganizationMenu
+      label: Organization
+      icon: mdi:domain
+      order_weight: 9100
+      children:
+        data:
+          - namespace: Netbox
+            name: SitesMenu
+            label: Sites
+            icon: mdi:office-building-marker
+            order_weight: 500
+            children:
+              data:
+                - namespace: Netbox
+                  name: Region
+                  label: Regions
+                  kind: NetboxRegion
+                  icon: mdi:earth
+                  order_weight: 1000
+
+                - namespace: Netbox
+                  name: SiteGroup
+                  label: Site Groups
+                  kind: NetboxSiteGroup
+                  icon: mdi:folder-marker
+                  order_weight: 2000
+
+                - namespace: Netbox
+                  name: Site
+                  label: Sites
+                  kind: NetboxSite
+                  icon: mdi:office-building-marker
+                  order_weight: 3000
+
+                - namespace: Netbox
+                  name: Location
+                  label: Locations
+                  kind: NetboxLocation
+                  icon: mdi:map-marker
+                  order_weight: 4000
+
+          - namespace: Netbox
+            name: TenancyMenu
+            label: Tenancy
+            icon: mdi:account-group
+            children:
+              data:
+                - namespace: Netbox
+                  name: Tenant
+                  label: Tenants
+                  kind: NetboxTenant
+                  icon: mdi:domain
+                  order_weight: 1000
+
+                - namespace: Netbox
+                  name: TenantGroup
+                  label: Tenant Groups
+                  kind: NetboxTenantGroup
+                  icon: mdi:account-group
+                  order_weight: 2000
+            order_weight: 1000
+
+          - namespace: Netbox
+            name: ContactsMenu
+            label: Contacts
+            icon: mdi:card-account-details
+            children:
+              data:
+                - namespace: Netbox
+                  name: Contact
+                  label: Contacts
+                  kind: NetboxContact
+                  icon: mdi:card-account-details
+                  order_weight: 1000
+
+                - namespace: Netbox
+                  name: ContactGroup
+                  label: Contact Groups
+                  kind: NetboxContactGroup
+                  icon: mdi:account-multiple
+                  order_weight: 2000
+
+                - namespace: Netbox
+                  name: ContactRole
+                  label: Contact Roles
+                  kind: NetboxContactRole
+                  icon: mdi:account-tie
+                  order_weight: 3000
+
+                - namespace: Netbox
+                  name: ContactAssignment
+                  label: Contact Assignments
+                  kind: NetboxContactAssignment
+                  icon: mdi:account-arrow-right
+                  order_weight: 4000
+            order_weight: 2000

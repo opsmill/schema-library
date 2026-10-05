@@ -1,0 +1,129 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/menu/latest.json
+#
+# Menu for the netbox_circuits schema: the Circuits section of the NetBox 4.7 navigation menu.
+# Load it after the schema. To arrange the whole sidebar like NetBox, also load the menus of the
+# schemas it requires:
+#
+#   infrahubctl menu load menus/netbox/netbox_organization.yml menus/netbox/netbox_devices.yml \
+#     menus/netbox/netbox_circuits.yml
+#
+# When this library is connected to Infrahub as a Git repository, register the files in .infrahub.yml:
+#
+#   menus:
+#     - menus/netbox/netbox_organization.yml
+#     - menus/netbox/netbox_devices.yml
+#     - menus/netbox/netbox_circuits.yml
+#
+# Each menu item that opens a list has the namespace and name of its node (Netbox + Device for
+# NetboxDevice). Infrahub leaves a node out of its generated menu when a menu item with the same
+# namespace and name exists, so the nodes keep include_in_menu: true without being listed twice, and
+# they still appear in the generated menu when this file is not loaded.
+---
+apiVersion: infrahub.app/v1
+kind: Menu
+spec:
+  data:
+    - namespace: Netbox
+      name: CircuitsMenu
+      label: Circuits
+      icon: mdi:transit-connection-variant
+      order_weight: 9700
+      children:
+        data:
+          - namespace: Netbox
+            name: Circuit
+            label: Circuits
+            kind: NetboxCircuit
+            icon: mdi:transit-connection-variant
+            order_weight: 1000
+
+          - namespace: Netbox
+            name: CircuitType
+            label: Circuit Types
+            kind: NetboxCircuitType
+            icon: mdi:shape-outline
+            order_weight: 2000
+
+          - namespace: Netbox
+            name: CircuitTermination
+            label: Circuit Terminations
+            kind: NetboxCircuitTermination
+            icon: mdi:transit-connection-horizontal
+            order_weight: 3000
+
+          - namespace: Netbox
+            name: VirtualCircuitsMenu
+            label: Virtual Circuits
+            icon: mdi:transit-connection
+            children:
+              data:
+                - namespace: Netbox
+                  name: VirtualCircuit
+                  label: Virtual Circuits
+                  kind: NetboxVirtualCircuit
+                  icon: mdi:transit-connection
+                  order_weight: 1000
+
+                - namespace: Netbox
+                  name: VirtualCircuitType
+                  label: Virtual Circuit Types
+                  kind: NetboxVirtualCircuitType
+                  icon: mdi:shape-outline
+                  order_weight: 2000
+
+                - namespace: Netbox
+                  name: VirtualCircuitTermination
+                  label: Virtual Circuit Terminations
+                  kind: NetboxVirtualCircuitTermination
+                  icon: mdi:transit-connection-horizontal
+                  order_weight: 3000
+            order_weight: 4000
+
+          - namespace: Netbox
+            name: CircuitGroupsMenu
+            label: Circuit Groups
+            icon: mdi:group
+            children:
+              data:
+                - namespace: Netbox
+                  name: CircuitGroup
+                  label: Circuit Groups
+                  kind: NetboxCircuitGroup
+                  icon: mdi:group
+                  order_weight: 1000
+
+                - namespace: Netbox
+                  name: CircuitGroupAssignment
+                  label: Group Assignments
+                  kind: NetboxCircuitGroupAssignment
+                  icon: mdi:group
+                  order_weight: 2000
+            order_weight: 5000
+
+          - namespace: Netbox
+            name: ProvidersMenu
+            label: Providers
+            icon: mdi:domain
+            children:
+              data:
+                - namespace: Netbox
+                  name: Provider
+                  label: Providers
+                  kind: NetboxProvider
+                  icon: mdi:domain
+                  order_weight: 1000
+
+                - namespace: Netbox
+                  name: ProviderAccount
+                  label: Provider Accounts
+                  kind: NetboxProviderAccount
+                  icon: mdi:card-account-details-outline
+                  order_weight: 2000
+
+                - namespace: Netbox
+                  name: ProviderNetwork
+                  label: Provider Networks
+                  kind: NetboxProviderNetwork
+                  icon: mdi:cloud-outline
+                  order_weight: 3000
+            order_weight: 6000

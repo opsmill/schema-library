@@ -430,3 +430,184 @@ extensions/vrrp:
   description: This schema extension adds VRRP Group and VRRP Interface nodes, linking
     a virtual IP address to the layer 3 interfaces that take part in the group.
   name: VRRP
+netbox/netbox_circuits:
+  dependencies:
+    - netbox/netbox_organization
+    - netbox/netbox_devices
+  description: Providers, provider accounts, provider networks, circuit types, circuits,
+    circuit terminations, circuit groups and virtual circuits, mapped from the NetBox
+    4.7 circuits tables. A circuit termination ends on a region, site group, site,
+    location or provider network, and a cable connects it to a device interface or
+    port.
+  name: NetBox Circuits
+  not_covered:
+    - Provider ASNs when netbox/netbox_ipam is not loaded. Load netbox/netbox_ipam,
+      in any order, to add the ASNs relationship to providers.
+  use_cases:
+    - Import NetBox circuits with their A and Z terminations, the site or provider
+      network each termination ends on, and the cable to the device port.
+    - Record virtual circuits between device interfaces over a provider network.
+netbox/netbox_connections:
+  dependencies:
+    - netbox/netbox_organization
+    - netbox/netbox_devices
+  description: 'Cables and cable bundles: the Connections section of the NetBox navigation
+    menu, mapped from the NetBox 4.7 dcim tables. Adds the cable, cable end and connector
+    fields to the interfaces, ports, power feeds and circuit terminations that a cable
+    can connect to.'
+  name: NetBox Connections
+  not_covered:
+    - Cable path tracing, and the interface, console and power connection lists that
+      NetBox computes from cable paths.
+    - Decimal cable lengths. They are stored as whole numbers in centimeters, because
+      Infrahub has no decimal attribute kind.
+    - Wireless links (wireless).
+  use_cases:
+    - Import NetBox cables with the objects at each end, and the cable end (A or B)
+      of each object.
+    - Group cables that share a route or a purpose into cable bundles.
+netbox/netbox_cooling:
+  dependencies:
+    - netbox/netbox_organization
+    - netbox/netbox_devices
+    - netbox/netbox_racks
+  description: 'Cooling sources and cooling feeds: the Cooling section of the NetBox
+    navigation menu, mapped from the NetBox 4.7 dcim tables. Cooling intakes and outflows
+    are device components in netbox/netbox_devices.'
+  name: NetBox Cooling
+  not_covered:
+    - Decimal cooling capacities and flow rates. They are stored as whole numbers
+      in watts and liters per minute, because Infrahub has no decimal attribute kind.
+  use_cases:
+    - Import NetBox cooling sources, such as chillers, and the cooling feeds that
+      supply each rack.
+netbox/netbox_devices:
+  dependencies:
+    - netbox/netbox_organization
+  description: 'Devices, modules, device roles, platforms, virtual chassis, virtual
+    device contexts, device types, module types, manufacturers, device components,
+    inventory items and MAC addresses: the Devices section of the NetBox navigation
+    menu, mapped from the NetBox 4.7 dcim tables. NetBox device type component templates
+    map to Infrahub object templates of devices.'
+  name: NetBox Devices
+  not_covered:
+    - Module type component templates. Infrahub generates templates for devices and
+      their components only, so create module components on the device.
+    - The counters and cached columns that NetBox computes.
+    - Half rack units, such as a 0.5U device height. Heights are whole rack units.
+    - Decimal weights, diameters and flow rates. They are stored as whole numbers
+      in grams, millimeters and liters per minute, because Infrahub has no decimal
+      attribute kind.
+    - Devices without a name, or with a name that another device uses. Device names
+      are mandatory and unique in Infrahub, so that devices, their components and
+      their virtual device contexts have human-friendly IDs.
+    - Devices without a platform or a tenant. Infrahub requires both on every device.
+    - Unique names for module bays and inventory items. NetBox makes them unique within
+      an optional parent, which an Infrahub uniqueness constraint cannot include.
+    - Device roles, platforms and module bay types with the same name under different
+      parents or manufacturers. Their names are unique in Infrahub, so that other
+      objects can refer to them by name.
+    - Clusters (virtualization), wireless LANs (wireless), and config templates (extras).
+  use_cases:
+    - Import NetBox devices with their device types, interfaces, ports, bays, modules
+      and inventory items, and the NetBox statuses and choices.
+    - Define a device template with its interfaces and ports, and create devices from
+      it, in place of NetBox device type component templates.
+    - 'Generate device configurations as Infrahub artifacts: devices inherit CoreArtifactTarget.'
+netbox/netbox_ipam:
+  dependencies:
+    - netbox/netbox_organization
+    - netbox/netbox_devices
+  description: VRFs, route targets, RIRs, aggregates, prefixes, IP ranges, IP addresses,
+    VLAN groups, VLANs, VLAN translation policies, ASNs, FHRP groups and services,
+    mapped from the NetBox 4.7 ipam tables. Each VRF is an Infrahub IP namespace,
+    so Infrahub arranges the prefixes and IP addresses of each VRF in a separate hierarchy.
+  name: NetBox IPAM
+  not_covered:
+    - Uniqueness of prefixes and IP addresses. NetBox checks it in application logic,
+      depending on the VRF setting and the address role. This schema does not enforce
+      it.
+    - Unique VLAN and VLAN group names and VLAN IDs. NetBox makes them unique within
+      an optional VLAN group or scope, which an Infrahub uniqueness constraint cannot
+      include.
+    - VM interfaces and clusters (virtualization) as targets of IP addresses, FHRP
+      groups, services and VLAN groups.
+  use_cases:
+    - Import NetBox IP address management data, including the same prefix in several
+      VRFs.
+    - Assign IP addresses to device interfaces, set the primary IP addresses of devices,
+      and assign VLANs and a VRF to interfaces.
+netbox/netbox_organization:
+  description: 'Regions, site groups, sites, locations, tenants, tenant groups, contacts,
+    contact groups, contact roles and contact assignments: the Organization section
+    of the NetBox navigation menu, mapped from the NetBox 4.7 dcim and tenancy tables.
+    Load it first: it also defines the generics that the other NetBox schemas use
+    for descriptions, comments, tags, tenants and contacts.'
+  name: NetBox Organization
+  not_covered:
+    - NetBox owners and owner groups (users app). Use Infrahub accounts, groups and
+      permissions.
+    - NetBox custom fields. Add attributes to the schema instead.
+    - Regions, site groups, tenants and contact groups with the same name under different
+      parents. Their names are unique in Infrahub, so that other objects can refer
+      to them by name.
+    - Unique location names. NetBox makes them unique within a site and an optional
+      parent location, which an Infrahub uniqueness constraint cannot include.
+  use_cases:
+    - Import the NetBox sites with their regions, site groups and locations, and list
+      every region, site group or location below another one, through the Infrahub
+      hierarchy of each tree.
+    - Record which customer or department each site, device, prefix, circuit or tunnel
+      belongs to.
+    - Assign contacts, with a role and a priority, to the objects that accept contacts
+      in NetBox.
+netbox/netbox_power:
+  dependencies:
+    - netbox/netbox_organization
+    - netbox/netbox_devices
+    - netbox/netbox_racks
+  description: 'Power panels and power feeds: the Power section of the NetBox navigation
+    menu, mapped from the NetBox 4.7 dcim tables. Power ports and power outlets are
+    device components in netbox/netbox_devices.'
+  name: NetBox Power
+  use_cases:
+    - Import NetBox power panels and the power feeds that supply each rack.
+    - Connect a power feed to a device power port with a cable, when netbox/netbox_connections
+      is loaded.
+netbox/netbox_racks:
+  dependencies:
+    - netbox/netbox_organization
+    - netbox/netbox_devices
+  description: 'Racks, rack reservations, rack groups, rack roles and rack types:
+    the Racks section of the NetBox navigation menu, mapped from the NetBox 4.7 dcim
+    tables. Adds the rack, position and rack face fields to devices.'
+  name: NetBox Racks
+  not_covered:
+    - Half rack units, such as a 0.5U rack position. Positions and heights are whole
+      rack units.
+    - Decimal weights and cooling capacities. They are stored as whole numbers in
+      grams and watts, because Infrahub has no decimal attribute kind.
+    - Unique rack names. NetBox makes them unique within a location, which an Infrahub
+      uniqueness constraint cannot include.
+    - NetBox users as the owners of rack reservations. Reservations refer to Infrahub
+      accounts.
+  use_cases:
+    - Import NetBox racks with their rack types, roles and groups, and the rack, position
+      and face of each device.
+    - Reserve rack units for future use.
+netbox/netbox_vpn:
+  dependencies:
+    - netbox/netbox_organization
+    - netbox/netbox_devices
+    - netbox/netbox_ipam
+  description: Tunnels, tunnel groups, tunnel terminations, IKE and IPSec proposals,
+    policies and profiles, and L2VPNs with their terminations, mapped from the NetBox
+    4.7 vpn tables.
+  name: NetBox VPN
+  not_covered:
+    - VM interfaces (virtualization) as tunnel or L2VPN terminations.
+  use_cases:
+    - Import NetBox tunnels with their IPSec profiles, the device interfaces they
+      terminate on, and the outside IP address of each termination.
+    - Import L2VPNs, such as VXLAN-EVPN or VPLS, with their route targets and the
+      interfaces or VLANs they terminate on.

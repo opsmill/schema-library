@@ -22,11 +22,12 @@ Infrahub ships without built-in schemas, giving you complete freedom to define y
 
 ## Project structure
 
-This project is divided into three main parts:
+This project is divided into four main parts:
 
 - **Base**: The foundational layer required for most extensions. It must be loaded before adding extensions.
 - **Extensions**: Generic schema components for managing infrastructure. Extensions may have dependencies on each other.
 - **Experimental**: Schema components that are not yet fully supported.
+- **NetBox**: Schemas that mirror the NetBox 4.7 data model, one for each section of the NetBox navigation menu (organization, devices, racks, connections, power, cooling, IPAM, circuits and VPN). They do not depend on the base schema.
 
 ## Getting started
 
@@ -73,6 +74,30 @@ infrahubctl schema load extensions/location_minimal
 
 # Load another extension
 infrahubctl schema load extensions/vlan
+```
+
+The NetBox schemas have their own load order. Load `netbox/netbox_organization` first, then `netbox/netbox_devices`, then only the other NetBox schemas you need:
+
+```bash
+infrahubctl schema load netbox/netbox_organization
+infrahubctl schema load netbox/netbox_devices
+infrahubctl schema load netbox/netbox_racks
+infrahubctl schema load netbox/netbox_connections
+# netbox_power and netbox_cooling also require netbox_racks
+infrahubctl schema load netbox/netbox_power
+infrahubctl schema load netbox/netbox_cooling
+infrahubctl schema load netbox/netbox_ipam
+infrahubctl schema load netbox/netbox_circuits
+# netbox_vpn also requires netbox_ipam
+infrahubctl schema load netbox/netbox_vpn
+```
+
+To load all the NetBox schemas with one command, run `infrahubctl schema load netbox`.
+
+To arrange the sidebar like the NetBox navigation menu, load the menu files of the NetBox schemas you loaded, from `menus/netbox/`:
+
+```bash
+infrahubctl menu load menus/netbox/netbox_organization.yml menus/netbox/netbox_devices.yml
 ```
 
 ## Available schemas
@@ -150,6 +175,20 @@ This list provides an overview of the schemas available in this repository. Each
 | **[VLAN](./reference/vlan.mdx)** | This schema extension adds VLAN and VLAN Group nodes, with a generic VLAN to build on, and links VLANs to prefixes and layer 2 interfaces. |
 | **[VRF](./reference/vrf.mdx)** | This schema extension adds VRF and Route Target nodes and links prefixes and IP addresses to a VRF. |
 | **[VRRP](./reference/vrrp.mdx)** | This schema extension adds VRRP Group and VRRP Interface nodes, linking a virtual IP address to the layer 3 interfaces that take part in the group. |
+
+### netbox
+
+| Name | Description |
+| ---- | ----------- |
+| **[NetBox Circuits](./reference/netbox_circuits.mdx)** | Providers, provider accounts, provider networks, circuit types, circuits, circuit terminations, circuit groups and virtual circuits, mapped from the NetBox 4.7 circuits tables. A circuit termination ends on a region, site group, site, location or provider network, and a cable connects it to a device interface or port. |
+| **[NetBox Connections](./reference/netbox_connections.mdx)** | Cables and cable bundles: the Connections section of the NetBox navigation menu, mapped from the NetBox 4.7 dcim tables. Adds the cable, cable end and connector fields to the interfaces, ports, power feeds and circuit terminations that a cable can connect to. |
+| **[NetBox Cooling](./reference/netbox_cooling.mdx)** | Cooling sources and cooling feeds: the Cooling section of the NetBox navigation menu, mapped from the NetBox 4.7 dcim tables. Cooling intakes and outflows are device components in netbox/netbox_devices. |
+| **[NetBox Devices](./reference/netbox_devices.mdx)** | Devices, modules, device roles, platforms, virtual chassis, virtual device contexts, device types, module types, manufacturers, device components, inventory items and MAC addresses: the Devices section of the NetBox navigation menu, mapped from the NetBox 4.7 dcim tables. NetBox device type component templates map to Infrahub object templates of devices. |
+| **[NetBox IPAM](./reference/netbox_ipam.mdx)** | VRFs, route targets, RIRs, aggregates, prefixes, IP ranges, IP addresses, VLAN groups, VLANs, VLAN translation policies, ASNs, FHRP groups and services, mapped from the NetBox 4.7 ipam tables. Each VRF is an Infrahub IP namespace, so Infrahub arranges the prefixes and IP addresses of each VRF in a separate hierarchy. |
+| **[NetBox Organization](./reference/netbox_organization.mdx)** | Regions, site groups, sites, locations, tenants, tenant groups, contacts, contact groups, contact roles and contact assignments: the Organization section of the NetBox navigation menu, mapped from the NetBox 4.7 dcim and tenancy tables. Load it first: it also defines the generics that the other NetBox schemas use for descriptions, comments, tags, tenants and contacts. |
+| **[NetBox Power](./reference/netbox_power.mdx)** | Power panels and power feeds: the Power section of the NetBox navigation menu, mapped from the NetBox 4.7 dcim tables. Power ports and power outlets are device components in netbox/netbox_devices. |
+| **[NetBox Racks](./reference/netbox_racks.mdx)** | Racks, rack reservations, rack groups, rack roles and rack types: the Racks section of the NetBox navigation menu, mapped from the NetBox 4.7 dcim tables. Adds the rack, position and rack face fields to devices. |
+| **[NetBox VPN](./reference/netbox_vpn.mdx)** | Tunnels, tunnel groups, tunnel terminations, IKE and IPSec proposals, policies and profiles, and L2VPNs with their terminations, mapped from the NetBox 4.7 vpn tables. |
 <!-- vale on -->
 
 ## Troubleshooting

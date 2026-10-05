@@ -1,0 +1,123 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/menu/latest.json
+#
+# Menu for the netbox_vpn schema: the VPN section of the NetBox 4.7 navigation menu.
+# Load it after the schema. To arrange the whole sidebar like NetBox, also load the menus of the
+# schemas it requires:
+#
+#   infrahubctl menu load menus/netbox/netbox_organization.yml menus/netbox/netbox_devices.yml \
+#     menus/netbox/netbox_ipam.yml menus/netbox/netbox_vpn.yml
+#
+# When this library is connected to Infrahub as a Git repository, register the files in .infrahub.yml:
+#
+#   menus:
+#     - menus/netbox/netbox_organization.yml
+#     - menus/netbox/netbox_devices.yml
+#     - menus/netbox/netbox_ipam.yml
+#     - menus/netbox/netbox_vpn.yml
+#
+# Each menu item that opens a list has the namespace and name of its node (Netbox + Device for
+# NetboxDevice). Infrahub leaves a node out of its generated menu when a menu item with the same
+# namespace and name exists, so the nodes keep include_in_menu: true without being listed twice, and
+# they still appear in the generated menu when this file is not loaded.
+---
+apiVersion: infrahub.app/v1
+kind: Menu
+spec:
+  data:
+    - namespace: Netbox
+      name: VPNMenu
+      label: VPN
+      icon: mdi:graph-outline
+      order_weight: 9600
+      children:
+        data:
+          - namespace: Netbox
+            name: TunnelsMenu
+            label: Tunnels
+            icon: mdi:tunnel
+            children:
+              data:
+                - namespace: Netbox
+                  name: Tunnel
+                  label: Tunnels
+                  kind: NetboxTunnel
+                  icon: mdi:tunnel
+                  order_weight: 1000
+
+                - namespace: Netbox
+                  name: TunnelGroup
+                  label: Tunnel Groups
+                  kind: NetboxTunnelGroup
+                  icon: mdi:folder-network
+                  order_weight: 2000
+
+                - namespace: Netbox
+                  name: TunnelTermination
+                  label: Tunnel Terminations
+                  kind: NetboxTunnelTermination
+                  icon: mdi:tunnel-outline
+                  order_weight: 3000
+            order_weight: 1000
+
+          - namespace: Netbox
+            name: L2VPNsMenu
+            label: L2VPNs
+            icon: mdi:bridge
+            children:
+              data:
+                - namespace: Netbox
+                  name: L2VPN
+                  label: L2VPNs
+                  kind: NetboxL2VPN
+                  icon: mdi:bridge
+                  order_weight: 1000
+
+                - namespace: Netbox
+                  name: L2VPNTermination
+                  label: L2VPN Terminations
+                  kind: NetboxL2VPNTermination
+                  icon: mdi:bridge
+                  order_weight: 2000
+            order_weight: 2000
+
+          - namespace: Netbox
+            name: SecurityMenu
+            label: Security
+            icon: mdi:shield-lock
+            children:
+              data:
+                - namespace: Netbox
+                  name: IKEProposal
+                  label: IKE Proposals
+                  kind: NetboxIKEProposal
+                  icon: mdi:key-chain-variant
+                  order_weight: 1000
+
+                - namespace: Netbox
+                  name: IKEPolicy
+                  label: IKE Policies
+                  kind: NetboxIKEPolicy
+                  icon: mdi:key-chain
+                  order_weight: 2000
+
+                - namespace: Netbox
+                  name: IPSecProposal
+                  label: IPSec Proposals
+                  kind: NetboxIPSecProposal
+                  icon: mdi:shield-key-outline
+                  order_weight: 3000
+
+                - namespace: Netbox
+                  name: IPSecPolicy
+                  label: IPSec Policies
+                  kind: NetboxIPSecPolicy
+                  icon: mdi:shield-key
+                  order_weight: 4000
+
+                - namespace: Netbox
+                  name: IPSecProfile
+                  label: IPSec Profiles
+                  kind: NetboxIPSecProfile
+                  icon: mdi:shield-lock
+                  order_weight: 5000
+            order_weight: 3000

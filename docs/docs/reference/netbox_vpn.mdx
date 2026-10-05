@@ -1,0 +1,1022 @@
+---
+title: NetBox VPN
+---
+
+Tunnels, tunnel groups, tunnel terminations, IKE and IPSec proposals, policies and profiles, and L2VPNs with their terminations, mapped from the NetBox 4.7 vpn tables.
+
+## Details
+
+- **Dependencies:**
+    - [netbox/netbox_organization](netbox_organization)
+    - [netbox/netbox_devices](netbox_devices)
+    - [netbox/netbox_ipam](netbox_ipam)
+
+## Use cases
+
+This extension covers:
+- Import NetBox tunnels with their IPSec profiles, the device interfaces they terminate on, and the outside IP address of each termination.
+- Import L2VPNs, such as VXLAN-EVPN or VPLS, with their route targets and the interfaces or VLANs they terminate on.
+
+Out of scope, and what to reach for instead:
+- VM interfaces (virtualization) as tunnel or L2VPN terminations.
+
+## Nodes
+
+### TunnelGroup
+
+- **Label:** Tunnel Group
+- **Description:** An administrative group of tunnels, for example all peer-to-peer tunnels inside a mesh network.
+- **Namespace:** Netbox
+- **Icon:** mdi:folder-network
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetboxGeneric, NetboxContactAssignable
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| slug | URL-friendly identifier that NetBox derives from the name. | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| tunnels | NetboxTunnel | True | many | Generic |
+
+### Tunnel
+
+- **Description:** A private virtual connection between endpoints across a shared network, using encapsulation such as GRE or IPSec.
+- **Namespace:** Netbox
+- **Icon:** mdi:tunnel
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetboxGeneric, NetboxTenantAssignable, NetboxContactAssignable
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| status |  | Dropdown | False | active | planned, active, disabled |
+| encapsulation |  | Dropdown | False |  | ipsec-transport, ipsec-tunnel, ip-ip, gre, wireguard, openvpn, l2tp, pptp |
+| tunnel_id |  | Number | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| group | NetboxTunnelGroup | True | one | Attribute |
+| ipsec_profile | NetboxIPSecProfile | True | one | Attribute |
+| terminations | NetboxTunnelTermination | True | many | Component |
+
+### TunnelTermination
+
+- **Label:** Tunnel Termination
+- **Description:** Connects a device interface to a tunnel, with a role such as peer, hub or spoke and an optional outside IP address.
+- **Namespace:** Netbox
+- **Icon:** mdi:tunnel-outline
+- **Uniqueness Constraints:**
+    - termination
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| role |  | Dropdown | False | peer | peer, hub, spoke |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| tunnel | NetboxTunnel | False | one | Parent |
+| termination | NetboxInterface | False | one | Attribute |
+| outside_ip | NetboxIPAddress | True | one | Attribute |
+| tags | BuiltinTag | True | many | Attribute |
+
+### IKEProposal
+
+- **Label:** IKE Proposal
+- **Description:** Internet Key Exchange (IKE) parameters for establishing a secure connection. IKE policies use IKE proposals.
+- **Namespace:** Netbox
+- **Icon:** mdi:key-chain-variant
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetboxGeneric
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| authentication_method |  | Dropdown | False |  | preshared-keys, certificates, rsa-signatures, dsa-signatures |
+| encryption_algorithm |  | Dropdown | False |  | aes-128-cbc, aes-128-gcm, aes-192-cbc, aes-192-gcm, aes-256-cbc, aes-256-gcm, 3des-cbc, des-cbc |
+| authentication_algorithm |  | Dropdown | True |  | hmac-sha1, hmac-sha256, hmac-sha384, hmac-sha512, hmac-md5 |
+| group | Diffie-Hellman group number, for example 14. | Number | False |  |  |
+| sa_lifetime |  | Number | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| ike_policies | NetboxIKEPolicy | True | many | Generic |
+
+### IKEPolicy
+
+- **Label:** IKE Policy
+- **Description:** Defines an IKE version, a mode and a set of proposals for IKE negotiation. IPSec profiles reference IKE policies.
+- **Namespace:** Netbox
+- **Icon:** mdi:key-chain
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetboxGeneric
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| version |  | Number | False | 2 |  |
+| mode |  | Dropdown | True |  | aggressive, main |
+| preshared_key |  | Password | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| proposals | NetboxIKEProposal | True | many | Attribute |
+| ipsec_profiles | NetboxIPSecProfile | True | many | Generic |
+
+### IPSecProposal
+
+- **Label:** IPSec Proposal
+- **Description:** A set of parameters used to negotiate security associations for IPSec tunnels. IPSec policies reference IPSec proposals.
+- **Namespace:** Netbox
+- **Icon:** mdi:shield-key-outline
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetboxGeneric
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| encryption_algorithm |  | Dropdown | True |  | aes-128-cbc, aes-128-gcm, aes-192-cbc, aes-192-gcm, aes-256-cbc, aes-256-gcm, 3des-cbc, des-cbc |
+| authentication_algorithm |  | Dropdown | True |  | hmac-sha1, hmac-sha256, hmac-sha384, hmac-sha512, hmac-md5 |
+| sa_lifetime_seconds |  | Number | True |  |  |
+| sa_lifetime_data |  | Number | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| ipsec_policies | NetboxIPSecPolicy | True | many | Generic |
+
+### IPSecPolicy
+
+- **Label:** IPSec Policy
+- **Description:** A set of IPSec proposals and an optional perfect forward secrecy (PFS) group. IPSec profiles use IPSec policies.
+- **Namespace:** Netbox
+- **Icon:** mdi:shield-key
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetboxGeneric
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| pfs_group | Diffie-Hellman group for perfect forward secrecy, for example 14. | Number | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| proposals | NetboxIPSecProposal | True | many | Attribute |
+| ipsec_profiles | NetboxIPSecProfile | True | many | Generic |
+
+### IPSecProfile
+
+- **Label:** IPSec Profile
+- **Description:** Combines an IKE policy, an IPSec policy and an IPSec mode for establishing an IPSec tunnel.
+- **Namespace:** Netbox
+- **Icon:** mdi:shield-lock
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetboxGeneric
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| mode |  | Dropdown | False | esp | esp, ah |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| ike_policy | NetboxIKEPolicy | False | one | Attribute |
+| ipsec_policy | NetboxIPSecPolicy | False | one | Attribute |
+| tunnels | NetboxTunnel | True | many | Generic |
+
+### L2VPN
+
+- **Label:** L2VPN
+- **Description:** A layer 2 bridge technology such as VXLAN, VPLS or EPL, with an optional identifier such as a VNI.
+- **Namespace:** Netbox
+- **Icon:** mdi:bridge
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetboxGeneric, NetboxTenantAssignable, NetboxContactAssignable
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| slug | URL-friendly identifier that NetBox derives from the name. | Text | True |  |  |
+| type |  | Dropdown | False |  | vpws, vpls, vxlan, vxlan-evpn, mpls-evpn, pbb-evpn, evpn-vpws, epl, evpl, ep-lan, evp-lan, ep-tree, evp-tree, spb |
+| status |  | Dropdown | False | active | active, planned, decommissioning |
+| identifier | Numeric identifier, for example a VXLAN VNI. | Number | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| import_targets | NetboxRouteTarget | True | many | Attribute |
+| export_targets | NetboxRouteTarget | True | many | Attribute |
+| terminations | NetboxL2VPNTermination | True | many | Component |
+
+### L2VPNTermination
+
+- **Label:** L2VPN Termination
+- **Description:** Attaches an L2VPN to an interface or a VLAN. Point-to-point L2VPN types such as VPWS and EPL accept only two terminations.
+- **Namespace:** Netbox
+- **Icon:** mdi:bridge
+- **Uniqueness Constraints:**
+    - assigned_object
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| l2vpn | NetboxL2VPN | False | one | Parent |
+| assigned_object | NetboxL2VPNAssignable | False | one | Attribute |
+| tags | BuiltinTag | True | many | Attribute |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### NetboxInterface
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| tunnel_termination | NetboxTunnelTermination | True | one | Generic |
+
+### NetboxL2VPNAssignable
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| l2vpn_termination | NetboxL2VPNTermination | True | one | Generic |
+
+### NetboxRouteTarget
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| importing_l2vpns | NetboxL2VPN | True | many | Generic |
+| exporting_l2vpns | NetboxL2VPN | True | many | Generic |
+
+### NetboxIPAddress
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| tunnel_terminations | NetboxTunnelTermination | True | many | Generic |
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: TunnelGroup
+  namespace: Netbox
+  description: An administrative group of tunnels, for example all peer-to-peer tunnels
+    inside a mesh network.
+  label: Tunnel Group
+  icon: mdi:folder-network
+  include_in_menu: true
+  menu_placement: NetboxTunnel
+  inherit_from:
+  - NetboxGeneric
+  - NetboxContactAssignable
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
+  - name: slug
+    kind: Text
+    parameters:
+      regex: ^[-a-zA-Z0-9_]+$
+    optional: true
+    description: URL-friendly identifier that NetBox derives from the name.
+    order_weight: 1100
+  relationships:
+  - name: tunnels
+    peer: NetboxTunnel
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_tunnel_group__tunnel
+    order_weight: 3100
+- name: Tunnel
+  namespace: Netbox
+  description: A private virtual connection between endpoints across a shared network,
+    using encapsulation such as GRE or IPSec.
+  icon: mdi:tunnel
+  include_in_menu: true
+  inherit_from:
+  - NetboxGeneric
+  - NetboxTenantAssignable
+  - NetboxContactAssignable
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: planned
+      label: Planned
+      description: Designated for future use but not yet in service
+      color: '#00bcd4'
+    - name: active
+      label: Active
+      description: Established and carrying traffic
+      color: '#4caf50'
+    - name: disabled
+      label: Disabled
+      description: Administratively disabled
+      color: '#f44336'
+    optional: false
+    order_weight: 1100
+  - name: encapsulation
+    kind: Dropdown
+    choices:
+    - name: ipsec-transport
+      label: IPsec - Transport
+      description: IPsec encrypting only the packet payload between endpoints
+    - name: ipsec-tunnel
+      label: IPsec - Tunnel
+      description: IPsec encrypting the entire original IP packet
+    - name: ip-ip
+      label: IP-in-IP
+      description: Encapsulation of one IP packet within another
+    - name: gre
+      label: GRE
+      description: Generic Routing Encapsulation
+    - name: wireguard
+      label: WireGuard
+    - name: openvpn
+      label: OpenVPN
+    - name: l2tp
+      label: L2TP
+      description: Layer 2 Tunneling Protocol
+    - name: pptp
+      label: PPTP
+      description: Point-to-Point Tunneling Protocol
+    optional: false
+    order_weight: 1300
+  - name: tunnel_id
+    kind: Number
+    label: Tunnel ID
+    optional: true
+    order_weight: 1500
+  relationships:
+  - name: group
+    peer: NetboxTunnelGroup
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_tunnel_group__tunnel
+    order_weight: 1200
+  - name: ipsec_profile
+    peer: NetboxIPSecProfile
+    label: IPSec Profile
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_ipsec_profile__tunnel
+    order_weight: 1400
+  - name: terminations
+    peer: NetboxTunnelTermination
+    kind: Component
+    cardinality: many
+    optional: true
+    identifier: netbox_tunnel__termination
+    order_weight: 3100
+- name: TunnelTermination
+  namespace: Netbox
+  description: Connects a device interface to a tunnel, with a role such as peer,
+    hub or spoke and an optional outside IP address.
+  label: Tunnel Termination
+  icon: mdi:tunnel-outline
+  include_in_menu: true
+  menu_placement: NetboxTunnel
+  display_label: '{{ tunnel__name__value }}: {{ termination__name__value }}'
+  uniqueness_constraints:
+  - - termination
+  attributes:
+  - name: role
+    kind: Dropdown
+    default_value: peer
+    choices:
+    - name: peer
+      label: Peer
+      description: Symmetric endpoint in a point-to-point tunnel
+      color: '#4caf50'
+    - name: hub
+      label: Hub
+      description: Central endpoint in a hub-and-spoke topology
+      color: '#2196f3'
+    - name: spoke
+      label: Spoke
+      description: Remote endpoint connecting to a hub
+      color: '#ff9800'
+    optional: false
+    order_weight: 1000
+  relationships:
+  - name: tunnel
+    peer: NetboxTunnel
+    kind: Parent
+    cardinality: one
+    optional: false
+    identifier: netbox_tunnel__termination
+    order_weight: 800
+  - name: termination
+    peer: NetboxInterface
+    label: Interface
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: netbox_interface__tunnel_termination
+    order_weight: 810
+  - name: outside_ip
+    peer: NetboxIPAddress
+    label: Outside IP
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_tunnel_termination__outside_ip
+    order_weight: 1100
+  - name: tags
+    peer: BuiltinTag
+    kind: Attribute
+    cardinality: many
+    optional: true
+    order_weight: 3000
+- name: IKEProposal
+  namespace: Netbox
+  description: Internet Key Exchange (IKE) parameters for establishing a secure connection.
+    IKE policies use IKE proposals.
+  label: IKE Proposal
+  icon: mdi:key-chain-variant
+  include_in_menu: true
+  menu_placement: NetboxIPSecProfile
+  inherit_from:
+  - NetboxGeneric
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
+  - name: authentication_method
+    kind: Dropdown
+    label: Authentication Method
+    choices:
+    - name: preshared-keys
+      label: Pre-shared keys
+    - name: certificates
+      label: Certificates
+    - name: rsa-signatures
+      label: RSA signatures
+    - name: dsa-signatures
+      label: DSA signatures
+    optional: false
+    order_weight: 1100
+  - name: encryption_algorithm
+    kind: Dropdown
+    label: Encryption Algorithm
+    choices:
+    - name: aes-128-cbc
+      label: 128-bit AES (CBC)
+    - name: aes-128-gcm
+      label: 128-bit AES (GCM)
+    - name: aes-192-cbc
+      label: 192-bit AES (CBC)
+    - name: aes-192-gcm
+      label: 192-bit AES (GCM)
+    - name: aes-256-cbc
+      label: 256-bit AES (CBC)
+    - name: aes-256-gcm
+      label: 256-bit AES (GCM)
+    - name: 3des-cbc
+      label: 3DES
+    - name: des-cbc
+      label: DES
+    optional: false
+    order_weight: 1200
+  - name: authentication_algorithm
+    kind: Dropdown
+    label: Authentication Algorithm
+    choices:
+    - name: hmac-sha1
+      label: SHA-1 HMAC
+    - name: hmac-sha256
+      label: SHA-256 HMAC
+    - name: hmac-sha384
+      label: SHA-384 HMAC
+    - name: hmac-sha512
+      label: SHA-512 HMAC
+    - name: hmac-md5
+      label: MD5 HMAC
+    optional: true
+    order_weight: 1300
+  - name: group
+    kind: Number
+    label: Diffie-Hellman Group
+    optional: false
+    description: Diffie-Hellman group number, for example 14.
+    order_weight: 1400
+  - name: sa_lifetime
+    kind: Number
+    label: SA Lifetime (seconds)
+    optional: true
+    order_weight: 1500
+  relationships:
+  - name: ike_policies
+    peer: NetboxIKEPolicy
+    label: IKE Policies
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_ike_policy__proposal
+    order_weight: 3100
+- name: IKEPolicy
+  namespace: Netbox
+  description: Defines an IKE version, a mode and a set of proposals for IKE negotiation.
+    IPSec profiles reference IKE policies.
+  label: IKE Policy
+  icon: mdi:key-chain
+  include_in_menu: true
+  menu_placement: NetboxIPSecProfile
+  inherit_from:
+  - NetboxGeneric
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
+  - name: version
+    kind: Number
+    label: IKE Version
+    default_value: 2
+    parameters:
+      min_value: 1
+      max_value: 2
+    optional: false
+    order_weight: 1100
+  - name: mode
+    kind: Dropdown
+    choices:
+    - name: aggressive
+      label: Aggressive
+    - name: main
+      label: Main
+    optional: true
+    order_weight: 1200
+  - name: preshared_key
+    kind: Password
+    label: Pre-shared Key
+    optional: true
+    order_weight: 1300
+  relationships:
+  - name: proposals
+    peer: NetboxIKEProposal
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: netbox_ike_policy__proposal
+    order_weight: 1400
+  - name: ipsec_profiles
+    peer: NetboxIPSecProfile
+    label: IPSec Profiles
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_ipsec_profile__ike_policy
+    order_weight: 3100
+- name: IPSecProposal
+  namespace: Netbox
+  description: A set of parameters used to negotiate security associations for IPSec
+    tunnels. IPSec policies reference IPSec proposals.
+  label: IPSec Proposal
+  icon: mdi:shield-key-outline
+  include_in_menu: true
+  menu_placement: NetboxIPSecProfile
+  inherit_from:
+  - NetboxGeneric
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
+  - name: encryption_algorithm
+    kind: Dropdown
+    label: Encryption Algorithm
+    choices:
+    - name: aes-128-cbc
+      label: 128-bit AES (CBC)
+    - name: aes-128-gcm
+      label: 128-bit AES (GCM)
+    - name: aes-192-cbc
+      label: 192-bit AES (CBC)
+    - name: aes-192-gcm
+      label: 192-bit AES (GCM)
+    - name: aes-256-cbc
+      label: 256-bit AES (CBC)
+    - name: aes-256-gcm
+      label: 256-bit AES (GCM)
+    - name: 3des-cbc
+      label: 3DES
+    - name: des-cbc
+      label: DES
+    optional: true
+    order_weight: 1100
+  - name: authentication_algorithm
+    kind: Dropdown
+    label: Authentication Algorithm
+    choices:
+    - name: hmac-sha1
+      label: SHA-1 HMAC
+    - name: hmac-sha256
+      label: SHA-256 HMAC
+    - name: hmac-sha384
+      label: SHA-384 HMAC
+    - name: hmac-sha512
+      label: SHA-512 HMAC
+    - name: hmac-md5
+      label: MD5 HMAC
+    optional: true
+    order_weight: 1200
+  - name: sa_lifetime_seconds
+    kind: Number
+    label: SA Lifetime (seconds)
+    optional: true
+    order_weight: 1300
+  - name: sa_lifetime_data
+    kind: Number
+    label: SA Lifetime (KB)
+    optional: true
+    order_weight: 1400
+  relationships:
+  - name: ipsec_policies
+    peer: NetboxIPSecPolicy
+    label: IPSec Policies
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_ipsec_policy__proposal
+    order_weight: 3100
+- name: IPSecPolicy
+  namespace: Netbox
+  description: A set of IPSec proposals and an optional perfect forward secrecy (PFS)
+    group. IPSec profiles use IPSec policies.
+  label: IPSec Policy
+  icon: mdi:shield-key
+  include_in_menu: true
+  menu_placement: NetboxIPSecProfile
+  inherit_from:
+  - NetboxGeneric
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
+  - name: pfs_group
+    kind: Number
+    label: PFS Group
+    optional: true
+    description: Diffie-Hellman group for perfect forward secrecy, for example 14.
+    order_weight: 1100
+  relationships:
+  - name: proposals
+    peer: NetboxIPSecProposal
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: netbox_ipsec_policy__proposal
+    order_weight: 1200
+  - name: ipsec_profiles
+    peer: NetboxIPSecProfile
+    label: IPSec Profiles
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_ipsec_profile__ipsec_policy
+    order_weight: 3100
+- name: IPSecProfile
+  namespace: Netbox
+  description: Combines an IKE policy, an IPSec policy and an IPSec mode for establishing
+    an IPSec tunnel.
+  label: IPSec Profile
+  icon: mdi:shield-lock
+  include_in_menu: true
+  inherit_from:
+  - NetboxGeneric
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
+  - name: mode
+    kind: Dropdown
+    default_value: esp
+    choices:
+    - name: esp
+      label: ESP
+    - name: ah
+      label: AH
+    optional: false
+    order_weight: 1100
+  relationships:
+  - name: ike_policy
+    peer: NetboxIKEPolicy
+    label: IKE Policy
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: netbox_ipsec_profile__ike_policy
+    order_weight: 800
+  - name: ipsec_policy
+    peer: NetboxIPSecPolicy
+    label: IPSec Policy
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: netbox_ipsec_profile__ipsec_policy
+    order_weight: 810
+  - name: tunnels
+    peer: NetboxTunnel
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_ipsec_profile__tunnel
+    order_weight: 3100
+- name: L2VPN
+  namespace: Netbox
+  description: A layer 2 bridge technology such as VXLAN, VPLS or EPL, with an optional
+    identifier such as a VNI.
+  label: L2VPN
+  icon: mdi:bridge
+  include_in_menu: true
+  inherit_from:
+  - NetboxGeneric
+  - NetboxTenantAssignable
+  - NetboxContactAssignable
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
+  - name: slug
+    kind: Text
+    parameters:
+      regex: ^[-a-zA-Z0-9_]+$
+    optional: true
+    description: URL-friendly identifier that NetBox derives from the name.
+    order_weight: 1100
+  - name: type
+    kind: Dropdown
+    choices:
+    - name: vpws
+      label: VPWS
+      description: 'Virtual Private Wire Service: point-to-point Layer 2 connectivity'
+    - name: vpls
+      label: VPLS
+      description: 'Virtual Private LAN Service: multipoint Layer 2 connectivity'
+    - name: vxlan
+      label: VXLAN
+      description: Virtual Extensible LAN overlay
+    - name: vxlan-evpn
+      label: VXLAN-EVPN
+      description: VXLAN with EVPN control plane
+    - name: mpls-evpn
+      label: MPLS EVPN
+      description: Ethernet VPN over an MPLS transport
+    - name: pbb-evpn
+      label: PBB EVPN
+      description: Provider Backbone Bridging with EVPN
+    - name: evpn-vpws
+      label: EVPN VPWS
+      description: Point-to-point service using an EVPN control plane
+    - name: epl
+      label: EPL
+      description: 'Ethernet Private Line: dedicated point-to-point service'
+    - name: evpl
+      label: EVPL
+      description: 'Ethernet Virtual Private Line: multiplexed point-to-point service'
+    - name: ep-lan
+      label: Ethernet Private LAN
+      description: Dedicated multipoint-to-multipoint service
+    - name: evp-lan
+      label: Ethernet Virtual Private LAN
+      description: Multiplexed multipoint-to-multipoint service
+    - name: ep-tree
+      label: Ethernet Private Tree
+      description: Dedicated rooted multipoint service
+    - name: evp-tree
+      label: Ethernet Virtual Private Tree
+      description: Multiplexed rooted multipoint service
+    - name: spb
+      label: SPB
+      description: Shortest Path Bridging
+    optional: false
+    order_weight: 1200
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: active
+      label: Active
+      description: Established and carrying traffic
+      color: '#4caf50'
+    - name: planned
+      label: Planned
+      description: Designated for future use but not yet in service
+      color: '#00bcd4'
+    - name: decommissioning
+      label: Decommissioning
+      description: Being retired from service
+      color: '#f44336'
+    optional: false
+    order_weight: 1300
+  - name: identifier
+    kind: Number
+    optional: true
+    description: Numeric identifier, for example a VXLAN VNI.
+    order_weight: 1400
+  relationships:
+  - name: import_targets
+    peer: NetboxRouteTarget
+    label: Import Route Targets
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: netbox_l2vpn__import_target
+    order_weight: 1500
+  - name: export_targets
+    peer: NetboxRouteTarget
+    label: Export Route Targets
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: netbox_l2vpn__export_target
+    order_weight: 1600
+  - name: terminations
+    peer: NetboxL2VPNTermination
+    kind: Component
+    cardinality: many
+    optional: true
+    identifier: netbox_l2vpn__termination
+    order_weight: 3100
+- name: L2VPNTermination
+  namespace: Netbox
+  description: Attaches an L2VPN to an interface or a VLAN. Point-to-point L2VPN types
+    such as VPWS and EPL accept only two terminations.
+  label: L2VPN Termination
+  icon: mdi:bridge
+  include_in_menu: true
+  menu_placement: NetboxL2VPN
+  display_label: '{{ l2vpn__name__value }}'
+  uniqueness_constraints:
+  - - assigned_object
+  relationships:
+  - name: l2vpn
+    peer: NetboxL2VPN
+    label: L2VPN
+    kind: Parent
+    cardinality: one
+    optional: false
+    identifier: netbox_l2vpn__termination
+    order_weight: 800
+  - name: assigned_object
+    peer: NetboxL2VPNAssignable
+    label: Assigned Object
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: netbox_l2vpn_termination__assigned_object
+    description: Interface or VLAN.
+    order_weight: 810
+  - name: tags
+    peer: BuiltinTag
+    kind: Attribute
+    cardinality: many
+    optional: true
+    order_weight: 3000
+extensions:
+  nodes:
+  - kind: NetboxInterface
+    relationships:
+    - name: tunnel_termination
+      peer: NetboxTunnelTermination
+      label: Tunnel Termination
+      kind: Generic
+      cardinality: one
+      optional: true
+      identifier: netbox_interface__tunnel_termination
+      order_weight: 3770
+  - kind: NetboxL2VPNAssignable
+    relationships:
+    - name: l2vpn_termination
+      peer: NetboxL2VPNTermination
+      label: L2VPN Termination
+      kind: Generic
+      cardinality: one
+      optional: true
+      identifier: netbox_l2vpn_termination__assigned_object
+      order_weight: 3780
+  - kind: NetboxRouteTarget
+    relationships:
+    - name: importing_l2vpns
+      peer: NetboxL2VPN
+      label: Importing L2VPNs
+      kind: Generic
+      cardinality: many
+      optional: true
+      identifier: netbox_l2vpn__import_target
+      order_weight: 3790
+    - name: exporting_l2vpns
+      peer: NetboxL2VPN
+      label: Exporting L2VPNs
+      kind: Generic
+      cardinality: many
+      optional: true
+      identifier: netbox_l2vpn__export_target
+      order_weight: 3795
+  - kind: NetboxIPAddress
+    relationships:
+    - name: tunnel_terminations
+      peer: NetboxTunnelTermination
+      label: Tunnel Terminations
+      kind: Generic
+      cardinality: many
+      optional: true
+      identifier: netbox_tunnel_termination__outside_ip
+      description: Tunnel terminations that use this address as their outside IP.
+      order_weight: 3800
+
+```

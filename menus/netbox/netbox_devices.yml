@@ -1,0 +1,225 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/menu/latest.json
+#
+# Menu for the netbox_devices schema: the Devices section of the NetBox 4.7 navigation menu.
+# Load it after the schema. To arrange the whole sidebar like NetBox, also load the menus of the
+# schemas it requires:
+#
+#   infrahubctl menu load menus/netbox/netbox_organization.yml menus/netbox/netbox_devices.yml
+#
+# When this library is connected to Infrahub as a Git repository, register the files in .infrahub.yml:
+#
+#   menus:
+#     - menus/netbox/netbox_organization.yml
+#     - menus/netbox/netbox_devices.yml
+#
+# Each menu item that opens a list has the namespace and name of its node (Netbox + Device for
+# NetboxDevice). Infrahub leaves a node out of its generated menu when a menu item with the same
+# namespace and name exists, so the nodes keep include_in_menu: true without being listed twice, and
+# they still appear in the generated menu when this file is not loaded.
+---
+apiVersion: infrahub.app/v1
+kind: Menu
+spec:
+  data:
+    - namespace: Netbox
+      name: DevicesMenu
+      label: Devices
+      icon: mdi:server
+      order_weight: 9300
+      children:
+        data:
+          - namespace: Netbox
+            name: Device
+            label: Devices
+            kind: NetboxDevice
+            icon: mdi:server
+            order_weight: 1000
+
+          - namespace: Netbox
+            name: Module
+            label: Modules
+            kind: NetboxModule
+            icon: mdi:expansion-card-variant
+            order_weight: 2000
+
+          - namespace: Netbox
+            name: DeviceRole
+            label: Device Roles
+            kind: NetboxDeviceRole
+            icon: mdi:tag
+            order_weight: 3000
+
+          - namespace: Netbox
+            name: Platform
+            label: Platforms
+            kind: NetboxPlatform
+            icon: mdi:application-cog-outline
+            order_weight: 4000
+
+          - namespace: Netbox
+            name: VirtualChassis
+            label: Virtual Chassis
+            kind: NetboxVirtualChassis
+            icon: mdi:layers-triple
+            order_weight: 5000
+
+          - namespace: Netbox
+            name: VirtualDeviceContext
+            label: Virtual Device Contexts
+            kind: NetboxVirtualDeviceContext
+            icon: mdi:monitor-multiple
+            order_weight: 6000
+
+          - namespace: Netbox
+            name: DeviceTypesMenu
+            label: Device Types
+            icon: mdi:poll
+            children:
+              data:
+                - namespace: Netbox
+                  name: DeviceType
+                  label: Device Types
+                  kind: NetboxDeviceType
+                  icon: mdi:poll
+                  order_weight: 1000
+
+                - namespace: Netbox
+                  name: ModuleType
+                  label: Module Types
+                  kind: NetboxModuleType
+                  icon: mdi:expansion-card
+                  order_weight: 2000
+
+                - namespace: Netbox
+                  name: ModuleTypeProfile
+                  label: Module Type Profiles
+                  kind: NetboxModuleTypeProfile
+                  icon: mdi:card-bulleted-settings-outline
+                  order_weight: 3000
+
+                - namespace: Netbox
+                  name: ModuleBayType
+                  label: Module Bay Types
+                  kind: NetboxModuleBayType
+                  icon: mdi:tray-full
+                  order_weight: 4000
+
+                - namespace: Netbox
+                  name: Manufacturer
+                  label: Manufacturers
+                  kind: NetboxManufacturer
+                  icon: mdi:factory
+                  order_weight: 5000
+            order_weight: 7000
+
+          - namespace: Netbox
+            name: DeviceComponentsMenu
+            label: Device Components
+            icon: mdi:ethernet
+            children:
+              data:
+                - namespace: Netbox
+                  name: Interface
+                  label: Interfaces
+                  kind: NetboxInterface
+                  icon: mdi:ethernet
+                  order_weight: 1000
+
+                - namespace: Netbox
+                  name: FrontPort
+                  label: Front Ports
+                  kind: NetboxFrontPort
+                  icon: mdi:arrow-right-bold-box-outline
+                  order_weight: 2000
+
+                - namespace: Netbox
+                  name: RearPort
+                  label: Rear Ports
+                  kind: NetboxRearPort
+                  icon: mdi:arrow-left-bold-box-outline
+                  order_weight: 3000
+
+                - namespace: Netbox
+                  name: ConsolePort
+                  label: Console Ports
+                  kind: NetboxConsolePort
+                  icon: mdi:console
+                  order_weight: 4000
+
+                - namespace: Netbox
+                  name: ConsoleServerPort
+                  label: Console Server Ports
+                  kind: NetboxConsoleServerPort
+                  icon: mdi:console-network
+                  order_weight: 5000
+
+                - namespace: Netbox
+                  name: PowerPort
+                  label: Power Ports
+                  kind: NetboxPowerPort
+                  icon: mdi:power-plug-outline
+                  order_weight: 6000
+
+                - namespace: Netbox
+                  name: PowerOutlet
+                  label: Power Outlets
+                  kind: NetboxPowerOutlet
+                  icon: mdi:power-socket
+                  order_weight: 7000
+
+                - namespace: Netbox
+                  name: CoolingIntake
+                  label: Cooling Intakes
+                  kind: NetboxCoolingIntake
+                  icon: mdi:coolant-temperature
+                  order_weight: 8000
+
+                - namespace: Netbox
+                  name: CoolingOutflow
+                  label: Cooling Outflows
+                  kind: NetboxCoolingOutflow
+                  icon: mdi:water-pump
+                  order_weight: 9000
+
+                - namespace: Netbox
+                  name: ModuleBay
+                  label: Module Bays
+                  kind: NetboxModuleBay
+                  icon: mdi:tray-plus
+                  order_weight: 10000
+
+                - namespace: Netbox
+                  name: DeviceBay
+                  label: Device Bays
+                  kind: NetboxDeviceBay
+                  icon: mdi:tray
+                  order_weight: 11000
+
+                - namespace: Netbox
+                  name: InventoryItem
+                  label: Inventory Items
+                  kind: NetboxInventoryItem
+                  icon: mdi:clipboard-list-outline
+                  order_weight: 12000
+
+                - namespace: Netbox
+                  name: InventoryItemRole
+                  label: Inventory Item Roles
+                  kind: NetboxInventoryItemRole
+                  icon: mdi:tag-text-outline
+                  order_weight: 13000
+
+                - namespace: Netbox
+                  name: PortMapping
+                  label: Port Mappings
+                  kind: NetboxPortMapping
+                  icon: mdi:swap-horizontal
+                  order_weight: 14000
+            order_weight: 8000
+
+          - namespace: Netbox
+            name: MACAddress
+            label: MAC Addresses
+            kind: NetboxMACAddress
+            icon: mdi:barcode
+            order_weight: 9000

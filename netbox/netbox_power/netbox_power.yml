@@ -1,0 +1,212 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
+# NetBox power, mapped to Infrahub: the nodes of the Power section of the NetBox navigation menu, which
+# are power panels and power feeds.
+# Source: the NetBox 4.7 database tables dcim_powerpanel and dcim_powerfeed, and the NetBox model
+# documentation.
+# Depends on: netbox/netbox_organization, netbox/netbox_devices and netbox/netbox_racks.
+#
+# How the NetBox tables map:
+#   - Power ports and power outlets are device components in netbox/netbox_devices, as in the NetBox
+#     Devices menu.
+#   - A power feed is a cabled object (NetboxCabledObject from netbox/netbox_devices). When
+#     netbox/netbox_connections is loaded, a cable can connect it to a device power port.
+#
+# This schema also adds the power panels relationship to sites and locations, and the power feeds
+# relationship to racks.
+version: "1.0"
+
+nodes:
+  - name: PowerPanel
+    namespace: Netbox
+    description: The origin point for electrical power distributed by one or more power feeds.
+    label: Power Panel
+    icon: mdi:flash
+    include_in_menu: true
+    inherit_from:
+      - NetboxGeneric
+      - NetboxContactAssignable
+    human_friendly_id:
+      - site__name__value
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        optional: false
+        order_weight: 1100
+    relationships:
+      - name: site
+        peer: NetboxSite
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_power_panel__site
+        order_weight: 800
+      - name: location
+        peer: NetboxLocation
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_power_panel__location
+        order_weight: 1000
+      - name: power_feeds
+        peer: NetboxPowerFeed
+        label: Power Feeds
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_power_feed__power_panel
+        order_weight: 3100
+
+  - name: PowerFeed
+    namespace: Netbox
+    description: >-
+      Power distributed from a power panel to a device, typically a PDU, through a cable to a device power port.
+    label: Power Feed
+    icon: mdi:power-plug
+    include_in_menu: true
+    menu_placement: NetboxPowerPanel
+    inherit_from:
+      - NetboxGeneric
+      - NetboxTenantAssignable
+      - NetboxCabledObject
+    display_label: '{{ name__value }}'
+    uniqueness_constraints:
+      - [power_panel, name__value]
+    attributes:
+      - name: name
+        kind: Text
+        optional: false
+        order_weight: 1090
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: offline
+            label: Offline
+            description: Installed but not currently supplying power
+            color: '#9e9e9e'
+          - name: active
+            label: Active
+            description: Supplying power and in service
+            color: '#4caf50'
+          - name: planned
+            label: Planned
+            description: Planned for future deployment
+            color: '#2196f3'
+          - name: failed
+            label: Failed
+            description: Malfunctioning or out of service
+            color: '#f44336'
+        optional: false
+        order_weight: 1180
+      - name: type
+        kind: Dropdown
+        default_value: primary
+        choices:
+          - name: primary
+            label: Primary
+            color: '#4caf50'
+          - name: redundant
+            label: Redundant
+            color: '#00bcd4'
+        optional: false
+        order_weight: 1270
+      - name: supply
+        kind: Dropdown
+        default_value: ac
+        choices:
+          - name: ac
+            label: AC
+          - name: dc
+            label: DC
+        optional: false
+        order_weight: 1360
+      - name: phase
+        kind: Dropdown
+        default_value: single-phase
+        choices:
+          - name: single-phase
+            label: Single phase
+          - name: three-phase
+            label: Three-phase
+        optional: false
+        order_weight: 1450
+      - name: voltage
+        kind: Number
+        label: Voltage (V)
+        default_value: 120
+        optional: false
+        order_weight: 1540
+      - name: amperage
+        kind: Number
+        label: Amperage (A)
+        default_value: 20
+        optional: false
+        order_weight: 1630
+      - name: max_utilization
+        kind: Number
+        label: Maximum Utilization (%)
+        default_value: 80
+        parameters:
+          min_value: 1
+          max_value: 100
+        optional: false
+        order_weight: 1720
+    relationships:
+      - name: power_panel
+        peer: NetboxPowerPanel
+        label: Power Panel
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_power_feed__power_panel
+        order_weight: 800
+      - name: rack
+        peer: NetboxRack
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_power_feed__rack
+        order_weight: 1000
+
+extensions:
+  nodes:
+    - kind: NetboxSite
+      relationships:
+        - name: power_panels
+          peer: NetboxPowerPanel
+          label: Power Panels
+          kind: Generic
+          cardinality: many
+          optional: true
+          identifier: netbox_power_panel__site
+          order_weight: 3400
+
+    - kind: NetboxLocation
+      relationships:
+        - name: power_panels
+          peer: NetboxPowerPanel
+          label: Power Panels
+          kind: Generic
+          cardinality: many
+          optional: true
+          identifier: netbox_power_panel__location
+          order_weight: 3300
+
+    - kind: NetboxRack
+      relationships:
+        - name: power_feeds
+          peer: NetboxPowerFeed
+          label: Power Feeds
+          kind: Generic
+          cardinality: many
+          optional: true
+          identifier: netbox_power_feed__rack
+          order_weight: 3300

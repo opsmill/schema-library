@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/menu/latest.json
+#
+# Menu for the netbox_power schema: the Power section of the NetBox 4.7 navigation menu.
+# Load it after the schema. To arrange the whole sidebar like NetBox, also load the menus of the
+# schemas it requires:
+#
+#   infrahubctl menu load menus/netbox/netbox_organization.yml menus/netbox/netbox_devices.yml \
+#     menus/netbox/netbox_racks.yml menus/netbox/netbox_power.yml
+#
+# When this library is connected to Infrahub as a Git repository, register the files in .infrahub.yml:
+#
+#   menus:
+#     - menus/netbox/netbox_organization.yml
+#     - menus/netbox/netbox_devices.yml
+#     - menus/netbox/netbox_racks.yml
+#     - menus/netbox/netbox_power.yml
+#
+# Each menu item that opens a list has the namespace and name of its node (Netbox + Device for
+# NetboxDevice). Infrahub leaves a node out of its generated menu when a menu item with the same
+# namespace and name exists, so the nodes keep include_in_menu: true without being listed twice, and
+# they still appear in the generated menu when this file is not loaded.
+---
+apiVersion: infrahub.app/v1
+kind: Menu
+spec:
+  data:
+    - namespace: Netbox
+      name: PowerMenu
+      label: Power
+      icon: mdi:flash
+      order_weight: 9800
+      children:
+        data:
+          - namespace: Netbox
+            name: PowerFeed
+            label: Power Feeds
+            kind: NetboxPowerFeed
+            icon: mdi:power-plug
+            order_weight: 1000
+
+          - namespace: Netbox
+            name: PowerPanel
+            label: Power Panels
+            kind: NetboxPowerPanel
+            icon: mdi:flash
+            order_weight: 2000

@@ -1,6 +1,7 @@
 .DS_Store
 .envrc
 .env
+infrahubctl.toml
 test.sh
 __pycache__
 

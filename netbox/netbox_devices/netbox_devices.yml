@@ -1,0 +1,2317 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
+# NetBox devices, mapped to Infrahub: the nodes of the Devices section of the NetBox navigation menu,
+# which are devices, modules, device roles, platforms, virtual chassis, virtual device contexts, device
+# types, module types, manufacturers, device components, inventory items and MAC addresses.
+# Source: the NetBox 4.7 database tables dcim_* and the NetBox model documentation.
+# Depends on: netbox/netbox_organization.
+#
+# How the NetBox tables map:
+#   - Device component templates (dcim_*template, including dcim_porttemplatemapping) become Infrahub
+#     object templates: NetboxDevice sets generate_template, and Infrahub generates a template for the
+#     device and for each component kind. Module type component templates have no equivalent.
+#   - Power ports, power outlets, cooling intakes and cooling outflows are device components, as in the
+#     NetBox Devices menu. Power panels and feeds are in netbox/netbox_power, and cooling sources and
+#     feeds are in netbox/netbox_cooling.
+#   - The _path, _site, _location, _rack and _name cache columns and the *_count counters are computed
+#     by NetBox and are not mapped.
+#   - Decimal values are stored as integers in a fixed small unit (weights in grams, diameters in
+#     millimeters, flow rates in liters per minute), because Infrahub has no decimal attribute kind.
+#     Coordinates are stored as text. Device heights are whole rack units: NetBox half units (for
+#     example 0.5U) are not supported.
+#   - Type fields with more than 40 NetBox values (interface, power port, power outlet, front and rear
+#     port types) are Text holding the NetBox slug, so a new NetBox type never blocks an import.
+#     Shorter lists are Dropdowns with the NetBox values, labels and descriptions.
+#   - The NetBox field "label" is mapped to physical_label: Infrahub fills an attribute named label
+#     from the name when it is empty.
+#   - Device names are mandatory and unique, while NetBox makes them optional. In return, devices
+#     have a human-friendly ID (their name), and device components and virtual device contexts have
+#     [device name, name], for example ["leaf1", "Ethernet1"].
+#   - NetboxDevice inherits CoreArtifactTarget, so device configurations can be generated as artifacts.
+#   - Device roles, platforms and inventory items are trees: each inherits its own hierarchical generic
+#     (for example NetboxPlatformHierarchy), which gives it the parent, children, ancestors and
+#     descendants fields. NetBox's path and sort_path are not mapped. The parent and children of each
+#     tree are its hierarchical generic, not the node itself: the Infrahub 1.11 web interface stops
+#     responding on the list page of a node that is its own parent.
+#   - Not mapped: virtualization (Device.cluster), wireless (Interface rf_*, tx_power, wireless_link,
+#     wireless_lans), extras (config_template), front_image and rear_image on device types.
+#
+# Generics that later schemas build on:
+#   - NetboxCabledObject holds mark_connected. netbox/netbox_connections adds the cable, cable_end,
+#     cable_connector and cable_positions fields.
+#   - NetboxIPAddressAssignable and NetboxServiceParent are completed by netbox/netbox_ipam.
+#   - NetboxL2VPNAssignable is completed by netbox/netbox_vpn.
+# Infrahub cannot add a generic to a node after the node is loaded, so the device nodes declare these
+# generics here even when the schema that uses them is not loaded.
+#
+# netbox/netbox_racks adds the rack, position and rack face fields of devices. This schema adds the
+# devices relationship to the sites and locations of netbox/netbox_organization.
+version: "1.0"
+
+generics:
+  - name: Component
+    namespace: Netbox
+    description: >-
+      Fields every device component shares: a name unique on the device, a physical label, a description and tags.
+    label: Device Component
+    include_in_menu: false
+    attributes:
+      - name: name
+        kind: Text
+        optional: false
+        order_weight: 1000
+      - name: physical_label
+        kind: Text
+        label: Physical Label
+        optional: true
+        description: Physical label printed on the component. The NetBox field is called label.
+        order_weight: 1010
+      - name: description
+        kind: Text
+        optional: true
+        order_weight: 2000
+    relationships:
+      - name: tags
+        peer: BuiltinTag
+        kind: Attribute
+        cardinality: many
+        optional: true
+        order_weight: 3000
+
+  - name: ModularComponent
+    namespace: Netbox
+    description: >-
+      A device component that a module can provide, such as an interface, a port, a power outlet or a cooling connector.
+    label: Modular Component
+    include_in_menu: false
+    relationships:
+      - name: module
+        peer: NetboxModule
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_module__component
+        description: Module that provides this component. Empty when the component belongs to the device itself.
+        order_weight: 810
+      - name: inventory_items
+        peer: NetboxInventoryItem
+        label: Inventory Items
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_inventory_item__component
+        order_weight: 3950
+
+  - name: CabledObject
+    namespace: Netbox
+    description: >-
+      An object a cable can connect to. netbox/netbox_connections adds the cable, the cable end and the connector
+      position.
+    label: Cabled Object
+    include_in_menu: false
+    attributes:
+      - name: mark_connected
+        kind: Boolean
+        label: Mark Connected
+        default_value: false
+        optional: true
+        description: Treat as if a cable is connected.
+        order_weight: 2540
+
+  - name: IPAddressAssignable
+    namespace: Netbox
+    description: Interface or FHRP group that IP addresses can be assigned to. netbox/netbox_ipam adds the relationship.
+    label: IP Address Assignable
+    include_in_menu: false
+
+  - name: ServiceParent
+    namespace: Netbox
+    description: Device or FHRP group that application services can run on. netbox/netbox_ipam adds the relationship.
+    label: Service Parent
+    include_in_menu: false
+
+  - name: L2VPNAssignable
+    namespace: Netbox
+    description: Interface or VLAN that an L2VPN can terminate on. netbox/netbox_vpn adds the relationship.
+    label: L2VPN Assignable
+    include_in_menu: false
+
+  - name: DeviceRoleHierarchy
+    namespace: Netbox
+    description: >-
+      Lets a device role have a parent device role, as in NetBox. Adds the parent, children, ancestors and descendants
+      fields.
+    label: Device Role Hierarchy
+    include_in_menu: false
+    hierarchical: true
+
+  - name: PlatformHierarchy
+    namespace: Netbox
+    description: >-
+      Lets a platform have a parent platform, as in NetBox. Adds the parent, children, ancestors and descendants fields.
+    label: Platform Hierarchy
+    include_in_menu: false
+    hierarchical: true
+
+  - name: InventoryItemHierarchy
+    namespace: Netbox
+    description: >-
+      Lets an inventory item have a parent inventory item, as in NetBox. Adds the parent, children, ancestors and
+      descendants fields.
+    label: Inventory Item Hierarchy
+    include_in_menu: false
+    hierarchical: true
+
+nodes:
+  - name: Manufacturer
+    namespace: Netbox
+    description: >-
+      The make of a device, for example Cisco or Dell. Each device type, module type and rack type belongs to a
+      manufacturer.
+    icon: mdi:factory
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxGeneric
+      - NetboxContactAssignable
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+    relationships:
+      - name: device_types
+        peer: NetboxDeviceType
+        label: Device Types
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_manufacturer__device_type
+        order_weight: 3100
+      - name: module_types
+        peer: NetboxModuleType
+        label: Module Types
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_manufacturer__module_type
+        order_weight: 3190
+      - name: module_bay_types
+        peer: NetboxModuleBayType
+        label: Module Bay Types
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_manufacturer__module_bay_type
+        order_weight: 3370
+      - name: platforms
+        peer: NetboxPlatform
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_manufacturer__platform
+        order_weight: 3460
+      - name: inventory_items
+        peer: NetboxInventoryItem
+        label: Inventory Items
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_manufacturer__inventory_item
+        order_weight: 3550
+
+  - name: DeviceType
+    namespace: Netbox
+    description: >-
+      A make and model of hardware, with physical attributes such as rack height. Components are set in device
+      templates.
+    label: Device Type
+    icon: mdi:poll
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxGeneric
+    human_friendly_id:
+      - manufacturer__name__value
+      - model__value
+    display_label: '{{ model__value }}'
+    attributes:
+      - name: model
+        kind: Text
+        optional: false
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1090
+      - name: part_number
+        kind: Text
+        label: Part Number
+        optional: true
+        order_weight: 2100
+      - name: u_height
+        kind: Number
+        label: Height (U)
+        default_value: 1
+        optional: false
+        description: Whole rack units. NetBox also allows half units, which are not supported here.
+        order_weight: 1270
+      - name: exclude_from_utilization
+        kind: Boolean
+        label: Exclude From Utilization
+        default_value: false
+        optional: true
+        order_weight: 1360
+      - name: is_full_depth
+        kind: Boolean
+        label: Full Depth
+        default_value: true
+        optional: true
+        order_weight: 1450
+      - name: subdevice_role
+        kind: Dropdown
+        label: Parent/Child Role
+        choices:
+          - name: parent
+            label: Parent
+            description: Houses child devices in its bays
+          - name: child
+            label: Child
+            description: Installed within a parent device bay
+        optional: true
+        description: Parent devices house child devices in device bays.
+        order_weight: 1540
+      - name: airflow
+        kind: Dropdown
+        choices:
+          - name: front-to-rear
+            label: Front to rear
+          - name: rear-to-front
+            label: Rear to front
+          - name: left-to-right
+            label: Left to right
+          - name: right-to-left
+            label: Right to left
+          - name: side-to-rear
+            label: Side to rear
+          - name: rear-to-side
+            label: Rear to side
+          - name: bottom-to-top
+            label: Bottom to top
+          - name: top-to-bottom
+            label: Top to bottom
+          - name: passive
+            label: Passive
+          - name: mixed
+            label: Mixed
+        optional: true
+        order_weight: 1630
+      - name: cooling_method
+        kind: Dropdown
+        label: Cooling Method
+        choices:
+          - name: air
+            label: Air
+            color: '#00bcd4'
+          - name: liquid
+            label: Liquid
+            color: '#2196f3'
+          - name: hybrid
+            label: Hybrid
+            color: '#9c27b0'
+          - name: immersion
+            label: Immersion
+            color: '#3f51b5'
+        optional: true
+        order_weight: 1720
+      - name: weight_grams
+        kind: Number
+        label: Weight (g)
+        optional: true
+        description: >-
+          NetBox stores a decimal weight with a unit (kg, g, lb or oz). Stored here in grams, as a whole number.
+        order_weight: 2200
+      - name: end_of_life
+        kind: DateTime
+        label: End of Life
+        optional: true
+        order_weight: 2300
+    relationships:
+      - name: manufacturer
+        peer: NetboxManufacturer
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_manufacturer__device_type
+        order_weight: 800
+      - name: default_platform
+        peer: NetboxPlatform
+        label: Default Platform
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_platform__device_type
+        order_weight: 1180
+      - name: devices
+        peer: NetboxDevice
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_device__device_type
+        order_weight: 3100
+
+  - name: ModuleTypeProfile
+    namespace: Netbox
+    description: >-
+      Classifies module types and defines the attributes their modules carry, for example a power supply's voltage.
+    label: Module Type Profile
+    icon: mdi:card-bulleted-settings-outline
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxGeneric
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        order_weight: 1000
+      - name: attribute_schema
+        kind: JSON
+        label: Attribute Schema
+        optional: true
+        description: >-
+          JSON schema for the attributes of module types that use this profile. The NetBox field is called schema.
+        order_weight: 1100
+    relationships:
+      - name: module_types
+        peer: NetboxModuleType
+        label: Module Types
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_module_type__profile
+        order_weight: 3100
+
+  - name: ModuleBayType
+    namespace: Netbox
+    description: A label on module bays and module types that restricts which modules fit which bays.
+    label: Module Bay Type
+    icon: mdi:tray-full
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxGeneric
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        description: Unique in Infrahub. NetBox makes it unique only per manufacturer.
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+      - name: color
+        kind: Color
+        optional: true
+        description: 'Color as a hex code, for example #aa1409.'
+        order_weight: 1200
+    relationships:
+      - name: manufacturer
+        peer: NetboxManufacturer
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_manufacturer__module_bay_type
+        order_weight: 1300
+      - name: module_bays
+        peer: NetboxModuleBay
+        label: Module Bays
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_module_bay__module_bay_type
+        order_weight: 3100
+      - name: module_types
+        peer: NetboxModuleType
+        label: Module Types
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_module_type__module_bay_type
+        order_weight: 3200
+
+  - name: ModuleType
+    namespace: Netbox
+    description: >-
+      A make and model of hardware installed in a module bay, with its own components, for example a line card.
+    label: Module Type
+    icon: mdi:expansion-card
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxGeneric
+    human_friendly_id:
+      - manufacturer__name__value
+      - model__value
+    display_label: '{{ model__value }}'
+    attributes:
+      - name: model
+        kind: Text
+        optional: false
+        order_weight: 1000
+      - name: part_number
+        kind: Text
+        label: Part Number
+        optional: true
+        order_weight: 2100
+      - name: airflow
+        kind: Dropdown
+        choices:
+          - name: front-to-rear
+            label: Front to rear
+          - name: rear-to-front
+            label: Rear to front
+          - name: left-to-right
+            label: Left to right
+          - name: right-to-left
+            label: Right to left
+          - name: side-to-rear
+            label: Side to rear
+          - name: passive
+            label: Passive
+        optional: true
+        order_weight: 1200
+      - name: cooling_method
+        kind: Dropdown
+        label: Cooling Method
+        choices:
+          - name: air
+            label: Air
+            color: '#00bcd4'
+          - name: liquid
+            label: Liquid
+            color: '#2196f3'
+          - name: hybrid
+            label: Hybrid
+            color: '#9c27b0'
+          - name: immersion
+            label: Immersion
+            color: '#3f51b5'
+        optional: true
+        order_weight: 1300
+      - name: weight_grams
+        kind: Number
+        label: Weight (g)
+        optional: true
+        description: >-
+          NetBox stores a decimal weight with a unit (kg, g, lb or oz). Stored here in grams, as a whole number.
+        order_weight: 2190
+      - name: end_of_life
+        kind: DateTime
+        label: End of Life
+        optional: true
+        order_weight: 2280
+      - name: attribute_data
+        kind: JSON
+        label: Attributes
+        optional: true
+        description: Values for the attributes that the module type profile defines.
+        order_weight: 2370
+    relationships:
+      - name: manufacturer
+        peer: NetboxManufacturer
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_manufacturer__module_type
+        order_weight: 800
+      - name: profile
+        peer: NetboxModuleTypeProfile
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_module_type__profile
+        order_weight: 1100
+      - name: module_bay_types
+        peer: NetboxModuleBayType
+        label: Module Bay Types
+        kind: Attribute
+        cardinality: many
+        optional: true
+        identifier: netbox_module_type__module_bay_type
+        order_weight: 1400
+      - name: modules
+        peer: NetboxModule
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_module__module_type
+        order_weight: 3100
+
+  - name: DeviceRole
+    namespace: Netbox
+    description: >-
+      A user-defined functional role for devices, for example core switch, distribution switch or access switch. Roles
+      can be nested.
+    label: Device Role
+    icon: mdi:tag
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxGeneric
+      - NetboxDeviceRoleHierarchy
+    parent: NetboxDeviceRoleHierarchy
+    children: NetboxDeviceRoleHierarchy
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        description: Unique in Infrahub. NetBox makes it unique only within the parent role.
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+      - name: color
+        kind: Color
+        optional: true
+        description: 'Color as a hex code, for example #aa1409.'
+        order_weight: 1200
+      - name: vm_role
+        kind: Boolean
+        label: VM Role
+        default_value: true
+        optional: true
+        description: Virtual machines can be assigned to this role.
+        order_weight: 1300
+    relationships:
+      - name: devices
+        peer: NetboxDevice
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_device__role
+        order_weight: 3100
+
+  - name: Platform
+    namespace: Netbox
+    description: >-
+      The software that runs on a device, for example Junos 15. Platforms can be nested, for example Debian under Linux.
+    icon: mdi:application-cog-outline
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxGeneric
+      - NetboxPlatformHierarchy
+    parent: NetboxPlatformHierarchy
+    children: NetboxPlatformHierarchy
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        description: Unique in Infrahub. NetBox makes it unique only per manufacturer.
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+    relationships:
+      - name: manufacturer
+        peer: NetboxManufacturer
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_manufacturer__platform
+        order_weight: 1200
+      - name: devices
+        peer: NetboxDevice
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_device__platform
+        order_weight: 3100
+      - name: device_types
+        peer: NetboxDeviceType
+        label: Device Types
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_platform__device_type
+        description: Device types that use this platform as their default.
+        order_weight: 3200
+
+  - name: Device
+    namespace: Netbox
+    description: >-
+      A piece of hardware installed in a site or rack. Infrahub device templates replace NetBox component templates.
+    icon: clarity:network-switch-solid
+    include_in_menu: true
+    inherit_from:
+      - CoreArtifactTarget
+      - NetboxGeneric
+      - NetboxTenantAssignable
+      - NetboxContactAssignable
+      - NetboxServiceParent
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    generate_template: true
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        description: Unique in Infrahub. NetBox makes the name optional and unique only within the site and tenant.
+        order_weight: 1000
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: offline
+            label: Offline
+            description: Installed but not currently in service
+            color: '#9e9e9e'
+          - name: active
+            label: Active
+            description: Fully operational and in service
+            color: '#4caf50'
+          - name: planned
+            label: Planned
+            description: Planned for future deployment
+            color: '#00bcd4'
+          - name: staged
+            label: Staged
+            description: Installed and being prepared for service
+            color: '#2196f3'
+          - name: failed
+            label: Failed
+            description: Malfunctioning or out of service
+            color: '#f44336'
+          - name: inventory
+            label: Inventory
+            description: In inventory but not yet deployed
+            color: '#9c27b0'
+          - name: decommissioning
+            label: Decommissioning
+            description: Being removed from service
+            color: '#ffeb3b'
+        optional: false
+        order_weight: 1140
+      - name: airflow
+        kind: Dropdown
+        choices:
+          - name: front-to-rear
+            label: Front to rear
+          - name: rear-to-front
+            label: Rear to front
+          - name: left-to-right
+            label: Left to right
+          - name: right-to-left
+            label: Right to left
+          - name: side-to-rear
+            label: Side to rear
+          - name: rear-to-side
+            label: Rear to side
+          - name: bottom-to-top
+            label: Bottom to top
+          - name: top-to-bottom
+            label: Top to bottom
+          - name: passive
+            label: Passive
+          - name: mixed
+            label: Mixed
+        optional: true
+        order_weight: 1490
+      - name: cooling_method
+        kind: Dropdown
+        label: Cooling Method
+        choices:
+          - name: air
+            label: Air
+            color: '#00bcd4'
+          - name: liquid
+            label: Liquid
+            color: '#2196f3'
+          - name: hybrid
+            label: Hybrid
+            color: '#9c27b0'
+          - name: immersion
+            label: Immersion
+            color: '#3f51b5'
+        optional: true
+        order_weight: 1560
+      - name: serial
+        kind: Text
+        label: Serial Number
+        optional: true
+        order_weight: 2100
+      - name: asset_tag
+        kind: Text
+        label: Asset Tag
+        optional: true
+        description: Unique in NetBox when set.
+        order_weight: 2170
+      - name: latitude
+        kind: Text
+        label: Latitude (decimal degrees)
+        parameters:
+          regex: ^-?\d{1,3}(\.\d{1,6})?$
+        optional: true
+        description: >-
+          GPS coordinate in decimal degrees (-90 to 90). Stored as text because Infrahub has no decimal attribute kind.
+        order_weight: 2240
+      - name: longitude
+        kind: Text
+        label: Longitude (decimal degrees)
+        parameters:
+          regex: ^-?\d{1,3}(\.\d{1,6})?$
+        optional: true
+        description: >-
+          GPS coordinate in decimal degrees (-180 to 180). Stored as text because Infrahub has no decimal attribute
+          kind.
+        order_weight: 2310
+      - name: vc_position
+        kind: Number
+        label: Virtual Chassis Position
+        optional: true
+        order_weight: 1700
+      - name: vc_priority
+        kind: Number
+        label: Virtual Chassis Priority
+        optional: true
+        description: Priority for election as virtual chassis master.
+        order_weight: 1770
+      - name: local_context_data
+        kind: JSON
+        label: Local Config Context Data
+        optional: true
+        description: Device-specific configuration context data.
+        order_weight: 2380
+    relationships:
+      - name: device_type
+        peer: NetboxDeviceType
+        label: Device Type
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_device__device_type
+        order_weight: 800
+      - name: role
+        peer: NetboxDeviceRole
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_device__role
+        order_weight: 810
+      - name: platform
+        peer: NetboxPlatform
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_device__platform
+        description: Mandatory in Infrahub. NetBox allows a device without a platform.
+        order_weight: 830
+      - name: tenant
+        peer: NetboxTenant
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_tenant__assigned_object
+        description: Mandatory in Infrahub. NetBox allows a device without a tenant.
+        order_weight: 840
+      - name: site
+        peer: NetboxSite
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_device__site
+        order_weight: 820
+      - name: location
+        peer: NetboxLocation
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_device__location
+        order_weight: 1210
+      - name: virtual_chassis
+        peer: NetboxVirtualChassis
+        label: Virtual Chassis
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_virtual_chassis__member
+        order_weight: 1630
+      - name: parent_bay
+        peer: NetboxDeviceBay
+        label: Parent Bay
+        kind: Generic
+        cardinality: one
+        optional: true
+        identifier: netbox_device_bay__installed_device
+        description: Device bay of a parent device that houses this device.
+        order_weight: 3100
+      - name: master_of
+        peer: NetboxVirtualChassis
+        label: Master Of
+        kind: Generic
+        cardinality: one
+        optional: true
+        identifier: netbox_virtual_chassis__master
+        description: Virtual chassis for which this device is the master.
+        order_weight: 3130
+      - name: interfaces
+        peer: NetboxInterface
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_device__interface
+        order_weight: 3160
+      - name: console_ports
+        peer: NetboxConsolePort
+        label: Console Ports
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_device__console_port
+        order_weight: 3190
+      - name: console_server_ports
+        peer: NetboxConsoleServerPort
+        label: Console Server Ports
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_device__console_server_port
+        order_weight: 3220
+      - name: power_ports
+        peer: NetboxPowerPort
+        label: Power Ports
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_device__power_port
+        order_weight: 3250
+      - name: power_outlets
+        peer: NetboxPowerOutlet
+        label: Power Outlets
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_device__power_outlet
+        order_weight: 3280
+      - name: front_ports
+        peer: NetboxFrontPort
+        label: Front Ports
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_device__front_port
+        order_weight: 3310
+      - name: rear_ports
+        peer: NetboxRearPort
+        label: Rear Ports
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_device__rear_port
+        order_weight: 3340
+      - name: cooling_intakes
+        peer: NetboxCoolingIntake
+        label: Cooling Intakes
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_device__cooling_intake
+        order_weight: 3370
+      - name: cooling_outflows
+        peer: NetboxCoolingOutflow
+        label: Cooling Outflows
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_device__cooling_outflow
+        order_weight: 3400
+      - name: device_bays
+        peer: NetboxDeviceBay
+        label: Device Bays
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_device__device_bay
+        order_weight: 3430
+      - name: module_bays
+        peer: NetboxModuleBay
+        label: Module Bays
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_device__module_bay
+        order_weight: 3460
+      - name: modules
+        peer: NetboxModule
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_device__module
+        order_weight: 3490
+      - name: inventory_items
+        peer: NetboxInventoryItem
+        label: Inventory Items
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_device__inventory_item
+        order_weight: 3520
+      - name: virtual_device_contexts
+        peer: NetboxVirtualDeviceContext
+        label: Virtual Device Contexts
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_device__virtual_device_context
+        order_weight: 3550
+
+  - name: Module
+    namespace: Netbox
+    description: >-
+      A field-replaceable hardware component installed in a module bay, with its own components, for example a line
+      card.
+    icon: mdi:expansion-card-variant
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxGeneric
+    display_label: '{{ module_bay__name__value }}: {{ module_type__model__value }}'
+    uniqueness_constraints:
+      - [module_bay]
+    attributes:
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: offline
+            label: Offline
+            description: Installed but not currently in service
+            color: '#9e9e9e'
+          - name: active
+            label: Active
+            description: Fully operational and in service
+            color: '#4caf50'
+          - name: planned
+            label: Planned
+            description: Planned for future deployment
+            color: '#00bcd4'
+          - name: staged
+            label: Staged
+            description: Installed and being prepared for service
+            color: '#2196f3'
+          - name: failed
+            label: Failed
+            description: Malfunctioning or out of service
+            color: '#f44336'
+          - name: decommissioning
+            label: Decommissioning
+            description: Being removed from service
+            color: '#ffeb3b'
+        optional: false
+        order_weight: 1000
+      - name: serial
+        kind: Text
+        label: Serial Number
+        optional: true
+        order_weight: 2100
+      - name: asset_tag
+        kind: Text
+        label: Asset Tag
+        optional: true
+        description: Unique in NetBox when set.
+        order_weight: 2200
+    relationships:
+      - name: device
+        peer: NetboxDevice
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_device__module
+        order_weight: 800
+      - name: module_bay
+        peer: NetboxModuleBay
+        label: Module Bay
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_module_bay__installed_module
+        order_weight: 810
+      - name: module_type
+        peer: NetboxModuleType
+        label: Module Type
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_module__module_type
+        order_weight: 820
+      - name: components
+        peer: NetboxModularComponent
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_module__component
+        description: Device components that this module provides.
+        order_weight: 3100
+      - name: module_bays
+        peer: NetboxModuleBay
+        label: Module Bays
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_module__module_bay
+        description: Module bays that this module provides, for nested modules.
+        order_weight: 3200
+
+  - name: VirtualChassis
+    namespace: Netbox
+    description: A set of devices that share a control plane, such as a switch stack managed as one device.
+    label: Virtual Chassis
+    icon: mdi:layers-triple
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxGeneric
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        optional: false
+        description: 'Not unique: NetBox allows several virtual chassis with the same name.'
+        order_weight: 1000
+      - name: domain
+        kind: Text
+        optional: true
+        description: Domain name or identifier of the virtual chassis.
+        order_weight: 1100
+    relationships:
+      - name: master
+        peer: NetboxDevice
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_virtual_chassis__master
+        description: Device that acts as master.
+        order_weight: 1200
+      - name: members
+        peer: NetboxDevice
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_virtual_chassis__member
+        order_weight: 3100
+
+  - name: VirtualDeviceContext
+    namespace: Netbox
+    description: >-
+      A logical partition of a physical device with its own control plane, to which device interfaces are allocated.
+    label: Virtual Device Context
+    icon: mdi:monitor-multiple
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxGeneric
+      - NetboxTenantAssignable
+    human_friendly_id:
+      - device__name__value
+      - name__value
+    display_label: '{{ name__value }}'
+    uniqueness_constraints:
+      - [device, name__value]
+    attributes:
+      - name: name
+        kind: Text
+        optional: false
+        order_weight: 1000
+      - name: identifier
+        kind: Number
+        optional: true
+        description: Numeric identifier, unique on the device.
+        order_weight: 1100
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: active
+            label: Active
+            description: Fully operational and in service
+            color: '#4caf50'
+          - name: planned
+            label: Planned
+            description: Planned for future deployment
+            color: '#00bcd4'
+          - name: offline
+            label: Offline
+            description: Configured but not currently in service
+            color: '#f44336'
+        optional: false
+        order_weight: 1200
+    relationships:
+      - name: device
+        peer: NetboxDevice
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_device__virtual_device_context
+        order_weight: 800
+      - name: interfaces
+        peer: NetboxInterface
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_interface__virtual_device_context
+        order_weight: 3100
+
+  - name: MACAddress
+    namespace: Netbox
+    description: >-
+      An Ethernet MAC address assigned to an interface. One MAC address of an interface can be its primary MAC address.
+    label: MAC Address
+    icon: mdi:barcode
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxGeneric
+    display_label: '{{ mac_address__value }}'
+    attributes:
+      - name: mac_address
+        kind: MacAddress
+        label: MAC Address
+        optional: false
+        order_weight: 1000
+    relationships:
+      - name: interface
+        peer: NetboxInterface
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_mac_address__interface
+        description: Interface the MAC address is assigned to.
+        order_weight: 1100
+      - name: primary_for_interface
+        peer: NetboxInterface
+        label: Primary For Interface
+        kind: Generic
+        cardinality: one
+        optional: true
+        identifier: netbox_interface__primary_mac_address
+        description: Interface that uses this as its primary MAC address.
+        order_weight: 3100
+
+  - name: Interface
+    namespace: Netbox
+    description: >-
+      A network interface that exchanges data with connected devices, most commonly Ethernet. Holds IP addresses and
+      VLANs.
+    icon: mdi:ethernet
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxComponent
+      - NetboxModularComponent
+      - NetboxCabledObject
+      - NetboxIPAddressAssignable
+      - NetboxL2VPNAssignable
+    human_friendly_id:
+      - device__name__value
+      - name__value
+    display_label: '{{ name__value }}'
+    uniqueness_constraints:
+      - [device, name__value]
+    attributes:
+      - name: type
+        kind: Text
+        optional: false
+        description: NetBox interface type slug, for example 1000base-t, 10gbase-x-sfpp, lag or virtual.
+        order_weight: 1040
+      - name: enabled
+        kind: Boolean
+        default_value: true
+        optional: true
+        order_weight: 1080
+      - name: mgmt_only
+        kind: Boolean
+        label: Management Only
+        default_value: false
+        optional: true
+        description: Used only for out-of-band management.
+        order_weight: 1120
+      - name: mtu
+        kind: Number
+        label: MTU
+        parameters:
+          min_value: 1
+          max_value: 65536
+        optional: true
+        order_weight: 1160
+      - name: speed
+        kind: Number
+        label: Speed (Kbps)
+        optional: true
+        order_weight: 1200
+      - name: duplex
+        kind: Dropdown
+        choices:
+          - name: half
+            label: Half
+          - name: full
+            label: Full
+          - name: auto
+            label: Auto
+        optional: true
+        order_weight: 1240
+      - name: mode
+        kind: Dropdown
+        label: 802.1Q Mode
+        choices:
+          - name: access
+            label: Access
+            description: Untagged traffic for a single VLAN
+          - name: tagged
+            label: Tagged
+            description: One untagged VLAN plus one or more tagged VLANs
+          - name: tagged-all
+            label: Tagged (All)
+            description: Untagged VLAN plus all tagged VLANs
+          - name: q-in-q
+            label: Q-in-Q (802.1ad)
+            description: 802.1ad service VLAN encapsulating customer VLANs
+        optional: true
+        order_weight: 1280
+      - name: wwn
+        kind: Text
+        label: WWN
+        parameters:
+          regex: ^([0-9A-Fa-f]{2}[:-]){7}[0-9A-Fa-f]{2}$
+        optional: true
+        description: 64-bit World Wide Name, for Fibre Channel interfaces.
+        order_weight: 1320
+      - name: poe_mode
+        kind: Dropdown
+        label: PoE Mode
+        choices:
+          - name: pd
+            label: PD
+            description: Powered device that receives power over Ethernet
+          - name: pse
+            label: PSE
+            description: Power sourcing equipment that supplies power over Ethernet
+        optional: true
+        order_weight: 1360
+      - name: poe_type
+        kind: Dropdown
+        label: PoE Type
+        choices:
+          - name: type1-ieee802.3af
+            label: 802.3af (Type 1)
+            description: IEEE Standard
+          - name: type2-ieee802.3at
+            label: 802.3at (Type 2)
+            description: IEEE Standard
+          - name: type3-ieee802.3bt
+            label: 802.3bt (Type 3)
+            description: IEEE Standard
+          - name: type4-ieee802.3bt
+            label: 802.3bt (Type 4)
+            description: IEEE Standard
+          - name: passive-24v-2pair
+            label: Passive 24V (2-pair)
+            description: Passive
+          - name: passive-24v-4pair
+            label: Passive 24V (4-pair)
+            description: Passive
+          - name: passive-48v-2pair
+            label: Passive 48V (2-pair)
+            description: Passive
+          - name: passive-48v-4pair
+            label: Passive 48V (4-pair)
+            description: Passive
+        optional: true
+        order_weight: 1400
+      - name: channels
+        kind: Number
+        optional: true
+        description: For a channelized (breakout) interface, the number of channels it is divided into.
+        order_weight: 1440
+      - name: channel_id
+        kind: Number
+        label: Channel ID
+        optional: true
+        description: Channel of the parent interface that this channel subinterface is bound to.
+        order_weight: 1480
+    relationships:
+      - name: device
+        peer: NetboxDevice
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_device__interface
+        order_weight: 800
+      - name: parent
+        peer: NetboxInterface
+        label: Parent Interface
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_interface__parent
+        direction: outbound
+        order_weight: 1520
+      - name: child_interfaces
+        peer: NetboxInterface
+        label: Child Interfaces
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_interface__parent
+        direction: inbound
+        order_weight: 3100
+      - name: lag
+        peer: NetboxInterface
+        label: LAG
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_interface__lag
+        direction: outbound
+        description: Link aggregation group interface that this interface is a member of.
+        order_weight: 1560
+      - name: lag_members
+        peer: NetboxInterface
+        label: LAG Members
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_interface__lag
+        direction: inbound
+        order_weight: 3200
+      - name: bridge
+        peer: NetboxInterface
+        label: Bridge Interface
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_interface__bridge
+        direction: outbound
+        order_weight: 1600
+      - name: bridged_interfaces
+        peer: NetboxInterface
+        label: Bridged Interfaces
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_interface__bridge
+        direction: inbound
+        order_weight: 3300
+      - name: virtual_device_contexts
+        peer: NetboxVirtualDeviceContext
+        label: Virtual Device Contexts
+        kind: Attribute
+        cardinality: many
+        optional: true
+        identifier: netbox_interface__virtual_device_context
+        order_weight: 1640
+      - name: primary_mac_address
+        peer: NetboxMACAddress
+        label: Primary MAC Address
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_interface__primary_mac_address
+        order_weight: 1680
+      - name: mac_addresses
+        peer: NetboxMACAddress
+        label: MAC Addresses
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_mac_address__interface
+        order_weight: 3400
+
+  - name: ConsolePort
+    namespace: Netbox
+    description: Gives access to the physical console of a device, locally or remotely through a console server.
+    label: Console Port
+    icon: mdi:console
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxComponent
+      - NetboxModularComponent
+      - NetboxCabledObject
+    human_friendly_id:
+      - device__name__value
+      - name__value
+    display_label: '{{ name__value }}'
+    uniqueness_constraints:
+      - [device, name__value]
+    attributes:
+      - name: type
+        kind: Dropdown
+        choices:
+          - name: de-9
+            label: DE-9
+            description: Serial
+          - name: db-25
+            label: DB-25
+            description: Serial
+          - name: rj-11
+            label: RJ-11
+            description: Serial
+          - name: rj-12
+            label: RJ-12
+            description: Serial
+          - name: rj-45
+            label: RJ-45
+            description: Serial
+          - name: mini-din-8
+            label: Mini-DIN 8
+            description: Serial
+          - name: usb-a
+            label: USB Type A
+            description: USB
+          - name: usb-b
+            label: USB Type B
+            description: USB
+          - name: usb-c
+            label: USB Type C
+            description: USB
+          - name: usb-mini-a
+            label: USB Mini A
+            description: USB
+          - name: usb-mini-b
+            label: USB Mini B
+            description: USB
+          - name: usb-micro-a
+            label: USB Micro A
+            description: USB
+          - name: usb-micro-b
+            label: USB Micro B
+            description: USB
+          - name: usb-micro-ab
+            label: USB Micro AB
+            description: USB
+          - name: other
+            label: Other
+            description: Other
+        optional: true
+        order_weight: 1040
+      - name: speed
+        kind: Number
+        label: Speed (bps)
+        optional: true
+        description: Baud rate, for example 9600 or 115200.
+        order_weight: 1140
+    relationships:
+      - name: device
+        peer: NetboxDevice
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_device__console_port
+        order_weight: 800
+
+  - name: ConsoleServerPort
+    namespace: Netbox
+    description: A port on a console server, which provides remote access to the local consoles of connected devices.
+    label: Console Server Port
+    icon: mdi:console-network
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxComponent
+      - NetboxModularComponent
+      - NetboxCabledObject
+    human_friendly_id:
+      - device__name__value
+      - name__value
+    display_label: '{{ name__value }}'
+    uniqueness_constraints:
+      - [device, name__value]
+    attributes:
+      - name: type
+        kind: Dropdown
+        choices:
+          - name: de-9
+            label: DE-9
+            description: Serial
+          - name: db-25
+            label: DB-25
+            description: Serial
+          - name: rj-11
+            label: RJ-11
+            description: Serial
+          - name: rj-12
+            label: RJ-12
+            description: Serial
+          - name: rj-45
+            label: RJ-45
+            description: Serial
+          - name: mini-din-8
+            label: Mini-DIN 8
+            description: Serial
+          - name: usb-a
+            label: USB Type A
+            description: USB
+          - name: usb-b
+            label: USB Type B
+            description: USB
+          - name: usb-c
+            label: USB Type C
+            description: USB
+          - name: usb-mini-a
+            label: USB Mini A
+            description: USB
+          - name: usb-mini-b
+            label: USB Mini B
+            description: USB
+          - name: usb-micro-a
+            label: USB Micro A
+            description: USB
+          - name: usb-micro-b
+            label: USB Micro B
+            description: USB
+          - name: usb-micro-ab
+            label: USB Micro AB
+            description: USB
+          - name: other
+            label: Other
+            description: Other
+        optional: true
+        order_weight: 1040
+      - name: speed
+        kind: Number
+        label: Speed (bps)
+        optional: true
+        description: Baud rate, for example 9600 or 115200.
+        order_weight: 1140
+    relationships:
+      - name: device
+        peer: NetboxDevice
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_device__console_server_port
+        order_weight: 800
+
+  - name: PowerPort
+    namespace: Netbox
+    description: Draws power from an upstream power outlet or power feed. Generally a power supply inside a device.
+    label: Power Port
+    icon: mdi:power-plug-outline
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxComponent
+      - NetboxModularComponent
+      - NetboxCabledObject
+    human_friendly_id:
+      - device__name__value
+      - name__value
+    display_label: '{{ name__value }}'
+    uniqueness_constraints:
+      - [device, name__value]
+    attributes:
+      - name: type
+        kind: Text
+        optional: true
+        description: NetBox power port type slug, for example iec-60320-c14.
+        order_weight: 1040
+      - name: maximum_draw
+        kind: Number
+        label: Maximum Draw (W)
+        optional: true
+        order_weight: 1140
+      - name: allocated_draw
+        kind: Number
+        label: Allocated Draw (W)
+        optional: true
+        order_weight: 1240
+    relationships:
+      - name: device
+        peer: NetboxDevice
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_device__power_port
+        order_weight: 800
+      - name: power_outlets
+        peer: NetboxPowerOutlet
+        label: Power Outlets
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_power_port__power_outlet
+        description: Outlets on the same device that this power port feeds.
+        order_weight: 3100
+
+  - name: PowerOutlet
+    namespace: Netbox
+    description: An outlet on a power distribution unit (PDU) or other device that supplies power to dependent devices.
+    label: Power Outlet
+    icon: mdi:power-socket
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxComponent
+      - NetboxModularComponent
+      - NetboxCabledObject
+    human_friendly_id:
+      - device__name__value
+      - name__value
+    display_label: '{{ name__value }}'
+    uniqueness_constraints:
+      - [device, name__value]
+    attributes:
+      - name: type
+        kind: Text
+        optional: true
+        description: NetBox power outlet type slug, for example iec-60320-c13.
+        order_weight: 1040
+      - name: status
+        kind: Dropdown
+        default_value: enabled
+        choices:
+          - name: enabled
+            label: Enabled
+            description: Powered on and supplying power
+            color: '#4caf50'
+          - name: disabled
+            label: Disabled
+            description: Powered off and not supplying power
+            color: '#f44336'
+          - name: faulty
+            label: Faulty
+            description: Malfunctioning or in an error state
+            color: '#9e9e9e'
+        optional: false
+        order_weight: 1140
+      - name: color
+        kind: Color
+        optional: true
+        description: 'Color as a hex code, for example #aa1409.'
+        order_weight: 1240
+      - name: feed_leg
+        kind: Dropdown
+        label: Feed Leg
+        choices:
+          - name: A
+            label: A
+          - name: B
+            label: B
+          - name: C
+            label: C
+        optional: true
+        description: Phase leg, for three-phase power.
+        order_weight: 1340
+    relationships:
+      - name: device
+        peer: NetboxDevice
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_device__power_outlet
+        order_weight: 800
+      - name: power_port
+        peer: NetboxPowerPort
+        label: Power Port
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_power_port__power_outlet
+        description: Power port on the same device that feeds this outlet.
+        order_weight: 1440
+
+  - name: FrontPort
+    namespace: Netbox
+    description: A pass-through port that is part of a longer cable path, for example on the front of a patch panel.
+    label: Front Port
+    icon: mdi:arrow-right-bold-box-outline
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxComponent
+      - NetboxModularComponent
+      - NetboxCabledObject
+    human_friendly_id:
+      - device__name__value
+      - name__value
+    display_label: '{{ name__value }}'
+    uniqueness_constraints:
+      - [device, name__value]
+    attributes:
+      - name: type
+        kind: Text
+        optional: false
+        description: NetBox port type slug, for example 8p8c or lc.
+        order_weight: 1040
+      - name: color
+        kind: Color
+        optional: true
+        description: 'Color as a hex code, for example #aa1409.'
+        order_weight: 1140
+      - name: positions
+        kind: Number
+        default_value: 1
+        optional: false
+        description: Number of rear port positions this front port maps to.
+        order_weight: 1240
+    relationships:
+      - name: device
+        peer: NetboxDevice
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_device__front_port
+        order_weight: 800
+      - name: rear_port_mappings
+        peer: NetboxPortMapping
+        label: Rear Port Mappings
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_port_mapping__front_port
+        order_weight: 3100
+
+  - name: RearPort
+    namespace: Netbox
+    description: >-
+      A pass-through port that continues a cable path. A rear port with several positions maps to several front ports.
+    label: Rear Port
+    icon: mdi:arrow-left-bold-box-outline
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxComponent
+      - NetboxModularComponent
+      - NetboxCabledObject
+    human_friendly_id:
+      - device__name__value
+      - name__value
+    display_label: '{{ name__value }}'
+    uniqueness_constraints:
+      - [device, name__value]
+    attributes:
+      - name: type
+        kind: Text
+        optional: false
+        description: NetBox port type slug, for example 8p8c or mpo.
+        order_weight: 1040
+      - name: color
+        kind: Color
+        optional: true
+        description: 'Color as a hex code, for example #aa1409.'
+        order_weight: 1140
+      - name: positions
+        kind: Number
+        default_value: 1
+        optional: false
+        order_weight: 1240
+    relationships:
+      - name: device
+        peer: NetboxDevice
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_device__rear_port
+        order_weight: 800
+      - name: front_port_mappings
+        peer: NetboxPortMapping
+        label: Front Port Mappings
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_port_mapping__rear_port
+        order_weight: 3100
+
+  - name: PortMapping
+    namespace: Netbox
+    description: Maps a position of a front port to a position of a rear port on the same device.
+    label: Port Mapping
+    icon: mdi:swap-horizontal
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    display_label: >-
+      {{ front_port__name__value }}:{{ front_port_position__value }} > {{ rear_port__name__value }}:{{
+      rear_port_position__value }}
+    uniqueness_constraints:
+      - [front_port, front_port_position__value]
+      - [rear_port, rear_port_position__value]
+    attributes:
+      - name: front_port_position
+        kind: Number
+        label: Front Port Position
+        default_value: 1
+        optional: false
+        order_weight: 1000
+      - name: rear_port_position
+        kind: Number
+        label: Rear Port Position
+        default_value: 1
+        optional: false
+        order_weight: 1100
+    relationships:
+      - name: front_port
+        peer: NetboxFrontPort
+        label: Front Port
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_port_mapping__front_port
+        order_weight: 800
+      - name: rear_port
+        peer: NetboxRearPort
+        label: Rear Port
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_port_mapping__rear_port
+        order_weight: 810
+
+  - name: CoolingIntake
+    namespace: Netbox
+    description: >-
+      A device component which consumes coolant, such as a server cold-plate inlet or a coolant distribution unit (CDU)
+      intake.
+    label: Cooling Intake
+    icon: mdi:coolant-temperature
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxComponent
+      - NetboxModularComponent
+    human_friendly_id:
+      - device__name__value
+      - name__value
+    display_label: '{{ name__value }}'
+    uniqueness_constraints:
+      - [device, name__value]
+    attributes:
+      - name: type
+        kind: Dropdown
+        label: Connector Type
+        choices:
+          - name: uqd
+            label: UQD (Universal Quick Disconnect)
+          - name: uqdb
+            label: UQDB (Universal Quick Disconnect, Blind-mate)
+          - name: qdc
+            label: QDC (Quick Disconnect Coupling)
+          - name: camlock
+            label: Camlock (cam-and-groove)
+          - name: npt
+            label: NPT (threaded)
+          - name: bsp
+            label: BSP (threaded)
+          - name: proprietary
+            label: Proprietary
+        optional: true
+        order_weight: 1040
+      - name: diameter_millimeters
+        kind: Number
+        label: Diameter (mm)
+        optional: true
+        description: NetBox stores a decimal diameter in mm, cm or inches. Converted to millimeters here.
+        order_weight: 1140
+      - name: max_flow_liters_per_minute
+        kind: Number
+        label: Maximum Flow (L/min)
+        optional: true
+        description: NetBox stores a decimal flow rate in L/min, m3/h or gal/min. Converted to liters per minute here.
+        order_weight: 1240
+    relationships:
+      - name: device
+        peer: NetboxDevice
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_device__cooling_intake
+        order_weight: 800
+      - name: cooling_outflow
+        peer: NetboxCoolingOutflow
+        label: Upstream Cooling Outflow
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_cooling_intake__cooling_outflow
+        description: Cooling outflow that supplies this intake.
+        order_weight: 1340
+      - name: downstream_outflows
+        peer: NetboxCoolingOutflow
+        label: Downstream Cooling Outflows
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_cooling_outflow__cooling_intake
+        order_weight: 3100
+
+  - name: CoolingOutflow
+    namespace: Netbox
+    description: A device component that delivers coolant to a downstream cooling intake, for example a manifold outlet.
+    label: Cooling Outflow
+    icon: mdi:water-pump
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxComponent
+      - NetboxModularComponent
+    human_friendly_id:
+      - device__name__value
+      - name__value
+    display_label: '{{ name__value }}'
+    uniqueness_constraints:
+      - [device, name__value]
+    attributes:
+      - name: type
+        kind: Dropdown
+        label: Connector Type
+        choices:
+          - name: uqd
+            label: UQD (Universal Quick Disconnect)
+          - name: uqdb
+            label: UQDB (Universal Quick Disconnect, Blind-mate)
+          - name: qdc
+            label: QDC (Quick Disconnect Coupling)
+          - name: camlock
+            label: Camlock (cam-and-groove)
+          - name: npt
+            label: NPT (threaded)
+          - name: bsp
+            label: BSP (threaded)
+          - name: proprietary
+            label: Proprietary
+        optional: true
+        order_weight: 1040
+      - name: diameter_millimeters
+        kind: Number
+        label: Diameter (mm)
+        optional: true
+        description: NetBox stores a decimal diameter in mm, cm or inches. Converted to millimeters here.
+        order_weight: 1140
+    relationships:
+      - name: device
+        peer: NetboxDevice
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_device__cooling_outflow
+        order_weight: 800
+      - name: cooling_intake
+        peer: NetboxCoolingIntake
+        label: Upstream Cooling Intake
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_cooling_outflow__cooling_intake
+        description: Cooling intake on the same device that feeds this outflow.
+        order_weight: 1240
+      - name: downstream_intakes
+        peer: NetboxCoolingIntake
+        label: Downstream Cooling Intakes
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_cooling_intake__cooling_outflow
+        order_weight: 3100
+
+  - name: DeviceBay
+    namespace: Netbox
+    description: >-
+      A slot within a parent device in which a child device can be installed, for example a blade server in a chassis.
+    label: Device Bay
+    icon: mdi:tray
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxComponent
+    human_friendly_id:
+      - device__name__value
+      - name__value
+    display_label: '{{ name__value }}'
+    uniqueness_constraints:
+      - [device, name__value]
+    attributes:
+      - name: enabled
+        kind: Boolean
+        default_value: true
+        optional: true
+        order_weight: 1040
+    relationships:
+      - name: device
+        peer: NetboxDevice
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_device__device_bay
+        order_weight: 800
+      - name: installed_device
+        peer: NetboxDevice
+        label: Installed Device
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_device_bay__installed_device
+        order_weight: 1140
+
+  - name: ModuleBay
+    namespace: Netbox
+    description: A slot within a device, or within a module, in which a field-replaceable module can be installed.
+    label: Module Bay
+    icon: mdi:tray-plus
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxComponent
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: position
+        kind: Text
+        optional: true
+        description: Free-form bay position, for example 1, F1 or PSU-1.
+        order_weight: 1140
+      - name: enabled
+        kind: Boolean
+        default_value: true
+        optional: true
+        order_weight: 1240
+    relationships:
+      - name: device
+        peer: NetboxDevice
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_device__module_bay
+        order_weight: 800
+      - name: module
+        peer: NetboxModule
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_module__module_bay
+        description: Module that provides this bay. Empty when the bay belongs to the device itself.
+        order_weight: 1040
+      - name: module_bay_types
+        peer: NetboxModuleBayType
+        label: Module Bay Types
+        kind: Attribute
+        cardinality: many
+        optional: true
+        identifier: netbox_module_bay__module_bay_type
+        order_weight: 1340
+      - name: installed_module
+        peer: NetboxModule
+        label: Installed Module
+        kind: Generic
+        cardinality: one
+        optional: true
+        identifier: netbox_module_bay__installed_module
+        order_weight: 3100
+
+  - name: InventoryItem
+    namespace: Netbox
+    description: >-
+      A hardware component of a device tracked for inventory, such as a CPU. Deprecated in NetBox 4.3 in favor of
+      modules.
+    label: Inventory Item
+    icon: mdi:clipboard-list-outline
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxComponent
+      - NetboxInventoryItemHierarchy
+    parent: NetboxInventoryItemHierarchy
+    children: NetboxInventoryItemHierarchy
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: part_id
+        kind: Text
+        label: Part ID
+        optional: true
+        order_weight: 2100
+      - name: serial
+        kind: Text
+        label: Serial Number
+        optional: true
+        order_weight: 2190
+      - name: asset_tag
+        kind: Text
+        label: Asset Tag
+        optional: true
+        description: Unique in NetBox when set.
+        order_weight: 2280
+      - name: discovered
+        kind: Boolean
+        default_value: false
+        optional: true
+        description: Created by automated discovery.
+        order_weight: 2370
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: offline
+            label: Offline
+            description: Installed but not currently in service
+            color: '#9e9e9e'
+          - name: active
+            label: Active
+            description: Fully operational and in service
+            color: '#4caf50'
+          - name: planned
+            label: Planned
+            description: Planned for future deployment
+            color: '#00bcd4'
+          - name: staged
+            label: Staged
+            description: Installed and being prepared for service
+            color: '#2196f3'
+          - name: failed
+            label: Failed
+            description: Malfunctioning or out of service
+            color: '#f44336'
+          - name: decommissioning
+            label: Decommissioning
+            description: Being removed from service
+            color: '#ffeb3b'
+        optional: false
+        order_weight: 1240
+    relationships:
+      - name: device
+        peer: NetboxDevice
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_device__inventory_item
+        order_weight: 800
+      - name: role
+        peer: NetboxInventoryItemRole
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_inventory_item__role
+        order_weight: 1040
+      - name: manufacturer
+        peer: NetboxManufacturer
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_manufacturer__inventory_item
+        order_weight: 1140
+      - name: component
+        peer: NetboxModularComponent
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_inventory_item__component
+        description: Device component associated with this item, for example the interface that holds a transceiver.
+        order_weight: 1340
+
+  - name: InventoryItemRole
+    namespace: Netbox
+    description: A user-defined functional role for inventory items.
+    label: Inventory Item Role
+    icon: mdi:tag-text-outline
+    include_in_menu: true
+    menu_placement: NetboxDevice
+    inherit_from:
+      - NetboxGeneric
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+      - name: color
+        kind: Color
+        optional: true
+        description: 'Color as a hex code, for example #aa1409.'
+        order_weight: 1200
+    relationships:
+      - name: inventory_items
+        peer: NetboxInventoryItem
+        label: Inventory Items
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_inventory_item__role
+        order_weight: 3100
+
+extensions:
+  nodes:
+    - kind: NetboxSite
+      relationships:
+        - name: devices
+          peer: NetboxDevice
+          kind: Generic
+          cardinality: many
+          optional: true
+          identifier: netbox_device__site
+          order_weight: 3300
+
+    - kind: NetboxLocation
+      relationships:
+        - name: devices
+          peer: NetboxDevice
+          kind: Generic
+          cardinality: many
+          optional: true
+          identifier: netbox_device__location
+          order_weight: 3200

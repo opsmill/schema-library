@@ -1,0 +1,341 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
+# NetBox connections, mapped to Infrahub: the nodes of the Connections section of the NetBox navigation
+# menu, which are cables and cable bundles.
+# Source: the NetBox 4.7 database tables dcim_cable, dcim_cablebundle and dcim_cabletermination, and
+# the NetBox model documentation.
+# Depends on: netbox/netbox_organization and netbox/netbox_devices.
+#
+# How the NetBox tables map:
+#   - dcim_cabletermination is folded into the cabled object, as NetBox already stores it on each port:
+#     this schema adds cable, cable_end (A or B), cable_connector and cable_positions to the
+#     NetboxCabledObject generic of netbox/netbox_devices. Interfaces, console ports, power ports and
+#     outlets, front and rear ports, power feeds (netbox/netbox_power) and circuit terminations
+#     (netbox/netbox_circuits) inherit these fields, whether their schema is loaded before or after
+#     this one.
+#   - Cable lengths are stored in centimeters, as whole numbers, because Infrahub has no decimal
+#     attribute kind.
+#   - Not mapped: cable paths (dcim_cablepath) and the interface, console and power connection lists
+#     that NetBox computes from them, and wireless links (wireless app).
+version: "1.0"
+
+nodes:
+  - name: Cable
+    namespace: Netbox
+    description: A direct physical connection between two sets of endpoints, A and B, for example two interfaces.
+    icon: mdi:cable-data
+    include_in_menu: true
+    inherit_from:
+      - NetboxGeneric
+      - NetboxTenantAssignable
+    display_label: '{{ physical_label__value }}'
+    attributes:
+      - name: physical_label
+        kind: Text
+        label: Physical Label
+        optional: true
+        description: Label used to identify the cable. The NetBox field is called label.
+        order_weight: 1000
+      - name: type
+        kind: Dropdown
+        choices:
+          - name: cat3
+            label: CAT3
+            description: Copper - Twisted Pair (UTP/STP)
+          - name: cat5
+            label: CAT5
+            description: Copper - Twisted Pair (UTP/STP)
+          - name: cat5e
+            label: CAT5e
+            description: Copper - Twisted Pair (UTP/STP)
+          - name: cat6
+            label: CAT6
+            description: Copper - Twisted Pair (UTP/STP)
+          - name: cat6a
+            label: CAT6a
+            description: Copper - Twisted Pair (UTP/STP)
+          - name: cat7
+            label: CAT7
+            description: Copper - Twisted Pair (UTP/STP)
+          - name: cat7a
+            label: CAT7a
+            description: Copper - Twisted Pair (UTP/STP)
+          - name: cat8
+            label: CAT8
+            description: Copper - Twisted Pair (UTP/STP)
+          - name: mrj21-trunk
+            label: MRJ21 Trunk
+            description: Copper - Twisted Pair (UTP/STP)
+          - name: dac-active
+            label: Direct Attach Copper (Active)
+            description: Copper - Twinax (DAC)
+          - name: dac-passive
+            label: Direct Attach Copper (Passive)
+            description: Copper - Twinax (DAC)
+          - name: coaxial
+            label: Coaxial
+            description: Copper - Coaxial
+          - name: rg-6
+            label: RG-6
+            description: Copper - Coaxial
+          - name: rg-8
+            label: RG-8
+            description: Copper - Coaxial
+          - name: rg-11
+            label: RG-11
+            description: Copper - Coaxial
+          - name: rg-59
+            label: RG-59
+            description: Copper - Coaxial
+          - name: rg-62
+            label: RG-62
+            description: Copper - Coaxial
+          - name: rg-213
+            label: RG-213
+            description: Copper - Coaxial
+          - name: lmr-100
+            label: LMR-100
+            description: Copper - Coaxial
+          - name: lmr-200
+            label: LMR-200
+            description: Copper - Coaxial
+          - name: lmr-400
+            label: LMR-400
+            description: Copper - Coaxial
+          - name: mmf
+            label: Multimode Fiber
+            description: Fiber - Multimode
+          - name: mmf-om1
+            label: Multimode Fiber (OM1)
+            description: Fiber - Multimode
+          - name: mmf-om2
+            label: Multimode Fiber (OM2)
+            description: Fiber - Multimode
+          - name: mmf-om3
+            label: Multimode Fiber (OM3)
+            description: Fiber - Multimode
+          - name: mmf-om4
+            label: Multimode Fiber (OM4)
+            description: Fiber - Multimode
+          - name: mmf-om5
+            label: Multimode Fiber (OM5)
+            description: Fiber - Multimode
+          - name: smf
+            label: Single-mode Fiber
+            description: Fiber - Single-mode
+          - name: smf-os1
+            label: Single-mode Fiber (OS1)
+            description: Fiber - Single-mode
+          - name: smf-os2
+            label: Single-mode Fiber (OS2)
+            description: Fiber - Single-mode
+          - name: aoc
+            label: Active Optical Cabling (AOC)
+            description: Fiber - Other
+          - name: power
+            label: Power
+            description: Power
+          - name: usb
+            label: USB
+            description: USB
+        optional: true
+        order_weight: 1100
+      - name: status
+        kind: Dropdown
+        default_value: connected
+        choices:
+          - name: connected
+            label: Connected
+            description: Link is connected and in service
+            color: '#4caf50'
+          - name: planned
+            label: Planned
+            description: Planned for future connection
+            color: '#2196f3'
+          - name: decommissioning
+            label: Decommissioning
+            description: Being removed from service
+            color: '#ffeb3b'
+        optional: false
+        order_weight: 1200
+      - name: profile
+        kind: Dropdown
+        choices:
+          - name: single-1c1p
+            label: 1C1P
+            description: Single
+          - name: single-1c2p
+            label: 1C2P
+            description: Single
+          - name: single-1c4p
+            label: 1C4P
+            description: Single
+          - name: single-1c6p
+            label: 1C6P
+            description: Single
+          - name: single-1c8p
+            label: 1C8P
+            description: Single
+          - name: single-1c12p
+            label: 1C12P
+            description: Single
+          - name: single-1c16p
+            label: 1C16P
+            description: Single
+          - name: trunk-2c1p
+            label: 2C1P trunk
+            description: Trunk
+          - name: trunk-2c2p
+            label: 2C2P trunk
+            description: Trunk
+          - name: trunk-2c4p
+            label: 2C4P trunk
+            description: Trunk
+          - name: trunk-2c4p-shuffle
+            label: 2C4P trunk (shuffle)
+            description: Trunk
+          - name: trunk-2c6p
+            label: 2C6P trunk
+            description: Trunk
+          - name: trunk-2c8p
+            label: 2C8P trunk
+            description: Trunk
+          - name: trunk-2c12p
+            label: 2C12P trunk
+            description: Trunk
+          - name: trunk-4c1p
+            label: 4C1P trunk
+            description: Trunk
+          - name: trunk-4c2p
+            label: 4C2P trunk
+            description: Trunk
+          - name: trunk-4c4p
+            label: 4C4P trunk
+            description: Trunk
+          - name: trunk-4c4p-shuffle
+            label: 4C4P trunk (shuffle)
+            description: Trunk
+          - name: trunk-4c6p
+            label: 4C6P trunk
+            description: Trunk
+          - name: trunk-4c8p
+            label: 4C8P trunk
+            description: Trunk
+          - name: trunk-8c4p
+            label: 8C4P trunk
+            description: Trunk
+          - name: breakout-1c2p-2c1p
+            label: 1C2P:2C1P breakout
+            description: Breakout
+          - name: breakout-1c4p-4c1p
+            label: 1C4P:4C1P breakout
+            description: Breakout
+          - name: breakout-1c6p-6c1p
+            label: 1C6P:6C1P breakout
+            description: Breakout
+          - name: breakout-1c8p-8c1p
+            label: 1C8P:8C1P breakout
+            description: Breakout
+          - name: breakout-2c4p-8c1p-shuffle
+            label: 2C4P:8C1P breakout (shuffle)
+            description: Breakout
+        optional: true
+        description: Maps the terminations at each end to connectors and positions, for example for breakout cables.
+        order_weight: 1300
+      - name: color
+        kind: Color
+        optional: true
+        description: 'Color as a hex code, for example #aa1409.'
+        order_weight: 1400
+      - name: length_centimeters
+        kind: Number
+        label: Length (cm)
+        optional: true
+        description: NetBox stores a decimal length in km, m, cm, mi, ft or in. Converted to centimeters here.
+        order_weight: 1500
+    relationships:
+      - name: bundle
+        peer: NetboxCableBundle
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_cable__bundle
+        order_weight: 1600
+      - name: terminations
+        peer: NetboxCabledObject
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_cable__termination
+        description: Objects at both ends of the cable. Each object records its own cable end (A or B).
+        order_weight: 3100
+
+  - name: CableBundle
+    namespace: Netbox
+    description: >-
+      A logical grouping of cables that share a purpose, route or physical grouping, such as a conduit, trunk or wiring
+      harness.
+    label: Cable Bundle
+    icon: mdi:cable-data
+    include_in_menu: true
+    menu_placement: NetboxCable
+    inherit_from:
+      - NetboxGeneric
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        order_weight: 1000
+    relationships:
+      - name: cables
+        peer: NetboxCable
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_cable__bundle
+        order_weight: 3100
+
+extensions:
+  nodes:
+    - kind: NetboxCabledObject
+      attributes:
+        - name: cable_end
+          kind: Dropdown
+          label: Cable End
+          choices:
+            - name: A
+              label: A
+            - name: B
+              label: B
+          optional: true
+          description: End of the cable that connects to this object.
+          order_weight: 2510
+        - name: cable_connector
+          kind: Number
+          label: Cable Connector
+          optional: true
+          description: Connector of the cable profile that this object uses.
+          order_weight: 2520
+        - name: cable_positions
+          kind: List
+          label: Cable Positions
+          optional: true
+          description: Positions of the cable profile connector that this object uses.
+          order_weight: 2530
+      relationships:
+        - name: cable
+          peer: NetboxCable
+          kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: netbox_cable__termination
+          order_weight: 2500

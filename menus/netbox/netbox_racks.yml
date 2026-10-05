@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/menu/latest.json
+#
+# Menu for the netbox_racks schema: the Racks section of the NetBox 4.7 navigation menu.
+# Load it after the schema. To arrange the whole sidebar like NetBox, also load the menus of the
+# schemas it requires:
+#
+#   infrahubctl menu load menus/netbox/netbox_organization.yml menus/netbox/netbox_devices.yml \
+#     menus/netbox/netbox_racks.yml
+#
+# When this library is connected to Infrahub as a Git repository, register the files in .infrahub.yml:
+#
+#   menus:
+#     - menus/netbox/netbox_organization.yml
+#     - menus/netbox/netbox_devices.yml
+#     - menus/netbox/netbox_racks.yml
+#
+# Each menu item that opens a list has the namespace and name of its node (Netbox + Device for
+# NetboxDevice). Infrahub leaves a node out of its generated menu when a menu item with the same
+# namespace and name exists, so the nodes keep include_in_menu: true without being listed twice, and
+# they still appear in the generated menu when this file is not loaded.
+---
+apiVersion: infrahub.app/v1
+kind: Menu
+spec:
+  data:
+    - namespace: Netbox
+      name: RacksMenu
+      label: Racks
+      icon: mdi:door-sliding
+      order_weight: 9200
+      children:
+        data:
+          - namespace: Netbox
+            name: Rack
+            label: Racks
+            kind: NetboxRack
+            icon: mdi:server
+            order_weight: 1000
+
+          - namespace: Netbox
+            name: RackReservation
+            label: Reservations
+            kind: NetboxRackReservation
+            icon: mdi:calendar-lock
+            order_weight: 2000
+
+          - namespace: Netbox
+            name: RackOrganizationMenu
+            label: Rack Organization
+            icon: mdi:view-column
+            children:
+              data:
+                - namespace: Netbox
+                  name: RackGroup
+                  label: Rack Groups
+                  kind: NetboxRackGroup
+                  icon: mdi:view-column
+                  order_weight: 1000
+
+                - namespace: Netbox
+                  name: RackRole
+                  label: Rack Roles
+                  kind: NetboxRackRole
+                  icon: mdi:tag-outline
+                  order_weight: 2000
+            order_weight: 3000
+
+          - namespace: Netbox
+            name: RackType
+            label: Rack Types
+            kind: NetboxRackType
+            icon: mdi:file-cabinet
+            order_weight: 4000

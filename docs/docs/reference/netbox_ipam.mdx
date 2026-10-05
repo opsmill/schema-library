@@ -1,0 +1,1832 @@
+---
+title: NetBox IPAM
+---
+
+VRFs, route targets, RIRs, aggregates, prefixes, IP ranges, IP addresses, VLAN groups, VLANs, VLAN translation policies, ASNs, FHRP groups and services, mapped from the NetBox 4.7 ipam tables. Each VRF is an Infrahub IP namespace, so Infrahub arranges the prefixes and IP addresses of each VRF in a separate hierarchy.
+
+## Details
+
+- **Dependencies:**
+    - [netbox/netbox_organization](netbox_organization)
+    - [netbox/netbox_devices](netbox_devices)
+
+## Use cases
+
+This extension covers:
+- Import NetBox IP address management data, including the same prefix in several VRFs.
+- Assign IP addresses to device interfaces, set the primary IP addresses of devices, and assign VLANs and a VRF to interfaces.
+
+Out of scope, and what to reach for instead:
+- Uniqueness of prefixes and IP addresses. NetBox checks it in application logic, depending on the VRF setting and the address role. This schema does not enforce it.
+- Unique VLAN and VLAN group names and VLAN IDs. NetBox makes them unique within an optional VLAN group or scope, which an Infrahub uniqueness constraint cannot include.
+- VM interfaces and clusters (virtualization) as targets of IP addresses, FHRP groups, services and VLAN groups.
+
+## Nodes
+
+### RIR
+
+- **Label:** RIR
+- **Description:** A regional Internet registry, such as ARIN or RIPE, or a private authority such as RFC 1918.
+- **Namespace:** Netbox
+- **Icon:** mdi:bank
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetboxGeneric
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| slug | URL-friendly identifier that NetBox derives from the name. | Text | True |  |  |
+| is_private | IP space managed by this RIR is private. | Boolean | True | False |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| aggregates | NetboxAggregate | True | many | Generic |
+| asns | NetboxASN | True | many | Generic |
+| asn_ranges | NetboxASNRange | True | many | Generic |
+
+### Aggregate
+
+- **Description:** The top of the IP space an organization manages, such as 10.0.0.0/8. Kept out of the Infrahub prefix hierarchy.
+- **Namespace:** Netbox
+- **Icon:** mdi:ip-network-outline
+- **Human Friendly ID:** prefix__value
+- **Inherit From:** NetboxGeneric, NetboxTenantAssignable, NetboxContactAssignable
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| prefix |  | IPNetwork | False |  |  |
+| date_added |  | DateTime | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| rir | NetboxRIR | False | one | Attribute |
+
+### IPAMRole
+
+- **Label:** IPAM Role
+- **Description:** The function of a prefix, IP range, VLAN or ASN, for example Data, Voice or Security. The NetBox model is ipam.Role.
+- **Namespace:** Netbox
+- **Icon:** mdi:tag
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetboxGeneric
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| slug | URL-friendly identifier that NetBox derives from the name. | Text | True |  |  |
+| weight | Used to sort roles. | Number | False | 1000 |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| prefixes | NetboxPrefix | True | many | Generic |
+| ip_ranges | NetboxIPRange | True | many | Generic |
+| vlans | NetboxVLAN | True | many | Generic |
+| asns | NetboxASN | True | many | Generic |
+
+### VRF
+
+- **Label:** VRF
+- **Description:** A virtual routing and forwarding table. In Infrahub a VRF is an IP namespace, so VRFs can hold overlapping prefixes.
+- **Namespace:** Netbox
+- **Icon:** mdi:router
+- **Human Friendly ID:** name__value
+- **Inherit From:** BuiltinIPNamespace, NetboxTenantAssignable
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| route_distinguisher | Unique in NetBox when set, for example 65000:100. The NetBox field is called rd. | Text | True |  |  |
+| enforce_unique | In NetBox, prevents duplicate prefixes and IP addresses within this VRF. | Boolean | True | True |  |
+| comments |  | TextArea | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| import_targets | NetboxRouteTarget | True | many | Attribute |
+| export_targets | NetboxRouteTarget | True | many | Attribute |
+| ip_ranges | NetboxIPRange | True | many | Generic |
+| interfaces | NetboxInterface | True | many | Generic |
+| tags | BuiltinTag | True | many | Attribute |
+
+### RouteTarget
+
+- **Label:** Route Target
+- **Description:** A route target: an extended BGP community used to control the redistribution of routes among VRF tables, for example 65000:1001.
+- **Namespace:** Netbox
+- **Icon:** mdi:target
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetboxGeneric, NetboxTenantAssignable
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name | Route target value, in a format such as ASN:number (RFC 4360). | Text | False |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| importing_vrfs | NetboxVRF | True | many | Generic |
+| exporting_vrfs | NetboxVRF | True | many | Generic |
+
+### Prefix
+
+- **Description:** An IPv4 or IPv6 network in CIDR notation, such as 192.0.2.0/24. Infrahub builds a prefix hierarchy for each VRF.
+- **Namespace:** Netbox
+- **Icon:** mdi:ip-network
+- **Inherit From:** BuiltinIPPrefix, NetboxTenantAssignable, NetboxContactAssignable
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| status |  | Dropdown | False | active | container, active, reserved, deprecated |
+| mark_utilized | Treat as fully utilized. | Boolean | True | False |  |
+| comments |  | TextArea | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| role | NetboxIPAMRole | True | one | Attribute |
+| scope | NetboxPrefixScope | True | one | Attribute |
+| vlan | NetboxVLAN | True | one | Attribute |
+| tags | BuiltinTag | True | many | Attribute |
+
+### IPRange
+
+- **Label:** IP Range
+- **Description:** A range of IPv4 or IPv6 addresses from a start address to an end address, both included.
+- **Namespace:** Netbox
+- **Icon:** mdi:arrow-expand-horizontal
+- **Inherit From:** NetboxGeneric, NetboxTenantAssignable, NetboxContactAssignable
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| start_address |  | IPHost | False |  |  |
+| end_address |  | IPHost | False |  |  |
+| status |  | Dropdown | False | active | active, reserved, deprecated |
+| mark_utilized | Treat as fully utilized. | Boolean | True | False |  |
+| mark_populated | Treat every address in the range as in use, without creating them. | Boolean | True | False |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| vrf | NetboxVRF | True | one | Attribute |
+| role | NetboxIPAMRole | True | one | Attribute |
+
+### IPAddress
+
+- **Label:** IP Address
+- **Description:** An IPv4 or IPv6 host address with its mask, as configured on an interface or an FHRP group.
+- **Namespace:** Netbox
+- **Icon:** mdi:ip
+- **Inherit From:** BuiltinIPAddress, NetboxTenantAssignable, NetboxContactAssignable
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| status |  | Dropdown | False | active | active, reserved, deprecated, dhcp, slaac |
+| role | Function of the address. Anycast, VIP and FHRP addresses can be duplicated. | Dropdown | True |  | loopback, secondary, anycast, vip, vrrp, hsrp, glbp, carp |
+| dns_name |  | Text | True |  |  |
+| comments |  | TextArea | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| assigned_object | NetboxIPAddressAssignable | True | one | Attribute |
+| nat_inside | NetboxIPAddress | True | one | Attribute |
+| nat_outside | NetboxIPAddress | True | many | Generic |
+| tags | BuiltinTag | True | many | Attribute |
+| primary_ip4_of_device | NetboxDevice | True | one | Generic |
+| primary_ip6_of_device | NetboxDevice | True | one | Generic |
+| oob_ip_of_device | NetboxDevice | True | one | Generic |
+| primary_ip4_of_virtual_device_context | NetboxVirtualDeviceContext | True | one | Generic |
+| primary_ip6_of_virtual_device_context | NetboxVirtualDeviceContext | True | one | Generic |
+| services | NetboxService | True | many | Generic |
+
+### VLANGroup
+
+- **Label:** VLAN Group
+- **Description:** Organizes VLANs. Can be scoped to a region, site group, site, location, rack group or rack, and can limit VLAN IDs.
+- **Namespace:** Netbox
+- **Icon:** mdi:lan
+- **Inherit From:** NetboxGeneric, NetboxTenantAssignable
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name | Not unique in Infrahub: NetBox makes it unique within the scope, and Infrahub uniqueness rules cannot include an optional scope. | Text | False |  |  |
+| slug | URL-friendly identifier that NetBox derives from the name. | Text | True |  |  |
+| vid_ranges | Ranges of VLAN IDs available in the group, for example [[1, 100], [200, 299]]. NetBox defaults to [[1, 4094]]. | List | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| scope | NetboxVLANGroupScope | True | one | Attribute |
+| vlans | NetboxVLAN | True | many | Generic |
+
+### VLAN
+
+- **Label:** VLAN
+- **Description:** A virtual LAN: an isolated layer 2 domain identified by a name and a numeric ID from 1 to 4094 (IEEE 802.1Q).
+- **Namespace:** Netbox
+- **Icon:** mdi:lan-connect
+- **Inherit From:** NetboxGeneric, NetboxTenantAssignable, NetboxL2VPNAssignable
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| vid |  | Number | False |  |  |
+| name | Not unique in Infrahub. NetBox makes it unique within the VLAN group. | Text | False |  |  |
+| status |  | Dropdown | False | active | active, reserved, deprecated |
+| qinq_role |  | Dropdown | True |  | svlan, cvlan |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| group | NetboxVLANGroup | True | one | Attribute |
+| site | NetboxSite | True | one | Attribute |
+| role | NetboxIPAMRole | True | one | Attribute |
+| qinq_svlan | NetboxVLAN | True | one | Attribute |
+| qinq_cvlans | NetboxVLAN | True | many | Generic |
+| prefixes | NetboxPrefix | True | many | Generic |
+| untagged_interfaces | NetboxInterface | True | many | Generic |
+| tagged_interfaces | NetboxInterface | True | many | Generic |
+| qinq_interfaces | NetboxInterface | True | many | Generic |
+
+### VLANTranslationPolicy
+
+- **Label:** VLAN Translation Policy
+- **Description:** A set of VLAN translation rules. Assigning a policy to an interface applies all of its rules to that interface.
+- **Namespace:** Netbox
+- **Icon:** mdi:swap-horizontal-bold
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetboxGeneric
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| rules | NetboxVLANTranslationRule | True | many | Component |
+| interfaces | NetboxInterface | True | many | Generic |
+
+### VLANTranslationRule
+
+- **Label:** VLAN Translation Rule
+- **Description:** Maps one local VLAN ID to one remote VLAN ID, within a VLAN translation policy.
+- **Namespace:** Netbox
+- **Icon:** mdi:swap-horizontal
+- **Uniqueness Constraints:**
+    - policy, local_vid__value
+    - policy, remote_vid__value
+- **Human Friendly ID:** policy__name__value, local_vid__value
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| local_vid |  | Number | False |  |  |
+| remote_vid |  | Number | False |  |  |
+| description |  | Text | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| policy | NetboxVLANTranslationPolicy | False | one | Parent |
+| tags | BuiltinTag | True | many | Attribute |
+
+### ASN
+
+- **Label:** ASN
+- **Description:** An autonomous system number used in BGP to identify an autonomous system. 16-bit and 32-bit ASNs are supported.
+- **Namespace:** Netbox
+- **Icon:** mdi:numeric
+- **Human Friendly ID:** asn__value
+- **Inherit From:** NetboxGeneric, NetboxTenantAssignable, NetboxContactAssignable
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| asn |  | Number | False |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| rir | NetboxRIR | False | one | Attribute |
+| role | NetboxIPAMRole | True | one | Attribute |
+| assigned_objects | NetboxASNAssignable | True | many | Generic |
+
+### ASNRange
+
+- **Label:** ASN Range
+- **Description:** A numeric range of AS numbers within an RIR, used to group ASNs and to provision them automatically.
+- **Namespace:** Netbox
+- **Icon:** mdi:numeric-9-plus-box-multiple
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetboxGeneric, NetboxTenantAssignable
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| slug | URL-friendly identifier that NetBox derives from the name. | Text | True |  |  |
+| start |  | Number | False |  |  |
+| end |  | Number | False |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| rir | NetboxRIR | False | one | Attribute |
+
+### FHRPGroup
+
+- **Label:** FHRP Group
+- **Description:** A first-hop redundancy protocol group, such as VRRP or HSRP, whose interfaces share a virtual IP address.
+- **Namespace:** Netbox
+- **Icon:** mdi:router-network
+- **Inherit From:** NetboxGeneric, NetboxIPAddressAssignable, NetboxServiceParent
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | True |  |  |
+| protocol |  | Dropdown | False |  | vrrp2, vrrp3, carp, clusterxl, hsrp, glbp, other |
+| group_id |  | Number | False |  |  |
+| auth_type |  | Dropdown | True |  | plaintext, md5 |
+| auth_key |  | Password | True |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| assignments | NetboxFHRPGroupAssignment | True | many | Component |
+
+### FHRPGroupAssignment
+
+- **Label:** FHRP Group Assignment
+- **Description:** Assigns an interface to an FHRP group, with a priority.
+- **Namespace:** Netbox
+- **Icon:** mdi:router-network
+- **Uniqueness Constraints:**
+    - interface, group
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| priority |  | Number | False |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| group | NetboxFHRPGroup | False | one | Parent |
+| interface | NetboxInterface | False | one | Attribute |
+
+### Service
+
+- **Description:** A layer 7 application service on a device or FHRP group, for example an HTTP server on TCP port 8000.
+- **Namespace:** Netbox
+- **Icon:** mdi:application-brackets
+- **Inherit From:** NetboxGeneric, NetboxContactAssignable
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| port_mappings | Protocol and port pairs, for example ["tcp/80", "tcp/443", "udp/53"]. | List | False |  |  |
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| parent | NetboxServiceParent | False | one | Attribute |
+| ip_addresses | NetboxIPAddress | True | many | Attribute |
+
+### ServiceTemplate
+
+- **Label:** Service Template
+- **Description:** A reusable definition of an application service, with a name and protocol and port pairs, from which services are created.
+- **Namespace:** Netbox
+- **Icon:** mdi:application-brackets-outline
+- **Human Friendly ID:** name__value
+- **Inherit From:** NetboxGeneric
+
+#### Attributes
+
+| name | description | kind | optional | default_value | choices |
+| ---- | ----------- | ---- | -------- | ------------- | ------- |
+| name |  | Text | False |  |  |
+| port_mappings | Protocol and port pairs, for example ["tcp/80", "tcp/443", "udp/53"]. | List | False |  |  |
+
+## Extensions
+
+:::note
+
+In this context "extensions" refer to modifications or additions to the existing schema, such as adding new attributes, relationships, or other schema elements.
+
+:::
+
+### NetboxDevice
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| primary_ip4 | NetboxIPAddress | True | one | Attribute |
+| primary_ip6 | NetboxIPAddress | True | one | Attribute |
+| oob_ip | NetboxIPAddress | True | one | Attribute |
+
+### NetboxVirtualDeviceContext
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| primary_ip4 | NetboxIPAddress | True | one | Attribute |
+| primary_ip6 | NetboxIPAddress | True | one | Attribute |
+
+### NetboxInterface
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| vrf | NetboxVRF | True | one | Attribute |
+| untagged_vlan | NetboxVLAN | True | one | Attribute |
+| tagged_vlans | NetboxVLAN | True | many | Attribute |
+| qinq_svlan | NetboxVLAN | True | one | Attribute |
+| vlan_translation_policy | NetboxVLANTranslationPolicy | True | one | Attribute |
+| fhrp_group_assignments | NetboxFHRPGroupAssignment | True | many | Generic |
+
+### NetboxSite
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| vlans | NetboxVLAN | True | many | Generic |
+
+### NetboxPrefixScope
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| prefixes | NetboxPrefix | True | many | Generic |
+
+### NetboxVLANGroupScope
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| vlan_groups | NetboxVLANGroup | True | many | Generic |
+
+### NetboxIPAddressAssignable
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| ip_addresses | NetboxIPAddress | True | many | Generic |
+
+### NetboxServiceParent
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| services | NetboxService | True | many | Generic |
+
+### NetboxASNAssignable
+
+#### Relationships
+
+| name | peer | optional | cardinality | kind |
+| ---- | ---- | -------- | ----------- | ---- |
+| asns | NetboxASN | True | many | Attribute |
+
+## Code
+
+```yaml
+version: '1.0'
+nodes:
+- name: RIR
+  namespace: Netbox
+  description: A regional Internet registry, such as ARIN or RIPE, or a private authority
+    such as RFC 1918.
+  label: RIR
+  icon: mdi:bank
+  include_in_menu: true
+  menu_placement: NetboxPrefix
+  inherit_from:
+  - NetboxGeneric
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
+  - name: slug
+    kind: Text
+    parameters:
+      regex: ^[-a-zA-Z0-9_]+$
+    optional: true
+    description: URL-friendly identifier that NetBox derives from the name.
+    order_weight: 1100
+  - name: is_private
+    kind: Boolean
+    label: Private
+    default_value: false
+    optional: true
+    description: IP space managed by this RIR is private.
+    order_weight: 1200
+  relationships:
+  - name: aggregates
+    peer: NetboxAggregate
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_rir__aggregate
+    order_weight: 3100
+  - name: asns
+    peer: NetboxASN
+    label: ASNs
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_rir__asn
+    order_weight: 3200
+  - name: asn_ranges
+    peer: NetboxASNRange
+    label: ASN Ranges
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_rir__asn_range
+    order_weight: 3300
+- name: Aggregate
+  namespace: Netbox
+  description: The top of the IP space an organization manages, such as 10.0.0.0/8.
+    Kept out of the Infrahub prefix hierarchy.
+  icon: mdi:ip-network-outline
+  include_in_menu: true
+  menu_placement: NetboxPrefix
+  inherit_from:
+  - NetboxGeneric
+  - NetboxTenantAssignable
+  - NetboxContactAssignable
+  human_friendly_id:
+  - prefix__value
+  display_label: '{{ prefix__value }}'
+  attributes:
+  - name: prefix
+    kind: IPNetwork
+    optional: false
+    order_weight: 1000
+  - name: date_added
+    kind: DateTime
+    label: Date Added
+    optional: true
+    order_weight: 2100
+  relationships:
+  - name: rir
+    peer: NetboxRIR
+    label: RIR
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: netbox_rir__aggregate
+    order_weight: 800
+- name: IPAMRole
+  namespace: Netbox
+  description: The function of a prefix, IP range, VLAN or ASN, for example Data,
+    Voice or Security. The NetBox model is ipam.Role.
+  label: IPAM Role
+  icon: mdi:tag
+  include_in_menu: true
+  menu_placement: NetboxPrefix
+  inherit_from:
+  - NetboxGeneric
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
+  - name: slug
+    kind: Text
+    parameters:
+      regex: ^[-a-zA-Z0-9_]+$
+    optional: true
+    description: URL-friendly identifier that NetBox derives from the name.
+    order_weight: 1100
+  - name: weight
+    kind: Number
+    default_value: 1000
+    optional: false
+    description: Used to sort roles.
+    order_weight: 1200
+  relationships:
+  - name: prefixes
+    peer: NetboxPrefix
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_ipam_role__prefix
+    order_weight: 3100
+  - name: ip_ranges
+    peer: NetboxIPRange
+    label: IP Ranges
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_ipam_role__ip_range
+    order_weight: 3200
+  - name: vlans
+    peer: NetboxVLAN
+    label: VLANs
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_ipam_role__vlan
+    order_weight: 3300
+  - name: asns
+    peer: NetboxASN
+    label: ASNs
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_ipam_role__asn
+    order_weight: 3400
+- name: VRF
+  namespace: Netbox
+  description: A virtual routing and forwarding table. In Infrahub a VRF is an IP
+    namespace, so VRFs can hold overlapping prefixes.
+  label: VRF
+  icon: mdi:router
+  include_in_menu: true
+  menu_placement: NetboxPrefix
+  inherit_from:
+  - BuiltinIPNamespace
+  - NetboxTenantAssignable
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: route_distinguisher
+    kind: Text
+    label: Route Distinguisher
+    optional: true
+    description: Unique in NetBox when set, for example 65000:100. The NetBox field
+      is called rd.
+    order_weight: 1200
+  - name: enforce_unique
+    kind: Boolean
+    label: Enforce Unique Space
+    default_value: true
+    optional: true
+    description: In NetBox, prevents duplicate prefixes and IP addresses within this
+      VRF.
+    order_weight: 1100
+  - name: comments
+    kind: TextArea
+    optional: true
+    order_weight: 2900
+  relationships:
+  - name: import_targets
+    peer: NetboxRouteTarget
+    label: Import Route Targets
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: netbox_vrf__import_target
+    order_weight: 1300
+  - name: export_targets
+    peer: NetboxRouteTarget
+    label: Export Route Targets
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: netbox_vrf__export_target
+    order_weight: 1400
+  - name: ip_ranges
+    peer: NetboxIPRange
+    label: IP Ranges
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_vrf__ip_range
+    order_weight: 3100
+  - name: interfaces
+    peer: NetboxInterface
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_interface__vrf
+    order_weight: 3200
+  - name: tags
+    peer: BuiltinTag
+    kind: Attribute
+    cardinality: many
+    optional: true
+    order_weight: 3000
+- name: RouteTarget
+  namespace: Netbox
+  description: 'A route target: an extended BGP community used to control the redistribution
+    of routes among VRF tables, for example 65000:1001.'
+  label: Route Target
+  icon: mdi:target
+  include_in_menu: true
+  menu_placement: NetboxPrefix
+  inherit_from:
+  - NetboxGeneric
+  - NetboxTenantAssignable
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    description: Route target value, in a format such as ASN:number (RFC 4360).
+    order_weight: 1000
+  relationships:
+  - name: importing_vrfs
+    peer: NetboxVRF
+    label: Importing VRFs
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_vrf__import_target
+    order_weight: 3100
+  - name: exporting_vrfs
+    peer: NetboxVRF
+    label: Exporting VRFs
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_vrf__export_target
+    order_weight: 3200
+- name: Prefix
+  namespace: Netbox
+  description: An IPv4 or IPv6 network in CIDR notation, such as 192.0.2.0/24. Infrahub
+    builds a prefix hierarchy for each VRF.
+  icon: mdi:ip-network
+  include_in_menu: true
+  inherit_from:
+  - BuiltinIPPrefix
+  - NetboxTenantAssignable
+  - NetboxContactAssignable
+  display_label: '{{ prefix__value }}'
+  attributes:
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: container
+      label: Container
+      description: Organizes a set of child prefixes
+      color: '#9e9e9e'
+    - name: active
+      label: Active
+      description: Provisioned and in use
+      color: '#2196f3'
+    - name: reserved
+      label: Reserved
+      description: Designated for future use
+      color: '#00bcd4'
+    - name: deprecated
+      label: Deprecated
+      description: No longer in use
+      color: '#f44336'
+    optional: false
+    order_weight: 1100
+  - name: mark_utilized
+    kind: Boolean
+    label: Mark Utilized
+    default_value: false
+    optional: true
+    description: Treat as fully utilized.
+    order_weight: 1500
+  - name: comments
+    kind: TextArea
+    optional: true
+    order_weight: 2900
+  relationships:
+  - name: role
+    peer: NetboxIPAMRole
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_ipam_role__prefix
+    order_weight: 1200
+  - name: scope
+    peer: NetboxPrefixScope
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_prefix__scope
+    description: Region, site group, site or location where the prefix is used.
+    order_weight: 1300
+  - name: vlan
+    peer: NetboxVLAN
+    label: VLAN
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_vlan__prefix
+    order_weight: 1400
+  - name: tags
+    peer: BuiltinTag
+    kind: Attribute
+    cardinality: many
+    optional: true
+    order_weight: 3000
+- name: IPRange
+  namespace: Netbox
+  description: A range of IPv4 or IPv6 addresses from a start address to an end address,
+    both included.
+  label: IP Range
+  icon: mdi:arrow-expand-horizontal
+  include_in_menu: true
+  menu_placement: NetboxPrefix
+  inherit_from:
+  - NetboxGeneric
+  - NetboxTenantAssignable
+  - NetboxContactAssignable
+  display_label: '{{ start_address__value }}-{{ end_address__value }}'
+  attributes:
+  - name: start_address
+    kind: IPHost
+    label: Start Address
+    optional: false
+    order_weight: 1000
+  - name: end_address
+    kind: IPHost
+    label: End Address
+    optional: false
+    order_weight: 1100
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: active
+      label: Active
+      description: Provisioned and in use
+      color: '#2196f3'
+    - name: reserved
+      label: Reserved
+      description: Designated for future use
+      color: '#00bcd4'
+    - name: deprecated
+      label: Deprecated
+      description: No longer in use
+      color: '#f44336'
+    optional: false
+    order_weight: 1300
+  - name: mark_utilized
+    kind: Boolean
+    label: Mark Utilized
+    default_value: false
+    optional: true
+    description: Treat as fully utilized.
+    order_weight: 1500
+  - name: mark_populated
+    kind: Boolean
+    label: Mark Populated
+    default_value: false
+    optional: true
+    description: Treat every address in the range as in use, without creating them.
+    order_weight: 1600
+  relationships:
+  - name: vrf
+    peer: NetboxVRF
+    label: VRF
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_vrf__ip_range
+    description: Empty means the global table.
+    order_weight: 1200
+  - name: role
+    peer: NetboxIPAMRole
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_ipam_role__ip_range
+    order_weight: 1400
+- name: IPAddress
+  namespace: Netbox
+  description: An IPv4 or IPv6 host address with its mask, as configured on an interface
+    or an FHRP group.
+  label: IP Address
+  icon: mdi:ip
+  include_in_menu: true
+  inherit_from:
+  - BuiltinIPAddress
+  - NetboxTenantAssignable
+  - NetboxContactAssignable
+  display_label: '{{ address__value }}'
+  attributes:
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: active
+      label: Active
+      description: Provisioned and in use
+      color: '#2196f3'
+    - name: reserved
+      label: Reserved
+      description: Designated for future use
+      color: '#00bcd4'
+    - name: deprecated
+      label: Deprecated
+      description: No longer in use
+      color: '#f44336'
+    - name: dhcp
+      label: DHCP
+      description: Assigned dynamically via DHCP
+      color: '#9c27b0'
+    - name: slaac
+      label: SLAAC
+      description: Assigned via IPv6 stateless address autoconfiguration
+      color: '#9c27b0'
+    optional: false
+    order_weight: 1100
+  - name: role
+    kind: Dropdown
+    choices:
+    - name: loopback
+      label: Loopback
+      description: A loopback interface address
+      color: '#9e9e9e'
+    - name: secondary
+      label: Secondary
+      description: A secondary address on an interface
+      color: '#2196f3'
+    - name: anycast
+      label: Anycast
+      description: An address shared among multiple nodes
+      color: '#ffeb3b'
+    - name: vip
+      label: VIP
+      description: A virtual IP address
+      color: '#9c27b0'
+    - name: vrrp
+      label: VRRP
+      description: A virtual address managed by VRRP
+      color: '#4caf50'
+    - name: hsrp
+      label: HSRP
+      description: A virtual address managed by HSRP
+      color: '#4caf50'
+    - name: glbp
+      label: GLBP
+      description: A virtual address managed by GLBP
+      color: '#4caf50'
+    - name: carp
+      label: CARP
+      description: A virtual address managed by CARP
+      color: '#4caf50'
+    optional: true
+    description: Function of the address. Anycast, VIP and FHRP addresses can be duplicated.
+    order_weight: 1200
+  - name: dns_name
+    kind: Text
+    label: DNS Name
+    optional: true
+    order_weight: 1300
+  - name: comments
+    kind: TextArea
+    optional: true
+    order_weight: 2900
+  relationships:
+  - name: assigned_object
+    peer: NetboxIPAddressAssignable
+    label: Assigned Object
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_ip_address__assigned_object
+    description: Interface or FHRP group that the address is assigned to.
+    order_weight: 1400
+  - name: nat_inside
+    peer: NetboxIPAddress
+    label: NAT Inside
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_ip_address__nat
+    direction: outbound
+    description: The inside IP address for which this address is the outside (NAT)
+      address.
+    order_weight: 1500
+  - name: nat_outside
+    peer: NetboxIPAddress
+    label: NAT Outside
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_ip_address__nat
+    direction: inbound
+    order_weight: 3580
+  - name: tags
+    peer: BuiltinTag
+    kind: Attribute
+    cardinality: many
+    optional: true
+    order_weight: 3000
+  - name: primary_ip4_of_device
+    peer: NetboxDevice
+    label: Primary IPv4 of Device
+    kind: Generic
+    cardinality: one
+    optional: true
+    identifier: netbox_device__primary_ip4
+    order_weight: 3100
+  - name: primary_ip6_of_device
+    peer: NetboxDevice
+    label: Primary IPv6 of Device
+    kind: Generic
+    cardinality: one
+    optional: true
+    identifier: netbox_device__primary_ip6
+    order_weight: 3180
+  - name: oob_ip_of_device
+    peer: NetboxDevice
+    label: Out-of-band IP of Device
+    kind: Generic
+    cardinality: one
+    optional: true
+    identifier: netbox_device__oob_ip
+    order_weight: 3260
+  - name: primary_ip4_of_virtual_device_context
+    peer: NetboxVirtualDeviceContext
+    label: Primary IPv4 of Virtual Device Context
+    kind: Generic
+    cardinality: one
+    optional: true
+    identifier: netbox_virtual_device_context__primary_ip4
+    order_weight: 3340
+  - name: primary_ip6_of_virtual_device_context
+    peer: NetboxVirtualDeviceContext
+    label: Primary IPv6 of Virtual Device Context
+    kind: Generic
+    cardinality: one
+    optional: true
+    identifier: netbox_virtual_device_context__primary_ip6
+    order_weight: 3420
+  - name: services
+    peer: NetboxService
+    label: Application Services
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_service__ip_address
+    order_weight: 3500
+- name: VLANGroup
+  namespace: Netbox
+  description: Organizes VLANs. Can be scoped to a region, site group, site, location,
+    rack group or rack, and can limit VLAN IDs.
+  label: VLAN Group
+  icon: mdi:lan
+  include_in_menu: true
+  menu_placement: NetboxVLAN
+  inherit_from:
+  - NetboxGeneric
+  - NetboxTenantAssignable
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    optional: false
+    description: 'Not unique in Infrahub: NetBox makes it unique within the scope,
+      and Infrahub uniqueness rules cannot include an optional scope.'
+    order_weight: 1000
+  - name: slug
+    kind: Text
+    parameters:
+      regex: ^[-a-zA-Z0-9_]+$
+    optional: true
+    description: URL-friendly identifier that NetBox derives from the name.
+    order_weight: 1100
+  - name: vid_ranges
+    kind: List
+    label: VLAN ID Ranges
+    optional: true
+    description: Ranges of VLAN IDs available in the group, for example [[1, 100],
+      [200, 299]]. NetBox defaults to [[1, 4094]].
+    order_weight: 1300
+  relationships:
+  - name: scope
+    peer: NetboxVLANGroupScope
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_vlan_group__scope
+    order_weight: 1200
+  - name: vlans
+    peer: NetboxVLAN
+    label: VLANs
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_vlan_group__vlan
+    order_weight: 3100
+- name: VLAN
+  namespace: Netbox
+  description: 'A virtual LAN: an isolated layer 2 domain identified by a name and
+    a numeric ID from 1 to 4094 (IEEE 802.1Q).'
+  label: VLAN
+  icon: mdi:lan-connect
+  include_in_menu: true
+  inherit_from:
+  - NetboxGeneric
+  - NetboxTenantAssignable
+  - NetboxL2VPNAssignable
+  display_label: '{{ name__value }} ({{ vid__value }})'
+  attributes:
+  - name: vid
+    kind: Number
+    label: VLAN ID
+    parameters:
+      min_value: 1
+      max_value: 4094
+    optional: false
+    order_weight: 1000
+  - name: name
+    kind: Text
+    optional: false
+    description: Not unique in Infrahub. NetBox makes it unique within the VLAN group.
+    order_weight: 1100
+  - name: status
+    kind: Dropdown
+    default_value: active
+    choices:
+    - name: active
+      label: Active
+      description: Provisioned and in use
+      color: '#2196f3'
+    - name: reserved
+      label: Reserved
+      description: Designated for future use
+      color: '#00bcd4'
+    - name: deprecated
+      label: Deprecated
+      description: No longer in use
+      color: '#f44336'
+    optional: false
+    order_weight: 1200
+  - name: qinq_role
+    kind: Dropdown
+    label: Q-in-Q Role
+    choices:
+    - name: svlan
+      label: Service
+      description: An outer service VLAN (S-VLAN)
+      color: '#2196f3'
+    - name: cvlan
+      label: Customer
+      description: An inner customer VLAN (C-VLAN)
+      color: '#ff9800'
+    optional: true
+    order_weight: 1600
+  relationships:
+  - name: group
+    peer: NetboxVLANGroup
+    label: VLAN Group
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_vlan_group__vlan
+    order_weight: 1300
+  - name: site
+    peer: NetboxSite
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_vlan__site
+    order_weight: 1400
+  - name: role
+    peer: NetboxIPAMRole
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_ipam_role__vlan
+    order_weight: 1500
+  - name: qinq_svlan
+    peer: NetboxVLAN
+    label: Q-in-Q Service VLAN
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_vlan__qinq
+    direction: outbound
+    description: Service VLAN (S-VLAN) that carries this customer VLAN.
+    order_weight: 1700
+  - name: qinq_cvlans
+    peer: NetboxVLAN
+    label: Q-in-Q Customer VLANs
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_vlan__qinq
+    direction: inbound
+    order_weight: 3100
+  - name: prefixes
+    peer: NetboxPrefix
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_vlan__prefix
+    order_weight: 3200
+  - name: untagged_interfaces
+    peer: NetboxInterface
+    label: Untagged Interfaces
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_interface__untagged_vlan
+    order_weight: 3300
+  - name: tagged_interfaces
+    peer: NetboxInterface
+    label: Tagged Interfaces
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_interface__tagged_vlan
+    order_weight: 3400
+  - name: qinq_interfaces
+    peer: NetboxInterface
+    label: Q-in-Q Interfaces
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_interface__qinq_svlan
+    order_weight: 3500
+- name: VLANTranslationPolicy
+  namespace: Netbox
+  description: A set of VLAN translation rules. Assigning a policy to an interface
+    applies all of its rules to that interface.
+  label: VLAN Translation Policy
+  icon: mdi:swap-horizontal-bold
+  include_in_menu: true
+  menu_placement: NetboxVLAN
+  inherit_from:
+  - NetboxGeneric
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
+  relationships:
+  - name: rules
+    peer: NetboxVLANTranslationRule
+    kind: Component
+    cardinality: many
+    optional: true
+    identifier: netbox_vlan_translation_policy__rule
+    order_weight: 3100
+  - name: interfaces
+    peer: NetboxInterface
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_interface__vlan_translation_policy
+    order_weight: 3200
+- name: VLANTranslationRule
+  namespace: Netbox
+  description: Maps one local VLAN ID to one remote VLAN ID, within a VLAN translation
+    policy.
+  label: VLAN Translation Rule
+  icon: mdi:swap-horizontal
+  include_in_menu: true
+  menu_placement: NetboxVLAN
+  human_friendly_id:
+  - policy__name__value
+  - local_vid__value
+  display_label: '{{ local_vid__value }} > {{ remote_vid__value }}'
+  uniqueness_constraints:
+  - - policy
+    - local_vid__value
+  - - policy
+    - remote_vid__value
+  attributes:
+  - name: local_vid
+    kind: Number
+    label: Local VLAN ID
+    parameters:
+      min_value: 1
+      max_value: 4094
+    optional: false
+    order_weight: 1000
+  - name: remote_vid
+    kind: Number
+    label: Remote VLAN ID
+    parameters:
+      min_value: 1
+      max_value: 4094
+    optional: false
+    order_weight: 1100
+  - name: description
+    kind: Text
+    optional: true
+    order_weight: 2000
+  relationships:
+  - name: policy
+    peer: NetboxVLANTranslationPolicy
+    kind: Parent
+    cardinality: one
+    optional: false
+    identifier: netbox_vlan_translation_policy__rule
+    order_weight: 800
+  - name: tags
+    peer: BuiltinTag
+    kind: Attribute
+    cardinality: many
+    optional: true
+    order_weight: 3000
+- name: ASN
+  namespace: Netbox
+  description: An autonomous system number used in BGP to identify an autonomous system.
+    16-bit and 32-bit ASNs are supported.
+  label: ASN
+  icon: mdi:numeric
+  include_in_menu: true
+  inherit_from:
+  - NetboxGeneric
+  - NetboxTenantAssignable
+  - NetboxContactAssignable
+  human_friendly_id:
+  - asn__value
+  display_label: AS{{ asn__value }}
+  attributes:
+  - name: asn
+    kind: Number
+    label: ASN
+    unique: true
+    parameters:
+      min_value: 1
+      max_value: 4294967295
+    optional: false
+    order_weight: 1000
+  relationships:
+  - name: rir
+    peer: NetboxRIR
+    label: RIR
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: netbox_rir__asn
+    order_weight: 800
+  - name: role
+    peer: NetboxIPAMRole
+    kind: Attribute
+    cardinality: one
+    optional: true
+    identifier: netbox_ipam_role__asn
+    order_weight: 1100
+  - name: assigned_objects
+    peer: NetboxASNAssignable
+    label: Sites and Providers
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: netbox_asn__assigned_object
+    description: Sites and, when netbox/netbox_circuits is loaded, providers that
+      use this ASN.
+    order_weight: 3100
+- name: ASNRange
+  namespace: Netbox
+  description: A numeric range of AS numbers within an RIR, used to group ASNs and
+    to provision them automatically.
+  label: ASN Range
+  icon: mdi:numeric-9-plus-box-multiple
+  include_in_menu: true
+  menu_placement: NetboxASN
+  inherit_from:
+  - NetboxGeneric
+  - NetboxTenantAssignable
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
+  - name: slug
+    kind: Text
+    parameters:
+      regex: ^[-a-zA-Z0-9_]+$
+    optional: true
+    description: URL-friendly identifier that NetBox derives from the name.
+    order_weight: 1100
+  - name: start
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 4294967295
+    optional: false
+    order_weight: 1200
+  - name: end
+    kind: Number
+    parameters:
+      min_value: 1
+      max_value: 4294967295
+    optional: false
+    order_weight: 1300
+  relationships:
+  - name: rir
+    peer: NetboxRIR
+    label: RIR
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: netbox_rir__asn_range
+    order_weight: 800
+- name: FHRPGroup
+  namespace: Netbox
+  description: A first-hop redundancy protocol group, such as VRRP or HSRP, whose
+    interfaces share a virtual IP address.
+  label: FHRP Group
+  icon: mdi:router-network
+  include_in_menu: true
+  inherit_from:
+  - NetboxGeneric
+  - NetboxIPAddressAssignable
+  - NetboxServiceParent
+  display_label: '{{ protocol__value }} {{ group_id__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    optional: true
+    order_weight: 1000
+  - name: protocol
+    kind: Dropdown
+    choices:
+    - name: vrrp2
+      label: VRRPv2
+      description: Virtual Router Redundancy Protocol version 2
+    - name: vrrp3
+      label: VRRPv3
+      description: Virtual Router Redundancy Protocol version 3
+    - name: carp
+      label: CARP
+      description: Common Address Redundancy Protocol
+    - name: clusterxl
+      label: ClusterXL
+      description: Check Point ClusterXL high-availability protocol
+    - name: hsrp
+      label: HSRP
+      description: Hot Standby Router Protocol
+    - name: glbp
+      label: GLBP
+      description: Gateway Load Balancing Protocol
+    - name: other
+      label: Other
+    optional: false
+    order_weight: 1100
+  - name: group_id
+    kind: Number
+    label: Group ID
+    parameters:
+      min_value: 0
+      max_value: 32767
+    optional: false
+    order_weight: 1200
+  - name: auth_type
+    kind: Dropdown
+    label: Authentication Type
+    choices:
+    - name: plaintext
+      label: Plaintext
+      description: Authentication using a cleartext password
+    - name: md5
+      label: MD5
+      description: Authentication using an MD5 hash
+    optional: true
+    order_weight: 1300
+  - name: auth_key
+    kind: Password
+    label: Authentication Key
+    optional: true
+    order_weight: 1400
+  relationships:
+  - name: assignments
+    peer: NetboxFHRPGroupAssignment
+    kind: Component
+    cardinality: many
+    optional: true
+    identifier: netbox_fhrp_group__assignment
+    order_weight: 3100
+- name: FHRPGroupAssignment
+  namespace: Netbox
+  description: Assigns an interface to an FHRP group, with a priority.
+  label: FHRP Group Assignment
+  icon: mdi:router-network
+  include_in_menu: true
+  menu_placement: NetboxFHRPGroup
+  display_label: '{{ group__group_id__value }}: {{ interface__name__value }}'
+  uniqueness_constraints:
+  - - interface
+    - group
+  attributes:
+  - name: priority
+    kind: Number
+    parameters:
+      min_value: 0
+      max_value: 255
+    optional: false
+    order_weight: 1000
+  relationships:
+  - name: group
+    peer: NetboxFHRPGroup
+    kind: Parent
+    cardinality: one
+    optional: false
+    identifier: netbox_fhrp_group__assignment
+    order_weight: 800
+  - name: interface
+    peer: NetboxInterface
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: netbox_interface__fhrp_group_assignment
+    order_weight: 810
+- name: Service
+  namespace: Netbox
+  description: A layer 7 application service on a device or FHRP group, for example
+    an HTTP server on TCP port 8000.
+  icon: mdi:application-brackets
+  include_in_menu: true
+  inherit_from:
+  - NetboxGeneric
+  - NetboxContactAssignable
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    optional: false
+    order_weight: 1000
+  - name: port_mappings
+    kind: List
+    label: Port Mappings
+    parameters:
+      regex: ^(tcp|udp|sctp)/\d{1,5}$
+    optional: false
+    description: Protocol and port pairs, for example ["tcp/80", "tcp/443", "udp/53"].
+    order_weight: 1100
+  relationships:
+  - name: parent
+    peer: NetboxServiceParent
+    kind: Attribute
+    cardinality: one
+    optional: false
+    identifier: netbox_service__parent
+    description: Device or FHRP group that runs the service.
+    order_weight: 800
+  - name: ip_addresses
+    peer: NetboxIPAddress
+    label: IP Addresses
+    kind: Attribute
+    cardinality: many
+    optional: true
+    identifier: netbox_service__ip_address
+    order_weight: 1200
+- name: ServiceTemplate
+  namespace: Netbox
+  description: A reusable definition of an application service, with a name and protocol
+    and port pairs, from which services are created.
+  label: Service Template
+  icon: mdi:application-brackets-outline
+  include_in_menu: true
+  menu_placement: NetboxService
+  inherit_from:
+  - NetboxGeneric
+  human_friendly_id:
+  - name__value
+  display_label: '{{ name__value }}'
+  attributes:
+  - name: name
+    kind: Text
+    unique: true
+    optional: false
+    order_weight: 1000
+  - name: port_mappings
+    kind: List
+    label: Port Mappings
+    parameters:
+      regex: ^(tcp|udp|sctp)/\d{1,5}$
+    optional: false
+    description: Protocol and port pairs, for example ["tcp/80", "tcp/443", "udp/53"].
+    order_weight: 1100
+extensions:
+  nodes:
+  - kind: NetboxDevice
+    relationships:
+    - name: primary_ip4
+      peer: NetboxIPAddress
+      label: Primary IPv4
+      kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: netbox_device__primary_ip4
+      order_weight: 1900
+    - name: primary_ip6
+      peer: NetboxIPAddress
+      label: Primary IPv6
+      kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: netbox_device__primary_ip6
+      order_weight: 1910
+    - name: oob_ip
+      peer: NetboxIPAddress
+      label: Out-of-band IP
+      kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: netbox_device__oob_ip
+      order_weight: 1920
+  - kind: NetboxVirtualDeviceContext
+    relationships:
+    - name: primary_ip4
+      peer: NetboxIPAddress
+      label: Primary IPv4
+      kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: netbox_virtual_device_context__primary_ip4
+      order_weight: 1900
+    - name: primary_ip6
+      peer: NetboxIPAddress
+      label: Primary IPv6
+      kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: netbox_virtual_device_context__primary_ip6
+      order_weight: 1910
+  - kind: NetboxInterface
+    relationships:
+    - name: vrf
+      peer: NetboxVRF
+      label: VRF
+      kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: netbox_interface__vrf
+      order_weight: 1900
+    - name: untagged_vlan
+      peer: NetboxVLAN
+      label: Untagged VLAN
+      kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: netbox_interface__untagged_vlan
+      order_weight: 1910
+    - name: tagged_vlans
+      peer: NetboxVLAN
+      label: Tagged VLANs
+      kind: Attribute
+      cardinality: many
+      optional: true
+      identifier: netbox_interface__tagged_vlan
+      order_weight: 1920
+    - name: qinq_svlan
+      peer: NetboxVLAN
+      label: Q-in-Q Service VLAN
+      kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: netbox_interface__qinq_svlan
+      order_weight: 1930
+    - name: vlan_translation_policy
+      peer: NetboxVLANTranslationPolicy
+      label: VLAN Translation Policy
+      kind: Attribute
+      cardinality: one
+      optional: true
+      identifier: netbox_interface__vlan_translation_policy
+      order_weight: 1940
+    - name: fhrp_group_assignments
+      peer: NetboxFHRPGroupAssignment
+      label: FHRP Group Assignments
+      kind: Generic
+      cardinality: many
+      optional: true
+      identifier: netbox_interface__fhrp_group_assignment
+      order_weight: 3700
+  - kind: NetboxSite
+    relationships:
+    - name: vlans
+      peer: NetboxVLAN
+      label: VLANs
+      kind: Generic
+      cardinality: many
+      optional: true
+      identifier: netbox_vlan__site
+      order_weight: 3700
+  - kind: NetboxPrefixScope
+    relationships:
+    - name: prefixes
+      peer: NetboxPrefix
+      kind: Generic
+      cardinality: many
+      optional: true
+      identifier: netbox_prefix__scope
+      order_weight: 3710
+  - kind: NetboxVLANGroupScope
+    relationships:
+    - name: vlan_groups
+      peer: NetboxVLANGroup
+      label: VLAN Groups
+      kind: Generic
+      cardinality: many
+      optional: true
+      identifier: netbox_vlan_group__scope
+      order_weight: 3720
+  - kind: NetboxIPAddressAssignable
+    relationships:
+    - name: ip_addresses
+      peer: NetboxIPAddress
+      label: IP Addresses
+      kind: Generic
+      cardinality: many
+      optional: true
+      identifier: netbox_ip_address__assigned_object
+      order_weight: 3730
+  - kind: NetboxServiceParent
+    relationships:
+    - name: services
+      peer: NetboxService
+      kind: Generic
+      cardinality: many
+      optional: true
+      identifier: netbox_service__parent
+      order_weight: 3740
+  - kind: NetboxASNAssignable
+    relationships:
+    - name: asns
+      peer: NetboxASN
+      label: ASNs
+      kind: Attribute
+      cardinality: many
+      optional: true
+      identifier: netbox_asn__assigned_object
+      order_weight: 1950
+
+```

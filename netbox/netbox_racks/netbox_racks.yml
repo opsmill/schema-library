@@ -1,0 +1,610 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
+# NetBox racks, mapped to Infrahub: the nodes of the Racks section of the NetBox navigation menu, which
+# are racks, rack reservations, rack groups, rack roles and rack types.
+# Source: the NetBox 4.7 database tables dcim_rack* and the NetBox model documentation.
+# Depends on: netbox/netbox_organization and netbox/netbox_devices, because a rack type has a
+# manufacturer, and this schema adds the rack, position and rack face fields to devices.
+#
+# How the NetBox tables map:
+#   - Rack heights, rack positions and device positions are whole rack units: NetBox half units (for
+#     example 0.5U) are not supported.
+#   - Weights are stored in grams and cooling capacities in watts, as whole numbers, because Infrahub
+#     has no decimal attribute kind.
+#   - A rack reservation is made by an Infrahub account instead of a NetBox user.
+#
+# This schema also adds the racks relationship to sites and locations, and the rack types relationship
+# to manufacturers.
+version: "1.0"
+
+nodes:
+  - name: RackGroup
+    namespace: Netbox
+    description: >-
+      Groups racks by physical placement, such as a row or an aisle, next to their location. Rack groups cannot be
+      nested.
+    label: Rack Group
+    icon: mdi:view-column
+    include_in_menu: true
+    menu_placement: NetboxRack
+    inherit_from:
+      - NetboxGeneric
+      - NetboxVLANGroupScope
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+    relationships:
+      - name: racks
+        peer: NetboxRack
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_rack__group
+        order_weight: 3100
+
+  - name: RackRole
+    namespace: Netbox
+    description: A functional role for racks, for example compute, storage or colocated customer equipment.
+    label: Rack Role
+    icon: mdi:tag-outline
+    include_in_menu: true
+    menu_placement: NetboxRack
+    inherit_from:
+      - NetboxGeneric
+    human_friendly_id:
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+        optional: false
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1100
+      - name: color
+        kind: Color
+        optional: true
+        description: 'Color as a hex code, for example #aa1409.'
+        order_weight: 1200
+    relationships:
+      - name: racks
+        peer: NetboxRack
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_rack__role
+        order_weight: 3100
+
+  - name: RackType
+    namespace: Netbox
+    description: Defines the physical characteristics of a particular model of rack.
+    label: Rack Type
+    icon: mdi:file-cabinet
+    include_in_menu: true
+    menu_placement: NetboxRack
+    inherit_from:
+      - NetboxGeneric
+    human_friendly_id:
+      - manufacturer__name__value
+      - model__value
+    display_label: '{{ model__value }}'
+    attributes:
+      - name: model
+        kind: Text
+        optional: false
+        order_weight: 1000
+      - name: slug
+        kind: Text
+        parameters:
+          regex: ^[-a-zA-Z0-9_]+$
+        optional: true
+        description: URL-friendly identifier that NetBox derives from the name.
+        order_weight: 1090
+      - name: form_factor
+        kind: Dropdown
+        label: Form Factor
+        choices:
+          - name: 2-post-frame
+            label: 2-post frame
+            description: Open two-post relay rack
+          - name: 4-post-frame
+            label: 4-post frame
+            description: Open four-post rack
+          - name: 4-post-cabinet
+            label: 4-post cabinet
+            description: Enclosed four-post cabinet
+          - name: wall-frame
+            label: Wall-mounted frame
+            description: Open frame mounted to a wall
+          - name: wall-frame-vertical
+            label: Wall-mounted frame (vertical)
+            description: Wall-mounted frame with vertical rail orientation
+          - name: wall-cabinet
+            label: Wall-mounted cabinet
+            description: Enclosed cabinet mounted to a wall
+          - name: wall-cabinet-vertical
+            label: Wall-mounted cabinet (vertical)
+            description: Wall-mounted cabinet with vertical rail orientation
+        optional: false
+        order_weight: 1180
+      - name: width
+        kind: Number
+        default_value: 19
+        optional: false
+        description: 'Rail-to-rail width in inches. NetBox values: 10, 19, 21 or 23.'
+        order_weight: 1270
+      - name: u_height
+        kind: Number
+        label: Height (U)
+        default_value: 42
+        optional: false
+        order_weight: 1360
+      - name: starting_unit
+        kind: Number
+        label: Starting Unit
+        default_value: 1
+        optional: false
+        order_weight: 1450
+      - name: desc_units
+        kind: Boolean
+        label: Descending Units
+        default_value: false
+        optional: true
+        description: Units are numbered from top to bottom.
+        order_weight: 1540
+      - name: outer_width
+        kind: Number
+        label: Outer Width
+        optional: true
+        order_weight: 2100
+      - name: outer_height
+        kind: Number
+        label: Outer Height
+        optional: true
+        order_weight: 2150
+      - name: outer_depth
+        kind: Number
+        label: Outer Depth
+        optional: true
+        order_weight: 2200
+      - name: outer_unit
+        kind: Dropdown
+        label: Outer Unit
+        choices:
+          - name: mm
+            label: Millimeters
+          - name: in
+            label: Inches
+        optional: true
+        order_weight: 2250
+      - name: mounting_depth
+        kind: Number
+        label: Mounting Depth (mm)
+        optional: true
+        order_weight: 2300
+      - name: weight_grams
+        kind: Number
+        label: Weight (g)
+        optional: true
+        description: >-
+          NetBox stores a decimal weight with a unit (kg, g, lb or oz). Stored here in grams, as a whole number.
+        order_weight: 2350
+      - name: max_weight_grams
+        kind: Number
+        label: Maximum Weight (g)
+        optional: true
+        description: >-
+          NetBox stores a decimal weight with a unit (kg, g, lb or oz). Stored here in grams, as a whole number.
+        order_weight: 2400
+      - name: cooling_capability
+        kind: Dropdown
+        label: Cooling Capability
+        choices:
+          - name: air-only
+            label: Air only
+            color: '#00bcd4'
+          - name: hybrid
+            label: Hybrid
+            color: '#2196f3'
+          - name: liquid-only
+            label: Liquid only
+            color: '#9c27b0'
+        optional: true
+        order_weight: 1630
+      - name: cooling_capacity_watts
+        kind: Number
+        label: Cooling Capacity (W)
+        optional: true
+        description: NetBox stores a decimal value in kilowatts. Converted to watts here.
+        order_weight: 1720
+    relationships:
+      - name: manufacturer
+        peer: NetboxManufacturer
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_manufacturer__rack_type
+        order_weight: 800
+      - name: racks
+        peer: NetboxRack
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_rack__rack_type
+        order_weight: 3100
+
+  - name: Rack
+    namespace: Netbox
+    description: >-
+      A two- or four-post equipment rack that holds devices. A rack belongs to a site and optionally to a location in
+      it.
+    icon: mdi:server
+    include_in_menu: true
+    inherit_from:
+      - NetboxGeneric
+      - NetboxTenantAssignable
+      - NetboxContactAssignable
+      - NetboxVLANGroupScope
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        optional: false
+        description: Not unique in Infrahub. NetBox makes it unique within the location.
+        order_weight: 1000
+      - name: facility_id
+        kind: Text
+        label: Facility ID
+        optional: true
+        description: Rack ID assigned by the facility.
+        order_weight: 2100
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: reserved
+            label: Reserved
+            description: Set aside for a specific purpose
+            color: '#ffeb3b'
+          - name: available
+            label: Available
+            description: Available for use
+            color: '#4caf50'
+          - name: planned
+            label: Planned
+            description: Planned for future deployment
+            color: '#00bcd4'
+          - name: active
+            label: Active
+            description: Currently in service
+            color: '#2196f3'
+          - name: deprecated
+            label: Deprecated
+            description: No longer recommended for use
+            color: '#f44336'
+        optional: false
+        order_weight: 1180
+      - name: serial
+        kind: Text
+        label: Serial Number
+        optional: true
+        order_weight: 2130
+      - name: asset_tag
+        kind: Text
+        label: Asset Tag
+        optional: true
+        description: Unique in NetBox when set.
+        order_weight: 2160
+      - name: form_factor
+        kind: Dropdown
+        label: Form Factor
+        choices:
+          - name: 2-post-frame
+            label: 2-post frame
+            description: Open two-post relay rack
+          - name: 4-post-frame
+            label: 4-post frame
+            description: Open four-post rack
+          - name: 4-post-cabinet
+            label: 4-post cabinet
+            description: Enclosed four-post cabinet
+          - name: wall-frame
+            label: Wall-mounted frame
+            description: Open frame mounted to a wall
+          - name: wall-frame-vertical
+            label: Wall-mounted frame (vertical)
+            description: Wall-mounted frame with vertical rail orientation
+          - name: wall-cabinet
+            label: Wall-mounted cabinet
+            description: Enclosed cabinet mounted to a wall
+          - name: wall-cabinet-vertical
+            label: Wall-mounted cabinet (vertical)
+            description: Wall-mounted cabinet with vertical rail orientation
+        optional: true
+        order_weight: 1360
+      - name: width
+        kind: Number
+        default_value: 19
+        optional: false
+        description: 'Rail-to-rail width in inches. NetBox values: 10, 19, 21 or 23.'
+        order_weight: 1420
+      - name: u_height
+        kind: Number
+        label: Height (U)
+        default_value: 42
+        optional: false
+        order_weight: 1480
+      - name: starting_unit
+        kind: Number
+        label: Starting Unit
+        default_value: 1
+        optional: false
+        order_weight: 1540
+      - name: desc_units
+        kind: Boolean
+        label: Descending Units
+        default_value: false
+        optional: true
+        description: Units are numbered from top to bottom.
+        order_weight: 1600
+      - name: outer_width
+        kind: Number
+        label: Outer Width
+        optional: true
+        order_weight: 2190
+      - name: outer_height
+        kind: Number
+        label: Outer Height
+        optional: true
+        order_weight: 2220
+      - name: outer_depth
+        kind: Number
+        label: Outer Depth
+        optional: true
+        order_weight: 2250
+      - name: outer_unit
+        kind: Dropdown
+        label: Outer Unit
+        choices:
+          - name: mm
+            label: Millimeters
+          - name: in
+            label: Inches
+        optional: true
+        order_weight: 2280
+      - name: mounting_depth
+        kind: Number
+        label: Mounting Depth (mm)
+        optional: true
+        order_weight: 2310
+      - name: weight_grams
+        kind: Number
+        label: Weight (g)
+        optional: true
+        description: >-
+          NetBox stores a decimal weight with a unit (kg, g, lb or oz). Stored here in grams, as a whole number.
+        order_weight: 2340
+      - name: max_weight_grams
+        kind: Number
+        label: Maximum Weight (g)
+        optional: true
+        description: >-
+          NetBox stores a decimal weight with a unit (kg, g, lb or oz). Stored here in grams, as a whole number.
+        order_weight: 2370
+      - name: airflow
+        kind: Dropdown
+        choices:
+          - name: front-to-rear
+            label: Front to rear
+          - name: rear-to-front
+            label: Rear to front
+        optional: true
+        order_weight: 1660
+      - name: cooling_capability
+        kind: Dropdown
+        label: Cooling Capability
+        choices:
+          - name: air-only
+            label: Air only
+            color: '#00bcd4'
+          - name: hybrid
+            label: Hybrid
+            color: '#2196f3'
+          - name: liquid-only
+            label: Liquid only
+            color: '#9c27b0'
+        optional: true
+        order_weight: 1720
+      - name: cooling_capacity_watts
+        kind: Number
+        label: Cooling Capacity (W)
+        optional: true
+        description: NetBox stores a decimal value in kilowatts. Converted to watts here.
+        order_weight: 1780
+    relationships:
+      - name: site
+        peer: NetboxSite
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_rack__site
+        order_weight: 800
+      - name: location
+        peer: NetboxLocation
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_rack__location
+        order_weight: 1060
+      - name: group
+        peer: NetboxRackGroup
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_rack__group
+        order_weight: 1120
+      - name: role
+        peer: NetboxRackRole
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_rack__role
+        order_weight: 1240
+      - name: rack_type
+        peer: NetboxRackType
+        label: Rack Type
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_rack__rack_type
+        order_weight: 1300
+      - name: devices
+        peer: NetboxDevice
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_device__rack
+        order_weight: 3100
+      - name: reservations
+        peer: NetboxRackReservation
+        kind: Component
+        cardinality: many
+        optional: true
+        identifier: netbox_rack__reservation
+        order_weight: 3200
+
+  - name: RackReservation
+    namespace: Netbox
+    description: Reserves specific units within a rack for future use. A reservation cannot span multiple racks.
+    label: Rack Reservation
+    icon: mdi:calendar-lock
+    include_in_menu: true
+    menu_placement: NetboxRack
+    inherit_from:
+      - NetboxGeneric
+      - NetboxTenantAssignable
+    display_label: '{{ rack__name__value }}: {{ description__value }}'
+    attributes:
+      - name: units
+        kind: List
+        optional: false
+        description: Rack units that are reserved, for example [1, 2, 3].
+        order_weight: 1000
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: pending
+            label: Pending
+            description: Awaiting confirmation
+            color: '#00bcd4'
+          - name: active
+            label: Active
+            description: Currently in effect
+            color: '#4caf50'
+          - name: stale
+            label: Stale
+            description: No longer valid or in use
+            color: '#ff9800'
+        optional: false
+        order_weight: 1100
+    relationships:
+      - name: rack
+        peer: NetboxRack
+        kind: Parent
+        cardinality: one
+        optional: false
+        identifier: netbox_rack__reservation
+        order_weight: 800
+      - name: user
+        peer: CoreAccount
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_rack_reservation__user
+        description: Infrahub account that made the reservation. NetBox requires a user.
+        order_weight: 1200
+
+extensions:
+  nodes:
+    - kind: NetboxSite
+      relationships:
+        - name: racks
+          peer: NetboxRack
+          kind: Generic
+          cardinality: many
+          optional: true
+          identifier: netbox_rack__site
+          order_weight: 3200
+
+    - kind: NetboxLocation
+      relationships:
+        - name: racks
+          peer: NetboxRack
+          kind: Generic
+          cardinality: many
+          optional: true
+          identifier: netbox_rack__location
+          order_weight: 3100
+
+    - kind: NetboxManufacturer
+      relationships:
+        - name: rack_types
+          peer: NetboxRackType
+          label: Rack Types
+          kind: Generic
+          cardinality: many
+          optional: true
+          identifier: netbox_manufacturer__rack_type
+          order_weight: 3280
+
+    - kind: NetboxDevice
+      attributes:
+        - name: position
+          kind: Number
+          label: Position (U)
+          optional: true
+          description: Lowest rack unit the device occupies. Whole units only.
+          order_weight: 1350
+        - name: face
+          kind: Dropdown
+          label: Rack Face
+          choices:
+            - name: front
+              label: Front
+            - name: rear
+              label: Rear
+          optional: true
+          order_weight: 1420
+      relationships:
+        - name: rack
+          peer: NetboxRack
+          kind: Attribute
+          cardinality: one
+          optional: true
+          identifier: netbox_device__rack
+          order_weight: 1280

@@ -28,6 +28,7 @@ markdown_all: &markdown_all
 schema_all: &schema_all
   - "base/**/*.{yml,yaml}"
   - "extensions/**/*.{yml,yaml}"
+  - "netbox/**/*.{yml,yaml}"
 
 documentation_all:
   - *doc_files

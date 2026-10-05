@@ -1,0 +1,220 @@
+---
+# yaml-language-server: $schema=https://schema.infrahub.app/infrahub/schema/latest.json
+# ---------------------------------------------------------------------------
+# This schema is a starting point for building with Infrahub, not a finished production model.
+# Adapting it for your environment typically requires architectural review, see
+# docs.infrahub.app, or reach out to OpsMill for help.
+# ---------------------------------------------------------------------------
+# NetBox cooling, mapped to Infrahub: the nodes of the Cooling section of the NetBox navigation menu,
+# which are cooling sources and cooling feeds.
+# Source: the NetBox 4.7 database tables dcim_coolingsource and dcim_coolingfeed, and the NetBox model
+# documentation.
+# Depends on: netbox/netbox_organization, netbox/netbox_devices and netbox/netbox_racks.
+#
+# How the NetBox tables map:
+#   - Cooling intakes and cooling outflows are device components in netbox/netbox_devices, as in the
+#     NetBox Devices menu.
+#   - Cooling capacities are stored in watts and flow rates in liters per minute, as whole numbers,
+#     because Infrahub has no decimal attribute kind.
+#
+# This schema also adds the cooling sources relationship to sites and locations, and the cooling feeds
+# relationship to racks.
+version: "1.0"
+
+nodes:
+  - name: CoolingSource
+    namespace: Netbox
+    description: >-
+      A facility-level source of cooling, such as a chiller, cooling tower or dry cooler. It is the upstream origin of
+      cooling feeds.
+    label: Cooling Source
+    icon: mdi:snowflake
+    include_in_menu: true
+    inherit_from:
+      - NetboxGeneric
+      - NetboxContactAssignable
+    human_friendly_id:
+      - site__name__value
+      - name__value
+    display_label: '{{ name__value }}'
+    attributes:
+      - name: name
+        kind: Text
+        optional: false
+        order_weight: 1100
+      - name: type
+        kind: Dropdown
+        choices:
+          - name: chiller
+            label: Chiller
+          - name: cooling-tower
+            label: Cooling tower
+          - name: dry-cooler
+            label: Dry cooler
+          - name: crac
+            label: CRAC
+          - name: crah
+            label: CRAH
+        optional: false
+        order_weight: 1200
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: offline
+            label: Offline
+            color: '#9e9e9e'
+          - name: active
+            label: Active
+            color: '#4caf50'
+          - name: planned
+            label: Planned
+            color: '#2196f3'
+          - name: failed
+            label: Failed
+            color: '#f44336'
+        optional: false
+        order_weight: 1300
+      - name: fluid_type
+        kind: Dropdown
+        label: Fluid Type
+        choices:
+          - name: water
+            label: Water
+          - name: water-glycol
+            label: Water/glycol
+          - name: dielectric
+            label: Dielectric
+          - name: refrigerant
+            label: Refrigerant
+        optional: true
+        order_weight: 1400
+      - name: cooling_capacity_watts
+        kind: Number
+        label: Cooling Capacity (W)
+        optional: true
+        description: NetBox stores a decimal value in kilowatts. Converted to watts here.
+        order_weight: 1500
+    relationships:
+      - name: site
+        peer: NetboxSite
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_cooling_source__site
+        order_weight: 800
+      - name: location
+        peer: NetboxLocation
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_cooling_source__location
+        order_weight: 1000
+      - name: cooling_feeds
+        peer: NetboxCoolingFeed
+        label: Cooling Feeds
+        kind: Generic
+        cardinality: many
+        optional: true
+        identifier: netbox_cooling_feed__cooling_source
+        order_weight: 3100
+
+  - name: CoolingFeed
+    namespace: Netbox
+    description: A coolant loop delivered from a cooling source to a rack or a coolant distribution unit (CDU).
+    label: Cooling Feed
+    icon: mdi:pipe
+    include_in_menu: true
+    menu_placement: NetboxCoolingSource
+    inherit_from:
+      - NetboxGeneric
+      - NetboxTenantAssignable
+    display_label: '{{ name__value }}'
+    uniqueness_constraints:
+      - [cooling_source, name__value]
+    attributes:
+      - name: name
+        kind: Text
+        optional: false
+        order_weight: 1100
+      - name: status
+        kind: Dropdown
+        default_value: active
+        choices:
+          - name: offline
+            label: Offline
+            color: '#9e9e9e'
+          - name: active
+            label: Active
+            color: '#4caf50'
+          - name: planned
+            label: Planned
+            color: '#2196f3'
+          - name: failed
+            label: Failed
+            color: '#f44336'
+        optional: false
+        order_weight: 1200
+      - name: cooling_capacity_watts
+        kind: Number
+        label: Cooling Capacity (W)
+        optional: true
+        description: NetBox stores a decimal value in kilowatts. Converted to watts here.
+        order_weight: 1300
+      - name: max_flow_liters_per_minute
+        kind: Number
+        label: Maximum Flow (L/min)
+        optional: true
+        description: NetBox stores a decimal flow rate in L/min, m3/h or gal/min. Converted to liters per minute here.
+        order_weight: 1400
+    relationships:
+      - name: cooling_source
+        peer: NetboxCoolingSource
+        label: Cooling Source
+        kind: Attribute
+        cardinality: one
+        optional: false
+        identifier: netbox_cooling_feed__cooling_source
+        order_weight: 800
+      - name: rack
+        peer: NetboxRack
+        kind: Attribute
+        cardinality: one
+        optional: true
+        identifier: netbox_cooling_feed__rack
+        order_weight: 1000
+
+extensions:
+  nodes:
+    - kind: NetboxSite
+      relationships:
+        - name: cooling_sources
+          peer: NetboxCoolingSource
+          label: Cooling Sources
+          kind: Generic
+          cardinality: many
+          optional: true
+          identifier: netbox_cooling_source__site
+          order_weight: 3500
+
+    - kind: NetboxLocation
+      relationships:
+        - name: cooling_sources
+          peer: NetboxCoolingSource
+          label: Cooling Sources
+          kind: Generic
+          cardinality: many
+          optional: true
+          identifier: netbox_cooling_source__location
+          order_weight: 3400
+
+    - kind: NetboxRack
+      relationships:
+        - name: cooling_feeds
+          peer: NetboxCoolingFeed
+          label: Cooling Feeds
+          kind: Generic
+          cardinality: many
+          optional: true
+          identifier: netbox_cooling_feed__rack
+          order_weight: 3400

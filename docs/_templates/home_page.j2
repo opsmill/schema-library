@@ -22,11 +22,12 @@ Infrahub ships without built-in schemas, giving you complete freedom to define y
 
 ## Project structure
 
-This project is divided into three main parts:
+This project is divided into four main parts:
 
 - **Base**: The foundational layer required for most extensions. It must be loaded before adding extensions.
 - **Extensions**: Generic schema components for managing infrastructure. Extensions may have dependencies on each other.
 - **Experimental**: Schema components that are not yet fully supported.
+- **NetBox**: Schemas that mirror the NetBox 4.7 data model, one for each section of the NetBox navigation menu (organization, devices, racks, connections, power, cooling, IPAM, circuits and VPN). They do not depend on the base schema.
 
 ## Getting started
 
@@ -73,6 +74,30 @@ infrahubctl schema load extensions/location_minimal
 
 # Load another extension
 infrahubctl schema load extensions/vlan
+```
+
+The NetBox schemas have their own load order. Load `netbox/netbox_organization` first, then `netbox/netbox_devices`, then only the other NetBox schemas you need:
+
+```bash
+infrahubctl schema load netbox/netbox_organization
+infrahubctl schema load netbox/netbox_devices
+infrahubctl schema load netbox/netbox_racks
+infrahubctl schema load netbox/netbox_connections
+# netbox_power and netbox_cooling also require netbox_racks
+infrahubctl schema load netbox/netbox_power
+infrahubctl schema load netbox/netbox_cooling
+infrahubctl schema load netbox/netbox_ipam
+infrahubctl schema load netbox/netbox_circuits
+# netbox_vpn also requires netbox_ipam
+infrahubctl schema load netbox/netbox_vpn
+```
+
+To load all the NetBox schemas with one command, run `infrahubctl schema load netbox`.
+
+To arrange the sidebar like the NetBox navigation menu, load the menu files of the NetBox schemas you loaded, from `menus/netbox/`:
+
+```bash
+infrahubctl menu load menus/netbox/netbox_organization.yml menus/netbox/netbox_devices.yml
 ```
 
 ## Available schemas
