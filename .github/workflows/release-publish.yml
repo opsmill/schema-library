@@ -1,0 +1,159 @@
+---
+# yamllint disable rule:truthy
+name: Publish release
+
+# Fires when a release pull request lands on `main`: creates the tag and
+# publishes the GitHub Release whose body is the changelog section humans
+# wrote, rather than a generated list of pull-request titles.
+#
+# Schema Library publishes a GitHub Release only.
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release-publish
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Tag and publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Decide whether this push is a release
+        id: decide
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          # Only a merged release PR authorises publication. The repository's
+          # pyproject version describes helper tooling, not the release.
+          BRANCH=$(
+            gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/pulls" \
+              --jq '[.[] | select(.merged_at != null)
+                      | .head.ref
+                      | select(startswith("release/v"))] | first // empty'
+          )
+          if [ -z "${BRANCH}" ]; then
+            echo "No merged release/v* pull request; nothing to publish."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          VERSION="${BRANCH#release/v}"
+          if ! [[ "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+((a|b|rc)[0-9]+)?(\.post[0-9]+)?(\.dev[0-9]+)?$ ]]; then
+            echo "::error::Invalid release version in PR branch: ${BRANCH}"
+            exit 1
+          fi
+          if gh release view "v${VERSION}" >/dev/null 2>&1; then
+            echo "v${VERSION} is already published."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if git rev-parse -q --verify "refs/tags/v${VERSION}" >/dev/null; then
+            TAG_COMMIT=$(git rev-list -n 1 "v${VERSION}")
+            if [ "${TAG_COMMIT}" != "${GITHUB_SHA}" ]; then
+              echo "::error::v${VERSION} already tags a different commit."
+              exit 1
+            fi
+          fi
+
+          echo "v${VERSION} authorised by ${BRANCH}."
+          echo "publish=true" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - uses: astral-sh/setup-uv@v7
+        if: steps.decide.outputs.publish == 'true'
+
+      - name: Classify the release version
+        id: classify
+        if: steps.decide.outputs.publish == 'true'
+        env:
+          VERSION: ${{ steps.decide.outputs.version }}
+        run: |
+          set -euo pipefail
+          uv run --no-project --with packaging python - <<'PY'
+          import os
+
+          from packaging.version import Version
+
+          version = Version(os.environ["VERSION"])
+          is_prerelease = version.is_prerelease or version.is_devrelease
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"prerelease={str(is_prerelease).lower()}\n")
+          PY
+
+      - name: Extract the changelog section
+        if: steps.decide.outputs.publish == 'true'
+        env:
+          VERSION: ${{ steps.decide.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          # Everything from the first release heading after the towncrier
+          # marker up to (but excluding) the next one — i.e. the section this
+          # release just added.
+          awk '
+            /<!-- towncrier release notes start -->/ { seen = 1; next }
+            seen && /^## / { if (started) exit; started = 1 }
+            started { print }
+          ' CHANGELOG.md > /tmp/release-body.md
+
+          if [ ! -s /tmp/release-body.md ]; then
+            echo "::error::Could not extract a changelog section for v${VERSION} from CHANGELOG.md."
+            exit 1
+          fi
+
+          if ! head -n 1 /tmp/release-body.md | grep -Fq "/tree/v${VERSION})"; then
+            MSG="The newest changelog section does not mention ${VERSION};"
+            MSG="${MSG} refusing to publish mismatched notes."
+            echo "::error::${MSG}"
+            exit 1
+          fi
+
+          echo "Release body:"
+          cat /tmp/release-body.md
+
+      - name: Create the tag and the GitHub Release
+        if: steps.decide.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          VERSION: ${{ steps.decide.outputs.version }}
+          IS_PRERELEASE: ${{ steps.classify.outputs.prerelease }}
+        run: |
+          set -euo pipefail
+
+          if [ "${IS_PRERELEASE}" = "true" ]; then
+            IS_LATEST=false
+            RELEASE_FLAGS=(--prerelease)
+          else
+            # Mark only the highest full release as latest.
+            RELEASED=$(gh release list --exclude-drafts --exclude-pre-releases \
+              --limit 1000 --json tagName --jq '.[].tagName')
+            HIGHEST=$(printf '%s\n%s\n' "${RELEASED}" "v${VERSION}" | sed '/^$/d; s/^v//' | sort -V | tail -n 1)
+            if [ "${HIGHEST}" = "${VERSION}" ]; then
+              IS_LATEST=true
+            else
+              IS_LATEST=false
+            fi
+            RELEASE_FLAGS=()
+          fi
+          echo "v${VERSION} prerelease=${IS_PRERELEASE} latest=${IS_LATEST}"
+
+          gh release create "v${VERSION}" \
+            --target "${GITHUB_SHA}" \
+            --title "v${VERSION}" \
+            --latest="${IS_LATEST}" \
+            "${RELEASE_FLAGS[@]}" \
+            --notes-file /tmp/release-body.md

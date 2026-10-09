@@ -145,3 +145,16 @@
 - name: "ci/skip-changelog"
   description: "No changelog fragment required"
   color: "ededed"
+
+# Release Drafter uses exactly one of these labels on each change PR.
+- name: "changes/major"
+  description: "Release with breaking changes"
+  color: "b60205"
+
+- name: "changes/minor"
+  description: "Release with new features"
+  color: "0e8a16"
+
+- name: "changes/patch"
+  description: "Release with fixes or maintenance"
+  color: "fbca04"

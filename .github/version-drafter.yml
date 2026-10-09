@@ -1,0 +1,8 @@
+---
+# Only explicit release-intent labels drive semantic version bumps.
+major-labels:
+  - "changes/major"
+minor-labels:
+  - "changes/minor"
+patch-labels:
+  - "changes/patch"
