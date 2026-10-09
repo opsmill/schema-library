@@ -14,7 +14,9 @@ BUMP_LABELS = frozenset({"changes/major", "changes/minor", "changes/patch"})
 RELEASE_PR_PREFIX = "chore(release):"
 # The `release/v<version>` branch auto-bump.yml opens: a normalised three-part
 # PEP 440 version, optionally with a pre-, post- or dev-release segment.
-RELEASE_BRANCH = re.compile(r"release/v\d+\.\d+\.\d+(?:(?:a|b|rc)\d+)?(?:\.post\d+)?(?:\.dev\d+)?")
+RELEASE_BRANCH = re.compile(
+    r"release/v\d+\.\d+\.\d+(?:(?:a|b|rc)\d+)?(?:\.post\d+)?(?:\.dev\d+)?"
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -50,7 +52,9 @@ def main() -> int:
         sys.stderr.write(f"Invalid labels JSON: {exc}\n")
         return 1
 
-    if not isinstance(raw_labels, list) or not all(isinstance(label, str) for label in raw_labels):
+    if not isinstance(raw_labels, list) or not all(
+        isinstance(label, str) for label in raw_labels
+    ):
         sys.stderr.write("Labels JSON must be an array of strings.\n")
         return 1
 
@@ -59,7 +63,9 @@ def main() -> int:
     if len(selected) != 1:
         choices = ", ".join(sorted(BUMP_LABELS))
         found = ", ".join(selected) if selected else "none"
-        sys.stderr.write(f"Pull requests must have exactly one release bump label ({choices}); found: {found}.\n")
+        sys.stderr.write(
+            f"Pull requests must have exactly one release bump label ({choices}); found: {found}.\n"
+        )
         return 1
 
     sys.stdout.write(f"Release bump label: {selected[0]}\n")
