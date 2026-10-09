@@ -1,0 +1,323 @@
+---
+# yamllint disable rule:truthy
+name: Auto bump version
+
+on:
+  # A human dispatches this workflow when main is ready to ship.
+  workflow_dispatch:
+    inputs:
+      version:
+        description: >-
+          Version to release, e.g. 1.4.0. Leave empty to calculate it from the
+          labels on the pull requests merged since the last release.
+        required: false
+        type: string
+
+concurrency:
+  group: auto-bump
+  cancel-in-progress: false
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Bump: calculate the next version, assemble the changelog, open a release PR
+  #
+  # Nothing is pushed to `main` directly and no tag is created here. The
+  # version bump and the assembled changelog land as a reviewable pull
+  # request; merging it is the act that authorises the release, and
+  # release-publish.yml then creates the tag and the GitHub Release.
+  #
+  # The version is computed in its own step whose sole output is a version
+  # string. That is the seam for a later migration onto the shared
+  # `release-prepare` workflow, which accepts exactly that as
+  # `bump-strategy: manual` + `version:`.
+  # ---------------------------------------------------------------------------
+  bump:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolved.outputs.version }}
+    steps:
+      # A dispatcher can select any ref, so check the branch before checkout.
+      - name: Check the branch
+        env:
+          RELEASE_BRANCH: main
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_NAME}" != "${RELEASE_BRANCH}" ]; then
+            MSG="Releases are prepared from '${RELEASE_BRANCH}', not"
+            MSG="${MSG} '${GITHUB_REF_NAME}'. Re-run this workflow with"
+            MSG="${MSG} '${RELEASE_BRANCH}' selected as the branch."
+            echo "::error::${MSG}"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          fetch-depth: 0
+          # The version guard below refuses a version that is already
+          # tagged, which it can only do if the tags are here. `fetch-depth:
+          # 0` happens to bring them today, but asking for them is the
+          # contract, spelled out the way release-publish.yml spells it out.
+          fetch-tags: true
+
+      - name: Require an explicit version for the first release
+        if: inputs.version == ''
+        run: |
+          set -euo pipefail
+          if ! git tag -l 'v*' | grep -q .; then
+            echo "::error::No release tag exists yet. Dispatch with an explicit version for the first release."
+            exit 1
+          fi
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --group dev --frozen
+
+      # One version string, from one of two sources. Empty input means the
+      # labels on the merged pull requests decide it, which is the default and
+      # the usual case; a value means whoever dispatched the run decided it,
+      # the way infrahub and infrahub-sdk-python decide every release. Both
+      # converge here, so everything downstream — and a later move onto the
+      # shared `release-prepare` workflow, whose `bump-strategy: manual`
+      # accepts exactly this — is identical either way.
+      - name: Calculate next version from PR labels
+        id: next
+        if: inputs.version == ''
+        uses: patrickjahns/version-drafter-action@v1.3.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+      - name: Resolve the version
+        id: resolved
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          DRAFTED_VERSION: ${{ steps.next.outputs.next-version }}
+        run: |
+          set -euo pipefail
+
+          # Read through the environment rather than interpolated into the
+          # script body: the input is free text typed into the Actions UI.
+          VERSION="${INPUT_VERSION:-${DRAFTED_VERSION}}"
+          VERSION="${VERSION#v}"
+
+          # Validate the version with packaging before using it in the tag.
+          VERSION="${VERSION}" uv run --no-project --with packaging python - <<'PY'
+          import os
+          import sys
+
+          from packaging.version import InvalidVersion, Version
+
+          raw = os.environ["VERSION"]
+
+          try:
+              version = Version(raw)
+          except InvalidVersion:
+              problem = "is not a PEP 440 version"
+          else:
+              problem = ""
+              # The tag and the CHANGELOG heading assume
+              # X.Y.Z, so 1.4 and 1.4.0.1 are refused even though PEP 440
+              # accepts both, and so are epochs and local versions, which
+              # parse but describe something that cannot be published.
+              if len(version.release) != 3:
+                  problem = "does not have exactly three release segments"
+              elif version.epoch or version.local:
+                  problem = "carries an epoch or a local version segment"
+              # One spelling has to reach the tag and CHANGELOG.md alike,
+              # so the version must be
+              # typed the way PEP 440 normalises it: 1.4.0-rc1 and 1.04.0
+              # both parse, but under a different name than was typed.
+              elif str(version) != raw:
+                  problem = f"is normalised by PEP 440 to '{version}'"
+
+          if problem:
+              print(
+                  f"::error::'{raw}' {problem} — refusing to prepare a"
+                  " release from it. Dispatch again with a three-part"
+                  " PEP 440 version, such as 1.4.0, 1.4.0rc1 or"
+                  " 1.4.0.post1."
+              )
+              sys.exit(1)
+          PY
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Refuse a version that is not a step forward
+        env:
+          VERSION: ${{ steps.resolved.outputs.version }}
+        run: |
+          set -euo pipefail
+          CURRENT=$(git tag -l 'v*' --sort=-v:refname | head -n 1)
+          CURRENT="${CURRENT#v}"
+          echo "Current: ${CURRENT}"
+          echo "Next:    ${VERSION}"
+
+          # Compare against the most recent released tag.
+          CURRENT="${CURRENT}" uv run --no-project --with packaging python - <<'PY'
+          import os
+          import sys
+
+          from packaging.version import Version
+
+          current = Version(os.environ["CURRENT"])
+          version = Version(os.environ["VERSION"])
+
+          if version == current:
+              print(
+                  f"::error::{version} is already the current version —"
+                  " there is nothing new to release. Merge the pull requests"
+                  " you want in this release first, or dispatch again with"
+                  " an explicit version."
+              )
+              sys.exit(1)
+
+          if version < current:
+              print(
+                  f"::error::{version} is older than the current version"
+                  f" {current} — preparing it would publish behind the"
+                  " one already shipped. Dispatch again with a version"
+                  f" above {current}."
+              )
+              sys.exit(1)
+          PY
+
+          # Refuse reuse of any existing tag, even after a rollback.
+          if git rev-parse -q --verify "refs/tags/v${VERSION}" >/dev/null; then
+            MSG="v${VERSION} has already been released — a tag for it"
+            MSG="${MSG} exists. Dispatch again with a version that has not"
+            MSG="${MSG} been released yet."
+            echo "::error::${MSG}"
+            exit 1
+          fi
+
+          echo "Release version: ${CURRENT} -> ${VERSION}"
+
+      - name: Assemble the changelog
+        env:
+          VERSION: ${{ steps.resolved.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          # A release must say what changed. Fail loudly rather than tag a
+          # version whose notes are empty — the same rule the shared
+          # changelog-towncrier composite enforces, with no opt-out.
+          #
+          # Count only what towncrier will actually render, using the same
+          # pattern changelog-check.yml applies to every pull request: a
+          # direct child of changelog/ named <id>.<type>.md, plus the
+          # optional counter towncrier appends when a name collides. A stray
+          # README.md is ignored at release time, so counting it here would
+          # let this guard pass on a release whose notes are empty.
+          TYPES="security|removed|deprecated|added|changed|fixed|housekeeping"
+          FRAGMENT="^changelog/[^/]+\.(${TYPES})(\.[0-9]+)?\.md$"
+
+          shopt -s nullglob
+          KEPT=()
+          for f in changelog/*.md; do
+            if ! [[ "$f" =~ $FRAGMENT ]]; then
+              echo "Ignoring ${f}: towncrier does not read it as a fragment."
+              continue
+            fi
+            # An empty fragment still counts towards the total below, so the
+            # release would proceed and towncrier would render the file as a
+            # heading with nothing under it. Name the file and stop: only the
+            # author knows what it was meant to say.
+            if ! grep -q '[^[:space:]]' "$f"; then
+              MSG="News fragment ${f} has no content — it would render as an"
+              MSG="${MSG} empty entry. Describe the change in it, or delete"
+              MSG="${MSG} the file."
+              echo "::error::${MSG}"
+              exit 1
+            fi
+            KEPT+=("$f")
+          done
+          if [ ${#KEPT[@]} -eq 0 ]; then
+            MSG="No news fragments in changelog/ — refusing to cut"
+            MSG="${MSG} v${VERSION} with an empty changelog."
+            MSG="${MSG} Add a fragment (housekeeping is fine) and re-run."
+            echo "::error::${MSG}"
+            exit 1
+          fi
+
+          uv run towncrier build --version "${VERSION}" --yes
+
+      - name: Open the release pull request
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          VERSION: ${{ steps.resolved.outputs.version }}
+        run: |
+          set -euo pipefail
+          export BRANCH="release/v${VERSION}"
+
+          git config user.name "opsmill-bot"
+          git config user.email "opsmill-bot@users.noreply.github.com"
+          git switch -c "${BRANCH}"
+
+          # Stage only what the bump and changelog assembly are allowed to
+          # touch. `git add -A` would sweep up stray files dropped by
+          # third-party tools during dependency installation.
+          git add CHANGELOG.md changelog/
+          git commit -m "chore(release): v${VERSION}"
+
+          # Dispatching again for the same version refreshes the same
+          # branch rather than opening a second PR for it. Plain
+          # --force rather than --force-with-lease: checkout does not fetch
+          # this branch's remote ref, so a lease has nothing to compare
+          # against. The branch is bot-owned and regenerated every run.
+          git push --force origin "${BRANCH}"
+
+          # A run that computes a different version opens a different branch,
+          # so an earlier release PR can still be open. Merging that one after
+          # this one would walk the version files back and let release-publish
+          # tag a version older than the one already released — supersede it
+          # rather than let the two race. `gh pr list` returns only 30 rows
+          # unless asked otherwise, which would leave the oldest release pull
+          # requests open and racing — bound it high enough that the listing
+          # is the complete set.
+          STALE=$(
+            gh pr list --state open --base main --limit 200 \
+              --json number,headRefName \
+              --jq '.[]
+                    | select(.headRefName | startswith("release/v"))
+                    | select(.headRefName != env.BRANCH)
+                    | .number'
+          )
+          for PR in ${STALE}; do
+            echo "Closing release PR #${PR}, superseded by ${BRANCH}."
+            gh pr close "${PR}" \
+              --comment "Superseded by the release pull request for v${VERSION}."
+          done
+
+          # Only an *open* pull request counts as one already prepared:
+          # `gh pr view <branch>` resolves closed and merged ones too, so a
+          # release PR closed without merging would otherwise be mistaken for
+          # the current one and leave the version stranded on the branch with
+          # nothing to merge.
+          OPEN_PR=$(
+            gh pr list --head "${BRANCH}" --state open --json number \
+              --jq '.[0].number // empty'
+          )
+          if [ -n "${OPEN_PR}" ]; then
+            echo "Release PR #${OPEN_PR} for ${BRANCH} already open — updated in place."
+            exit 0
+          fi
+
+          gh pr create \
+            --base main \
+            --head "${BRANCH}" \
+            --title "chore(release): v${VERSION}" \
+            --label "ci/skip-changelog" \
+            --body "$(cat <<EOF
+          Prepared on request. Merging this pull request authorises the release:
+          \`release-publish.yml\` then tags \`v${VERSION}\` and publishes the GitHub
+          Release using the changelog section below.
+
+          - Schema release version is \`${VERSION}\` from the Git tag; the helper project version is unchanged
+          - \`CHANGELOG.md\` assembled from the news fragments, which are consumed by this commit
+
+          Review the assembled changelog before merging — it is what users will read.
+          EOF
+          )"
