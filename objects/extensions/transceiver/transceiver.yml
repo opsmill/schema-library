@@ -4,9 +4,6 @@
 # extensions/rack (LocationRack: NYC1-RACK-01, DcimDevice: nyc1-rtr01 with
 # interface GigabitEthernet0/0/0/0), extensions/organization (OrganizationManufacturer:
 # Cisco, Dell).
-#
-# extensions/optical_multiplexer builds on top of extensions/transceiver in a later wave -- this file
-# stays self-contained and doesn't assume dwdm data exists.
 # ---------------------------------------------------------------------------
 ---
 apiVersion: infrahub.app/v1

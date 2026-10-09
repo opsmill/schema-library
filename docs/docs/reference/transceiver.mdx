@@ -50,7 +50,7 @@ Limitations: there is no validation between type, form factor, protocol and dist
 | name | description | kind | optional | default_value | choices |
 | ---- | ----------- | ---- | -------- | ------------- | ------- |
 | serial_number |  | Text | True |  |  |
-| transceiver_type | Type of transceiver, such as LR, SR, T. | Dropdown | False |  | lr, sr, lrm, t, sr4, lr4, zr, er, dac, aoc |
+| transceiver_type | Type of transceiver, such as LR, SR, T. | Dropdown | False |  | lr, sr, lrm, t, sr4, lr4, dr4, zr, er, dac, aoc |
 | status |  | Dropdown | False | plugged | plugged, spare, decommissioned |
 | form_factor | The physical form factor of the transceiver. | Dropdown | False |  | sfp, sfp_plus, qsfp, qsfp_plus, qsfp28, qsfp_dd, cfp, cfp2, cfp4, xfp, sfp56, qsfp56, osfp |
 
@@ -140,6 +140,10 @@ generics:
       description: Long Range 4-lane transceiver, typically used for longer distances
         over parallel optics.
       color: '#336699'
+    - name: dr4
+      label: DR4 (500m Range 4-lane)
+      description: 500 m 4-lane transceiver over parallel single mode fiber.
+      color: '#339966'
     - name: zr
       label: ZR (Extended Reach)
       description: Extended Reach transceiver, suitable for distances up to 80km.
