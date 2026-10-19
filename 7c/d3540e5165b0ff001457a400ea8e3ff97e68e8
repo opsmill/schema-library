@@ -1,0 +1,31 @@
+base/dcim.yml
+  s_756605d570e551::t_027f9f5b46db05 107,359-365
+changelog/+device-type-devices.added.md
+  s_756605d570e551::t_ec74107a6906b5 1
+docs/docs/reference/dcim.mdx
+  s_a2f1b17812bc2b::t_dc2334601800de 37,324,568-574
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7cd3540e5165b0ff001457a400ea8e3ff97e68e8",
+  "prompts": {},
+  "sessions": {
+    "s_756605d570e551": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aa5f797e-cef4-4e76-a45c-47dfa58fbec5",
+        "model": "unknown"
+      },
+      "human_author": "Bearchitek <benoit@opsmill.com>"
+    },
+    "s_a2f1b17812bc2b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "800e1b10-7585-4fd4-bff7-57b8118ec85e",
+        "model": "unknown"
+      },
+      "human_author": "Bearchitek <benoit@opsmill.com>"
+    }
+  }
+}
