@@ -34,6 +34,7 @@ Base DCIM schema: device types, platforms, devices, and physical and virtual int
 | name | peer | optional | cardinality | kind |
 | ---- | ---- | -------- | ----------- | ---- |
 | manufacturer | OrganizationManufacturer | False | one | Attribute |
+| devices | DcimPhysicalDevice | True | many | Generic |
 
 ### Platform
 
@@ -320,6 +321,7 @@ generics:
     kind: Attribute
     cardinality: one
     optional: true
+    identifier: dcimdevicetype__dcimphysicaldevice
     order_weight: 1150
   - name: location
     peer: LocationHosting
@@ -563,6 +565,13 @@ nodes:
     optional: false
     identifier: manufacturer__device_type
     order_weight: 1250
+  - name: devices
+    peer: DcimPhysicalDevice
+    kind: Generic
+    cardinality: many
+    optional: true
+    identifier: dcimdevicetype__dcimphysicaldevice
+    order_weight: 1300
 - name: Platform
   namespace: Dcim
   description: A Platform represent the type of software running on a device.
