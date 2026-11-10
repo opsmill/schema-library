@@ -2,7 +2,7 @@ import os
 
 from invoke import Collection, Context, task
 
-from . import docs, linter, schemas
+from . import docs, linter, marketplace, schemas
 
 VERSION = os.getenv("INFRAHUB_VERSION", None)
 DOCKER_PROJECT = os.getenv("INFRAHUB_BUILD_NAME", "schema-library-ci")
@@ -13,6 +13,7 @@ ns = Collection()
 ns.add_collection(Collection.from_module(linter))
 ns.add_collection(Collection.from_module(schemas))
 ns.add_collection(Collection.from_module(docs))
+ns.add_collection(Collection.from_module(marketplace))
 
 
 @task(name="start")

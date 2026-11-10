@@ -1,0 +1,106 @@
+---
+# yamllint disable rule:line-length
+name: Publish release
+
+# Fires when a release pull request lands on `main`: creates the `vX.Y.Z` tag
+# and the GitHub Release, whose body is the changelog section assembled by
+# release-prepare.yml.
+#
+# Publishing the Release is what triggers marketplace-publish.yml (test gate,
+# then the Marketplace). It is created with the bot token on purpose: events
+# raised with the default GITHUB_TOKEN do not trigger other workflows.
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release-publish
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Tag and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v7"
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Decide whether this push is a release
+        id: decide
+        env:
+          GH_TOKEN: ${{ secrets.GH_INFRAHUB_BOT_TOKEN }}
+        run: |
+          set -euo pipefail
+          # pyproject.toml is canonical: release-prepare.yml bumps it, and
+          # marketplace-publish.yml checks the tag against it.
+          VERSION=$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+
+          # Keyed on "is there a tag for the version on disk?" rather than on
+          # the commit message, so it behaves the same whether the release PR
+          # was squashed, rebased or merged.
+          if git rev-parse -q --verify "refs/tags/v${VERSION}" >/dev/null; then
+            echo "v${VERSION} is already tagged — nothing to publish."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # An untagged version is not on its own an authorisation to release:
+          # a hand-edited pyproject.toml would otherwise cut a release of its
+          # own accord. Publishing also requires this commit to be the merge
+          # of a release pull request.
+          RELEASE_PR=$(
+            gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/pulls" \
+              --jq '[.[]
+                     | select(.merged_at != null)
+                     | select(.head.ref | startswith("release/v"))
+                     | .number] | first // empty'
+          )
+          if [ -z "${RELEASE_PR}" ]; then
+            echo "${GITHUB_SHA} is not the merge of a release/v* pull request — nothing to publish."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "v${VERSION} authorised by merged release PR #${RELEASE_PR} — publishing."
+          echo "publish=true" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Extract the changelog section
+        if: steps.decide.outputs.publish == 'true'
+        env:
+          VERSION: ${{ steps.decide.outputs.version }}
+        run: |
+          set -euo pipefail
+          # The first release heading after the towncrier marker, up to (but
+          # excluding) the next one: the section this release just added.
+          awk '
+            /<!-- towncrier release notes start -->/ { seen = 1; next }
+            seen && /^## / { if (started) exit; started = 1 }
+            started { print }
+          ' CHANGELOG.md > "${RUNNER_TEMP}/release-body.md"
+
+          if ! grep -q "v${VERSION}" "${RUNNER_TEMP}/release-body.md"; then
+            echo "::error::The newest CHANGELOG.md section is not v${VERSION}; refusing to publish mismatched notes."
+            exit 1
+          fi
+          cat "${RUNNER_TEMP}/release-body.md"
+
+      - name: Create the tag and the GitHub Release
+        if: steps.decide.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GH_INFRAHUB_BOT_TOKEN }}
+          VERSION: ${{ steps.decide.outputs.version }}
+        run: |
+          set -euo pipefail
+          gh release create "v${VERSION}" \
+            --target "${GITHUB_SHA}" \
+            --title "Schema Library - v${VERSION}" \
+            --notes-file "${RUNNER_TEMP}/release-body.md" \
+            --latest

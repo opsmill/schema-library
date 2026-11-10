@@ -1,0 +1,235 @@
+---
+# yamllint disable rule:line-length
+name: Prepare release
+
+# Path B of the OpsMill release process: preparing a release is a decision, so
+# a human dispatches this when `main` is ready to ship. It opens a release pull
+# request; merging that pull request is what publishes the release (see
+# release-publish.yml and marketplace-publish.yml).
+#
+#   gh workflow run release-prepare.yml --ref main                  # version from PR labels
+#   gh workflow run release-prepare.yml --ref main -f version=1.5.0 # version stated
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: >-
+          Version to release, e.g. 1.5.0. Leave empty to calculate it from the
+          labels on the pull requests merged since the last release.
+        required: false
+        type: string
+      force:
+        description: >-
+          Prepare the release even when it would change nothing in the
+          Marketplace (a tooling- or docs-only release).
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: release-prepare
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    name: Prepare the release pull request
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # `workflow_dispatch` runs against whichever ref the dispatcher picks.
+      # Check it before anything is checked out or bumped.
+      - name: Check the branch
+        env:
+          RELEASE_BRANCH: main
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_NAME}" != "${RELEASE_BRANCH}" ]; then
+            echo "::error::Releases are prepared from '${RELEASE_BRANCH}', not '${GITHUB_REF_NAME}'. Re-run this workflow with '${RELEASE_BRANCH}' selected as the branch."
+            exit 1
+          fi
+
+      - name: "Check out repository code"
+        uses: "actions/checkout@v7"
+        with:
+          token: ${{ secrets.GH_INFRAHUB_BOT_TOKEN }}
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: "Set up Python"
+        uses: "actions/setup-python@v7"
+        with:
+          python-version: "3.12"
+      - name: "Install uv"
+        uses: "astral-sh/setup-uv@v7"
+        with:
+          version: "0.9.18"
+      - name: "Install dependencies"
+        run: "uv sync --group dev"
+
+      # One version string, from one of two sources. This step's only output
+      # is that string: the seam for a later move onto the shared
+      # `release-prepare` workflow (`bump-strategy: manual` + `version:`).
+      - name: Calculate next version from PR labels
+        id: next
+        if: inputs.version == ''
+        uses: patrickjahns/version-drafter-action@v1.3.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_INFRAHUB_BOT_TOKEN }}
+
+      - name: Resolve the version
+        id: resolved
+        env:
+          # Read through the environment: the input is free text.
+          INPUT_VERSION: ${{ inputs.version }}
+          DRAFTED_VERSION: ${{ steps.next.outputs.next-version }}
+        run: |
+          set -euo pipefail
+          VERSION="${INPUT_VERSION:-${DRAFTED_VERSION}}"
+          VERSION="${VERSION#v}"
+
+          if ! printf '%s' "${VERSION}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::'${VERSION}' is not a usable X.Y.Z version — refusing to prepare a release from it."
+            exit 1
+          fi
+
+          LATEST=$(git tag --list 'v*' --sort=-v:refname | head -n 1)
+          if [ -n "${LATEST}" ]; then
+            HIGHEST=$(printf '%s\n%s\n' "${LATEST#v}" "${VERSION}" | sort -V | tail -n 1)
+            if [ "${HIGHEST}" != "${VERSION}" ] || [ "${LATEST#v}" = "${VERSION}" ]; then
+              echo "::error::v${VERSION} does not exceed the latest release ${LATEST}. Merge what you want in this release first, or dispatch again with a higher version."
+              exit 1
+            fi
+          fi
+
+          echo "Releasing v${VERSION} (previous: ${LATEST:-none})"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "previous=${LATEST}" >> "$GITHUB_OUTPUT"
+
+      # The release notes are assembled from news fragments, so a release must
+      # carry at least one. Same pattern as changelog-check.yml: a direct child
+      # of changelog/ named <id>.<type>.md.
+      - name: Check the news fragments
+        env:
+          VERSION: ${{ steps.resolved.outputs.version }}
+        run: |
+          set -euo pipefail
+          TYPES="security|removed|deprecated|added|changed|fixed|housekeeping"
+          FRAGMENT="^changelog/[^/]+\.(${TYPES})(\.[0-9]+)?\.md$"
+
+          shopt -s nullglob
+          KEPT=0
+          for f in changelog/*.md; do
+            [[ "$f" =~ $FRAGMENT ]] || continue
+            if ! grep -q '[^[:space:]]' "$f"; then
+              echo "::error::News fragment ${f} is empty — it would render as an empty entry. Describe the change in it, or delete the file."
+              exit 1
+            fi
+            KEPT=$((KEPT + 1))
+          done
+          if [ "${KEPT}" -eq 0 ]; then
+            echo "::error::No news fragments in changelog/ — refusing to cut v${VERSION} with an empty changelog. Add a fragment and re-run."
+            exit 1
+          fi
+
+      # Plans the Marketplace publish from public data, without a token, so it
+      # writes nothing. It fails on anything that would block the publish, and
+      # on a release that would change nothing in the Marketplace (an
+      # experimental-only change, say) unless `force` is set. The plan becomes
+      # the body of the release pull request.
+      - name: Plan the Marketplace publish
+        env:
+          VERSION: ${{ steps.resolved.outputs.version }}
+          PREVIOUS: ${{ steps.resolved.outputs.previous }}
+          FORCE: ${{ inputs.force }}
+          MARKETPLACE_URL: ${{ vars.MARKETPLACE_URL }}
+        run: |
+          set -euo pipefail
+          ARGS=(--version "${VERSION}" --preview --markdown-out "${RUNNER_TEMP}/marketplace-plan.md")
+          if [ -n "${PREVIOUS}" ]; then
+            ARGS+=(--previous-tag "${PREVIOUS}")
+          fi
+          if [ "${FORCE}" != "true" ]; then
+            ARGS+=(--require-changes)
+          fi
+          uv run invoke marketplace.publish "${ARGS[@]}"
+
+      - name: Bump the version and assemble the changelog
+        env:
+          VERSION: ${{ steps.resolved.outputs.version }}
+        run: |
+          set -euo pipefail
+          uv version "${VERSION}"
+          uv run towncrier build --version "${VERSION}" --yes
+
+      - name: Open the release pull request
+        env:
+          GH_TOKEN: ${{ secrets.GH_INFRAHUB_BOT_TOKEN }}
+          VERSION: ${{ steps.resolved.outputs.version }}
+          PREVIOUS: ${{ steps.resolved.outputs.previous }}
+        run: |
+          set -euo pipefail
+          export BRANCH="release/v${VERSION}"
+
+          git config user.name "opsmill-bot"
+          git config user.email "github-bot@opsmill.com"
+          git switch -c "${BRANCH}"
+
+          # Stage only what the bump and the changelog assembly touch.
+          git add pyproject.toml uv.lock CHANGELOG.md changelog/
+          git commit -m "chore(release): v${VERSION}"
+
+          # Dispatching again for the same version refreshes the same branch.
+          # The branch is bot-owned and regenerated every run.
+          git push --force origin "${BRANCH}"
+
+          # A run that computes a different version opens a different branch.
+          # Merging an older release pull request after this one would walk
+          # the version back, so supersede it rather than let the two race.
+          STALE=$(
+            gh pr list --state open --base main --limit 200 \
+              --json number,headRefName \
+              --jq '.[]
+                    | select(.headRefName | startswith("release/v"))
+                    | select(.headRefName != env.BRANCH)
+                    | .number'
+          )
+          for PR in ${STALE}; do
+            echo "Closing release PR #${PR}, superseded by ${BRANCH}."
+            gh pr close "${PR}" --comment "Superseded by the release pull request for v${VERSION}."
+          done
+
+          BODY="${RUNNER_TEMP}/body.md"
+          {
+            echo "Prepared on request. **Merging this pull request publishes the release:**"
+            echo "\`release-publish.yml\` tags \`v${VERSION}\` and creates the GitHub Release, then"
+            echo "\`marketplace-publish.yml\` runs the full test suite against the tag and publishes"
+            echo "to the Marketplace."
+            echo
+            echo "- Version bumped to \`${VERSION}\` (previous release: \`${PREVIOUS:-none}\`)"
+            echo "- \`CHANGELOG.md\` assembled from the news fragments, which this commit consumes"
+            echo "- Every CI check runs on this pull request, including the schema load"
+            echo
+            echo "Review the changelog and the Marketplace plan below before merging. A wrong"
+            echo "version is fixed by dispatching again with \`-f version=…\`, never by editing"
+            echo "this branch."
+            echo
+            cat "${RUNNER_TEMP}/marketplace-plan.md"
+          } > "${BODY}"
+
+          # Only an *open* pull request counts as already prepared.
+          OPEN_PR=$(gh pr list --head "${BRANCH}" --state open --json number --jq '.[0].number // empty')
+          if [ -n "${OPEN_PR}" ]; then
+            gh pr edit "${OPEN_PR}" --body-file "${BODY}"
+            echo "Release PR #${OPEN_PR} for ${BRANCH} already open — updated in place."
+            exit 0
+          fi
+
+          gh pr create \
+            --base main \
+            --head "${BRANCH}" \
+            --title "chore(release): v${VERSION}" \
+            --label "ci/skip-changelog" \
+            --body-file "${BODY}"
