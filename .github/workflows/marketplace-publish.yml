@@ -8,11 +8,13 @@ name: Marketplace publish
 # (no review queue); a schema removed or renamed in Git is deprecated.
 #
 # Runs when release-publish.yml publishes the GitHub Release for `vX.Y.Z`:
-# first the full CI suite against the tag (the gate), then the publish.
+# first the full CI suite against the tag (the gate), then the publish. The
+# release version is the tag; pyproject.toml describes helper tooling and is
+# not read here. A pre-release is never published to the Marketplace.
 #
 # Manual runs, e.g. to retry after a Marketplace outage or to dry-run:
-#   gh workflow run marketplace-publish.yml --ref v1.5.0 -f preview=false  # publish a tag
-#   gh workflow run marketplace-publish.yml --ref main -f version=1.5.0    # plan only, any ref
+#   gh workflow run marketplace-publish.yml --ref v2.0.0 -f preview=false  # publish a tag
+#   gh workflow run marketplace-publish.yml --ref main -f version=2.0.0    # plan only, any ref
 on:
   release:
     types: [published]
@@ -23,7 +25,7 @@ on:
         type: boolean
         default: true
       version:
-        description: "Version to plan for (preview only; defaults to pyproject.toml)"
+        description: "Version to plan for (preview only; defaults to the tag when run on one)"
         type: string
         required: false
 
@@ -38,18 +40,49 @@ permissions:
   pull-requests: read
 
 jobs:
+  # Cheap, and first on purpose: a tag the Marketplace cannot take is refused
+  # before the long test run, not after it.
+  release:
+    name: Resolve the release
+    if: >-
+      (github.event_name == 'release' && !github.event.release.prerelease)
+      || (github.event_name == 'workflow_dispatch' && !inputs.preview)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - name: Resolve the release
+        id: release
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_TYPE}" != "tag" ]; then
+            echo "::error::Publishing needs a release tag, not '${GITHUB_REF_NAME}'. Dispatch with --ref vX.Y.Z."
+            exit 1
+          fi
+          VERSION="${GITHUB_REF_NAME#v}"
+          # The Marketplace versions schemas with semantic versions. The
+          # release process also allows post-releases (2.0.0.post1), which
+          # have no semantic-version spelling.
+          if ! printf '%s' "${VERSION}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Tag ${GITHUB_REF_NAME} is not a plain X.Y.Z version, so it cannot be published to the Marketplace."
+            exit 1
+          fi
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
   gate:
     name: Gate
-    if: github.event_name == 'release' || !inputs.preview
+    needs: release
     uses: ./.github/workflows/ci.yml
     with:
       full: true
 
   publish:
     name: Publish to the Marketplace
-    needs: gate
-    # The environment holds the admin token and only deploys `v*` tags, so
-    # nothing but a release tag can write to the Marketplace.
+    needs: [release, gate]
+    # The environment holds the admin token. Without protection rules the
+    # workflow still runs, so the tag check above is what keeps a branch from
+    # publishing.
     environment: marketplace
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -70,24 +103,6 @@ jobs:
       - name: "Install dependencies"
         run: "uv sync"
 
-      - name: Resolve the release
-        id: release
-        run: |
-          set -euo pipefail
-          if [ "${GITHUB_REF_TYPE}" != "tag" ]; then
-            echo "::error::Publishing needs a release tag, not '${GITHUB_REF_NAME}'. Dispatch with --ref vX.Y.Z."
-            exit 1
-          fi
-          VERSION=$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
-          if [ "${GITHUB_REF_NAME}" != "v${VERSION}" ]; then
-            echo "::error::Tag ${GITHUB_REF_NAME} does not match pyproject.toml version ${VERSION}."
-            exit 1
-          fi
-          PREVIOUS=$(git describe --tags --abbrev=0 --match 'v*' "${GITHUB_REF_NAME}^" 2>/dev/null || true)
-          echo "Publishing v${VERSION} (previous release: ${PREVIOUS:-none})"
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "previous=${PREVIOUS}" >> "$GITHUB_OUTPUT"
-
       # Plans first and writes nothing unless the whole plan is clean; the
       # report lands in the job summary either way. Re-running for the same
       # tag is safe: what already landed reports as unchanged.
@@ -95,11 +110,12 @@ jobs:
         env:
           MARKETPLACE_URL: ${{ vars.MARKETPLACE_URL }}
           MARKETPLACE_TOKEN: ${{ secrets.MARKETPLACE_TOKEN }}
-          VERSION: ${{ steps.release.outputs.version }}
-          PREVIOUS: ${{ steps.release.outputs.previous }}
+          VERSION: ${{ needs.release.outputs.version }}
         run: |
           set -euo pipefail
           ARGS=(--version "${VERSION}" --diff)
+          PREVIOUS=$(git describe --tags --abbrev=0 --match 'v*' "${GITHUB_REF_NAME}^" 2>/dev/null || true)
+          echo "Publishing v${VERSION} (previous release: ${PREVIOUS:-none})"
           if [ -n "${PREVIOUS}" ]; then
             ARGS+=(--previous-tag "${PREVIOUS}")
           fi
@@ -135,7 +151,14 @@ jobs:
           INPUT_VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
-          VERSION="${INPUT_VERSION:-$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')}"
+          VERSION="${INPUT_VERSION#v}"
+          if [ -z "${VERSION}" ] && [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          if [ -z "${VERSION}" ]; then
+            echo "::error::State the version to plan for, e.g. -f version=2.0.0."
+            exit 1
+          fi
           ARGS=(--version "${VERSION}" --preview --diff)
           PREVIOUS=$(git describe --tags --abbrev=0 --match 'v*' HEAD 2>/dev/null || true)
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then

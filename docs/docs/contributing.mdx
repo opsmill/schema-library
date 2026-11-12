@@ -18,56 +18,6 @@ To add documentation for your schema:
 - Run `invoke docs.generate` to generate documentation files.
 - Then run `invoke docs.build` and `invoke docs.serve` to build and serve the documentation locally.
 
-## Releasing
-
-The [Infrahub Marketplace](https://marketplace.infrahub.app) publishes the schemas in this repository. Nothing reaches it when a pull request merges: a release is cut on request, passes the full test suite, and only then is published.
-
-### What a release publishes
-
-- Every schema under `base/` and `extensions/`, with its `name` and `description` from `.metadata.yml`.
-- A schema whose content changed since its last published version gets a new Marketplace version equal to the release version. A `v1.5.0` release publishes changed schemas at `1.5.0` and leaves unchanged ones at their current version, so "library v1.5.0" means each schema at its highest version up to `1.5.0`.
-- A schema removed from `base/` or `extensions/` is deprecated on the Marketplace. A renamed one is deprecated with a pointer to its new name, which is published as a new schema. The Marketplace doesn't delete published versions.
-- `experimental/` is never published. Experimental schemas already on the Marketplace stay as they are. To publish one, move it to `extensions/` in a pull request.
-- Collections aren't changed by a release. If a schema belongs to a collection, align the collection in the Marketplace after the release.
-
-### Every pull request
-
-- Add a news fragment under `changelog/`, named `<id>.<type>.md`, where `<type>` is `security`, `removed`, `deprecated`, `added`, `changed`, `fixed` or `housekeeping`. The fragments become the release notes.
-- Label the pull request with the size of the change. The labels on the pull requests merged since the last release recommend the next version, and the highest one wins:
-
-| Bump  | Labels                                                                     |
-| ----- | -------------------------------------------------------------------------- |
-| Major | `changes/major`, `type/breaking-change`                                    |
-| Minor | `changes/minor`, `type/feature`, `type/refactoring`                        |
-| Patch | `changes/patch`, `type/bug`, `type/housekeeping`, `type/documentation`     |
-
-### Cutting a release
-
-1. Dispatch the **Prepare release** workflow from `main`:
-
-   ```bash
-   gh workflow run release-prepare.yml --ref main                  # version from the labels
-   gh workflow run release-prepare.yml --ref main -f version=1.5.0 # version stated
-   ```
-
-   State the version when the labels recommend the wrong one. The workflow refuses a release that would change nothing on the Marketplace, such as one with only `experimental/` changes; pass `-f force=true` to release anyway.
-
-2. Review the `chore(release): vX.Y.Z` pull request it opens. Its description shows exactly what the Marketplace will receive, and every CI check runs on it, including loading every schema into Infrahub. To change the version, dispatch again with `-f version=…` rather than editing the branch.
-
-3. Merge the pull request. Merging is the publish: the `vX.Y.Z` tag and its release notes are created, the full test suite runs against the tag, and the schemas are published to the Marketplace. The **Marketplace publish** run's summary lists what changed.
-
-If the test suite fails on the tag, nothing is published. Fix the problem in a pull request and cut the next patch release. If the publish itself fails, for example because the Marketplace is unavailable, re-run it for the same tag; schemas that already landed report as unchanged:
-
-```bash
-gh workflow run marketplace-publish.yml --ref v1.5.0 -f preview=false
-```
-
-To see what a release would publish without cutting one, run the plan locally. It reads public data only and writes nothing:
-
-```bash
-uv run invoke marketplace.publish --version 1.5.0 --previous-tag v1.4.11 --preview --diff
-```
-
 ## Documentation
 
 Most documentation is generated automatically:
@@ -80,5 +30,3 @@ Most documentation is generated automatically:
 
 To modify the documentation, edit the templates in the `_templates` directory.
 After making changes, run `invoke docs.generate` to update the documentation.
-
-:::

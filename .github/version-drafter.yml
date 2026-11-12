@@ -1,8 +1,8 @@
 ---
-# Labels on the pull requests merged since the last release recommend its
-# version; the highest bump wins. release-prepare.yml reads this, and a version
-# stated at dispatch overrides it. Same label set as the other ecosystem
-# repositories.
-major-labels: ['changes/major', 'type/breaking-change']
-minor-labels: ['changes/minor', 'type/feature', 'type/refactoring']
-patch-labels: ['changes/patch', 'type/bug', 'type/housekeeping', 'type/documentation']
+# Only explicit release-intent labels drive semantic version bumps.
+major-labels:
+  - "changes/major"
+minor-labels:
+  - "changes/minor"
+patch-labels:
+  - "changes/patch"

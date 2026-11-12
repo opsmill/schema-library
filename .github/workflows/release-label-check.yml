@@ -1,0 +1,55 @@
+---
+# yamllint disable rule:truthy
+name: Release bump label
+
+# `pull_request_target` runs this workflow and the checker as they are on the
+# base branch, so a pull request cannot weaken the gate that judges it. That is
+# safe only because no pull-request code is checked out or run: the checker
+# reads the event payload alone. Keep it that way — never add a checkout of the
+# head ref here. A consequence: the check does not run on the pull request
+# that introduces or changes it.
+on:
+  pull_request_target:
+    branches:
+      - main
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+
+permissions: {}
+
+# Applying several labels at once fires one `labeled` event per label; without
+# this, an early run that saw only some of them can finish last and leave a
+# stale red check.
+concurrency:
+  group: label-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Require one release bump label
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Validate release bump label
+        env:
+          PR_AUTHOR_LOGIN: ${{ github.event.pull_request.user.login }}
+          PR_HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          PR_LABELS_JSON: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          REPOSITORY: ${{ github.repository }}
+        run: >-
+          python scripts/check_release_labels.py
+          --author-login "${PR_AUTHOR_LOGIN}"
+          --head-repository "${PR_HEAD_REPOSITORY}"
+          --labels-json "${PR_LABELS_JSON}"
+          --head-ref "${PR_HEAD_REF}"
+          --repository "${REPOSITORY}"
+          --title "${PR_TITLE}"

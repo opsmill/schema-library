@@ -31,31 +31,6 @@
   description: "Item we know we need to improve way it is implemented"
   color: "73FA20"
 
-- name: "type/breaking-change"
-  description: "Change that breaks schemas already loaded by users"
-  color: "b60205"
-
-- name: "type/refactoring"
-  description: "Restructure a schema without changing what it models"
-  color: "c5def5"
-
-# ----------------------------------
-# CHANGES
-# Override the version bump a release takes from the type/* labels.
-# See .github/version-drafter.yml.
-# ----------------------------------
-- name: "changes/major"
-  description: "Release this change as a major version"
-  color: "b60205"
-
-- name: "changes/minor"
-  description: "Release this change as a minor version"
-  color: "fbca04"
-
-- name: "changes/patch"
-  description: "Release this change as a patch version"
-  color: "0e8a16"
-
 # ----------------------------------
 # TYPE ALL
 # ----------------------------------
@@ -170,3 +145,16 @@
 - name: "ci/skip-changelog"
   description: "No changelog fragment required"
   color: "ededed"
+
+# Release Drafter uses exactly one of these labels on each change PR.
+- name: "changes/major"
+  description: "Release with breaking changes"
+  color: "b60205"
+
+- name: "changes/minor"
+  description: "Release with new features"
+  color: "0e8a16"
+
+- name: "changes/patch"
+  description: "Release with fixes or maintenance"
+  color: "fbca04"
