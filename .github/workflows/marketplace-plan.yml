@@ -1,0 +1,71 @@
+---
+# yamllint disable rule:line-length
+# yamllint disable rule:truthy
+name: Marketplace plan
+
+# Shows what the Marketplace will receive when a release pull request merges,
+# before anyone merges it: which schemas get a new version, which are
+# deprecated, and the payload diffs. The report is in the job summary.
+#
+# Planning reads public data only, with no token, so it writes nothing. The job
+# fails when the plan has a blocking problem (for example a schema whose
+# Marketplace history cannot take this version), so that surfaces on the
+# release pull request rather than after the merge.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: marketplace-plan-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    name: Plan the Marketplace publish
+    # Only the pull requests auto-bump.yml opens, from a branch of this
+    # repository.
+    if: >-
+      startsWith(github.head_ref, 'release/v')
+      && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: "Check out repository code"
+        uses: "actions/checkout@v7"
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: "Set up Python"
+        uses: "actions/setup-python@v7"
+        with:
+          python-version: "3.12"
+      - name: "Install uv"
+        uses: "astral-sh/setup-uv@v7"
+        with:
+          version: "0.9.18"
+      - name: "Install dependencies"
+        run: "uv sync"
+
+      - name: Plan
+        env:
+          MARKETPLACE_URL: ${{ vars.MARKETPLACE_URL }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          VERSION="${HEAD_REF#release/v}"
+          # Same rule as marketplace-publish.yml: only plain X.Y.Z releases
+          # reach the Marketplace.
+          if ! printf '%s' "${VERSION}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::notice::${VERSION} is not a plain X.Y.Z version, so this release is not published to the Marketplace."
+            exit 0
+          fi
+          ARGS=(--version "${VERSION}" --preview --diff)
+          PREVIOUS=$(git describe --tags --abbrev=0 --match 'v*' HEAD 2>/dev/null || true)
+          if [ -n "${PREVIOUS}" ]; then
+            ARGS+=(--previous-tag "${PREVIOUS}")
+          fi
+          uv run invoke marketplace.publish "${ARGS[@]}"
