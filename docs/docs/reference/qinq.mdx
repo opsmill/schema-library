@@ -19,6 +19,7 @@ This schema extension adds the Service VLAN and Customer VLAN nodes needed to mo
 - **Namespace:** Ipam
 - **Uniqueness Constraints:**
     - vlan_id__value, vlan_group
+    - name__value
 - **Inherit From:** IpamGenericVLAN
 
 #### Relationships
@@ -64,6 +65,7 @@ nodes:
   uniqueness_constraints:
   - - vlan_id__value
     - vlan_group
+  - - name__value
   relationships:
   - name: cvlan
     peer: IpamCVLAN
