@@ -47,6 +47,10 @@ generics:
             label: LR4 (Long Range 4-lane)
             description: Long Range 4-lane transceiver, typically used for longer distances over parallel optics.
             color: "#336699"
+          - name: dr4
+            label: DR4 (500m Range 4-lane)
+            description: 500 m 4-lane transceiver over parallel single mode fiber.
+            color: "#339966"
           - name: zr
             label: ZR (Extended Reach)
             description: Extended Reach transceiver, suitable for distances up to 80km.
