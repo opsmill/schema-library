@@ -1,0 +1,1 @@
+Every push to every branch now validates each schema in `base/` and `extensions/` offline with `infrahubctl validate schema`, and reports each failing file as a GitHub annotation. The schema load in a pull request waits for this check, so a malformed schema fails before Infrahub starts.

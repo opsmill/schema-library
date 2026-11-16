@@ -3,9 +3,9 @@
 name: "CI"
 on:
   pull_request:
-  push:
-    branches:
-      - main
+  # Pushes are not built here: schema-validate.yml runs on every push, and the
+  # heavier checks run on pull requests and on the release gate below.
+  #
   # The release gate: marketplace-publish.yml calls this workflow with
   # `full: true`, so every check runs against the tagged commit regardless of
   # which files changed. Checks added here gate releases automatically.
@@ -139,11 +139,22 @@ jobs:
       - name: "Linting: rumdl"
         run: "uv run rumdl check ."
 
+  schema-validate:
+    name: Validate all schema files
+    needs: ["files-changed"]
+    if: |
+      always() && !cancelled() &&
+      (inputs.full || needs.files-changed.outputs.schema == 'true' || startsWith(github.head_ref, 'release/v'))
+    uses: ./.github/workflows/schema-validate.yml
+    permissions:
+      contents: read
+
   schema-test:
     name: Test all schema files
     needs:
       - files-changed
       - yaml-lint
+      - schema-validate
     if: |
       always() && !cancelled() &&
       !contains(needs.*.result, 'failure') &&
