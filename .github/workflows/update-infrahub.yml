@@ -1,0 +1,91 @@
+---
+# yamllint disable rule:truthy rule:line-length
+name: Update Infrahub version
+
+# Infrahub publishes a release, which sends `trigger-infrahub-update` with the
+# version in the payload. This workflow moves the pin in pyproject.toml and the
+# matrix in ci.yml to that version, then opens a pull request that the SA team
+# reviews. Nothing is merged automatically.
+on:
+  repository_dispatch:
+    types: [trigger-infrahub-update]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Infrahub version to test against, for example 1.12.1"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    name: Open the version bump pull request
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: update-infrahub-${{ github.event.client_payload.version || inputs.version }}
+      cancel-in-progress: false
+    env:
+      # Read through the environment: the version is free text from outside this workflow.
+      RAW_VERSION: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.version || inputs.version }}
+      GH_TOKEN: ${{ secrets.GH_UPDATE_PACKAGE_OTTO }}
+    steps:
+      - name: Validate the version
+        run: |
+          set -euo pipefail
+          VERSION="${RAW_VERSION#v}"
+          if ! [[ "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::'${VERSION}' is not a version in the form X.Y.Z."
+            exit 1
+          fi
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+
+      - name: Check out repository code
+        uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.GH_UPDATE_PACKAGE_OTTO }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.9.18"
+          python-version: "3.12"
+
+      - name: Update infrahub-testcontainers and the CI matrix
+        run: |
+          set -euo pipefail
+          uv add --group integration "infrahub-testcontainers==${VERSION}"
+          sed -i -E "s/(infrahub-version: \[\")[0-9]+\.[0-9]+\.[0-9]+(\"\])/\1${VERSION}\2/" .github/workflows/ci.yml
+          grep -q "infrahub-version: \[\"${VERSION}\"\]" .github/workflows/ci.yml
+          echo "Schemas are now tested against Infrahub ${VERSION}." > "changelog/+infrahub-${VERSION}.housekeeping.md"
+
+      - name: Commit and push the branch
+        run: |
+          set -euo pipefail
+          BRANCH="infrahub-update/v${VERSION}"
+          git config user.name "opsmill-bot"
+          git config user.email "github-bot@opsmill.com"
+          git switch -c "${BRANCH}"
+          git add pyproject.toml uv.lock .github/workflows/ci.yml "changelog/+infrahub-${VERSION}.housekeeping.md"
+          git commit -m "chore: test schemas against Infrahub ${VERSION}"
+          # The branch belongs to this workflow and is rebuilt on every run for the same version.
+          git push --force origin "${BRANCH}"
+
+      - name: Open the pull request
+        run: |
+          set -euo pipefail
+          BRANCH="infrahub-update/v${VERSION}"
+          OPEN_PR=$(gh pr list --head "${BRANCH}" --state open --json number --jq '.[0].number // empty')
+          if [ -n "${OPEN_PR}" ]; then
+            echo "Pull request #${OPEN_PR} for ${BRANCH} is already open and was updated in place."
+            exit 0
+          fi
+          gh pr create \
+            --base main \
+            --head "${BRANCH}" \
+            --title "chore: test schemas against Infrahub ${VERSION}" \
+            --label "changes/patch" \
+            --reviewer "opsmill/sa" \
+            --body "Moves the \`infrahub-testcontainers\` pin and the Infrahub version in the \`schema-test\` job to ${VERSION}. The \`schema-test\` job loads every non-experimental schema into Infrahub ${VERSION}. Review the result and merge when it passes."

@@ -48,14 +48,14 @@ def _build_dependency_graph(metadata):
 # Topological sort to determine a safe load order
 def _resolve_load_order(graph, all_extensions):
     all_exts = copy.deepcopy(all_extensions)
-    load_order = []  # List to store the final load order
+    order = []  # List to store the final load order
     queue = deque([node for node, deps in all_exts.items() if not deps])
 
     # While we have something to proceed
     while queue:
         # Pick first element in the queue and add it to the result
         current = queue.popleft()
-        load_order.append(current)
+        order.append(current)
 
         # Remove 'current' from the dependencies of all other nodes
         for node in all_exts:
@@ -66,28 +66,36 @@ def _resolve_load_order(graph, all_extensions):
                     # We add it to the queue to be proceed!
                     queue.append(node)
 
-    if len(load_order) != len(all_exts):
+    if len(order) != len(all_exts):
         # Remove debugging output, just raise error
         raise ValueError("Cycle detected in dependency graph!")
 
-    return load_order
+    return order
+
+
+def load_order(include_experimental: bool = False) -> list[str]:
+    """Return the schema paths to load, in an order that respects dependencies.
+
+    Each entry is a directory relative to the repository root. The dummy `base`
+    node loads the `base/` directory. Keys in `.metadata.yml` that are not
+    directories, such as `base/dcim`, are not loadable on their own and are left out.
+    Experimental schemas are included only when `include_experimental` is true.
+    """
+    metadata = _load_yaml_metadata()
+    graph, all_extensions = _build_dependency_graph(metadata)
+    repository_root = METADATA_FILE.parent
+    return [
+        entry
+        for entry in _resolve_load_order(graph, all_extensions)
+        if (include_experimental or not entry.startswith("experimental/"))
+        and (repository_root / entry).is_dir()
+    ]
 
 
 @task
 def load_all_schemas(context: Context) -> None:
-    # Parse metadata file
-    metadata = _load_yaml_metadata()
-
-    # Build dependency graph
-    graph, all_extensions = _build_dependency_graph(metadata)
-
-    # Determine the correct order to load extensions
-    load_order = _resolve_load_order(graph, all_extensions)
-
     # Load each extension respecting dependencies, skipping experimental ones unless the flag is set
-    for extension in load_order:
-        if extension.startswith("experimental/") and not TEST_EXPERIMENTAL:
-            continue
+    for extension in load_order(include_experimental=bool(TEST_EXPERIMENTAL)):
         _load_extension(context, Path(extension))
 
     print("All good! ✨")

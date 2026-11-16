@@ -78,7 +78,8 @@ jobs:
         with:
           version: "0.9.18"
       - name: "Install dependencies"
-        run: "uv sync --group dev"
+        # The integration group provides the imports that mypy and pylint resolve in tests/integration.
+        run: "uv sync --group dev --group integration"
       - name: "Linting: ruff check"
         run: "uv run ruff check ."
       - name: "Linting: ruff format"
@@ -88,7 +89,7 @@ jobs:
       - name: "Pylint Tests"
         run: "uv run pylint --ignore .venv ."
       - name: "Unit Tests"
-        run: "uv run pytest"
+        run: "uv run pytest tests/unit"
 
   yaml-lint:
     name: Run yaml lint
@@ -162,14 +163,24 @@ jobs:
       (inputs.full || needs.files-changed.outputs.schema == 'true' || startsWith(github.head_ref, 'release/v'))
     runs-on:
       group: huge-runners
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        # Infrahub version the schemas are loaded into. Keep it equal to the
+        # `infrahub-testcontainers` pin in pyproject.toml: the bump workflow
+        # (update-infrahub.yml) updates both.
+        infrahub-version: ["1.12.1"]
     env:
-      INFRAHUB_API_TOKEN: 06438eb2-8019-4776-878c-0941b1f1d1ec
-      INFRAHUB_VERSION: latest
+      INFRAHUB_TESTING_IMAGE_VER: ${{ matrix.infrahub-version }}
+      INFRAHUB_TIMEOUT: 600
+      INFRAHUB_TESTING_LOG_LEVEL: INFO
     steps:
       - name: Check out repository code
         uses: actions/checkout@v7
         with:
           submodules: true
+      - name: Install tini
+        run: apt-get update && apt-get install -y tini
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
@@ -179,24 +190,13 @@ jobs:
         with:
           version: "0.9.18"
       - name: Install dependencies
-        run: uv sync --group dev
-      - name: Set job name
-        run: echo JOB_NAME="$GITHUB_JOB" >> $GITHUB_ENV
-      - name: "Set environment variable INFRAHUB_BUILD_NAME"
-        run: echo INFRAHUB_BUILD_NAME=infrahub-${{ runner.name }} >> $GITHUB_ENV
-      - name: Initialize Infrahub
-        run: uv run invoke start
-      - name: Set infrahub address
+        run: uv sync --group dev --group integration
+      - name: Set the pytest temporary directory for the runner
         run: |
-          PORT=$(docker compose -p $INFRAHUB_BUILD_NAME port infrahub-server 8000 | cut -d: -f2)
-          echo "INFRAHUB_ADDRESS=http://localhost:${PORT}" >> $GITHUB_ENV
-      - name: "Store start time"
-        run: echo TEST_START_TIME=$(date +%s)000 >> $GITHUB_ENV
-      - name: Load all schemas files
-        run: uv run invoke schemas.load-all-schemas
-      - name: "Clear docker environment and force vmagent to stop"
-        if: always()
-        run: uv run invoke destroy
+          RUNNER_NAME=$(echo "${{ runner.name }}" | grep -o 'ghrunner[0-9]\+' | sed 's/ghrunner\([0-9]\+\)/ghrunner_\1/')
+          echo "PYTEST_DEBUG_TEMPROOT=/var/lib/github/${RUNNER_NAME}/_temp" >> $GITHUB_ENV
+      - name: Load all schemas into Infrahub
+        run: exec tini -s -g -- uv run pytest tests/integration -v
 
   check-documentation:
     name: Check generated documentation is up to date
