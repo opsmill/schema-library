@@ -15,8 +15,8 @@ from .conftest import TestSchemaLibrary
 
 # The `infrahubctl` installed next to the running interpreter, whatever the PATH holds.
 INFRAHUBCTL = Path(sys.executable).parent / "infrahubctl"
-TRANSIENT_ERROR = "Timeout reading from cache"
-TRANSIENT_RETRIES = 2
+LOADED_MARKER = "loaded successfully"
+WAIT_RETRIES = 2
 ORDER = load_order()
 METADATA = yaml.safe_load(METADATA_FILE.read_text(encoding="utf-8"))
 
@@ -43,14 +43,11 @@ class TestSchemaLoad(TestSchemaLibrary):
 
         command = f"{INFRAHUBCTL} schema load {path} --wait 60"
         result = ctl(command)
-        # The schema is stored before `--wait` polls the instance. When that poll hits a cache
-        # timeout inside Infrahub the command exits 1 even though the load succeeded, and loading
-        # the same schema again changes nothing, so retry that one case instead of failing.
-        for _ in range(TRANSIENT_RETRIES):
-            if (
-                result.returncode == 0
-                or TRANSIENT_ERROR not in result.stdout + result.stderr
-            ):
+        # The schema is stored before `--wait` polls the instance. When that poll fails, for example on a
+        # cache timeout inside Infrahub, the command exits 1 although the load succeeded. Loading the same
+        # schema again changes nothing, so retry that case instead of reporting a failed load.
+        for _ in range(WAIT_RETRIES):
+            if result.returncode == 0 or LOADED_MARKER not in result.stdout:
                 break
             result = ctl(command)
         if result.returncode != 0:
