@@ -6,6 +6,19 @@ on:
   push:
     branches:
       - main
+  # The release gate: marketplace-publish.yml calls this workflow with
+  # `full: true`, so every check runs against the tagged commit regardless of
+  # which files changed. Checks added here gate releases automatically.
+  #
+  # Release pull requests (`release/v*`) also run everything: they only touch
+  # the version and the changelog, so the path filter would otherwise skip the
+  # schema load on exactly the pull request whose merge publishes a release.
+  workflow_call:
+    inputs:
+      full:
+        description: "Run every check, ignoring the changed-files filter"
+        type: boolean
+        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,6 +35,9 @@ env:
 jobs:
   files-changed:
     name: Detect which file has changed
+    # A full run checks everything, so there is nothing to filter — and a
+    # `release` event has no base to diff against.
+    if: ${{ !inputs.full }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -44,7 +60,9 @@ jobs:
           filters: .github/file-filters.yml
 
   python-lint:
-    if: needs.files-changed.outputs.python == 'true'
+    if: |
+      always() && !cancelled() &&
+      (inputs.full || needs.files-changed.outputs.python == 'true' || startsWith(github.head_ref, 'release/v'))
     needs: ["files-changed"]
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
@@ -74,7 +92,9 @@ jobs:
 
   yaml-lint:
     name: Run yaml lint
-    if: needs.files-changed.outputs.yaml == 'true'
+    if: |
+      always() && !cancelled() &&
+      (inputs.full || needs.files-changed.outputs.yaml == 'true' || startsWith(github.head_ref, 'release/v'))
     needs: ["files-changed"]
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
@@ -96,7 +116,9 @@ jobs:
 
   markdown-lint:
     name: Run markdown lint
-    if: needs.files-changed.outputs.markdown == 'true'
+    if: |
+      always() && !cancelled() &&
+      (inputs.full || needs.files-changed.outputs.markdown == 'true' || startsWith(github.head_ref, 'release/v'))
     needs: ["files-changed"]
     runs-on: "ubuntu-latest"
     timeout-minutes: 5
@@ -126,7 +148,7 @@ jobs:
       always() && !cancelled() &&
       !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled') &&
-      needs.files-changed.outputs.schema == 'true'
+      (inputs.full || needs.files-changed.outputs.schema == 'true' || startsWith(github.head_ref, 'release/v'))
     runs-on:
       group: huge-runners
     env:
