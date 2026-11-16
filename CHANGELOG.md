@@ -4,6 +4,27 @@ This project uses [*towncrier*](https://towncrier.readthedocs.io/) and the chang
 
 <!-- towncrier release notes start -->
 
+## [Schema Library - v2.0.1](https://github.com/opsmill/schema-library/tree/v2.0.1) - 2026-11-16
+
+### Added
+
+- A device type lists the devices of that type: `DcimDeviceType` has a `devices` relationship, the reverse of `device_type` on `DcimPhysicalDevice`.
+- Schemas now reach the [Infrahub Marketplace](https://marketplace.infrahub.app) through a release
+  rather than a daily sync of `main`. Publishing the GitHub Release for `vX.Y.Z` runs the full test
+  suite against the tag, then publishes every `base/` and `extensions/` schema whose content changed
+  at version `X.Y.Z`. A schema removed or renamed here is deprecated on the Marketplace, and
+  `experimental/` is never published. The release pull request shows what the Marketplace will
+  receive before it is merged. See `RELEASING.md`.
+
+### Housekeeping
+
+- Documentation tooling now matches the other OpsMill repositories. The docs site is built with
+  pnpm rather than npm (`docs/pnpm-lock.yaml` replaces `docs/package-lock.json`), and Markdown is
+  linted with [rumdl](https://github.com/rvben/rumdl), configured under `[tool.rumdl]` in
+  `pyproject.toml`, rather than a globally installed `markdownlint-cli`. CI no longer invokes `npm`
+  anywhere. Run `invoke docs.install` and `invoke docs.build` as before; both now shell out to pnpm.
+- Schema Library releases are prepared as reviewable pull requests before a merge publishes the GitHub Release.
+
 ## [Schema Library - v2.0.0](https://github.com/opsmill/schema-library/tree/v2.0.0) - 2026-09-15
 
 > [!WARNING]
