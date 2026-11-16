@@ -1,12 +1,20 @@
 import copy
 import os
+import sys
 from collections import defaultdict, deque
+from dataclasses import dataclass
 from pathlib import Path
 
 import yaml  # type: ignore
+from infrahub_sdk.schema import validate_schema
+from infrahub_sdk.yaml import SchemaFile
 from invoke import Context, task  # type: ignore
 
-METADATA_FILE = Path(__file__).parent.parent.resolve() / ".metadata.yml"
+REPOSITORY_ROOT = Path(__file__).parent.parent.resolve()
+METADATA_FILE = REPOSITORY_ROOT / ".metadata.yml"
+# Folders of published schemas. `experimental/` is deliberately not validated.
+VALIDATED_FOLDERS = ("base", "extensions")
+SCHEMA_SUFFIXES = {".yml", ".yaml"}
 # Flag if we need to test experimental section or not
 TEST_EXPERIMENTAL = os.getenv("TEST_EXPERIMENTAL", None)
 
@@ -91,3 +99,63 @@ def load_all_schemas(context: Context) -> None:
         _load_extension(context, Path(extension))
 
     print("All good! ✨")
+
+
+@dataclass(frozen=True)
+class Finding:
+    """One problem found in a schema file."""
+
+    path: Path
+    message: str
+
+
+def validate_schema_files(root: Path) -> list[Finding]:
+    """Validate every schema file under `base/` and `extensions/` of `root`.
+
+    Errors and warnings are both returned as findings. Every problem in every
+    file is reported, in path order.
+    """
+    findings: list[Finding] = []
+    files = sorted(
+        path
+        for folder in VALIDATED_FOLDERS
+        for path in (root / folder).rglob("*")
+        if path.is_file() and path.suffix in SCHEMA_SUFFIXES
+    )
+    for file_path in files:
+        relative = file_path.relative_to(root)
+        for schema_file in SchemaFile.load_file_from_disk(path=file_path):
+            if not schema_file.valid or not schema_file.content:
+                findings.append(
+                    Finding(relative, schema_file.error_message or "Invalid YAML file")
+                )
+                continue
+            result = validate_schema(schema=schema_file.payload)
+            findings.extend(Finding(relative, error.message) for error in result.errors)
+            findings.extend(
+                Finding(relative, f"Warning: {warning.message}")
+                for warning in result.warnings
+            )
+    return findings
+
+
+def _escape_annotation(value: str) -> str:
+    """Escape a value for a GitHub workflow command."""
+    return value.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+
+def format_annotation(finding: Finding) -> str:
+    return f"::error file={_escape_annotation(finding.path.as_posix())}::{_escape_annotation(finding.message)}"
+
+
+@task
+def validate(context: Context) -> None:  # pylint: disable=unused-argument
+    """Validate every schema in `base/` and `extensions/` without starting Infrahub."""
+    findings = validate_schema_files(REPOSITORY_ROOT)
+    for finding in findings:
+        print(format_annotation(finding))
+    if findings:
+        files = len({finding.path for finding in findings})
+        print(f"Found {len(findings)} problem(s) in {files} file(s).")
+        sys.exit(1)
+    print("All schemas are valid.")

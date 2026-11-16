@@ -1,0 +1,1 @@
+Every push to every branch now validates each schema in `base/` and `extensions/` offline and reports each problem with its file path as a GitHub annotation. The schema load in a pull request waits for this check, so a malformed schema fails before Infrahub starts. Run it locally with `uv run invoke schemas.validate`.
