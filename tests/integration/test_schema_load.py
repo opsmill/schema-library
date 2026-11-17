@@ -15,8 +15,6 @@ from .conftest import TestSchemaLibrary
 
 # The `infrahubctl` installed next to the running interpreter, whatever the PATH holds.
 INFRAHUBCTL = Path(sys.executable).parent / "infrahubctl"
-LOADED_MARKER = "loaded successfully"
-WAIT_RETRIES = 2
 ORDER = load_order()
 METADATA = yaml.safe_load(METADATA_FILE.read_text(encoding="utf-8"))
 
@@ -43,13 +41,7 @@ class TestSchemaLoad(TestSchemaLibrary):
 
         command = f"{INFRAHUBCTL} schema load {path} --wait 60"
         result = ctl(command)
-        # The schema is stored before `--wait` polls the instance. When that poll fails, for example on a
-        # cache timeout inside Infrahub, the command exits 1 although the load succeeded. Loading the same
-        # schema again changes nothing, so retry that case instead of reporting a failed load.
-        for _ in range(WAIT_RETRIES):
-            if result.returncode == 0 or LOADED_MARKER not in result.stdout:
-                break
-            result = ctl(command)
+        # Preserve convergence failures: a no-op reload skips the SDK's wait check.
         if result.returncode != 0:
             self.failed.add(path)
         assert result.returncode == 0, (
