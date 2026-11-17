@@ -27,6 +27,9 @@ dev = [
     # subtle enough to regress without being noticed until a docs build fails.
     "pytest>=8.3.0",
 ]
+integration = [
+    "infrahub-testcontainers==1.12.1",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

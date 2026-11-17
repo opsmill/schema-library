@@ -41,3 +41,24 @@ To run the plan locally:
 ```bash
 uv run invoke marketplace.publish --version 2.0.0 --previous-tag v1.4.11 --preview --diff
 ```
+
+## Infrahub version used by the tests
+
+The `schema-test` job loads every non-experimental schema into a pinned Infrahub version. The pin is `infrahub-testcontainers` in the `integration` dependency group of `pyproject.toml`; the package version equals the Infrahub image version. The same version is the `infrahub-version` matrix value in the `schema-test` job of `ci.yml`.
+
+When Infrahub publishes a release, `opsmill/infrahub` sends a `trigger-infrahub-update` repository dispatch. `update-infrahub.yml` then updates both places, adds a news fragment, and opens a pull request from the `infrahub-update/vX.Y.Z` branch with the `changes/patch` label. The SA team (`@opsmill/sa`) is the requested reviewer. Nothing merges automatically: the reviewer checks that `schema-test` passes against the new version, then merges.
+
+To move the pin without a release dispatch, run the workflow by hand:
+
+```bash
+gh workflow run update-infrahub.yml -f version=1.12.1
+```
+
+To run the schema load test locally, start Docker and run:
+
+```bash
+uv sync --group dev --group integration
+uv run pytest tests/integration -v
+```
+
+Set `INFRAHUB_TESTING_IMAGE_VER` to test against a different Infrahub version than the pin. `uv run pytest tests/unit` runs the unit tests and does not need Docker.
