@@ -1,12 +1,22 @@
+import importlib.metadata
 import os
 
 from invoke import Collection, Context, task
 
 from . import docs, linter, marketplace, schemas
 
-VERSION = os.getenv("INFRAHUB_VERSION", None)
+
+def _default_infrahub_version() -> str:
+    """Return the Infrahub version to start: the pinned test version when it is installed."""
+    try:
+        return importlib.metadata.version("infrahub-testcontainers")
+    except importlib.metadata.PackageNotFoundError:
+        return "stable"
+
+
+VERSION = os.getenv("INFRAHUB_VERSION") or _default_infrahub_version()
 DOCKER_PROJECT = os.getenv("INFRAHUB_BUILD_NAME", "schema-library-ci")
-COMPOSE_COMMAND = f"curl -fsSL https://infrahub.opsmill.io/{VERSION if VERSION else 'stable'} | sed 's/8000:8000/0:8000/' | docker compose -p {DOCKER_PROJECT} -f -"  # noqa: line-too-long
+COMPOSE_COMMAND = f"curl -fsSL https://infrahub.opsmill.io/{VERSION} | sed 's/8000:8000/0:8000/' | docker compose -p {DOCKER_PROJECT} -f -"  # noqa: line-too-long
 
 ns = Collection()
 

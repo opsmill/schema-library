@@ -28,6 +28,11 @@ markdown_all: &markdown_all
 schema_all: &schema_all
   - "base/**/*.{yml,yaml}"
   - "extensions/**/*.{yml,yaml}"
+  # The Infrahub version the schemas load into comes from the testcontainers pin.
+  - "pyproject.toml"
+  - "uv.lock"
+  - "tests/integration/**"
+  - "tasks/schemas.py"
 
 documentation_all:
   - *doc_files
