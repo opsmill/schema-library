@@ -164,14 +164,7 @@ jobs:
     runs-on:
       group: huge-runners
     timeout-minutes: 60
-    strategy:
-      matrix:
-        # Infrahub version the schemas are loaded into. Keep it equal to the
-        # `infrahub-testcontainers` pin in pyproject.toml: the bump workflow
-        # (update-infrahub.yml) updates both.
-        infrahub-version: ["1.12.1"]
     env:
-      INFRAHUB_TESTING_IMAGE_VER: ${{ matrix.infrahub-version }}
       INFRAHUB_TIMEOUT: 600
       INFRAHUB_TESTING_LOG_LEVEL: INFO
     steps:
