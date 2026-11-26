@@ -3,8 +3,12 @@
 name: "CI"
 on:
   pull_request:
-  # Pushes are not built here: schema-validate.yml runs on every push, and the
-  # heavier checks run on pull requests and on the release gate below.
+  # Pushes to `main` run the same checks, so that a failure on `main` reaches
+  # notify-ci-failure.yml. Other branches are not built on push: schema-validate.yml
+  # runs on every push, and the heavier checks run on pull requests and on the
+  # release gate below.
+  push:
+    branches: [main]
   #
   # The release gate: marketplace-publish.yml calls this workflow with
   # `full: true`, so every check runs against the tagged commit regardless of

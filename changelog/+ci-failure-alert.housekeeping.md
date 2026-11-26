@@ -1,0 +1,1 @@
+When CI fails on `main`, or when a Marketplace publish run fails (the release gate or the publish itself, on a release or a manual run), a Slack message names the failed run and links to it. CI now also runs on every push to `main`.
